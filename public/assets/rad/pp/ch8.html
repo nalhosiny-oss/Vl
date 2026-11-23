@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>قبل المعمل وبعده: الوحدة الثامنة – مبادئ الوقاية من الإشعاع</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F5F6F8;--panel:#FFFFFF;--ink:#1A2230;--muted:#5A6474;--line:#DEE2E8;--acc:#3B2F0B;--onacc:#fff;--acc2:#B38F00;--chip:#ECEFF3;--ok:#2E7D4F;--okbg:#E3F1E8;--bad:#B03A2E;--badbg:#F8E1DD}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.65}
+.wrap{max-width:980px;margin:0 auto;padding:14px 14px 16px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;justify-content:space-between}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.1rem,3.2vw,1.45rem);margin:.3em 0 0}
+h1 span{color:var(--acc)}
+.tabs{display:flex;gap:8px;margin:12px 0 10px}
+.tabs button{flex:1;font:inherit;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 10px;border-radius:12px;cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.pane{display:none}.pane.on{display:block}
+.hint{color:var(--muted);font-size:.86rem;margin:0 0 8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:300px}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.tag{display:inline-block;font-size:.78rem;color:var(--acc2);border:1px solid var(--line);border-radius:999px;padding:0 10px;margin-inline-start:6px}
+.q{margin:4px 0 8px;font-size:1rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:8px 12px;border-radius:10px;margin:5px 0;cursor:pointer;min-height:42px}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.fb{margin-top:6px;font-size:.9rem;color:var(--muted)}
+.fb b{color:var(--ink)}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+textarea{width:100%;min-height:76px;font:inherit;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px;resize:vertical}
+.show{font:inherit;margin-top:6px;border:1px solid var(--acc2);background:transparent;color:var(--acc2);padding:6px 14px;border-radius:10px;cursor:pointer;min-height:40px}
+.ans{display:none;margin-top:8px;background:var(--chip);border-radius:10px;padding:8px 12px;font-size:.93rem}
+.ans.on{display:block}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.nav button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 16px;border-radius:10px;cursor:pointer;min-height:40px}
+.nav button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--acc)}
+.score{text-align:center;padding:30px 10px}
+.score .big{font-size:2rem;color:var(--acc2);font-weight:700}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+.step{font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+.do{margin-top:8px;background:var(--chip);border-inline-start:3px solid var(--acc2);border-radius:10px;padding:8px 12px;font-size:.93rem}
+.verdict{font-weight:700}
+.tabs button{font-size:clamp(.8rem,2.6vw,1rem);padding:8px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><span class="badge" id="badge"></span></div>
+<h1 id="h1"></h1>
+<nav class="tabs" role="tablist"><button role="tab" aria-selected="true" data-p="pre" id="t1"></button><button role="tab" aria-selected="false" data-p="poe" id="t3"></button><button role="tab" aria-selected="false" data-p="post" id="t2"></button></nav>
+<section class="pane on" id="pre"><p class="hint" id="h_pre"></p><div class="card" id="pc"></div><div class="nav"><button id="pp"></button><div class="dots" id="pd"></div><button id="pn"></button></div></section>
+<section class="pane" id="poe"><p class="hint" id="h_poe"></p><div class="card" id="ec"></div><div class="nav"><button id="ep"></button><div class="dots" id="ed"></div><button id="en"></button></div></section>
+<section class="pane" id="post"><p class="hint" id="h_post"></p><div class="card" id="dc"></div><div class="nav"><button id="dp"></button><div class="dots" id="dd"></div><button id="dn"></button></div></section>
+</div>
+<script>
+const D={"lang": "ar", "course": "الفيزياء الإشعاعية", "code": "2038002-4", "title": "قبل المعمل وبعده: <span>الوحدة الثامنة – مبادئ الوقاية من الإشعاع</span>", "review": "محاضرة الوحدة الثامنة: مبادئ الوقاية (ALARA)، ومسح الإشعاع ومراقبته، ومآزر الرصاص، والوقاية في الطب، وحدود الجرعة السنوية، ومراقبة التلوث، والنفايات النووية، وتوصيات ICRP.", "pre": [{"q": "حد الجرعة الفعالة السنوي للعاملين حسب ICRP:", "o": ["1 mSv", "20 mSv (متوسط 5 سنوات)", "100 mSv", "500 mSv"], "a": 1, "e": "بحد أقصى 50 mSv في سنة واحدة."}, {"q": "حد الجرعة السنوي لعامة الناس:", "o": ["1 mSv", "20 mSv", "5 mSv", "0.1 mSv"], "a": 0, "e": "من المصادر الصناعية."}, {"q": "مبدأ ALARA يعني:", "o": ["أقل جرعة يمكن تحقيقها بشكل معقول", "لا تعرض أبدًا", "جرعة ثابتة", "أعلى جرعة مسموحة"], "a": 0, "e": "As Low As Reasonably Achievable."}], "post": [{"t": "تفسير", "q": "ما المبادئ الثلاثة لنظام الوقاية الإشعاعية (ICRP)؟", "a": "التبرير (فائدة الممارسة أكبر من ضررها)، والأمثلية ALARA، وحدود الجرعة للأفراد."}, {"t": "حساب", "q": "عامل يتعرض لـ 50 μSv/h مدة ساعة يوميًا لـ 200 يوم. هل يتجاوز حد العاملين؟", "a": "<span class=\"eq\" dir=\"ltr\">50 × 200 = 10 mSv</span>، أقل من 20 mSv."}], "poe": [{"t": "الوقاية", "q": "الانتقال من 1 m إلى 2 m عن المصدر يقلل الجرعة السنوية إلى:", "o": ["النصف", "الربع", "لا تتغير"], "a": 1, "do": "في تبويب «الزمن والمسافة والتدريع» ضاعف البعد.", "e": "1/d²."}]};
+const T=D.lang==='ar'?{t1:'١) اختبار قبلي',t3:'٢) توقّع ثم جرّب',t2:'٣) مناقشة بعد المعمل',hpoe:'أثناء المعمل: توقّع النتيجة أولًا، ثم جرّبها في المعمل، ثم اقرأ التفسير.',s1:'① توقّع',s2:'② جرّب في المعمل',s3:'③ فسّر',see:'جرّبت، أظهر التفسير',hit:'توقّعك صحيح.',miss:'توقّعك يخالف النتيجة، وهذا مفيد: لاحظ السبب.',hpre:'أجب قبل فتح المعمل؛ يظهر التصحيح فور اختيارك، ولا تُحفظ النتيجة ولا تُرسل لأحد.',hpost:'بعد إنهاء المعمل: اكتب إجابتك أولًا، ثم قارنها بالإجابة النموذجية.',prev:'السابق',next:'التالي',res:'النتيجة',again:'إعادة الاختبار',ok:'إجابة صحيحة.',no:'ليست هذه.',show:'أظهر الإجابة النموذجية',hide:'أخفِ الإجابة',ph:'اكتب إجابتك هنا…',q:'السؤال',of:'من',good:'أنت مستعد للمعمل، افتحه الآن.',mid:'جيد، راجع ما أخطأت فيه ثم ابدأ المعمل.',low:'راجع المحاضرة قبل أن تبدأ المعمل: '}:{t1:'1) Pre-lab quiz',t3:'2) Predict & try',t2:'3) Post-lab discussion',hpoe:'During the lab: predict first, try it in the lab, then read the explanation.',s1:'① Predict',s2:'② Try it in the lab',s3:'③ Explain',see:'I tried it, show explanation',hit:'Your prediction was right.',miss:'Your prediction differs from the result, which is useful: see why.',hpre:'Answer before opening the lab. Feedback appears instantly; nothing is saved or sent.',hpost:'After the lab: write your own answer first, then compare it with the model answer.',prev:'Previous',next:'Next',res:'Result',again:'Retake quiz',ok:'Correct.',no:'Not quite.',show:'Show model answer',hide:'Hide answer',ph:'Write your answer here…',q:'Question',of:'of',good:'You are ready, open the lab now.',mid:'Good. Review what you missed, then start the lab.',low:'Review the lecture before starting the lab: '};
+const $=id=>document.getElementById(id);
+$('badge').innerHTML=D.course+' · <bdi dir="ltr">'+D.code+'</bdi>';$('h1').innerHTML=D.title;
+$('t1').textContent=T.t1;$('t2').textContent=T.t2;$('t3').textContent=T.t3;$('h_poe').textContent=T.hpoe;$('h_pre').textContent=T.hpre;$('h_post').textContent=T.hpost;
+['pp','dp','ep'].forEach(i=>$(i).textContent=T.prev);['pn','dn','en'].forEach(i=>$(i).textContent=T.next);
+let pi=0,st=D.pre.map(()=>-1),di=0,shown=D.post.map(()=>false),txt=D.post.map(()=>'');
+function dots(el,n,k){el.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('i');if(i===k)d.className='on';el.appendChild(d);}}
+function rPre(){const c=$('pc');const N=D.pre.length;
+if(pi===N){const s=st.filter((v,i)=>v===D.pre[i].a).length;c.innerHTML='<div class="score"><div>'+T.res+'</div><div class="big">'+s+' / '+N+'</div><p>'+(s>=N-1?T.good:(s>=Math.ceil(N/2)?T.mid:T.low+D.review))+'</p><button class="show" id="rt">'+T.again+'</button></div>';$('rt').onclick=()=>{st=st.map(()=>-1);pi=0;rPre();};}
+else{const it=D.pre[pi];c.innerHTML='<div class="qn">'+T.q+' '+(pi+1)+' '+T.of+' '+N+'</div><div class="q">'+it.q+'</div>';
+it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=t;
+if(st[pi]>=0){b.disabled=true;if(j===it.a)b.classList.add('right');else if(j===st[pi])b.classList.add('wrong');}
+b.onclick=()=>{st[pi]=j;rPre();};c.appendChild(b);});
+if(st[pi]>=0){const f=document.createElement('div');f.className='fb';f.innerHTML='<b>'+(st[pi]===it.a?T.ok:T.no)+'</b> '+it.e;c.appendChild(f);}}
+dots($('pd'),N+1,pi);$('pp').disabled=pi===0;$('pn').disabled=pi===N||(pi<N&&st[pi]<0);}
+function rPost(){const c=$('dc');const N=D.post.length;const it=D.post[di];
+c.innerHTML='<div class="qn">'+T.q+' '+(di+1)+' '+T.of+' '+N+'<span class="tag">'+it.t+'</span></div><div class="q">'+it.q+'</div><textarea placeholder="'+T.ph+'"></textarea><button class="show">'+(shown[di]?T.hide:T.show)+'</button><div class="ans'+(shown[di]?' on':'')+'">'+it.a+'</div>';
+const ta=c.querySelector('textarea');ta.value=txt[di];ta.oninput=()=>txt[di]=ta.value;
+c.querySelector('.show').onclick=()=>{shown[di]=!shown[di];rPost();};
+dots($('dd'),N,di);$('dp').disabled=di===0;$('dn').disabled=di===N-1;}
+$('pp').onclick=()=>{pi--;rPre();};$('pn').onclick=()=>{pi++;rPre();};$('dp').onclick=()=>{di--;rPost();};$('dn').onclick=()=>{di++;rPost();};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===b.dataset.p));});
+let ei=0,ech=D.poe.map(()=>-1),eopen=D.poe.map(()=>false);
+function rPoe(){const c=$('ec');const N=D.poe.length;const it=D.poe[ei];
+ c.innerHTML='<div class="qn">'+T.q+' '+(ei+1)+' '+T.of+' '+N+'<span class="tag">'+it.t+'</span></div><div class="step">'+T.s1+'</div><div class="q">'+it.q+'</div>';
+ it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=t;
+  if(ech[ei]>=0){b.disabled=true;if(eopen[ei]&&j===it.a)b.classList.add('right');else if(j===ech[ei])b.classList.add(eopen[ei]&&j!==it.a?'wrong':'right');if(!eopen[ei]&&j===ech[ei]){b.classList.remove('right');b.style.borderColor='var(--acc2)';}}
+  b.onclick=()=>{ech[ei]=j;rPoe();};c.appendChild(b);});
+ if(ech[ei]>=0){const d=document.createElement('div');d.innerHTML='<div class="step">'+T.s2+'</div><div class="do">'+it.do+'</div>'+(eopen[ei]?'<div class="step">'+T.s3+'</div><div class="fb"><span class="verdict">'+(ech[ei]===it.a?T.hit:T.miss)+'</span> '+it.e+'</div>':'<button class="show" id="see">'+T.see+'</button>');c.appendChild(d);
+  const s=c.querySelector('#see');if(s)s.onclick=()=>{eopen[ei]=true;rPoe();};}
+ dots($('ed'),N,ei);$('ep').disabled=ei===0;$('en').disabled=ei===N-1;}
+$('ep').onclick=()=>{ei--;rPoe();};$('en').onclick=()=>{ei++;rPoe();};
+rPre();rPost();rPoe();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f1"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script><script>(function(){var p=(location.hash||"#pre").slice(1);
+var b=document.querySelector('.tabs button[data-p="'+p+'"]');if(b)b.click();
+["nav.tabs",".top","#h1"].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display="none";});
+document.documentElement.style.background=document.body.style.background="transparent";})();</script>
+</body>
+</html>
