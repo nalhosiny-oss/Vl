@@ -123,10 +123,10 @@ function proj(cx,cy,s,ry,rx){return p=>{const x=p[0],y=p[1],z=p[2];const x1=x*Ma
 function ball(g,P,r,col){const gr=g.createRadialGradient(P[0]-r*0.35,P[1]-r*0.35,r*0.1,P[0],P[1],r);gr.addColorStop(0,'#fff');gr.addColorStop(1,col);g.fillStyle=gr;g.beginPath();g.arc(P[0],P[1],r,0,7);g.fill();g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=1;g.stroke();}
 
 function lab1(){const g=ctx('c1'),V=sl('i1v','o1v',v=>v.toFixed(1)),x=sl('i1x','o1x',v=>v.toFixed(2)),lmin=12.398/V;const M=frame(g,90,555,1060,510,0.2,2,0,1.2,'λ (Å)','الشدة (نسبية)');
- const mu=l=>8*Math.pow(l,3)*(l<1.38?1:0.12),cont=l=>l<=lmin?0:(l/lmin-1)/(l*l)*lmin*lmin*0.35*V/25,Ka=1.5406,Kb=1.3922,on=V>8.98;
+ const mu=l=>8*Math.pow(l,3)*(l<1.488?1:0.12),cont=l=>l<=lmin?0:(l/lmin-1)/(l*l)*lmin*lmin*0.35*V/25,Ka=1.5406,Kb=1.3922,on=V>8.98;
  const I=l=>(cont(l)+(on?0.9*(V-8.98)/20*Math.exp(-(((l-Ka)/0.008)**2))+0.25*(V-8.98)/20*Math.exp(-(((l-Kb)/0.008)**2)):0));
  plot(g,M,fn(M,I,1500),css('--muted'),2,[5,5]);plot(g,M,fn(M,l=>I(l)*Math.exp(-mu(l)*x),1500),css('--b'),3.5);plot(g,M,[[lmin,0],[lmin,1.2]],css('--r'),2,[4,5]);
- R('r1a','λ_min = hc/eV = 12.398/V(kV) = '+lmin.toFixed(3)+' Å');R('r1b',on?'خطا Kα (1.541 Å) وKβ (1.392 Å) للنحاس ظاهران':'V < 8.98 kV: لا تكفي الطاقة لإقصاء إلكترون K، فلا خطوط مميزة');R('r1c','I = I₀ e^(−μx)،  حافة امتصاص عند 1.38 Å (مرشح نيكل تقريبي)');R('r1d','رمادي: قبل الماص · أزرق: بعده');}
+ R('r1a','λ_min = hc/eV = 12.398/V(kV) = '+lmin.toFixed(3)+' Å');R('r1b',on?'خطا Kα (1.541 Å) وKβ (1.392 Å) للنحاس ظاهران':'V < 8.98 kV: لا تكفي الطاقة لإقصاء إلكترون K، فلا خطوط مميزة');R('r1c','I = I₀ e^(−μx)،  حافة امتصاص K للنيكل عند 1.488 Å تقع بين Kβ وKα فتمتص Kβ بقوة (مرشح نيكل)');R('r1d','رمادي: قبل الماص · أزرق: بعده');}
 function lab2(){const g=ctx('c2'),th=sl('i2t','o2t',v=>v.toFixed(1)+'°')*deg,d=sl('i2d','o2d',v=>v.toFixed(2)),l=sl('i2l','o2l',v=>v.toFixed(2));const s=55,y0=250,dp=d*s;
  for(let j=0;j<5;j++)for(let i=0;i<22;i++)dot(g,80+i*48,y0+j*dp,7,css('--b'));const cx=600;const L=420;
  for(let j=0;j<2;j++){const yy=y0+j*dp,xx=cx+j*dp/Math.tan(th);const dx=Math.cos(th),dy=Math.sin(th);const xa=xx-dx*L,ya=yy-dy*L;

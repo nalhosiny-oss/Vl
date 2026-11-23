@@ -104,7 +104,7 @@ const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=
 
 $('p1').onclick=()=>rs('t1');
 function lab1(){const g=ctx('c1'),w=sl('i1w','o1w',v=>v.toFixed(2)),v=sl('i1v','o1v',v=>v.toFixed(1)),Rd=3,s=70,t=Math.min(el('t1'),Rd/v),r=v*t;
- R('r1a','زمن الوصول إلى الحافة = '+(Rd/v).toFixed(2)+' s');R('r1b','قوة كوريوليس F = −2m ω × v′،  تسارعها 2ωv = '+(2*Math.abs(w)*v).toFixed(2)+' m/s²');R('r1c','الانحراف عند الحافة (في الإطار الدوّار) ≈ '+(Math.abs(w)*Rd*Rd/v).toFixed(2)+' m '+(w>0?'إلى اليمين':w<0?'إلى اليسار':''));
+ R('r1a','زمن الوصول إلى الحافة = '+(Rd/v).toFixed(2)+' s');R('r1b','قوة كوريوليس F = −2m ω × v′،  تسارعها 2ωv = '+(2*Math.abs(w)*v).toFixed(2)+' m/s²');{const th=Math.abs(w)*Rd/v,side=(w>0?'إلى اليمين':w<0?'إلى اليسار':'');R('r1c','زاوية الانحراف عند الحافة θ = ωR/v = '+th.toFixed(2)+' rad ('+(th/deg).toFixed(0)+'°) '+side+(th<=Math.PI?'،  الإزاحة الجانبية y′ = R sin θ = '+(Rd*Math.sin(th)).toFixed(2)+' m':'')+(th<0.3?'  (≈ ωR²/v للزوايا الصغيرة)':''));}
  [[330,'إطار ثابت (قصوري)',false],[870,'إطار دوّار مع القرص',true]].forEach(([cx,lab,rot])=>{const cy=300,a0=rot?0:w*t;g.fillStyle='rgba(122,78,45,.12)';g.beginPath();g.arc(cx,cy,Rd*s,0,7);g.fill();ring(g,cx,cy,Rd*s,css('--ink'),3);
   for(let k=0;k<4;k++){const b=a0+k*Math.PI/2;seg(g,cx,cy,cx+Rd*s*Math.cos(b),cy-Rd*s*Math.sin(b),css('--line'),2);}const p=[];for(let tt=0;tt<=t;tt+=0.01){const rr=v*tt,ang=rot?-w*tt:0;p.push([cx+rr*s*Math.cos(ang),cy-rr*s*Math.sin(ang)]);}poly(g,p,css('--r'),3);
   const ang=rot?-w*t:0;dot(g,cx+r*s*Math.cos(ang),cy-r*s*Math.sin(ang),10,css('--o'));text(g,lab,cx,560,css('--ink'),'center',20,true);});}
