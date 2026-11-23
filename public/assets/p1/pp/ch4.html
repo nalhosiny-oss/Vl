@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before and After the Lab: Chapter 4 – Energy of a System</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F2F8F7;--panel:#FFFFFF;--ink:#12302E;--muted:#4E6866;--line:#CFE3E0;--acc:#0F5C59;--onacc:#fff;--acc2:#C9762A;--chip:#E6F2F0;--ok:#1E8E5A;--okbg:#E3F5EC;--bad:#C63A3A;--badbg:#FBE6E6}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.65}
+.wrap{max-width:980px;margin:0 auto;padding:14px 14px 16px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;justify-content:space-between}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.1rem,3.2vw,1.45rem);margin:.3em 0 0}
+h1 span{color:var(--acc)}
+.tabs{display:flex;gap:8px;margin:12px 0 10px}
+.tabs button{flex:1;font:inherit;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 10px;border-radius:12px;cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.pane{display:none}.pane.on{display:block}
+.hint{color:var(--muted);font-size:.86rem;margin:0 0 8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:300px}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.tag{display:inline-block;font-size:.78rem;color:var(--acc2);border:1px solid var(--line);border-radius:999px;padding:0 10px;margin-inline-start:6px}
+.q{margin:4px 0 8px;font-size:1rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:8px 12px;border-radius:10px;margin:5px 0;cursor:pointer;min-height:42px}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.fb{margin-top:6px;font-size:.9rem;color:var(--muted)}
+.fb b{color:var(--ink)}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+textarea{width:100%;min-height:76px;font:inherit;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px;resize:vertical}
+.show{font:inherit;margin-top:6px;border:1px solid var(--acc2);background:transparent;color:var(--acc2);padding:6px 14px;border-radius:10px;cursor:pointer;min-height:40px}
+.ans{display:none;margin-top:8px;background:var(--chip);border-radius:10px;padding:8px 12px;font-size:.93rem}
+.ans.on{display:block}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.nav button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 16px;border-radius:10px;cursor:pointer;min-height:40px}
+.nav button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--acc)}
+.score{text-align:center;padding:30px 10px}
+.score .big{font-size:2rem;color:var(--acc2);font-weight:700}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+.step{font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+.do{margin-top:8px;background:var(--chip);border-inline-start:3px solid var(--acc2);border-radius:10px;padding:8px 12px;font-size:.93rem}
+.verdict{font-weight:700}
+.tabs button{font-size:clamp(.8rem,2.6vw,1rem);padding:8px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><span class="badge" id="badge"></span></div>
+<h1 id="h1"></h1>
+<nav class="tabs" role="tablist"><button role="tab" aria-selected="true" data-p="pre" id="t1"></button><button role="tab" aria-selected="false" data-p="poe" id="t3"></button><button role="tab" aria-selected="false" data-p="post" id="t2"></button></nav>
+<section class="pane on" id="pre"><p class="hint" id="h_pre"></p><div class="card" id="pc"></div><div class="nav"><button id="pp"></button><div class="dots" id="pd"></div><button id="pn"></button></div></section>
+<section class="pane" id="poe"><p class="hint" id="h_poe"></p><div class="card" id="ec"></div><div class="nav"><button id="ep"></button><div class="dots" id="ed"></div><button id="en"></button></div></section>
+<section class="pane" id="post"><p class="hint" id="h_post"></p><div class="card" id="dc"></div><div class="nav"><button id="dp"></button><div class="dots" id="dd"></div><button id="dn"></button></div></section>
+</div>
+<script>
+const D={"lang":"en","course":"Physics 1","code":"203205-4","title":"Before and After the Lab: <span>Chapter 4 – Energy of a System</span>","review":"Chapter 4 lecture: work, work done by a spring (Hooke's law), the work–kinetic energy theorem, power, potential energy.","pre":[{"q":"A 50 N force at 30° above the horizontal pulls an object 3.0 m horizontally. The work done is:","o":["75 J","129.9 J","150 J","0 J"],"a":1,"e":"W = Fd cos θ = 50 × 3 × cos30° ≈ 129.9 J."},{"q":"The work done by a force is zero, however large the force, when the angle between the force and the displacement is:","o":["0°","45°","90°","180°"],"a":2,"e":"cos 90° = 0, as for the normal force on an object moving horizontally."},{"q":"If the extension of a spring is doubled, the work required:","o":["doubles","increases four times","does not change","halves"],"a":1,"e":"W = ½kx<sup>2</sup>."},{"q":"An 1800 kg elevator rises at a constant 3.0 m/s against 4000 N of friction. The power needed is about:","o":["12 kW","53 kW","65 kW","120 kW"],"a":2,"e":"T = Mg + f = 17640 + 4000 = 21640 N, and P = Tv ≈ 6.5×10<sup>4</sup> W."},{"q":"The change in gravitational potential energy between two heights:","o":["depends on the choice of reference level","does not depend on the choice of reference level","is always zero","depends on the path"],"a":1,"e":"ΔU = mg(y<sub>f</sub> − y<sub>i</sub>): the difference is unaffected by moving the reference level, although the value of U itself changes."}],"post":[{"t":"Experiment 1: Work and force angle","q":"At what angle is the work zero however large the force? When is it negative? Give an example of each.","a":"It is zero at 90° (e.g. the weight of an object moving horizontally, or the centripetal force in circular motion). It is negative when the angle exceeds 90° (e.g. kinetic friction opposing the displacement)."},{"t":"Experiment 2: The spring","q":"You doubled the extension x. By what factor did the work increase? Calculate it for the default values (k = 200 N/m, x = 0.20 m).","a":"It increases four times because W = ½kx<sup>2</sup>. At x = 0.20 m: W = ½ × 200 × 0.04 = 4 J, and at x = 0.40 m: 16 J."},{"t":"Experiment 3: Work and kinetic energy","q":"A 6 kg block is pulled by a 12 N force over 3 m. Find its final speed without friction, then set μ<sub>k</sub> = 0.2: what is the smallest force that keeps it moving at constant speed?","a":"Without friction: W = 36 J = ½mv<sup>2</sup> ⇒ v = √12 ≈ 3.46 m/s. With μ<sub>k</sub> = 0.2: f<sub>k</sub> = 0.2 × 6 × 9.8 ≈ 11.8 N, so a 12 N force barely exceeds friction and the acceleration is very small."},{"t":"Experiments 4 and 5: Power and potential energy","q":"If you double the elevator speed with the same load, what happens to the power? By how much does the potential energy of a 2 kg object change when it rises from 1 m to 5 m?","a":"The power doubles because P = Fv and the force is unchanged. ΔU = mgΔy = 2 × 9.8 × 4 = 78.4 J, and this value does not change when the reference level is moved."}],"poe":[{"t":"Experiment 1: Work and force angle","q":"A <span class=\"eq\" dir=\"ltr\">50 N</span> force moves a body <span class=\"eq\" dir=\"ltr\">3 m</span>, with <span class=\"eq\" dir=\"ltr\">90°</span> between the force and the displacement. The work is:","o":["<span class=\"eq\" dir=\"ltr\">150 J</span>","<span class=\"eq\" dir=\"ltr\">−150 J</span>","Zero","<span class=\"eq\" dir=\"ltr\">75 J</span>"],"a":2,"do":"In the «Work and the force angle» tab set <span class=\"eq\" dir=\"ltr\">F = 50</span>, <span class=\"eq\" dir=\"ltr\">d = 3</span>, then <span class=\"eq\" dir=\"ltr\">θ = 90°</span>, then try <span class=\"eq\" dir=\"ltr\">180°</span>.","e":"<span class=\"eq\" dir=\"ltr\">W = Fd cos θ</span> and <span class=\"eq\" dir=\"ltr\">cos 90° = 0</span>: a force perpendicular to the motion does no work however large. The most negative work is at <span class=\"eq\" dir=\"ltr\">180°</span>: <span class=\"eq\" dir=\"ltr\">−150 J</span>."},{"t":"Experiment 2: Spring (variable force)","q":"If you double the spring's extension from <span class=\"eq\" dir=\"ltr\">0.20 m</span> to <span class=\"eq\" dir=\"ltr\">0.40 m</span>, the work done:","o":["Doubles","Quadruples","Increases eightfold","Does not change"],"a":1,"do":"In the «Spring and variable force» tab keep <span class=\"eq\" dir=\"ltr\">k = 200</span> and read the work at <span class=\"eq\" dir=\"ltr\">x = 0.20</span> then <span class=\"eq\" dir=\"ltr\">0.40</span>.","e":"<span class=\"eq\" dir=\"ltr\">W = ½kx<sup>2</sup></span>: from <span class=\"eq\" dir=\"ltr\">4 J</span> to <span class=\"eq\" dir=\"ltr\">16 J</span>. The force itself grows with <span class=\"eq\" dir=\"ltr\">x</span>, so the work is a triangle area whose base and height both double."},{"t":"Experiment 3: Work–kinetic energy","q":"A <span class=\"eq\" dir=\"ltr\">6 kg</span> box is pulled by <span class=\"eq\" dir=\"ltr\">12 N</span> over <span class=\"eq\" dir=\"ltr\">3 m</span>. With <span class=\"eq\" dir=\"ltr\">μ<sub>k</sub> = 0.2</span>, its final kinetic energy is:","o":["<span class=\"eq\" dir=\"ltr\">36 J</span>, as without friction","Close to zero","<span class=\"eq\" dir=\"ltr\">72 J</span>","Negative"],"a":1,"do":"In the «Work and kinetic energy» tab set <span class=\"eq\" dir=\"ltr\">m = 6</span>, <span class=\"eq\" dir=\"ltr\">F = 12</span>, <span class=\"eq\" dir=\"ltr\">d = 3</span>, and run once with <span class=\"eq\" dir=\"ltr\">μ<sub>k</sub> = 0</span> and once with <span class=\"eq\" dir=\"ltr\">0.2</span>.","e":"Friction <span class=\"eq\" dir=\"ltr\">μ<sub>k</sub>mg ≈ 11.8 N</span> almost equals the pull, so the net work is <span class=\"eq\" dir=\"ltr\">≈ (12 − 11.8) × 3 ≈ 0.7 J</span>. The rest of the applied work becomes internal (thermal) energy."},{"t":"Experiment 4: Power","q":"An elevator moves at constant speed. If you double the speed with the same mass and friction, the tension <span class=\"eq\" dir=\"ltr\">T</span> and the power:","o":["<span class=\"eq\" dir=\"ltr\">T</span> doubles, power quadruples","<span class=\"eq\" dir=\"ltr\">T</span> unchanged, power doubles","Both unchanged","<span class=\"eq\" dir=\"ltr\">T</span> doubles, power unchanged"],"a":1,"do":"In the «Power» tab read <span class=\"eq\" dir=\"ltr\">T</span> and the power at <span class=\"eq\" dir=\"ltr\">v = 2 m/s</span>, then at <span class=\"eq\" dir=\"ltr\">v = 4 m/s</span>.","e":"At constant speed the net force is zero, so <span class=\"eq\" dir=\"ltr\">T = Mg + f</span> does not depend on speed, while <span class=\"eq\" dir=\"ltr\">P = Tv</span> is proportional to it."},{"t":"Experiment 5: Potential energy","q":"If you move only the reference level (keeping both heights), the change in potential energy <span class=\"eq\" dir=\"ltr\">ΔU</span>:","o":["Changes with the reference","Stays the same","Becomes zero","Changes sign"],"a":1,"do":"In the «Potential energy» tab keep <span class=\"eq\" dir=\"ltr\">y<sub>i</sub></span> and <span class=\"eq\" dir=\"ltr\">y<sub>f</sub></span>, move the reference level and watch <span class=\"eq\" dir=\"ltr\">U<sub>i</sub></span>, <span class=\"eq\" dir=\"ltr\">U<sub>f</sub></span> and <span class=\"eq\" dir=\"ltr\">ΔU</span>.","e":"Each <span class=\"eq\" dir=\"ltr\">U</span> changes, but <span class=\"eq\" dir=\"ltr\">ΔU = mg(y<sub>f</sub> − y<sub>i</sub>)</span> does not. Only the difference has physical meaning, so the reference is a free choice."}]};
+const T=D.lang==='ar'?{t1:'١) اختبار قبلي',t3:'٢) توقّع ثم جرّب',t2:'٣) مناقشة بعد المعمل',hpoe:'أثناء المعمل: توقّع النتيجة أولًا، ثم جرّبها في المعمل، ثم اقرأ التفسير.',s1:'① توقّع',s2:'② جرّب في المعمل',s3:'③ فسّر',see:'جرّبت، أظهر التفسير',hit:'توقّعك صحيح.',miss:'توقّعك يخالف النتيجة، وهذا مفيد: لاحظ السبب.',hpre:'أجب قبل فتح المعمل؛ يظهر التصحيح فور اختيارك، ولا تُحفظ النتيجة ولا تُرسل لأحد.',hpost:'بعد إنهاء المعمل: اكتب إجابتك أولًا، ثم قارنها بالإجابة النموذجية.',prev:'السابق',next:'التالي',res:'النتيجة',again:'إعادة الاختبار',ok:'إجابة صحيحة.',no:'ليست هذه.',show:'أظهر الإجابة النموذجية',hide:'أخفِ الإجابة',ph:'اكتب إجابتك هنا…',q:'السؤال',of:'من',good:'أنت مستعد للمعمل، افتحه الآن.',mid:'جيد، راجع ما أخطأت فيه ثم ابدأ المعمل.',low:'راجع المحاضرة قبل أن تبدأ المعمل: '}:{t1:'1) Pre-lab quiz',t3:'2) Predict & try',t2:'3) Post-lab discussion',hpoe:'During the lab: predict first, try it in the lab, then read the explanation.',s1:'① Predict',s2:'② Try it in the lab',s3:'③ Explain',see:'I tried it, show explanation',hit:'Your prediction was right.',miss:'Your prediction differs from the result, which is useful: see why.',hpre:'Answer before opening the lab. Feedback appears instantly; nothing is saved or sent.',hpost:'After the lab: write your own answer first, then compare it with the model answer.',prev:'Previous',next:'Next',res:'Result',again:'Retake quiz',ok:'Correct.',no:'Not quite.',show:'Show model answer',hide:'Hide answer',ph:'Write your answer here…',q:'Question',of:'of',good:'You are ready, open the lab now.',mid:'Good. Review what you missed, then start the lab.',low:'Review the lecture before starting the lab: '};
+const $=id=>document.getElementById(id);
+$('badge').innerHTML=D.course+' · <bdi dir="ltr">'+D.code+'</bdi>';$('h1').innerHTML=D.title;
+$('t1').textContent=T.t1;$('t2').textContent=T.t2;$('t3').textContent=T.t3;$('h_poe').textContent=T.hpoe;$('h_pre').textContent=T.hpre;$('h_post').textContent=T.hpost;
+['pp','dp','ep'].forEach(i=>$(i).textContent=T.prev);['pn','dn','en'].forEach(i=>$(i).textContent=T.next);
+let pi=0,st=D.pre.map(()=>-1),di=0,shown=D.post.map(()=>false),txt=D.post.map(()=>'');
+function dots(el,n,k){el.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('i');if(i===k)d.className='on';el.appendChild(d);}}
+function rPre(){const c=$('pc');const N=D.pre.length;
+if(pi===N){const s=st.filter((v,i)=>v===D.pre[i].a).length;c.innerHTML='<div class="score"><div>'+T.res+'</div><div class="big">'+s+' / '+N+'</div><p>'+(s>=N-1?T.good:(s>=Math.ceil(N/2)?T.mid:T.low+D.review))+'</p><button class="show" id="rt">'+T.again+'</button></div>';$('rt').onclick=()=>{st=st.map(()=>-1);pi=0;rPre();};}
+else{const it=D.pre[pi];c.innerHTML='<div class="qn">'+T.q+' '+(pi+1)+' '+T.of+' '+N+'</div><div class="q">'+it.q+'</div>';
+it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=t;
+if(st[pi]>=0){b.disabled=true;if(j===it.a)b.classList.add('right');else if(j===st[pi])b.classList.add('wrong');}
+b.onclick=()=>{st[pi]=j;rPre();};c.appendChild(b);});
+if(st[pi]>=0){const f=document.createElement('div');f.className='fb';f.innerHTML='<b>'+(st[pi]===it.a?T.ok:T.no)+'</b> '+it.e;c.appendChild(f);}}
+dots($('pd'),N+1,pi);$('pp').disabled=pi===0;$('pn').disabled=pi===N||(pi<N&&st[pi]<0);}
+function rPost(){const c=$('dc');const N=D.post.length;const it=D.post[di];
+c.innerHTML='<div class="qn">'+T.q+' '+(di+1)+' '+T.of+' '+N+'<span class="tag">'+it.t+'</span></div><div class="q">'+it.q+'</div><textarea placeholder="'+T.ph+'"></textarea><button class="show">'+(shown[di]?T.hide:T.show)+'</button><div class="ans'+(shown[di]?' on':'')+'">'+it.a+'</div>';
+const ta=c.querySelector('textarea');ta.value=txt[di];ta.oninput=()=>txt[di]=ta.value;
+c.querySelector('.show').onclick=()=>{shown[di]=!shown[di];rPost();};
+dots($('dd'),N,di);$('dp').disabled=di===0;$('dn').disabled=di===N-1;}
+$('pp').onclick=()=>{pi--;rPre();};$('pn').onclick=()=>{pi++;rPre();};$('dp').onclick=()=>{di--;rPost();};$('dn').onclick=()=>{di++;rPost();};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===b.dataset.p));});
+let ei=0,ech=D.poe.map(()=>-1),eopen=D.poe.map(()=>false);
+function rPoe(){const c=$('ec');const N=D.poe.length;const it=D.poe[ei];
+ c.innerHTML='<div class="qn">'+T.q+' '+(ei+1)+' '+T.of+' '+N+'<span class="tag">'+it.t+'</span></div><div class="step">'+T.s1+'</div><div class="q">'+it.q+'</div>';
+ it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=t;
+  if(ech[ei]>=0){b.disabled=true;if(eopen[ei]&&j===it.a)b.classList.add('right');else if(j===ech[ei])b.classList.add(eopen[ei]&&j!==it.a?'wrong':'right');if(!eopen[ei]&&j===ech[ei]){b.classList.remove('right');b.style.borderColor='var(--acc2)';}}
+  b.onclick=()=>{ech[ei]=j;rPoe();};c.appendChild(b);});
+ if(ech[ei]>=0){const d=document.createElement('div');d.innerHTML='<div class="step">'+T.s2+'</div><div class="do">'+it.do+'</div>'+(eopen[ei]?'<div class="step">'+T.s3+'</div><div class="fb"><span class="verdict">'+(ech[ei]===it.a?T.hit:T.miss)+'</span> '+it.e+'</div>':'<button class="show" id="see">'+T.see+'</button>');c.appendChild(d);
+  const s=c.querySelector('#see');if(s)s.onclick=()=>{eopen[ei]=true;rPoe();};}
+ dots($('ed'),N,ei);$('ep').disabled=ei===0;$('en').disabled=ei===N-1;}
+$('ep').onclick=()=>{ei--;rPoe();};$('en').onclick=()=>{ei++;rPoe();};
+rPre();rPost();rPoe();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f1"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script><script>(function(){var p=(location.hash||"#pre").slice(1);
+var b=document.querySelector('.tabs button[data-p="'+p+'"]');if(b)b.click();
+["nav.tabs",".top","#h1"].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display="none";});
+document.documentElement.style.background=document.body.style.background="transparent";})();</script>
+</body>
+</html>

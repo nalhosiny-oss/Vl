@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab — Experiment 8: Capacitance of a Capacitor (RC circuit)</title>
+<style>
+ :root{
+  --bg:#F3F7FC; --panel:#FFFFFF; --panel2:#F5F9FD; --line:#D3DEEC; --navy:#0F2547; --ink:#15203A;
+  --cyan:#1BA7C9; --cyanD:#0E7C99; --amber:#E8A13A; --amberD:#A8620A; --red:#C8322F; --green:#2E7D4F; --gray:#566179;
+ }
+ *{box-sizing:border-box}
+ body{margin:0;background:var(--bg);color:var(--ink);font-family:Calibri,"Segoe UI",Candara,Arial,sans-serif;line-height:1.55;font-size:16px}
+ header{background:var(--navy);color:#fff;padding:20px 18px 16px;text-align:center;border-bottom:4px solid var(--amber)}
+ header .tag{display:inline-block;color:#7FDCF2;border:1px solid #7FDCF2;border-radius:20px;padding:1px 14px;font-size:13px;letter-spacing:.3px}
+ h1{margin:8px 0 2px;font-family:Cambria,Georgia,serif;font-size:27px;font-weight:700}
+ h1 span{color:var(--amber)}
+ header p{margin:0;color:#C6D4E8;font-size:15px}
+ .wrap{max-width:1120px;margin:0 auto;padding:14px}
+ .safety{background:#FFF5E6;border:1px solid var(--amber);border-left:6px solid var(--amber);border-radius:10px;padding:9px 14px;margin:12px 0;font-size:15px}
+ .safety b{color:var(--amberD)}
+ nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+ nav button{flex:1 1 150px;background:var(--panel);color:var(--gray);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:15px;cursor:pointer;font-weight:600}
+ nav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+ section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(15,37,71,.06)}
+ section.on{display:block}
+ h2{margin:0 0 10px;font-size:21px;color:var(--navy);font-family:Cambria,Georgia,serif}
+ h3{margin:16px 0 6px;font-size:17px;color:var(--cyanD)}
+ .eq{display:inline-block;font-family:"Cambria Math",Cambria,"Times New Roman",serif;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:2px 10px;margin:2px 0;font-size:17px;color:var(--navy);white-space:nowrap}
+ .eq.big{display:block;text-align:center;font-size:21px;margin:8px auto;max-width:520px;padding:6px 12px;white-space:normal}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+ @media(max-width:820px){.grid,.grid3{grid-template-columns:1fr}}
+ .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+ label{display:block;font-size:15px;color:var(--gray);margin-top:8px}
+ input[type=range]{width:100%;accent-color:var(--cyanD)}
+ select,input[type=number],input[type=text]{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+ .val{color:var(--cyanD);font-weight:bold}
+ .btn{background:var(--navy);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px;font-weight:600}
+ .btn.or{background:var(--amberD)}
+ .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--gray)}
+ .btn:disabled{opacity:.45;cursor:default}
+ canvas{width:100%;display:block;border-radius:10px;background:#fff;border:1px solid var(--line)}
+ table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+ th,td{border:1px solid var(--line);padding:5px;text-align:center}
+ th{background:var(--navy);color:#fff;font-weight:600}
+ td input{text-align:center;padding:4px}
+ .ok{color:var(--green);font-weight:600} .bad{color:var(--red);font-weight:600}
+ .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+ .q p{margin:0 0 6px;font-weight:bold;color:var(--navy)}
+ .opt{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+ .opt.right{border-color:var(--green);background:#E6F4EA}
+ .opt.wrong{border-color:var(--red);background:#FBE9E8}
+ .fb{font-size:15px;color:var(--gray);min-height:1.2em}
+ .note{font-size:15px;color:var(--gray)}
+ .reading{font-size:21px;color:var(--amberD);font-weight:bold}
+ .meter{font-family:Consolas,"Courier New",monospace;background:#10233F;color:#7FF0B0;border-radius:8px;padding:6px 12px;font-size:22px;display:inline-block;min-width:150px;text-align:right}
+ .res{background:#EAF6FB;border:1px solid #BFE3EF;border-radius:10px;padding:10px 14px;margin-top:10px}
+ .res b{color:var(--navy)}
+ .wi{background:var(--panel2);border:1px solid var(--line);border-left:5px solid var(--cyan);border-radius:10px;padding:10px 12px;margin:10px 0}
+ .wi p{margin:0 0 6px;font-weight:600}
+ .wi .ans{display:none;color:var(--ink);background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px;margin-top:6px}
+ .wi.show .ans{display:block}
+ footer{text-align:center;color:var(--gray);font-size:13px;padding:16px}
+ sub,sup{font-size:70%}
+
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header>
+ <span class="tag">Physics 2 (203207-4) — Practical Virtual Lab</span>
+ <h1>Experiment 8: <span>Capacitance of a Capacitor (RC circuit)</span></h1>
+ <p>Determining C from the impedance Z of a series RC circuit at 60 Hz</p>
+</header>
+<div class="wrap">
+ <div class="safety">⚠️ <b>Safety:</b> use a <b>non-polarised</b> capacitor for AC (an electrolytic capacitor can burst on AC); never exceed the maximum voltage written on the capacitor; switch off and discharge the capacitor before touching its leads.</div>
+ <nav>
+  <button class="on" data-s="s1">1) Pre-lab questions</button>
+  <button data-s="s2">2) Theory</button>
+  <button data-s="s3">3) Simulation &amp; measurement</button>
+  <button data-s="s4">4) Data table &amp; analysis</button>
+  <button data-s="sR">5) My lab readings ✔</button>
+  <button data-s="s5">6) What if…?</button>
+ </nav>
+ <section id="s1" class="on"><h2>Pre-lab questions</h2><p class="note">Answer before you come to the lab. The correction appears as soon as you choose.</p><div id="quiz"></div><p class="reading" id="qscore"></p></section>
+ <section id="s2"><h2>Theory</h2>
+<p>A capacitor connected to AC charges and discharges every half-cycle, so an alternating current flows in the circuit even though no charge crosses the gap between the plates. Linked to <b>Chapter 6 – capacitors in an AC circuit</b>.</p>
+<h3>1. Capacitive reactance</h3>
+<span class="eq big"><i>X<sub>C</sub></i> = 1/(<i>ωC</i>) = 1/(2π<i>f C</i>), &nbsp; <i>f</i> = 60 Hz in Saudi Arabia</span>
+<p><i>X<sub>C</sub></i> decreases when the frequency or the capacitance increases. For DC (<i>f</i> = 0) it is infinite: a capacitor blocks steady current.</p>
+<h3>2. Impedance of the series RC circuit</h3>
+<p>The voltage across <i>R</i> is in phase with the current, while the voltage across <i>C</i> lags it by 90°. They add as perpendicular vectors:</p>
+<span class="eq big"><i>Z</i> = √(<i>R</i>² + <i>X<sub>C</sub></i>²) &nbsp;and&nbsp; <i>V</i><sub>rms</sub> = <i>I</i><sub>rms</sub> <i>Z</i></span>
+<h3>3. Method</h3>
+<p>Measure the current <i>I</i> for several voltages <i>V</i> across the series combination of <i>R</i> and <i>C</i>. Plot <i>V</i> (<i>y</i>-axis) against <i>I</i> (<i>x</i>-axis): the slope is <i>Z</i>. Then</p>
+<span class="eq big"><i>X<sub>C</sub></i> = √(<i>Z</i>² − <i>R</i>²) &nbsp;→&nbsp; <i>C</i> = 1 / (2π<i>f X<sub>C</sub></i>)</span>
+<p>Compare with the value written on the capacitor: error % = |<i>C</i><sub>exp</sub> − <i>C</i><sub>cap</sub>| / <i>C</i><sub>cap</sub> × 100 %.</p>
+<div class="card"><b>Apparatus:</b> variable low-voltage AC supply (60 Hz), non-polarised capacitor, fixed resistor R (known), AC ammeter, AC voltmeter, connecting wires.</div>
+ </section>
+ <section id="s3"><h2>Simulation &amp; measurement</h2>
+<div class="grid">
+ <div class="card">
+  <div class="grid"><label>Capacitor (written value)<select id="cap"><option value="10">10 µF (max 50 V)</option><option value="22" selected>22 µF (max 50 V)</option><option value="47">47 µF (max 50 V)</option></select></label>
+  <label>Resistor R<select id="res0"><option value="100" selected>100 Ω</option><option value="47">47 Ω</option></select></label></div>
+  <label>Voltage across R and C: <span class="val" id="vv"></span></label><input type="range" id="V" min="0" max="18" step="2" value="2">
+  <div class="grid"><p>Voltmeter: <span class="meter" id="mv">0.00 V~</span></p><p>Ammeter: <span class="meter" id="ma">0.000 A~</span></p></div>
+  <label><input type="checkbox" id="dc" style="width:auto"> Use a DC supply instead (see what happens)</label>
+  <p><button class="btn or" id="add">Record V and I</button></p>
+  <p class="note" id="msg">Record V = 2, 4, … 18 V.</p>
+ </div>
+ <div class="card"><canvas id="cc" width="560" height="300"></canvas><canvas id="ph" width="560" height="230" style="margin-top:8px"></canvas></div>
+</div>
+ </section>
+ <section id="s4"><h2>Data table &amp; analysis</h2>
+<div style="overflow-x:auto"><table><thead><tr><th>#</th><th>V (V)</th><th>I (A)</th><th style="background:#7A5200">V/I (Ω)</th><th>Result</th></tr></thead><tbody id="tb"></tbody></table></div>
+<canvas id="plot" width="900" height="360" style="margin-top:10px"></canvas>
+<div class="grid3"><label>Slope Z of YOUR V – I line (Ω)<input type="number" id="uZ" step="0.1"></label><label>Your X_C = √(Z² − R²) (Ω)<input type="number" id="uX" step="0.1"></label><label>Your C = 1/(2πf X_C) (µF)<input type="number" id="uL" step="0.01"></label></div>
+<button class="btn or" id="chk">Check</button> <button class="btn ghost" id="clr">Clear</button>
+<div class="res" id="res"><p class="note">Record at least 5 voltages (AC) with one capacitor, then check.</p></div>
+ </section>
+ <section id="sR"><h2>My real lab readings — self-check</h2><div id="real"></div></section>
+ <section id="s5"><h2>What if…?</h2><p class="note">Predict first, write your reason, then reveal the explanation.</p><div id="whatif"></div></section>
+</div>
+<footer>Physics 2 (203207-4) · Practical part · Prof. Najm Al-Hosiny</footer>
+<script>
+// ===== shared helpers for Physics 2 practical virtual labs =====
+const $=id=>document.getElementById(id);
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+ document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+ b.classList.add('on'); $(b.dataset.s).classList.add('on');
+ if(window.onTab) window.onTab(b.dataset.s);
+});
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function roundTo(x,step){return Math.round(x/step)*step;}
+function fmt(x,d){return (x===null||x===undefined||isNaN(x))?'—':(+x).toFixed(d);}
+function pct(a,b){return Math.abs(a-b)/Math.abs(b)*100;}
+function close(u,t,tol){return u!==null&&u!==''&&u!==undefined&&!isNaN(u)&&Math.abs(u-t)<=Math.abs(t)*tol+1e-12;}
+function numIn(id){const v=$(id).value.trim().replace(',','.'); return v===''?null:+v;}
+
+function buildQuiz(Q){
+ let score=0,answered=0; const qz=$('quiz');
+ Q.forEach((it,i)=>{
+  const d=document.createElement('div'); d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+String.fromCharCode(97+j)+') '+o+'</button>').join('')+'<div class="fb"></div>';
+  d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+   if(d.dataset.done) return; d.dataset.done=1; answered++;
+   const j=+b.dataset.j; d.querySelectorAll('.opt')[it.a].classList.add('right');
+   if(j===it.a){score++; d.querySelector('.fb').innerHTML='<span class="ok">✔ Correct.</span> '+it.e;}
+   else{b.classList.add('wrong'); d.querySelector('.fb').innerHTML='<span class="bad">✘ Not quite.</span> '+it.e;}
+   if(answered===Q.length) $('qscore').textContent='Your score: '+score+' / '+Q.length;
+  });
+  qz.appendChild(d);
+ });
+}
+function buildWhatIf(W){
+ const box=$('whatif');
+ W.forEach((it,i)=>{
+  const d=document.createElement('div'); d.className='wi';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p><textarea rows="2" style="width:100%;font:inherit;border:1px solid #D3DEEC;border-radius:8px;padding:6px" placeholder="Write your prediction and reason first…"></textarea>'+
+   '<button class="btn ghost">Show the explanation</button><div class="ans">'+it.a+'</div>';
+  d.querySelector('button').onclick=()=>d.classList.toggle('show');
+  box.appendChild(d);
+ });
+}
+function fitLine(xs,ys){
+ const n=xs.length; if(n<2) return null;
+ const sx=xs.reduce((a,b)=>a+b,0), sy=ys.reduce((a,b)=>a+b,0);
+ const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0);
+ const den=n*sxx-sx*sx; if(Math.abs(den)<1e-15) return null;
+ const m=(n*sxy-sx*sy)/den, b=(sy-m*sx)/n;
+ const res=ys.map((y,i)=>y-(m*xs[i]+b)); const s2=n>2?res.reduce((a,r)=>a+r*r,0)/(n-2):0;
+ return {m,b,dm:Math.sqrt(n*s2/den),db:Math.sqrt(s2*sxx/den)};
+}
+function fitOrigin(xs,ys){
+ const n=xs.length; if(n<1) return null;
+ const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0); if(sxx===0) return null;
+ const m=sxy/sxx; const s2=n>1?ys.reduce((a,y,i)=>a+(y-m*xs[i])**2,0)/(n-1):0;
+ return {m,b:0,dm:Math.sqrt(s2/sxx),db:0};
+}
+function niceStep(range){const r=range/6,p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p;return (f<1.5?1:f<3?2:f<7?5:10)*p;}
+function drawPlot(cv,pts,o){
+ o=o||{}; const g=cv.getContext('2d'), W=cv.width,H=cv.height; g.clearRect(0,0,W,H); g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+ const L=74,R=22,T=22,B=58;
+ let xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+ let x0=o.xmin!==undefined?o.xmin:Math.min(0,...xs), x1=o.xmax!==undefined?o.xmax:Math.max(...xs,1e-9);
+ let y0=o.ymin!==undefined?o.ymin:Math.min(0,...ys), y1=o.ymax!==undefined?o.ymax:Math.max(...ys,1e-9);
+ if(!pts.length&&o.xmax===undefined){x0=0;x1=1;}
+ if(!pts.length&&o.ymax===undefined){y0=0;y1=1;}
+ if(o.xmax===undefined) x1+=(x1-x0)*0.08; if(o.ymax===undefined) y1+=(y1-y0)*0.10;
+ if(x0<0&&o.xmin===undefined)x0-=(x1-x0)*0.05; if(y0<0&&o.ymin===undefined)y0-=(y1-y0)*0.05;
+ const X=x=>L+(x-x0)/(x1-x0)*(W-L-R), Y=y=>H-B-(y-y0)/(y1-y0)*(H-T-B);
+ const sxs=niceStep(x1-x0), sys=niceStep(y1-y0);
+ g.font='13px Calibri, Arial'; g.textAlign='center'; g.strokeStyle='#E3EAF3'; g.fillStyle='#566179';
+ const dec=s=>s>=1?0:Math.min(4,Math.ceil(-Math.log10(s)-1e-9));
+ for(let x=Math.ceil(x0/sxs)*sxs;x<=x1+1e-12;x+=sxs){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),H-B);g.stroke();g.fillText(x.toFixed(dec(sxs)),X(x),H-B+17);}
+ g.textAlign='right';
+ for(let y=Math.ceil(y0/sys)*sys;y<=y1+1e-12;y+=sys){g.beginPath();g.moveTo(L,Y(y));g.lineTo(W-R,Y(y));g.stroke();g.fillText(y.toFixed(dec(sys)),L-6,Y(y)+4);}
+ g.strokeStyle='#0F2547'; g.lineWidth=1.5; g.beginPath(); g.moveTo(L,T); g.lineTo(L,H-B); g.lineTo(W-R,H-B); g.stroke();
+ if(x0<0&&x1>0){g.beginPath();g.moveTo(X(0),T);g.lineTo(X(0),H-B);g.stroke();}
+ if(y0<0&&y1>0){g.beginPath();g.moveTo(L,Y(0));g.lineTo(W-R,Y(0));g.stroke();}
+ g.lineWidth=1; g.fillStyle='#0F2547'; g.textAlign='center'; g.font='bold 14px Calibri, Arial';
+ g.fillText(o.xlabel||'x',(L+W-R)/2,H-14);
+ g.save(); g.translate(18,(T+H-B)/2); g.rotate(-Math.PI/2); g.fillText(o.ylabel||'y',0,0); g.restore();
+ const line=(f,col,dash)=>{ if(!f) return; g.strokeStyle=col; g.lineWidth=2; g.setLineDash(dash||[]);
+  const xa=o.extend?x0:Math.min(0,x0), xb=x1; g.beginPath(); g.moveTo(X(xa),Y(f.m*xa+f.b)); g.lineTo(X(xb),Y(f.m*xb+f.b)); g.stroke(); g.setLineDash([]); g.lineWidth=1;};
+ g.save(); g.beginPath(); g.rect(L,T,W-L-R,H-T-B); g.clip();
+ if(o.curve){ g.strokeStyle='#A8620A'; g.lineWidth=2; g.beginPath(); o.curve.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1]))); g.stroke(); g.lineWidth=1; }
+ if(o.series){ o.series.forEach(s=>{ g.strokeStyle=s.col; g.lineWidth=2; g.setLineDash(s.dash||[]); g.beginPath(); s.pts.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1]))); g.stroke(); g.setLineDash([]); g.lineWidth=1; }); }
+ line(o.fit,'#A8620A'); line(o.student,'#0E7C99',[6,5]);
+ if(o.vline!==undefined){g.strokeStyle='#C8322F'; g.setLineDash([4,4]); g.beginPath(); g.moveTo(X(o.vline),T); g.lineTo(X(o.vline),H-B); g.stroke(); g.setLineDash([]);}
+ g.restore();
+ pts.forEach(p=>{g.fillStyle=p[2]||'#0F2547'; g.beginPath(); g.arc(X(p[0]),Y(p[1]),4.5,0,2*Math.PI); g.fill();});
+ g.font='13px Calibri, Arial'; g.textAlign='left'; let ly=T+14;
+ if(o.fit||o.curve){g.fillStyle='#A8620A'; g.fillText(o.fitLabel||'— best-fit line (least squares)',L+10,ly); ly+=16;}
+ if(o.student){g.fillStyle='#0E7C99'; g.fillText('- - line with YOUR slope',L+10,ly); ly+=16;}
+ if(o.legend) o.legend.forEach(l=>{g.fillStyle=l[1]; g.fillText(l[0],L+10,ly); ly+=16;});
+}
+// ===== "My real lab readings" self-check =====
+function buildReal(cfg){
+ const box=$('real'), KEY='p2lab_real_'+cfg.key;
+ let store={}; try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){store={};}
+ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}};
+ const num=v=>{if(v===undefined||v===null) return null; v=String(v).trim().replace(',', '.'); if(v==='') return null; const x=parseFloat(v); return isNaN(x)?null:x;};
+ let h='<p class="note">'+(cfg.intro||'')+' Type the readings you recorded in the laboratory (in your manual), do your own calculations, then press <b>Check my results</b>. '+
+  'Your entries are kept in this browser, so you can come back later. Take a screenshot of the result and attach it at the end of your report.</p>';
+ if(cfg.consts&&cfg.consts.length){h+='<div class="grid3">'+cfg.consts.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+ cfg.tables.forEach(t=>{
+  h+='<h3>'+t.title+'</h3><div style="overflow-x:auto"><table id="rt_'+t.id+'"><thead><tr><th>#</th>'+t.cols.map(c=>'<th'+(c.calc?' style="background:#7A5200"':'')+'>'+c.label+'</th>').join('')+'</tr></thead><tbody></tbody></table></div>';
+  if(t.add!==false) h+='<button class="btn ghost" data-add="'+t.id+'">+ Add a row</button>';
+ });
+ if(cfg.mine&&cfg.mine.length){h+='<h3>Your results from your hand-drawn graph / calculation</h3><div class="grid3">'+cfg.mine.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+ h+='<p><button class="btn or" id="rcheck">Check my results</button> <button class="btn ghost" id="rclear">Clear all my entries</button></p>'+
+  '<p class="note">Yellow-headed columns are your own calculations: they turn <span class="ok">green</span> when correct and <span class="bad">red</span> when not.</p>'+
+  (cfg.plot?'<canvas id="rplot" width="760" height="430"></canvas>':'')+'<div class="res" id="rres"><p class="note">Results appear here after you press Check.</p></div>';
+ box.innerHTML=h;
+ const rowsOf=t=>{ if(!store[t.id]) store[t.id]=[]; const n=Math.max(t.rows||5, store[t.id].length); while(store[t.id].length<n) store[t.id].push({}); return store[t.id]; };
+ function renderTables(){
+  cfg.tables.forEach(t=>{
+   const tb=$('rt_'+t.id).querySelector('tbody'); const R=rowsOf(t);
+   if(t.preset) R.forEach((r,i)=>{ if(t.preset[i]) Object.keys(t.preset[i]).forEach(k=>{ if(r[k]===undefined) r[k]=String(t.preset[i][k]); }); });
+   tb.innerHTML=R.map((r,i)=>'<tr><td>'+(t.rowLabels?t.rowLabels[i]||(i+1):(i+1))+'</td>'+t.cols.map(c=>'<td'+(c.calc?' style="background:#FFF8D6"':'')+'><input type="text" inputmode="decimal" data-t="'+t.id+'" data-r="'+i+'" data-c="'+c.id+'" value="'+(r[c.id]===undefined?'':String(r[c.id]).replace(/"/g,''))+'"></td>').join('')+'</tr>').join('');
+  });
+  box.querySelectorAll('input[data-t]').forEach(inp=>inp.oninput=()=>{store[inp.dataset.t][+inp.dataset.r][inp.dataset.c]=inp.value; inp.style.borderColor=''; save();});
+ }
+ box.querySelectorAll('input[data-k]').forEach(inp=>{ if(store['k_'+inp.dataset.k]!==undefined) inp.value=store['k_'+inp.dataset.k]; inp.oninput=()=>{store['k_'+inp.dataset.k]=inp.value; save();}; });
+ box.querySelectorAll('button[data-add]').forEach(b=>b.onclick=()=>{ store[b.dataset.add].push({}); save(); renderTables(); });
+ let armed=false;
+ $('rclear').onclick=()=>{ if(!armed){armed=true; $('rclear').textContent='Click again to clear everything'; setTimeout(()=>{armed=false; $('rclear').textContent='Clear all my entries';},4000); return;}
+  store={}; save(); box.querySelectorAll('input[data-k]').forEach(i=>i.value=''); renderTables(); $('rres').innerHTML='<p class="note">Cleared.</p>'; if(cfg.plot) drawPlot($('rplot'),[],cfg.plot); armed=false; $('rclear').textContent='Clear all my entries'; };
+ $('rcheck').onclick=()=>{
+  const K={}; box.querySelectorAll('input[data-k]').forEach(i=>K[i.dataset.k]=num(i.value));
+  const T={}; let marks=0, good=0;
+  cfg.tables.forEach(t=>{
+   T[t.id]=[];
+   store[t.id].forEach((r,i)=>{
+    const o={_i:i}; t.cols.forEach(c=>{ if(!c.calc) o[c.id]=num(r[c.id]); });
+    const complete=t.cols.filter(c=>!c.calc&&!c.optional).every(c=>o[c.id]!==null);
+    t.cols.filter(c=>c.calc).forEach(c=>{
+     const inp=box.querySelector('input[data-t="'+t.id+'"][data-r="'+i+'"][data-c="'+c.id+'"]'); const u=num(r[c.id]);
+     if(!complete){ inp.style.borderColor=''; return; }
+     let e=null; try{ e=c.f(o,K); }catch(err){ e=null; } o[c.id]=e; o['your_'+c.id]=u;
+     if(u===null||e===null||!isFinite(e)){ inp.style.borderColor=''; return; }
+     const ok=c.abs!==undefined?Math.abs(u-e)<=c.abs:close(u,e,c.tol||0.02); marks++; if(ok) good++;
+     inp.style.borderColor=ok?'#2E7D4F':'#C8322F'; inp.style.borderWidth='2px'; inp.title=ok?'correct':'expected about '+(+e.toPrecision(4));
+    });
+    if(complete) T[t.id].push(o);
+   });
+  });
+  let out;
+  try{ out=cfg.analyze(T,K)||{}; }catch(err){ out={html:'<span class="bad">Please check your entries: '+err.message+'</span>'}; }
+  let s=marks?'<b>Your calculated columns:</b> '+good+' / '+marks+' correct'+(good<marks?' — hover over (or tap) a red cell to see the expected value.':' ✔')+'<br>':'';
+  $('rres').innerHTML=s+(out.html||'');
+  if(cfg.plot){ const p=out.plot||{pts:[]}; drawPlot($('rplot'),p.pts,Object.assign({},cfg.plot,p)); }
+ };
+ renderTables(); if(cfg.plot) drawPlot($('rplot'),[],cfg.plot);
+}
+function ok5(u,t,lim,txt){ lim=lim||5; if(u===null||u===undefined) return ''; const d=pct(u,t); return d<=lim?'<span class="ok">✔ '+txt+' is within '+lim+' % of the best-fit value</span>':'<span class="bad">✘ '+txt+' differs by '+d.toFixed(1)+' % from the best-fit value — check the two points you read on your line</span>'; }
+// ===== circuit drawing helpers =====
+function cvs(id){const c=$(id); return [c,c.getContext('2d')];}
+function wire(g,pts,col){g.strokeStyle=col||'#15203A'; g.lineWidth=2.2; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.stroke(); g.lineWidth=1;}
+function resistor(g,x1,y,x2,label,vert){ // zig-zag between two points (horizontal) or vertical
+ g.strokeStyle='#15203A'; g.lineWidth=2.2; g.beginPath();
+ const n=6, len=vert?(x2-y):(x2-x1);
+ if(!vert){ const a=x1+len*0.2, b=x2-len*0.2; g.moveTo(x1,y); g.lineTo(a,y); for(let i=0;i<n;i++){ g.lineTo(a+(b-a)*(i+0.5)/n, y+(i%2?8:-8)); } g.lineTo(b,y); g.lineTo(x2,y); }
+ else { const x=x1, ya=y+len*0.2, yb=x2-len*0.2; g.moveTo(x,y); g.lineTo(x,ya); for(let i=0;i<n;i++){ g.lineTo(x+(i%2?8:-8), ya+(yb-ya)*(i+0.5)/n); } g.lineTo(x,yb); g.lineTo(x,x2); }
+ g.stroke(); g.lineWidth=1;
+ if(label){ g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; if(!vert) g.fillText(label,(x1+x2)/2,y-14); else g.fillText(label,x1+30,(y+x2)/2+5); }
+}
+function meterIcon(g,x,y,letter,col){ g.fillStyle='#fff'; g.strokeStyle=col||'#0E7C99'; g.lineWidth=2; g.beginPath(); g.arc(x,y,15,0,2*Math.PI); g.fill(); g.stroke(); g.lineWidth=1; g.fillStyle=col||'#0E7C99'; g.font='bold 15px Calibri'; g.textAlign='center'; g.fillText(letter,x,y+5); }
+function battery(g,x,y,label,vert){ g.strokeStyle='#15203A'; g.lineWidth=2.2;
+ if(!vert){ g.beginPath(); g.moveTo(x-4,y-16); g.lineTo(x-4,y+16); g.stroke(); g.lineWidth=4; g.beginPath(); g.moveTo(x+4,y-9); g.lineTo(x+4,y+9); g.stroke(); }
+ else { g.beginPath(); g.moveTo(x-16,y-4); g.lineTo(x+16,y-4); g.stroke(); g.lineWidth=4; g.beginPath(); g.moveTo(x-9,y+4); g.lineTo(x+9,y+4); g.stroke(); }
+ g.lineWidth=1; if(label){ g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; vert?g.fillText(label,x-36,y+5):g.fillText(label,x,y-22);} }
+function acSource(g,x,y,label){ g.fillStyle='#fff'; g.strokeStyle='#15203A'; g.lineWidth=2.2; g.beginPath(); g.arc(x,y,16,0,2*Math.PI); g.fill(); g.stroke(); g.beginPath(); for(let i=0;i<=20;i++){const t=i/20; const px=x-9+18*t, py=y-6*Math.sin(2*Math.PI*t); i?g.lineTo(px,py):g.moveTo(px,py);} g.stroke(); g.lineWidth=1; if(label){g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; g.fillText(label,x,y-24);} }
+function capacitor(g,x,y,label,vert){ g.strokeStyle='#15203A'; g.lineWidth=3;
+ if(!vert){ g.beginPath(); g.moveTo(x-5,y-14); g.lineTo(x-5,y+14); g.moveTo(x+5,y-14); g.lineTo(x+5,y+14); g.stroke(); }
+ else { g.beginPath(); g.moveTo(x-14,y-5); g.lineTo(x+14,y-5); g.moveTo(x-14,y+5); g.lineTo(x+14,y+5); g.stroke(); }
+ g.lineWidth=1; if(label){g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; vert?g.fillText(label,x+34,y+5):g.fillText(label,x,y-20);} }
+function inductor(g,x1,y,x2,label){ g.strokeStyle='#15203A'; g.lineWidth=2.2; g.beginPath(); const a=x1+(x2-x1)*0.15,b=x2-(x2-x1)*0.15, n=4, w=(b-a)/n; g.moveTo(x1,y); g.lineTo(a,y); for(let i=0;i<n;i++){ g.arc(a+w*(i+0.5),y,w/2,Math.PI,0,false);} g.lineTo(x2,y); g.stroke(); g.lineWidth=1; if(label){g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; g.fillText(label,(x1+x2)/2,y-18);} }
+function dot(g,x,y){g.fillStyle='#15203A'; g.beginPath(); g.arc(x,y,4,0,2*Math.PI); g.fill();}
+function txt(g,s,x,y,col,font,al){g.fillStyle=col||'#0F2547'; g.font=font||'14px Calibri'; g.textAlign=al||'center'; g.fillText(s,x,y);}
+// ===== oscilloscope screen =====
+function drawScope(cv,fn,vdiv,tdiv,ypos,opt){ opt=opt||{}; const g=cv.getContext('2d'), W=cv.width, H=cv.height, dx=W/10, dy=H/8;
+ g.fillStyle='#0B1A2E'; g.fillRect(0,0,W,H); g.strokeStyle='#23415F'; g.lineWidth=1;
+ for(let i=0;i<=10;i++){g.beginPath();g.moveTo(i*dx,0);g.lineTo(i*dx,H);g.stroke();}
+ for(let j=0;j<=8;j++){g.beginPath();g.moveTo(0,j*dy);g.lineTo(W,j*dy);g.stroke();}
+ g.strokeStyle='#3C6A92'; g.beginPath(); g.moveTo(W/2,0); g.lineTo(W/2,H); g.moveTo(0,H/2); g.lineTo(W,H/2); g.stroke();
+ for(let i=0;i<50;i++){ const x=i*dx/5; g.beginPath(); g.moveTo(x,H/2-4); g.lineTo(x,H/2+4); g.stroke(); }
+ for(let j=0;j<40;j++){ const y=j*dy/5; g.beginPath(); g.moveTo(W/2-4,y); g.lineTo(W/2+4,y); g.stroke(); }
+ g.strokeStyle='#5CF2A0'; g.lineWidth=2.2; g.shadowColor='#5CF2A0'; g.shadowBlur=4; g.beginPath();
+ for(let px=0;px<=W;px++){ const t=px/dx*tdiv; let v=fn(t)/vdiv; let y=H/2-(v+ypos)*dy; y=Math.max(-5,Math.min(H+5,y)); px?g.lineTo(px,y):g.moveTo(px,y); }
+ g.stroke(); g.shadowBlur=0; g.lineWidth=1;
+ g.fillStyle='#9FC3E6'; g.font='13px Consolas, monospace'; g.textAlign='left';
+ g.fillText('CH1  '+fmtV(vdiv)+'/div',8,H-8); g.textAlign='right'; g.fillText('TIME '+fmtT(tdiv)+'/div',W-8,H-8);
+}
+function fmtV(v){return v<1?(v*1000).toFixed(0)+' mV':v+' V';}
+function fmtT(t){return t<1e-3?(t*1e6).toFixed(0)+' µs':(t*1e3).toFixed(t<1e-2?1:0)+' ms';}
+
+</script>
+<script>
+buildQuiz([
+ {q:'The capacitive reactance is:',o:['X_C = 2πfC','X_C = 1/(2πfC)','X_C = C/f','X_C = fC'],a:1,e:'X_C = 1/(ωC); it decreases as f or C increases.'},
+ {q:'With a steady DC supply, the current in a series RC circuit (after charging) is:',o:['V/R','V/Z','zero','very large'],a:2,e:'For f = 0, X_C is infinite: the capacitor blocks DC.'},
+ {q:'For R and C in series, the impedance is:',o:['R + X_C','√(R² + X_C²)','R − X_C','1/(R + X_C)'],a:1,e:'V_R and V_C are 90° apart, so they add as perpendicular vectors.'},
+ {q:'C = 22 µF at 60 Hz. X_C is about:',o:['8.3 Ω','121 Ω','1320 Ω','0.008 Ω'],a:1,e:'X_C = 1/(2π × 60 × 22 × 10⁻⁶) = 120.6 Ω.'},
+ {q:'Why must an electrolytic capacitor not be used on AC?',o:['It has too small a capacitance','It is polarised — reverse voltage every half-cycle damages it','It has no reactance','It changes the frequency'],a:1,e:'Use a non-polarised capacitor for AC.'}
+]);
+buildWhatIf([
+ {q:'What if the capacitance is doubled?',a:'X_C is halved, so Z decreases, the slope of V–I becomes smaller and the current increases.'},
+ {q:'What if the supply frequency were 50 Hz?',a:'X_C = 1/(2πfC) becomes 20 % larger, so the current falls. Using f = 60 Hz in the formula for a 50 Hz supply would give a wrong C.'},
+ {q:'What if you forget R and take X_C = Z?',a:'X_C is overestimated, so C is underestimated. With R = 100 Ω and C = 22 µF: Z = 157 Ω instead of X_C = 121 Ω → C = 16.9 µF instead of 22 µF (23 % error).'},
+ {q:'What if a DC supply is used?',a:'The capacitor charges in a fraction of a second and then the current is zero: no steady DC current passes a capacitor. Tick the DC box to see.'}
+]);
+const f=60; let rows=[], ext=null; const tolC=1+0.05*(Math.random()*2-1);
+const Rv=()=>+$('res0').value, Cn=()=>+$('cap').value;
+function I(){ if($('dc').checked) return 0; const XC=1/(2*Math.PI*f*Cn()*1e-6*tolC); return +$('V').value/Math.hypot(Rv(),XC); }
+function drawC(){ const [c,g]=cvs('cc'); g.clearRect(0,0,c.width,c.height); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height);
+ if($('dc').checked) battery(g,70,150,'DC',true); else {acSource(g,70,150,''); txt(g,'AC 60 Hz',70,190,'#0F2547','bold 13px Calibri');} wire(g,[[70,134],[70,50],[180,50]]); wire(g,[[70,166],[70,250],[460,250],[460,50],[440,50]]);
+ meterIcon(g,195,50,'A','#A8620A'); wire(g,[[210,50],[260,50]]); resistor(g,260,50,340,'R = '+Rv()+' Ω'); wire(g,[[340,50],[385,50]]); capacitor(g,390,50,'C'); wire(g,[[395,50],[440,50]]);
+ wire(g,[[250,50],[250,170],[330,170]],'#0E7C99'); wire(g,[[440,50],[440,170],[360,170]],'#0E7C99'); meterIcon(g,345,170,'V'); dot(g,250,50); dot(g,440,50); txt(g,'voltmeter across R and C together',345,205,'#566179','13px Calibri'); }
+function drawPh(){ const [c,g]=cvs('ph'); g.clearRect(0,0,c.width,c.height); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); const XC=1/(2*Math.PI*f*Cn()*1e-6*tolC), R=Rv(), s=150/Math.max(XC,R);
+ const o=[60,40]; g.strokeStyle='#0E7C99'; g.lineWidth=3; g.beginPath(); g.moveTo(o[0],o[1]); g.lineTo(o[0]+R*s,o[1]); g.stroke(); txt(g,'R',o[0]+R*s/2,o[1]-8,'#0E7C99','bold 13px Calibri');
+ g.strokeStyle='#A8620A'; g.beginPath(); g.moveTo(o[0]+R*s,o[1]); g.lineTo(o[0]+R*s,o[1]+XC*s); g.stroke(); txt(g,'X_C',o[0]+R*s+8,o[1]+XC*s/2,'#A8620A','bold 13px Calibri','left');
+ g.strokeStyle='#0F2547'; g.beginPath(); g.moveTo(o[0],o[1]); g.lineTo(o[0]+R*s,o[1]+XC*s); g.stroke(); g.lineWidth=1; txt(g,'Z',o[0]+R*s/2-14,o[1]+XC*s/2+10,'#0F2547','bold 13px Calibri');
+ txt(g,'Impedance triangle: Z² = R² + X_C²',380,24,'#566179','13px Calibri'); }
+function upd(){ $('vv').textContent=$('V').value+' V'; const i=I(); $('mv').textContent=(+$('V').value*(1+0.002*gauss())).toFixed(2)+($('dc').checked?' V=':' V~'); $('ma').textContent=(i*(1+0.004*gauss())).toFixed(3)+($('dc').checked?' A=':' A~');
+ $('msg').innerHTML=$('dc').checked?'<span class="bad">DC: after a short charging moment the current is zero — the capacitor blocks DC.</span>':'Record V = 2, 4, … 18 V.'; drawC(); drawPh(); }
+['cap','res0','V','dc'].forEach(id=>$(id).addEventListener('input',upd));
+$('add').onclick=()=>{ if($('dc').checked){alert('Use the AC supply.');return;} if(+$('V').value<=0){alert('Raise V first.');return;}
+ const key=$('cap').value+'/'+$('res0').value; if(rows.length&&rows[0].key!==key){alert('Use the same C and R for all rows (Clear to change).');return;}
+ rows=rows.filter(r=>Math.round(r.V)!==+$('V').value); rows.push({key,C:Cn(),R:Rv(),V:+(+$('V').value*(1+0.002*gauss())).toFixed(2),I:+(I()*(1+0.004*gauss())).toFixed(3),u:null}); rows.sort((a,b)=>a.V-b.V); render(); };
+function render(){ const tb=$('tb'); tb.innerHTML='';
+ rows.forEach((r,i)=>{ const tr=document.createElement('tr'); tr.innerHTML='<td>'+(i+1)+'</td><td>'+r.V.toFixed(2)+'</td><td>'+r.I.toFixed(3)+'</td><td style="background:#FFF8D6"><input type="number" step="0.1" value="'+(r.u??'')+'"></td><td>'+(r.res||'')+'</td>';
+  tr.querySelector('input').oninput=e=>{r.u=e.target.value===''?null:+e.target.value;}; tb.appendChild(tr); });
+ drawPlot($('plot'),rows.map(r=>[r.I,r.V]),Object.assign({xlabel:'I (A)',ylabel:'V (V)'},ext||{})); }
+$('chk').onclick=()=>{ if(rows.length<5){alert('Record at least 5 voltages.');return;} rows.forEach(r=>{ const e=r.V/r.I; r.res=close(r.u,e,0.01)?'<span class="ok">✔</span>':'<span class="bad">✘ '+e.toFixed(1)+' Ω</span>'; });
+ const fl=fitOrigin(rows.map(r=>r.I),rows.map(r=>r.V)); const R=rows[0].R, Cw=rows[0].C; const XC=Math.sqrt(fl.m**2-R**2), C=1e6/(2*Math.PI*f*XC);
+ const uZ=numIn('uZ'), uX=numIn('uX'), uC=numIn('uL'); ext={fit:fl,student:uZ!==null?{m:uZ,b:0}:null}; render();
+ let s='<b>Best-fit Z</b> = '+fl.m.toFixed(1)+' Ω; with R = '+R+' Ω: X_C = '+XC.toFixed(1)+' Ω → <b>C = '+C.toFixed(2)+' µF</b>; written on the capacitor '+Cw+' µF → error '+pct(C,Cw).toFixed(1)+' %<br>';
+ if(uZ!==null) s+=ok5(uZ,fl.m,3,'Your Z')+'<br>'; if(uX!==null&&uZ) s+='Your X_C: '+(close(uX,Math.sqrt(uZ**2-R**2),0.01)?'<span class="ok">✔</span>':'<span class="bad">✘ √('+uZ+'² − '+R+'²) = '+Math.sqrt(uZ**2-R**2).toFixed(1)+' Ω</span>')+'<br>';
+ if(uC!==null&&uX) s+='Your C: '+(close(uC,1e6/(2*Math.PI*f*uX),0.01)?'<span class="ok">✔</span>':'<span class="bad">✘ 1/(2π × 60 × '+uX+') = '+(1e6/(2*Math.PI*f*uX)).toFixed(2)+' µF</span>');
+ $('res').innerHTML=s; };
+$('clr').onclick=()=>{rows=[];ext=null;render();$('res').innerHTML='<p class="note">Record at least 5 voltages with one capacitor.</p>';};
+upd(); render(); window.onTab=()=>{upd();render();};
+buildReal({key:'exp8', intro:'One row for each voltage.',
+ consts:[{id:'R',label:'R (Ω)'},{id:'Cc',label:'C written on the capacitor (µF)'},{id:'f',label:'Frequency f (Hz) — 60 in Saudi Arabia'}],
+ tables:[{id:'T',title:'Your V and I readings',rows:9,cols:[{id:'V',label:'V (V)'},{id:'I',label:'I (A)'},{id:'z',label:'V/I (Ω)',calc:1,tol:0.01,f:o=>o.V/o.I}]}],
+ mine:[{id:'Z',label:'Slope Z of your V – I line (Ω)'},{id:'X',label:'Your X_C (Ω)'},{id:'C',label:'Your C (µF)'}],
+ plot:{xlabel:'I (A)', ylabel:'V (V)'},
+ analyze:(T,K)=>{ const P=T.T.map(o=>[o.I,o.V]); if(P.length<3) return {html:'Enter at least 3 rows.',plot:{pts:P}}; const fl=fitOrigin(P.map(p=>p[0]),P.map(p=>p[1])); const F=K.f||60;
+  let s='<b>Best-fit Z</b> = '+fmt(fl.m,1)+' Ω'; if(K.R!==null){ const X=Math.sqrt(Math.max(0,fl.m**2-K.R**2)), C=1e6/(2*Math.PI*F*X); s+=' → X_C = '+fmt(X,1)+' Ω → <b>C = '+fmt(C,2)+' µF</b>'; if(K.Cc) s+=' (capacitor: '+K.Cc+' µF, error '+fmt(pct(C,K.Cc),1)+' %)'; }
+  s+='<br>'+ok5(K.Z,fl.m,3,'Your Z'); if(K.C!==null&&K.X) s+='<br>Your C: '+(close(K.C,1e6/(2*Math.PI*F*K.X),0.01)?'<span class="ok">✔ = 1/(2πf X_C)</span>':'<span class="bad">✘ 1/(2πf X_C) = '+fmt(1e6/(2*Math.PI*F*K.X),2)+' µF</span>');
+  return {html:s, plot:{pts:P, fit:fl, student:K.Z?{m:K.Z,b:0}:null}}; }});
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

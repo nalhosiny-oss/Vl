@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل استقطاب الضوء</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل استقطاب الضوء</h1><p>البصريات الفيزيائية – الفصل السادس. غيّر القيم وراقب النتيجة، واستخدم أزرار الأمثلة للتحقق من حلولك.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">قانون مالوس</button><button role="tab" aria-selected="false" data-t="t2">زاوية بروستر</button><button role="tab" aria-selected="false" data-t="t3">مجموعة الألواح</button><button role="tab" aria-selected="false" data-t="t4">الصفائح البلورية</button><button role="tab" aria-selected="false" data-t="t5">النشاط الضوئي</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="مستقطب ومحلل وقانون مالوس"></canvas><div class="ctrl"><label>شدة الضوء المستقطب I₀ (W/m²) <b id="o1i">20.0</b></label><input id="i1i" type="range" min="1" max="50" step="0.5" value="20"><label>الزاوية θ بين المحورين <b id="o1t">60°</b></label><input id="i1t" type="range" min="0" max="180" step="1" value="60"><div class="row"><button class="btn" type="button" id="p1a">المثال المحلول</button><button class="btn" type="button" id="p1b">المسألة 1</button></div><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span></div><div class="task"><h3>سؤال</h3>أدخل ثالث مستقطب بزاوية 45° بين مستقطبين متعامدين. ما الشدة النافذة؟ (احسبها بتطبيق مالوس مرتين)</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="الانعكاس عند زاوية بروستر"></canvas><div class="ctrl"><label>معامل الانكسار μ <b id="o2m">1.33</b></label><input id="i2m" type="range" min="1.1" max="2.5" step="0.01" value="1.33"><label>زاوية السقوط φ <b id="o2t">53.0°</b></label><input id="i2t" type="range" min="0" max="89" step="0.5" value="53"><div class="row"><button class="btn" type="button" id="p2a">الماء (المثال المحلول)</button><button class="btn" type="button" id="p2b">اضبط على زاوية بروستر</button></div><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span></div><div class="task"><h3>سؤال</h3>عند زاوية بروستر، ما الزاوية بين الشعاعين المنعكس والمنكسر؟</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="مجموعة الألواح المتوازية"></canvas><div class="ctrl"><label>عدد الألواح m <b id="o3n">5</b></label><input id="i3n" type="range" min="1" max="30" step="1" value="5"><label>معامل الانكسار μ <b id="o3m">1.50</b></label><input id="i3m" type="range" min="1.3" max="2" step="0.01" value="1.5"><div class="readout"><span class="eq" id="r3a"></span></div><div class="task"><h3>سؤال</h3>كم لوحاً يلزم لتصل درجة الاستقطاب إلى 90% تقريباً؟</div></div></section><section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="صفيحة بلورية وحالة الاستقطاب الخارج"></canvas><div class="ctrl"><label>الطول الموجي λ (nm) <b id="o4l">600</b></label><input id="i4l" type="range" min="400" max="700" step="1" value="600"><label>فرق معاملي الانكسار μO − μE <b id="o4n">0.010</b></label><input id="i4n" type="range" min="0.001" max="0.2" step="0.001" value="0.01"><label>سمك الصفيحة d (μm) <b id="o4d">15.0</b></label><input id="i4d" type="range" min="0" max="100" step="0.1" value="15"><div class="row"><button class="btn" type="button" id="p4">المسألة 2</button></div><div class="readout"><span class="eq" id="r4a"></span><span class="eq" id="r4b"></span></div><div class="task"><h3>سؤال</h3>ما سمك صفيحة نصف الموجة لنفس المادة والطول الموجي؟</div></div></section><section class="lab" id="t5" role="tabpanel"><canvas id="c5" width="1200" height="600" aria-label="مقياس الاستقطاب والنشاط الضوئي"></canvas><div class="ctrl"><label>القدرة النوعية S (° dm⁻¹ (g/mL)⁻¹) <b id="o5s">0.2</b></label><input id="i5s" type="range" min="0.1" max="80" step="0.1" value="0.2"><label>التركيز ρ (g/mL) <b id="o5r">0.50</b></label><input id="i5r" type="range" min="0" max="1" step="0.01" value="0.5"><label>طول الأنبوب d (dm) <b id="o5d">2.0</b></label><input id="i5d" type="range" min="0.5" max="4" step="0.1" value="2"><div class="row"><button class="btn" type="button" id="p5a">المسألة 3</button><button class="btn" type="button" id="p5b">سكروز S = 66.5</button></div><div class="readout"><span class="eq" id="r5a"></span></div><div class="task"><h3>سؤال</h3>كيف تستخدم هذا الجهاز لتعيين تركيز سكر مجهول؟</div></div></section>
+<footer>أ.د. نجم الحصيني – البصريات الفيزيائية، الفصل السادس. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);if(Math.hypot(x1-x0,y1-y0)<4)return;g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function curve(g,f,x0,x1,col,w){g.beginPath();let st=false;for(let q=x0;q<=x1;q+=2){const y=f(q);if(!isFinite(y)){st=false;continue;}st?g.lineTo(q,y):g.moveTo(q,y);st=true;}g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function grid(g,cx,cy,sc,nx,ny){g.strokeStyle=css('--grid');g.lineWidth=1;for(let i=-nx;i<=nx;i++){g.beginPath();g.moveTo(cx+i*sc,cy-ny*sc);g.lineTo(cx+i*sc,cy+ny*sc);g.stroke();}for(let j=-ny;j<=ny;j++){g.beginPath();g.moveTo(cx-nx*sc,cy+j*sc);g.lineTo(cx+nx*sc,cy+j*sc);g.stroke();}seg(g,cx-nx*sc,cy,cx+nx*sc,cy,css('--muted'),2);seg(g,cx,cy-ny*sc,cx,cy+ny*sc,css('--muted'),2);}
+function box(g,x0,y0,w,h){g.fillStyle=css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const deg=Math.PI/180;
+
+
+function wl(l){const t=[[380,[130,0,200]],[440,[30,30,255]],[490,[0,190,255]],[510,[0,210,60]],[580,[240,220,0]],[645,[255,40,0]],[750,[170,0,0]]];if(l<380)l=380;if(l>750)l=750;
+ for(let i=0;i<t.length-1;i++)if(l<=t[i+1][0]){const f=(l-t[i][0])/(t[i+1][0]-t[i][0]),a=t[i][1],b=t[i+1][1];return 'rgb('+a.map((v,j)=>Math.round(v+(b[j]-v)*f)).join(',')+')';}}
+function strip(g,x0,y0,w,h,I,col){for(let q=0;q<w;q+=2){g.globalAlpha=Math.max(0,Math.min(1,I(q)));g.fillStyle=col;g.fillRect(x0+q,y0,2,h);}g.globalAlpha=1;g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(x0,y0,w,h);}
+const sinc2=b=>Math.abs(b)<1e-9?1:(Math.sin(b)/b)**2;
+const sci=(v,d=2)=>{if(!isFinite(v))return '—';const e=Math.floor(Math.log10(Math.abs(v)));if(e>=-2&&e<4)return v.toFixed(Math.max(0,d-e));return (v/Math.pow(10,e)).toFixed(d)+'×10^'+e;};
+
+$('p1a').onclick=()=>{$('i1i').value=20;$('i1t').value=60;};$('p1b').onclick=()=>{$('i1i').value=12;$('i1t').value=30;};
+function lab1(){const g=ctx('c1'),I0=sl('i1i','o1i',v=>v.toFixed(1)),th=sl('i1t','o1t',v=>v+'°'),I=I0*Math.cos(th*deg)**2;$('r1a').textContent='I = I₀ cos²θ = '+I.toFixed(2)+' W/m²';$('r1b').textContent='I/I₀ = '+(I/I0).toFixed(3);
+ const y0=200;seg(g,40,y0,700,y0,css('--o'),3);const disc=(cx,a,col)=>{g.strokeStyle=css('--ink');g.lineWidth=3;g.beginPath();g.ellipse(cx,y0,25,110,0,0,7);g.stroke();seg(g,cx-25*Math.sin(a)*.3,y0-95*Math.cos(a),cx+25*Math.sin(a)*.3,y0+95*Math.cos(a),col,4);};disc(200,0,css('--o'));disc(500,th*deg,css('--b'));
+ for(let i=0;i<3;i++){const px=300+i*60;seg(g,px,y0,px,y0-70,css('--o'),3);}for(let i=0;i<3;i++){const px=600+i*40,A=70*Math.cos(th*deg);seg(g,px,y0,px+A*Math.sin(th*deg)*.3,y0-A*Math.cos(th*deg),css('--b'),3);}
+ const X0=760,Y0=540,gx=400,gy=380;seg(g,X0,Y0,X0+gx,Y0,css('--muted'),2);seg(g,X0,Y0,X0,Y0-gy,css('--muted'),2);curve(g,q=>Y0-gy*Math.cos((q-X0)/gx*Math.PI)**2,X0,X0+gx,css('--o'),3);dot(g,X0+th/180*gx,Y0-gy*Math.cos(th*deg)**2,8,css('--b'));
+ text(g,'0°',X0,Y0+25,css('--muted'),'center',18);text(g,'90°',X0+gx/2,Y0+25,css('--muted'),'center',18);text(g,'180°',X0+gx,Y0+25,css('--muted'),'center',18);}
+$('p2a').onclick=()=>{$('i2m').value=1.33;$('i2t').value=53.1;};$('p2b').onclick=()=>{$('i2t').value=(Math.atan(+$('i2m').value)/deg).toFixed(1);};
+function lab2(){const g=ctx('c2'),m=sl('i2m','o2m',v=>v.toFixed(2)),a=sl('i2t','o2t',v=>v.toFixed(1)+'°')*deg,t2=Math.asin(Math.sin(a)/m),ci=Math.cos(a),ct=Math.cos(t2),rs=((ci-m*ct)/(ci+m*ct))**2,rp=((m*ci-ct)/(m*ci+ct))**2,tb=Math.atan(m);
+ $('r2a').textContent='φp = arctan μ = '+(tb/deg).toFixed(2)+'°,  r = 90° − φp = '+(90-tb/deg).toFixed(2)+'°';$('r2b').textContent='Rs = '+(rs*100).toFixed(2)+'%,  Rp = '+(rp*100).toFixed(2)+'%';$('r2c').textContent='درجة استقطاب المنعكس = '+((rs-rp)/(rs+rp)*100).toFixed(0)+'%';$('r2c').className='';
+ const cx=330,yi=300,L=240;g.fillStyle=css('--b');g.globalAlpha=.12;g.fillRect(20,yi,620,280);g.globalAlpha=1;seg(g,20,yi,640,yi,css('--muted'),2);seg(g,cx,40,cx,560,css('--muted'),1.5,[6,6]);
+ seg(g,cx-L*Math.sin(a),yi-L*Math.cos(a),cx,yi,css('--o'),4);seg(g,cx,yi,cx+L*Math.sin(a),yi-L*Math.cos(a),css('--o'),1+30*(rs+rp)/2);seg(g,cx,yi,cx+L*Math.sin(t2),yi+L*Math.cos(t2),css('--o'),4);
+ const X0=720,Y0=540,gx=440,gy=420,R=th=>{const b=Math.asin(Math.sin(th)/m),c1=Math.cos(th),c2=Math.cos(b);return [((c1-m*c2)/(c1+m*c2))**2,((m*c1-c2)/(m*c1+c2))**2];};seg(g,X0,Y0,X0+gx,Y0,css('--muted'),2);seg(g,X0,Y0,X0,Y0-gy,css('--muted'),2);
+ curve(g,q=>Y0-gy*R((q-X0)/gx*Math.PI/2*0.999)[0],X0,X0+gx,css('--b'),3);curve(g,q=>Y0-gy*R((q-X0)/gx*Math.PI/2*0.999)[1],X0,X0+gx,css('--o'),3);seg(g,X0+tb/(Math.PI/2)*gx,Y0,X0+tb/(Math.PI/2)*gx,Y0-gy,css('--ink'),1.5,[5,5]);seg(g,X0+a/(Math.PI/2)*gx,Y0,X0+a/(Math.PI/2)*gx,Y0-gy,css('--r'),2);
+ text(g,'Rs',X0+gx-5,Y0-gy+20,css('--b'),'right',20);text(g,'Rp',X0+gx-5,Y0-gy+45,css('--o'),'right',20);}
+function lab3(){const g=ctx('c3'),m=sl('i3n','o3n'),mu=sl('i3m','o3m',v=>v.toFixed(2)),k=Math.pow(2*mu/(1-mu*mu),2),P=m/(m+k);$('r3a').textContent='P = m / [m + (2μ/(1 − μ²))²] = '+(P*100).toFixed(1)+'%';
+ for(let i=0;i<Math.min(m,20);i++){g.save();g.translate(200+i*28,250);g.rotate(0.6);g.fillStyle=css('--b');g.globalAlpha=.2;g.fillRect(-6,-150,12,300);g.globalAlpha=1;g.restore();}seg(g,40,250,1160,250,css('--o'),3);
+ const X0=120,Y0=560,gx=1000,gy=180;seg(g,X0,Y0,X0+gx,Y0,css('--muted'),2);seg(g,X0,Y0,X0,Y0-gy,css('--muted'),2);curve(g,q=>{const mm=(q-X0)/gx*30;return Y0-gy*mm/(mm+k);},X0,X0+gx,css('--o'),3);dot(g,X0+m/30*gx,Y0-gy*P,8,css('--b'));text(g,'m',X0+gx,Y0+25,css('--muted'),'center',20);}
+$('p4').onclick=()=>{$('i4l').value=600;$('i4n').value=0.01;$('i4d').value=15;};
+function lab4(){const g=ctx('c4'),l=sl('i4l','o4l')*1e-9,dn=sl('i4n','o4n',v=>v.toFixed(3)),d=sl('i4d','o4d',v=>v.toFixed(1))*1e-6,D=dn*d,del=2*Math.PI*D/l,q=(D/l)%1;
+ $('r4a').textContent='Δ = (μO − μE)d = '+(D*1e9).toFixed(1)+' nm = '+(D/l).toFixed(3)+' λ';$('r4b').className='';$('r4b').textContent='d(λ/4) = '+(l/(4*dn)*1e6).toFixed(2)+' μm ،  d(λ/2) = '+(l/(2*dn)*1e6).toFixed(2)+' μm'+(Math.abs(q-0.25)<0.01||Math.abs(q-0.75)<0.01?' — الخرج دائري':(Math.abs(q-0.5)<0.01?' — الخرج خطي مدار 90°':''));
+ const cx=850,cy=300,R=220;g.strokeStyle=css('--grid');g.lineWidth=2;g.strokeRect(cx-R,cy-R,2*R,2*R);seg(g,cx-R,cy,cx+R,cy,css('--grid'),1);seg(g,cx,cy-R,cx,cy+R,css('--grid'),1);
+ g.beginPath();for(let i=0;i<=360;i++){const s=i/360*2*Math.PI,px=cx+R*0.8*Math.cos(s),py=cy-R*0.8*Math.cos(s+del);i?g.lineTo(px,py):g.moveTo(px,py);}g.strokeStyle=css('--o');g.lineWidth=4;g.stroke();
+ dot(g,cx+R*0.8*Math.cos(T*3),cy-R*0.8*Math.cos(T*3+del),9,css('--ink'));g.fillStyle=css('--b');g.globalAlpha=.15;g.fillRect(150,100,250,400);g.globalAlpha=1;seg(g,40,300,150,300,css('--o'),3);seg(g,400,300,560,300,css('--o'),3);text(g,'δ = '+(del/Math.PI).toFixed(2)+'π',275,560,css('--ink'),'center');}
+$('p5a').onclick=()=>{$('i5s').value=0.2;$('i5r').value=0.5;$('i5d').value=2;};$('p5b').onclick=()=>{$('i5s').value=66.5;};
+function lab5(){const g=ctx('c5'),S=sl('i5s','o5s',v=>v.toFixed(1)),rho=sl('i5r','o5r',v=>v.toFixed(2)),d=sl('i5d','o5d',v=>v.toFixed(1)),th=S*rho*d;$('r5a').textContent='θ = S ρ d = '+th.toFixed(3)+'°';
+ const y0=300;seg(g,40,y0,1160,y0,css('--o'),3);const disc=(cx,a,col)=>{g.strokeStyle=css('--ink');g.lineWidth=3;g.beginPath();g.ellipse(cx,y0,25,120,0,0,7);g.stroke();seg(g,cx-25*Math.sin(a)*.3,y0-105*Math.cos(a),cx+25*Math.sin(a)*.3,y0+105*Math.cos(a),col,4);};
+ disc(160,0,css('--o'));g.fillStyle='#F7D35C';g.globalAlpha=.15+0.6*rho;g.fillRect(260,y0-70,120+d*120,140);g.globalAlpha=1;g.strokeStyle=css('--ink');g.strokeRect(260,y0-70,120+d*120,140);disc(Math.min(1080,420+d*120),th*deg,css('--b'));}
+
+function loop(t){T=reduce?0:t/1000;({t1:typeof lab1!=='undefined'?lab1:null,t2:typeof lab2!=='undefined'?lab2:null,t3:typeof lab3!=='undefined'?lab3:null,t4:typeof lab4!=='undefined'?lab4:null,t5:typeof lab5!=='undefined'?lab5:null})[active]();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المعمل الافتراضي — التجربة 7: مضخم ألياف الإربيوم EDFA</title>
+<style>
+  :root{
+    --bg:#120a0b; --panel:#1e1214; --panel2:#28181b; --line:#3d262a;
+    --ruby:#c2183b; --ruby2:#e8435f; --gold:#d4a64a; --gold2:#f0cf86;
+    --text:#f3e9e4; --muted:#bfa9a3; --ok:#5fbf7f; --bad:#e8435f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#3a0f18 0%,var(--bg) 55%);color:var(--text);
+       font-family:"Segoe UI",Tahoma,"Geeza Pro","Arial",sans-serif;line-height:1.7}
+  header{padding:22px 18px 10px;text-align:center;border-bottom:1px solid var(--line)}
+  header .tag{display:inline-block;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:2px 14px;font-size:13px}
+  h1{margin:8px 0 2px;font-size:26px;color:var(--text)}
+  h1 span{color:var(--ruby2)}
+  header p{margin:0;color:var(--muted);font-size:14px}
+  .wrap{max-width:1100px;margin:0 auto;padding:14px}
+  .safety{background:linear-gradient(90deg,#4a1220,#2a1014);border:1px solid var(--ruby);border-radius:12px;padding:10px 14px;margin:12px 0;font-size:14px}
+  .safety b{color:var(--gold2)}
+  nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  nav button{flex:1 1 150px;background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:10px;
+             font:inherit;font-size:15px;cursor:pointer}
+  nav button.on{background:var(--ruby);color:#fff;border-color:var(--ruby)}
+  section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+  section.on{display:block}
+  h2{margin:0 0 10px;font-size:20px;color:var(--gold2)}
+  h3{margin:14px 0 6px;font-size:16px;color:var(--ruby2)}
+  .eq{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:"Cambria Math","Times New Roman",serif;font-style:italic;
+      background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 12px;margin:4px 0;font-size:18px;color:#fff}
+  .eq.big{display:block;text-align:center;font-size:22px;margin:8px auto;max-width:420px}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  label{display:block;font-size:14px;color:var(--muted);margin-top:8px}
+  input[type=range]{width:100%;accent-color:var(--ruby)}
+  select,input[type=number],input[type=text]{background:#0f0809;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+  .val{color:var(--gold2);font-weight:bold}
+  .btn{background:var(--ruby);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px}
+  .btn.gold{background:var(--gold);color:#1a0d0f}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px;background:#07040a;border:1px solid var(--line)}
+  #screenCv{cursor:crosshair}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+  th,td{border:1px solid var(--line);padding:6px;text-align:center}
+  th{background:#3a1520;color:var(--gold2)}
+  td input{text-align:center}
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+  .q p{margin:0 0 6px;font-weight:bold}
+  .opt{display:block;width:100%;text-align:right;background:#0f0809;color:var(--text);border:1px solid var(--line);border-radius:8px;
+       padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+  .opt.right{border-color:var(--ok);background:#13301e}
+  .opt.wrong{border-color:var(--bad);background:#3a121a}
+  .fb{font-size:14px;color:var(--muted);min-height:1.2em}
+  .note{font-size:14px;color:var(--muted)}
+  .reading{font-size:20px;color:var(--gold2)}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:16px}
+  .pill{display:inline-block;background:#3a1520;border:1px solid var(--ruby);border-radius:20px;padding:1px 10px;font-size:13px;margin:2px}
+  input[type=number]{direction:ltr;text-align:center}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header>
+  <span class="tag">فيزياء الليزر وتطبيقاته — المعمل الافتراضي للعملي</span>
+  <h1>التجربة 7: <span>مضخم ألياف الإربيوم المشوبة</span></h1>
+  <p>Erbium-Doped Fiber Amplifier (EDFA) — الكسب وقدرة الخرج</p>
+</header>
+<div class="wrap">
+  <div class="safety">⚠️ <b>تنبيه سلامة مهم:</b> ليزر الضخ ⁦(980 nm)⁩ وإشارة الدخل ⁦(1550 nm)⁩ <b>غير مرئيين</b>، فلن ترى الخطر. لا تنظر أبدًا إلى طرف ليف أو موصل مفتوح، وأطفئ الضخ قبل فك أي موصل، وغطِّ الموصلات غير المستخدمة بأغطيتها. استخدم الموهِّن لحماية المستقبل الضوئي.</div>
+  <nav>
+    <button class="on" data-s="s1">1) أسئلة التحضير</button>
+    <button data-s="s2">2) فكرة التجربة</button>
+    <button data-s="s3">3) المحاكاة والقياس</button>
+    <button data-s="s4">4) الجداول والحسابات</button>
+    <button data-s="s5">5) ماذا لو…؟</button>
+  </nav>
+
+  <section id="s1" class="on">
+    <h2>أسئلة التحضير قبل المعمل</h2>
+    <p class="note">أجب عنها قبل حضور التجربة؛ يظهر التصحيح مباشرة بعد اختيارك.</p>
+    <div id="quiz"></div><p class="reading" id="qscore"></p>
+  </section>
+
+  <section id="s2">
+    <h2>فكرة التجربة</h2>
+    <p>مضخم ألياف الإربيوم ليف زجاجي من السيليكا مشوب بأيونات الإربيوم <span class="ltr">Er³⁺</span>. يرفع ليزر الضخ ⁦(980 nm أو 1480 nm)⁩ الأيونات إلى مستويات أعلى فيحدث انقلاب إسكاني بين المستوى شبه المستقر والمستوى الأرضي،
+       فتُضخَّم إشارة الاتصالات في نطاق ⁦1520–1580 nm⁩ بالانبعاث المستحث (نظام ثلاثي المستويات).</p>
+    <h3>الكسب بالديسيبل</h3>
+    <span class="eq big">G(dB) = 10 log₁₀ (P<sub>out</sub> / P<sub>in</sub>) = P<sub>out</sub>(dBm) − P<sub>in</sub>(dBm)</span>
+    <p>حيث <span class="eq">P(dBm) = 10 log₁₀ (P / 1 mW)</span>. ويرتبط الكسب بمعامل الكسب <span class="eq">g</span> وطول الليف <span class="eq">l</span>:</p>
+    <span class="eq big">G(dB) = 4.34 g l</span>
+    <h3>ما الذي سنلاحظه؟</h3>
+    <p>• عند ضخ ضعيف يمتص الليف الإشارة (كسب سالب)، ثم يزداد الكسب مع قدرة الضخ حتى يقترب من الإشباع.<br>
+       • عند قدرة ضخ ثابتة يقل الكسب كلما زادت قدرة الإشارة (إشباع الكسب)، لأن الإشارة القوية تستهلك الانقلاب الإسكاني.</p>
+    <div class="card"><b>الأجهزة:</b> وحدة ليزر الضخ — ليف الإربيوم (وحدة EDFA) — مصدر إشارة ⁦1550 nm⁩ — موهِّن ضوئي — مستقبل ضوئي / مقياس قدرة — موصلات ألياف أحادية النمط.</div>
+  </section>
+
+  <section id="s3">
+    <h2>المحاكاة والقياس</h2>
+    <div class="grid">
+      <div class="card">
+        <canvas dir="ltr" id="setupCv" width="520" height="220"></canvas>
+        <label>تيار ليزر الضخ ← قدرة الضخ: <span class="val ltr" id="ppV"></span></label>
+        <input type="range" id="pp" min="0" max="120" step="1" value="0">
+        <label>قدرة إشارة الدخل <span class="ltr">P<sub>in</sub></span></label>
+        <select id="pin">
+          <option value="-30">⁦−30 dBm⁩</option><option value="-25">⁦−25 dBm⁩</option><option value="-20" selected>⁦−20 dBm⁩</option>
+          <option value="-15">⁦−15 dBm⁩</option><option value="-10">⁦−10 dBm⁩</option><option value="-5">⁦−5 dBm⁩</option><option value="0">⁦0 dBm⁩</option></select>
+      </div>
+      <div class="card">
+        <p>قراءة مقياس القدرة عند خرج المضخم:</p>
+        <div class="reading ltr" id="meter" style="font-size:34px">—</div>
+        <p class="note">القراءة بعد تصحيح توهين الموهِّن، بدقة <span class="ltr">0.1 dB</span>.</p>
+        <h3>الجزء أ: الخرج والكسب مقابل قدرة الضخ</h3>
+        <p class="note">ثبّت <span class="ltr">P<sub>in</sub> = −20 dBm</span> وغيّر قدرة الضخ.</p>
+        <button class="btn" id="recA">سجّل في الجدول أ</button>
+        <h3>الجزء ب: الكسب مقابل قدرة الإشارة</h3>
+        <p class="note">ثبّت قدرة الضخ عند <span class="ltr">100 mW</span> وغيّر <span class="ltr">P<sub>in</sub></span>.</p>
+        <button class="btn" id="recB">سجّل في الجدول ب</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="s4">
+    <h2>الجداول والحسابات</h2>
+    <p class="note">احسب الكسب لكل قراءة بنفسك <span class="ltr">G = P<sub>out</sub> − P<sub>in</sub></span> ثم اضغط «تحقّق».</p>
+    <h3>الجدول أ — <span class="ltr">P<sub>in</sub></span> ثابتة</h3>
+    <table><thead><tr><th>قدرة الضخ (mW)</th><th>P<sub>out</sub> (dBm)</th><th>الكسب الذي حسبته (dB)</th><th>النتيجة</th></tr></thead><tbody id="tbA"></tbody></table>
+    <h3>الجدول ب — قدرة الضخ ثابتة</h3>
+    <table><thead><tr><th>P<sub>in</sub> (dBm)</th><th>P<sub>out</sub> (dBm)</th><th>الكسب الذي حسبته (dB)</th><th>النتيجة</th></tr></thead><tbody id="tbB"></tbody></table>
+    <button class="btn gold" id="chkBtn">تحقّق من حساباتي وارسم المنحنيات</button>
+    <button class="btn ghost" id="clrBtn">مسح الجدولين</button>
+    <div class="grid" style="margin-top:10px">
+      <div class="card"><canvas dir="ltr" id="pl1" width="500" height="260"></canvas></div>
+      <div class="card"><canvas dir="ltr" id="pl2" width="500" height="260"></canvas></div>
+      <div class="card"><canvas dir="ltr" id="pl3" width="500" height="260"></canvas></div>
+      <div class="card" id="resBox"><p class="note">المنحنيات الثلاثة المطلوبة في التقرير: (أ) قدرة الخرج مقابل قدرة الضخ، (ب) الكسب مقابل قدرة الضخ، (ج) الكسب مقابل قدرة إشارة الخرج.</p></div>
+    </div>
+    <p class="note">📄 ملف Excel للتحقق الذاتي موجود في صفحة التجربة: أدخل قراءاتك فيه بعد رسمك اليدوي، وأرفق صورة نتيجته في آخر تقريرك.</p>
+  </section>
+
+  <section id="s5">
+    <h2>ماذا لو…؟</h2>
+    <p class="note">توقّع الإجابة أولًا، ثم جرّب في المحاكاة واضغط «أظهر التفسير».</p>
+    <div id="whatif"></div>
+  </section>
+</div>
+<footer>إعداد: أ.د. نجم الحصيني — قسم الفيزياء، جامعة الطائف</footer>
+<script>
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');document.getElementById(b.dataset.s).classList.add('on');upd();});
+const Q=[
+ {q:'لماذا تقع إشارة الاتصالات المضخَّمة قرب 1550 nm؟',o:['لأنها مرئية','لأنها توافق انتقال أيونات الإربيوم وأقل فقد في ألياف السيليكا','لأن الليزر الأحمر لا يعمل في الألياف','بلا سبب'],a:1,e:'انتقال Er³⁺ يقع في هذا النطاق، وهو نفسه نطاق أقل توهين في ألياف السيليكا.'},
+ {q:'إذا كانت P_in = −20 dBm و P_out = 5 dBm فإن الكسب:',o:['−15 dB','25 dB','−25 dB','100 dB'],a:1,e:'G = P_out − P_in = 5 − (−20) = 25 dB.'},
+ {q:'كسب 20 dB يعني أن القدرة تضاعفت:',o:['20 مرة','2 مرة','100 مرة','1000 مرة'],a:2,e:'20 dB = 10 log(100).'},
+ {q:'لماذا يقل الكسب عندما تكون إشارة الدخل قوية؟',o:['لأن الليف يسخن','لأن الإشارة القوية تستهلك الأيونات المثارة فينخفض الانقلاب الإسكاني (الإشباع)','لأن الموهِّن يعمل','لأن الضخ يتوقف'],a:1,e:'هذا إشباع الكسب: الانبعاث المستحث السريع يفرغ المستوى العلوي أسرع مما يعيد الضخ ملأه.'},
+ {q:'أي سلوك آمن مع ليزرات الألياف تحت الحمراء؟',o:['النظر إلى طرف الليف للتأكد من خروج الضوء','فك الموصل والضخ يعمل','إطفاء الضخ قبل فك الموصلات وعدم النظر إلى أطراف الألياف','لا خطر لأن الضوء غير مرئي'],a:2,e:'الضوء غير المرئي خطر على العين لأنه لا يسبب رد فعل الإغماض.'}
+];
+let score=0,answered=0;const qz=document.getElementById('quiz');
+Q.forEach((it,i)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+(/dB/.test(o)?'<span class="ltr">'+o+'</span>':o)+'</button>').join('')+'<div class="fb"></div>';
+  d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(d.dataset.done)return;d.dataset.done=1;answered++;const j=+b.dataset.j;
+    d.querySelectorAll('.opt')[it.a].classList.add('right');
+    if(j===it.a){score++;d.querySelector('.fb').innerHTML='<span class="ok">✔ صحيح.</span> '+it.e;}
+    else{b.classList.add('wrong');d.querySelector('.fb').innerHTML='<span class="bad">✘ ليس هذا.</span> '+it.e;}
+    if(answered===Q.length)document.getElementById('qscore').textContent='نتيجتك: '+score+' من '+Q.length;});
+  qz.appendChild(d);});
+// ---- EDFA model (phenomenological) ----
+const A0=-9, GMAX=32, PTH=6, PS=28, PSAT=10; // dB, dB, mW, mW, mW (output saturation)
+function g0(pp){ // small-signal gain dB
+  return A0+(GMAX-A0)*(1-Math.exp(-Math.max(0,pp)/PS))*(pp/(pp+PTH));}
+function gain(pp,pinDbm){const pin=Math.pow(10,pinDbm/10),G0=Math.pow(10,g0(pp)/10);let G=G0;
+  for(let k=0;k<200;k++){const Gn=G0*Math.exp(-(G-1)*pin/PSAT);G=0.7*G+0.3*Gn;}
+  return 10*Math.log10(G);}
+function noise(){return (Math.random()-0.5)*0.16;}
+let A=[],B=[],last=null;
+const pp=document.getElementById('pp'),pin=document.getElementById('pin');
+const sc=document.getElementById('setupCv'),sx=sc.getContext('2d');
+function drawSetup(){const W=520,H=220;sx.fillStyle='#07040a';sx.fillRect(0,0,W,H);
+  const box=(x,y,w,h,t,c)=>{sx.fillStyle='#2a1a1c';sx.fillRect(x,y,w,h);sx.strokeStyle=c||'#d4a64a';sx.lineWidth=2;sx.strokeRect(x,y,w,h);sx.fillStyle='#f3e9e4';sx.font='13px Tahoma, Arial';sx.textAlign='center';sx.fillText(t,x+w/2,y+h/2+4);sx.textAlign='start';};
+  box(10,40,90,40,'Signal 1550');box(10,140,90,40,'Pump 980');box(160,80,130,60,'EDFA (Er fiber)','#e8435f');box(330,90,70,40,'Atten.');box(430,90,80,40,'Detector');
+  const on=+pp.value>0;sx.strokeStyle='#888';sx.lineWidth=3;
+  sx.beginPath();sx.moveTo(100,60);sx.lineTo(160,100);sx.moveTo(100,160);sx.lineTo(160,120);sx.moveTo(290,110);sx.lineTo(330,110);sx.moveTo(400,110);sx.lineTo(430,110);sx.stroke();
+  sx.fillStyle='#bfa9a3';sx.font='11px Tahoma, Arial';sx.fillText('(invisible IR — schematic colours only)',150,205);
+  if(on){sx.strokeStyle='rgba(255,140,40,'+Math.min(1,+pp.value/60)+')';sx.lineWidth=2;sx.beginPath();sx.moveTo(100,160);sx.lineTo(160,120);sx.stroke();}}
+function upd(){drawSetup();document.getElementById('ppV').textContent=pp.value+' mW';
+  const G=gain(+pp.value,+pin.value); const pout=+pin.value+G+noise(); last={pp:+pp.value,pin:+pin.value,pout:Math.round(pout*10)/10};
+  document.getElementById('meter').textContent='P_out = '+last.pout.toFixed(1)+' dBm';}
+pp.oninput=upd;pin.onchange=upd;
+document.getElementById('recA').onclick=()=>{if(last.pin!==-20){alert('في الجزء أ ثبّت P_in عند −20 dBm.');return;}
+  A=A.filter(r=>r.pp!==last.pp);A.push({...last,u:null});A.sort((a,b)=>a.pp-b.pp);render();};
+document.getElementById('recB').onclick=()=>{if(last.pp!==100){alert('في الجزء ب ثبّت قدرة الضخ عند 100 mW.');return;}
+  B=B.filter(r=>r.pin!==last.pin);B.push({...last,u:null});B.sort((a,b)=>a.pin-b.pin);render();};
+function rowHTML(r,first){return '<td><span class="ltr">'+first+'</span></td><td><span class="ltr">'+r.pout.toFixed(1)+'</span></td><td><input type="number" step="0.1" value="'+(r.u??'')+'"></td><td>'+(r.res||'')+'</td>';}
+function render(){[['tbA',A,r=>r.pp],['tbB',B,r=>r.pin]].forEach(([id,arr,f])=>{const tb=document.getElementById(id);tb.innerHTML='';
+  arr.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=rowHTML(r,f(r));tr.querySelector('input').oninput=e=>{r.u=e.target.value===''?null:+e.target.value;};tb.appendChild(tr);});});}
+document.getElementById('clrBtn').onclick=()=>{A=[];B=[];render();};
+function plot(id,pts,xl,yl){const c=document.getElementById(id),x=c.getContext('2d'),W=c.width,H=c.height,m=46;x.fillStyle='#07040a';x.fillRect(0,0,W,H);
+  if(!pts.length)return;const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);let x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  if(x1===x0)x1=x0+1;if(y1===y0)y1=y0+1;const px=v=>m+(v-x0)/(x1-x0)*(W-m-16),py=v=>H-m+6-(v-y0)/(y1-y0)*(H-m-14);
+  x.strokeStyle='#bfa9a3';x.fillStyle='#bfa9a3';x.font='12px Tahoma, Arial';x.textAlign='center';x.beginPath();x.moveTo(m,8);x.lineTo(m,H-m+6);x.lineTo(W-8,H-m+6);x.stroke();
+  x.fillText(xl,W/2,H-8);x.save();x.translate(12,H/2);x.rotate(-Math.PI/2);x.fillText(yl,0,0);x.restore();
+  for(let k=0;k<=4;k++){const v=x0+(x1-x0)*k/4;x.fillText(v.toFixed(0),px(v),H-m+22);const w=y0+(y1-y0)*k/4;x.fillText(w.toFixed(1),m-20,py(w)+4);}
+  x.strokeStyle='#d4a64a';x.beginPath();pts.forEach((p,i)=>{i?x.lineTo(px(p[0]),py(p[1])):x.moveTo(px(p[0]),py(p[1]));});x.stroke();
+  x.fillStyle='#e8435f';pts.forEach(p=>{x.beginPath();x.arc(px(p[0]),py(p[1]),4,0,7);x.fill();});}
+document.getElementById('chkBtn').onclick=()=>{if(A.length<4||B.length<4){alert('سجّل 4 قراءات على الأقل في كل جدول.');return;}
+  let ok=0,n=0;[...A,...B].forEach(r=>{const G=r.pout-r.pin;n++;
+    if(r.u==null)r.res='<span class="bad">لم تحسب</span>';else if(Math.abs(r.u-G)<=0.15){r.res='<span class="ok">✔</span>';ok++;}else r.res='<span class="bad">✘ راجع: <span class="ltr">'+G.toFixed(1)+'</span></span>';});
+  render();
+  plot('pl1',A.map(r=>[r.pp,r.pout]),'Pump power (mW)','P_out (dBm)');
+  plot('pl2',A.map(r=>[r.pp,r.pout-r.pin]),'Pump power (mW)','Gain (dB)');
+  plot('pl3',B.map(r=>[r.pout,r.pout-r.pin]),'P_out (dBm)','Gain (dB)');
+  const gmax=Math.max(...A.map(r=>r.pout-r.pin)), gsmall=Math.max(...B.map(r=>r.pout-r.pin)), glarge=Math.min(...B.map(r=>r.pout-r.pin));
+  document.getElementById('resBox').innerHTML='حساباتك الصحيحة: <b>'+ok+'</b> من '+n+'<br>أعلى كسب في الجزء أ: <span class="ltr val">'+gmax.toFixed(1)+' dB</span><br>'+
+   'انخفاض الكسب بالإشباع في الجزء ب: من <span class="ltr">'+gsmall.toFixed(1)+'</span> إلى <span class="ltr">'+glarge.toFixed(1)+' dB</span><br>'+
+   '<span class="note">في المناقشة: حدّد قدرة الضخ التي يصبح عندها الكسب موجبًا (عتبة الشفافية)، وفسّر انخفاض الكسب عند الإشارات القوية.</span>';};
+const WI=[
+ {q:'لماذا يكون الكسب سالبًا عند قدرة ضخ صغيرة جدًا؟',a:'لأن معظم الأيونات في المستوى الأرضي فتمتص الإشارة؛ يحتاج النظام ثلاثي المستويات إلى ضخ يزيد على عتبة الشفافية قبل أن يبدأ التضخيم.'},
+ {q:'ماذا لو ضاعفنا قدرة الضخ وهي أصلًا عالية؟',a:'يزيد الكسب قليلًا فقط لأنه يقترب من الإشباع: معظم الأيونات مثارة بالفعل. جرّب بين 80 و 120 mW.'},
+ {q:'لماذا نستخدم موهِّنًا قبل المستقبل؟',a:'لأن قدرة الخرج قد تتجاوز حد المستقبل فيتشبع أو يتلف؛ ثم نصحح القراءة بإضافة قيمة التوهين (بالديسيبل).'},
+ {q:'كم مرة تضاعفت القدرة إذا كان الكسب 30 dB؟',a:'1000 مرة، لأن 30 dB = 10 log₁₀(1000).'},
+ {q:'لماذا أحدث EDFA ثورة في اتصالات الألياف البصرية؟',a:'لأنه يضخّم الإشارة الضوئية مباشرة دون تحويلها إلى كهربائية، ولعدة قنوات (أطوال موجية) معًا، فقلّل كلفة مكررات الخطوط الطويلة.'}
+];
+const wi=document.getElementById('whatif');
+WI.forEach((w,i)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+w.q+'</p><button class="btn ghost">أظهر التفسير</button><div class="fb" style="display:none;margin-top:6px">'+w.a+'</div>';
+  d.querySelector('button').onclick=()=>{d.querySelector('.fb').style.display='block';};wi.appendChild(d);});
+upd();
+</script>
+<script>window.REAL_CFG={
+ id:'exp7', intro:'اكتب قراءات المستقبل الضوئي من المعمل الحقيقي (بعد تصحيح توهين الموهِّن)، واحسب الكسب G = P<sub>out</sub> − P<sub>in</sub> بيدك.', minRows:2,
+ consts:[{id:'pin',label:'قدرة الإشارة في الجدول أ P<sub>in</sub> (dBm)',def:-20}],
+ tables:[{title:'الجدول أ — P<sub>in</sub> ثابتة', rows:8, cols:[{key:'pump',label:'قدرة الضخ (mW)'},{key:'out',label:'P<sub>out</sub> (dBm)'}],
+   user:{label:'الكسب الذي حسبته (dB)', ref:(o,c)=>o.out-c.pin, tol:{abs:0.15}, d:1}},
+  {title:'الجدول ب — قدرة الضخ ثابتة', rows:7, cols:[{key:'pin',label:'P<sub>in</sub> (dBm)'},{key:'out',label:'P<sub>out</sub> (dBm)'}],
+   user:{label:'الكسب الذي حسبته (dB)', ref:o=>o.out-o.pin, tol:{abs:0.15}, d:1}}],
+ extras:[],
+ plots:[{table:0, x:o=>o.pump, y:o=>o.out, xl:'pump (mW)', yl:'Pout (dBm)', join:true, title:'(أ)'},
+        {table:0, x:o=>o.pump, y:(o,c)=>o.out-c.pin, xl:'pump (mW)', yl:'G (dB)', join:true, title:'(ب)'},
+        {table:1, x:o=>o.out, y:o=>o.out-o.pin, xl:'Pout (dBm)', yl:'G (dB)', join:true, noZero:true, title:'(ج)'}],
+ result:(D,c)=>{const A=D[0].map(o=>[o.pump,o.out-c.pin]); const B=D[1].map(o=>o.out-o.pin);
+  const gmax=A.length?Math.max(...A.map(a=>a[1])):null; let thr=null; const s=A.slice().sort((a,b)=>a[0]-b[0]);
+  for(let i=1;i<s.length;i++){ if(s[i-1][1]<0&&s[i][1]>=0){ thr=s[i-1][0]+(0-s[i-1][1])*(s[i][0]-s[i-1][0])/(s[i][1]-s[i-1][1]); break; } }
+  const L=[]; if(gmax!=null) L.push('أقصى كسب في الجدول أ: <span class="ltr val">'+gmax.toFixed(1)+' dB</span>');
+  if(thr!=null) L.push('عتبة الشفافية (G = 0) تقريبًا: <span class="ltr">'+thr.toFixed(1)+' mW</span>');
+  if(B.length>1) L.push('تغير الكسب في الجدول ب: من <span class="ltr">'+B[0].toFixed(1)+'</span> إلى <span class="ltr">'+B[B.length-1].toFixed(1)+' dB</span> (إشباع الكسب)');
+  return {lines:L};}
+};</script>
+<script>// ===== Real-lab readings mode (shared engine) =====
+(function(){
+const CFG = window.REAL_CFG;
+const KEY = 'laserlab_real_' + CFG.id;
+let st = {consts:{}, tables:[], extras:{}};
+try { const s = localStorage.getItem(KEY); if (s) st = JSON.parse(s); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e) {} };
+const num = v => (v === '' || v == null || isNaN(+v)) ? null : +v;
+const close = (u, ref, t) => t.abs != null ? Math.abs(u - ref) <= t.abs : Math.abs(u - ref) / Math.abs(ref) <= (t.rel || 0.02);
+const fmt = (v, d) => (v == null || !isFinite(v)) ? '—' : v.toFixed(d);
+
+const s4 = document.getElementById('s4');
+const h2 = s4.querySelector('h2');
+const sim = document.createElement('div'); sim.id = 'simMode';
+while (h2.nextSibling) sim.appendChild(h2.nextSibling);
+// remove Excel note from simulation mode
+sim.querySelectorAll('p.note').forEach(p => { if (p.textContent.indexOf('Excel') >= 0) p.remove(); });
+const sw = document.createElement('div'); sw.className = 'modesw';
+sw.innerHTML = '<button class="btn gold" id="mReal">قراءات المعمل الحقيقي</button><button class="btn ghost" id="mSim">قراءات من المحاكاة</button>';
+const real = document.createElement('div'); real.id = 'realMode';
+h2.after(sw); sw.after(real); real.after(sim);
+
+const css = document.createElement('style');
+css.textContent = '.modesw{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}#realMode input.rin{background:#3a2e10;border:1px solid #d4a64a;color:#fff6dc;border-radius:6px;padding:6px;width:100%;min-width:70px;text-align:center;font-size:15px}' +
+ '#realMode .cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}#realMode .cgrid label{display:block;font-size:14px;margin-bottom:3px}#realMode td.calc{color:#bfa9a3}#realMode .tblwrap{overflow-x:auto}#realMode .rtools{margin:6px 0}#realMode h3{margin:14px 0 6px}';
+document.head.appendChild(css);
+
+function setMode(r) {
+  real.style.display = r ? '' : 'none'; sim.style.display = r ? 'none' : '';
+  document.getElementById('mReal').className = 'btn ' + (r ? 'gold' : 'ghost');
+  document.getElementById('mSim').className = 'btn ' + (r ? 'ghost' : 'gold');
+  if (!r && typeof drawPlot === 'function') { try { drawPlot(); } catch(e) {} }
+}
+
+function build() {
+  let h = '<p class="note">' + CFG.intro + ' الخانات الذهبية لقراءاتك وحساباتك؛ تُحفظ تلقائيًا في هذا الجهاز. بعد «تحقّق» التقط صورة لهذه الصفحة وأرفقها في آخر تقريرك.</p>';
+  if (CFG.consts && CFG.consts.length) {
+    h += '<div class="cgrid">';
+    CFG.consts.forEach(c => { const v = st.consts[c.id] ?? c.def ?? ''; h += '<div><label>' + c.label + '</label><input class="rin ltr" type="number" step="any" data-c="' + c.id + '" value="' + v + '"></div>'; });
+    h += '</div>';
+  }
+  CFG.tables.forEach((T, ti) => {
+    if (!st.tables[ti]) st.tables[ti] = [];
+    const rows = st.tables[ti];
+    while (rows.length < (T.rows || 5)) rows.push({});
+    if (T.title) h += '<h3>' + T.title + '</h3>';
+    h += '<div class="tblwrap"><table><thead><tr>';
+    T.cols.forEach(c => h += '<th>' + c.label + '</th>');
+    (T.calc || []).forEach(c => h += '<th>' + c.label + '</th>');
+    if (T.user) h += '<th>' + T.user.label + '</th><th>النتيجة</th>';
+    h += '</tr></thead><tbody>';
+    rows.forEach((r, ri) => {
+      h += '<tr>';
+      T.cols.forEach(c => h += '<td><input class="rin ltr" type="number" step="any" data-t="' + ti + '" data-r="' + ri + '" data-k="' + c.key + '" value="' + (r[c.key] ?? (c.fixed ? c.fixed(ri) : '')) + '"></td>');
+      (T.calc || []).forEach((c, ci) => h += '<td class="calc ltr" id="rc' + ti + '_' + ri + '_' + ci + '"></td>');
+      if (T.user) h += '<td><input class="rin ltr" type="number" step="any" data-t="' + ti + '" data-r="' + ri + '" data-k="_u" value="' + (r._u ?? '') + '"></td><td class="st" id="rs' + ti + '_' + ri + '"></td>';
+      h += '</tr>';
+    });
+    h += '</tbody></table></div><div class="rtools"><button class="btn ghost" data-add="' + ti + '">+ صف</button></div>';
+  });
+  if (CFG.extras && CFG.extras.length) {
+    h += '<div class="cgrid">';
+    CFG.extras.forEach(e => h += '<div><label>' + e.label + '</label><input class="rin ltr" type="number" step="any" data-e="' + e.id + '" value="' + (st.extras[e.id] ?? '') + '"></div>');
+    h += '</div>';
+  }
+  h += '<button class="btn gold" id="rChk">تحقّق من نتائجي</button> <button class="btn ghost" id="rClr">مسح كل القراءات</button>';
+  h += '<div class="grid" style="margin-top:10px">';
+  (CFG.plots || []).forEach((p, i) => h += '<div class="card"><canvas dir="ltr" id="rPlot' + i + '" width="520" height="300"></canvas></div>');
+  h += '<div class="card" id="rRes"><p class="note">تظهر هنا النتائج بعد التحقق.</p></div></div>';
+  real.innerHTML = h;
+  real.querySelectorAll('input[data-c]').forEach(i => i.oninput = () => { st.consts[i.dataset.c] = i.value; save(); refreshCalc(); });
+  real.querySelectorAll('input[data-t]').forEach(i => i.oninput = () => { st.tables[+i.dataset.t][+i.dataset.r][i.dataset.k] = i.value; save(); refreshCalc(); });
+  real.querySelectorAll('input[data-e]').forEach(i => i.oninput = () => { st.extras[i.dataset.e] = i.value; save(); });
+  real.querySelectorAll('button[data-add]').forEach(b => b.onclick = () => { st.tables[+b.dataset.add].push({}); save(); build(); });
+  document.getElementById('rChk').onclick = check;
+  document.getElementById('rClr').onclick = () => { if (!confirmClear()) return; st = {consts:{}, tables:[], extras:{}}; save(); build(); };
+  refreshCalc(); drawPlots(false);
+}
+let clrArm = false;
+function confirmClear() { const b = document.getElementById('rClr'); if (clrArm) { clrArm = false; return true; } clrArm = true; b.textContent = 'اضغط مرة أخرى للتأكيد'; setTimeout(() => { clrArm = false; if (b) b.textContent = 'مسح كل القراءات'; }, 3000); return false; }
+
+function C() { const o = {}; (CFG.consts || []).forEach(c => o[c.id] = num(st.consts[c.id] ?? c.def)); return o; }
+function data(ti) {
+  const T = CFG.tables[ti];
+  return (st.tables[ti] || []).map((r, ri) => { const o = {_ri: ri}; T.cols.forEach(c => o[c.key] = num(r[c.key] ?? (c.fixed ? c.fixed(ri) : null))); o._u = num(r._u); return o; })
+    .filter(o => T.cols.every(c => o[c.key] != null));
+}
+function refreshCalc() {
+  const c = C();
+  CFG.tables.forEach((T, ti) => { (T.calc || []).forEach((cc, ci) => {
+    (st.tables[ti] || []).forEach((r, ri) => {
+      const o = {}; T.cols.forEach(k => o[k.key] = num(r[k.key] ?? (k.fixed ? k.fixed(ri) : null)));
+      const ok = T.cols.every(k => o[k.key] != null);
+      const el = document.getElementById('rc' + ti + '_' + ri + '_' + ci); if (el) el.textContent = ok ? fmt(cc.f(o, c), cc.d ?? 2) : '';
+    });
+  }); });
+}
+function fitOrigin(xs, ys) { let a = 0, b = 0; xs.forEach((x, i) => { a += x * ys[i]; b += x * x; }); return b ? a / b : null; }
+function check() {
+  const c = C(); const miss = (CFG.consts || []).filter(k => c[k.id] == null);
+  const box = document.getElementById('rRes');
+  if (miss.length) { box.innerHTML = '<p class="bad">أدخل أولًا: ' + miss.map(k => k.label).join('، ') + '</p>'; return; }
+  const D = CFG.tables.map((T, ti) => data(ti));
+  if (D.every(d => d.length < (CFG.minRows || 2))) { box.innerHTML = '<p class="bad">أدخل ' + (CFG.minRows || 2) + ' قراءات على الأقل.</p>'; return; }
+  let ok = 0, tot = 0;
+  CFG.tables.forEach((T, ti) => {
+    (st.tables[ti] || []).forEach((r, ri) => { const el = document.getElementById('rs' + ti + '_' + ri); if (el) el.innerHTML = ''; });
+    if (!T.user) return;
+    D[ti].forEach(o => {
+      const ref = T.user.ref(o, c); const el = document.getElementById('rs' + ti + '_' + o._ri); tot++;
+      if (o._u == null) el.innerHTML = '<span class="bad">لم تحسب</span>';
+      else if (close(o._u, ref, T.user.tol || {})) { el.innerHTML = '<span class="ok">✔ صحيح</span>'; ok++; }
+      else el.innerHTML = '<span class="bad">✘ راجع: ' + fmt(ref, T.user.d ?? 1) + '</span>';
+    });
+  });
+  const R = CFG.result(D, c, fitOrigin);
+  let h = '';
+  if (tot) h += '<b>حساباتك الصحيحة في الجدول:</b> ' + ok + ' من ' + tot + '<br>';
+  (CFG.extras || []).forEach(e => {
+    const u = num(st.extras[e.id]); const ref = e.ref(R, D, c);
+    if (ref == null || !isFinite(ref)) return;
+    h += e.label + ': ' + (u == null ? '<span class="bad">لم تُدخل</span>' : close(u, ref, e.tol || {}) ? '<span class="ok">✔ قريب من الصحيح</span>' : '<span class="bad">✘ راجع (الصحيح ≈ <span class="ltr">' + fmt(ref, e.d ?? 3) + '</span>)</span>') + '<br>';
+  });
+  h += '<hr style="border-color:#3a2a2e">' + R.lines.join('<br>');
+  box.innerHTML = h;
+  drawPlots(true, R);
+}
+function drawPlots(withFit, R) {
+  (CFG.plots || []).forEach((P, i) => {
+    const cv = document.getElementById('rPlot' + i); if (!cv) return; const x = cv.getContext('2d');
+    const W = cv.width, H = cv.height, m = 48;
+    x.fillStyle = '#07040a'; x.fillRect(0, 0, W, H);
+    const d = data(P.table); const c = C();
+    const pts = d.map(o => [P.x(o, c), P.y(o, c)]).filter(p => isFinite(p[0]) && isFinite(p[1]));
+    x.strokeStyle = '#bfa9a3'; x.fillStyle = '#bfa9a3'; x.font = '13px Tahoma, Arial'; x.textAlign = 'center';
+    let xmin = Math.min(0, ...pts.map(p => p[0])), xmax = Math.max(1, ...pts.map(p => p[0]));
+    let ymin = Math.min(0, ...pts.map(p => p[1])), ymax = Math.max(1, ...pts.map(p => p[1]));
+    if (P.noZero) { xmin = Math.min(...pts.map(p => p[0]), xmax - 1); ymin = Math.min(...pts.map(p => p[1]), ymax - 1); }
+    const px = (xmax - xmin) * 0.08 || 1, py = (ymax - ymin) * 0.1 || 1; xmax += px; ymax += py; if (xmin < 0) xmin -= px; if (ymin < 0) ymin -= py;
+    const X = v => m + (v - xmin) / (xmax - xmin) * (W - m - 15), Y = v => H - m + 10 - (v - ymin) / (ymax - ymin) * (H - m - 15);
+    x.beginPath(); x.moveTo(m, 8); x.lineTo(m, H - m + 10); x.lineTo(W - 8, H - m + 10); x.stroke();
+    if (xmin < 0) { x.beginPath(); x.moveTo(X(0), 8); x.lineTo(X(0), H - m + 10); x.setLineDash([3, 3]); x.stroke(); x.setLineDash([]); }
+    if (ymin < 0) { x.beginPath(); x.moveTo(m, Y(0)); x.lineTo(W - 8, Y(0)); x.setLineDash([3, 3]); x.stroke(); x.setLineDash([]); }
+    const nice = r => { const e = Math.pow(10, Math.floor(Math.log10(r / 4))); const f = r / 4 / e; return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * e; };
+    const sx = nice(xmax - xmin), sy = nice(ymax - ymin), lbl = v => +(+v.toFixed(6)).toPrecision(4) + '';
+    for (let v = Math.ceil(xmin / sx) * sx; v <= xmax + 1e-9; v += sx) x.fillText(lbl(v), X(v), H - m + 26);
+    x.textAlign = 'right'; for (let v = Math.ceil(ymin / sy) * sy; v <= ymax + 1e-9; v += sy) x.fillText(lbl(v), m - 5, Y(v) + 4); x.textAlign = 'center';
+    x.fillText(P.xl, W / 2, H - 6); x.save(); x.translate(13, H / 2); x.rotate(-Math.PI / 2); x.fillText(P.yl, 0, 0); x.restore();
+    if (withFit && P.fit && R && R[P.fit] != null) { const s = R[P.fit]; x.strokeStyle = '#d4a64a'; x.lineWidth = 2; x.beginPath(); x.moveTo(X(xmin), Y(s * xmin)); x.lineTo(X(xmax), Y(s * xmax)); x.stroke(); x.lineWidth = 1; }
+    if (withFit && P.join) { const q = pts.slice().sort((a, b) => a[0] - b[0]); x.strokeStyle = '#d4a64a'; x.beginPath(); q.forEach((p, k) => k ? x.lineTo(X(p[0]), Y(p[1])) : x.moveTo(X(p[0]), Y(p[1]))); x.stroke(); }
+    x.fillStyle = '#e8435f'; pts.forEach(p => { x.beginPath(); x.arc(X(p[0]), Y(p[1]), 5, 0, 7); x.fill(); });
+    if (P.title) { x.fillStyle = '#d4a64a'; x.textAlign = 'right'; x.fillText(P.title, W - 10, 20); }
+  });
+}
+document.getElementById('mReal').onclick = () => setMode(true);
+document.getElementById('mSim').onclick = () => setMode(false);
+build(); setMode(true);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Light and Optics – Virtual Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=STIX+Two+Text&amp;display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:68ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',Georgia,serif;font-size:1.1rem;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.readout span{display:block}
+.eq{font-family:'STIX Two Text',Georgia,serif;font-size:1.12rem}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Light and Optics Lab</h1><p>Physics 1 (Engineering &amp; Computing) – Chapter 9. Change the values and watch the result, then use the example buttons to check your solutions and answer the question under each experiment.</p></header>
+<nav class="tabs" role="tablist" aria-label="Experiments"><button role="tab" aria-selected="true" data-t="t1">Reflection & refraction</button><button role="tab" aria-selected="false" data-t="t2">Spherical mirrors</button><button role="tab" aria-selected="false" data-t="t3">Thin lenses</button><button role="tab" aria-selected="false" data-t="t4">Apparent depth</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="Reflection and refraction at a surface"></canvas><div class="ctrl">
+<label><span>n₁</span> <b id="o1a">1.00</b></label><input id="i1a" type="range" min="1" max="2.5" step="0.01" value="1">
+<label><span>n₂</span> <b id="o1b">1.47</b></label><input id="i1b" type="range" min="1" max="2.5" step="0.01" value="1.47">
+<label><span>Angle of incidence θ₁</span> <b id="o1t">40.0°</b></label><input id="i1t" type="range" min="0" max="89" step="0.5" value="40">
+<div class="row"><button class="btn" type="button" id="p1">Example: air to quartz (n = 1.47)</button></div>
+<div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span></div>
+<div class="task"><h3>Question</h3>Make n₁ larger than n₂ and increase the angle. At what angle does the refracted ray disappear?</div></div></section>
+
+<section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="A spherical mirror forming an image"></canvas><div class="ctrl">
+<div class="row"><button class="btn" type="button" data-mm="1" aria-pressed="true">Concave</button><button class="btn" type="button" data-mm="-1" aria-pressed="false">Convex</button></div>
+<label><span>|f| (cm)</span> <b id="o2f">20.0</b></label><input id="i2f" type="range" min="5" max="50" step="0.5" value="20">
+<label><span>Object distance p (cm)</span> <b id="o2p">40.0</b></label><input id="i2p" type="range" min="2" max="100" step="0.5" value="40">
+<div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span></div>
+<div class="task"><h3>Question</h3>Move the object from far away toward the concave mirror. When does the image change from real to virtual?</div></div></section>
+
+<section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="A thin lens forming an image"></canvas><div class="ctrl">
+<div class="row"><button class="btn" type="button" data-ll="1" aria-pressed="true">Converging</button><button class="btn" type="button" data-ll="-1" aria-pressed="false">Diverging</button></div>
+<label><span>|f| (cm)</span> <b id="o3f">15.0</b></label><input id="i3f" type="range" min="5" max="50" step="0.5" value="15">
+<label><span>Object distance p (cm)</span> <b id="o3p">30.0</b></label><input id="i3p" type="range" min="2" max="100" step="0.5" value="30">
+<label><span>Lens index n (lens-maker's equation)</span> <b id="o3n">1.50</b></label><input id="i3n" type="range" min="1.3" max="2" step="0.01" value="1.5">
+<label><span>R₁ = −R₂ (cm)</span> <b id="o3r">15.0</b></label><input id="i3r" type="range" min="5" max="60" step="0.5" value="15">
+<div class="readout"><span class="eq" id="r3a"></span><span id="r3b"></span><span class="eq" id="r3c"></span></div>
+<div class="task"><h3>Question</h3>For a converging lens, what object distance gives a real image exactly the same size as the object?</div></div></section>
+
+<section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="Apparent depth"></canvas><div class="ctrl">
+<label><span>Index of the object's medium n₁</span> <b id="o4a">1.33</b></label><input id="i4a" type="range" min="1" max="2.5" step="0.01" value="1.33">
+<label><span>Index of the observer's medium n₂</span> <b id="o4b">1.00</b></label><input id="i4b" type="range" min="1" max="2.5" step="0.01" value="1">
+<label><span>Real depth p (cm)</span> <b id="o4p">100.0</b></label><input id="i4p" type="range" min="1" max="200" step="0.5" value="100">
+<div class="readout"><span class="eq" id="r4a"></span></div>
+<div class="task"><h3>Question</h3>Why does a swimming pool look shallower than it really is?</div></div></section>
+<footer>Prof. Najm Al-Hosiny – Physics 1 (Engineering &amp; Computing), Chapter 9. Works on any phone or computer; nothing to install.</footer>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+function text(g,s,x,y,col,al,sz){g.font=(sz||24)+'px Inter, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction='ltr';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);if(Math.hypot(x1-x0,y1-y0)<4)return;g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function curve(g,f,x0,x1,col,w){g.beginPath();let st=false;for(let q=x0;q<=x1;q+=2){const y=f(q);if(!isFinite(y)){st=false;continue;}st?g.lineTo(q,y):g.moveTo(q,y);st=true;}g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function grid(g,cx,cy,sc,nx,ny){g.strokeStyle=css('--grid');g.lineWidth=1;for(let i=-nx;i<=nx;i++){g.beginPath();g.moveTo(cx+i*sc,cy-ny*sc);g.lineTo(cx+i*sc,cy+ny*sc);g.stroke();}for(let j=-ny;j<=ny;j++){g.beginPath();g.moveTo(cx-nx*sc,cy+j*sc);g.lineTo(cx+nx*sc,cy+j*sc);g.stroke();}seg(g,cx-nx*sc,cy,cx+nx*sc,cy,css('--muted'),2);seg(g,cx,cy-ny*sc,cx,cy+ny*sc,css('--muted'),2);}
+function box(g,x0,y0,w,h){g.fillStyle=css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const deg=Math.PI/180;
+const sci=(v,d=2)=>{if(!isFinite(v))return '—';if(v===0)return '0';const e=Math.floor(Math.log10(Math.abs(v)));if(e>=-2&&e<4)return v.toFixed(Math.max(0,d-e));return (v/Math.pow(10,e)).toFixed(d)+'×10^'+e;};
+function chg(g,x,y,q,r){dot(g,x,y,r||14,q>0?css('--r'):css('--b'));text(g,q>0?'+':'−',x,y+7,'#fff','center',20);}
+$('p1').onclick=()=>{$('i1a').value=1;$('i1b').value=1.47;$('i1t').value=40;};
+function lab1(){const g=ctx('c1'),n1=sl('i1a','o1a',v=>v.toFixed(2)),n2=sl('i1b','o1b',v=>v.toFixed(2)),t1=sl('i1t','o1t',v=>v.toFixed(1)+'°')*deg,s2=n1*Math.sin(t1)/n2;
+ $('r1a').textContent=s2>1?'Total internal reflection (θc = '+(Math.asin(n2/n1)/deg).toFixed(1)+'°)':'θ₂ = '+(Math.asin(s2)/deg).toFixed(1)+'°  (n₁ sinθ₁ = n₂ sinθ₂)';$('r1b').textContent="θ₁' = θ₁ = "+(t1/deg).toFixed(1)+'°  (law of reflection)';
+ const cx=600,yi=300,L=260;g.fillStyle=css('--b');g.globalAlpha=.08+0.12*(n2-1);g.fillRect(40,yi,1120,280);g.globalAlpha=.08+0.12*(n1-1);g.fillRect(40,20,1120,280);g.globalAlpha=1;seg(g,40,yi,1160,yi,css('--muted'),2);seg(g,cx,20,cx,580,css('--muted'),1.5,[6,6]);
+ arrow(g,cx-L*Math.sin(t1),yi-L*Math.cos(t1),cx,yi,css('--o'),4);arrow(g,cx,yi,cx+L*Math.sin(t1),yi-L*Math.cos(t1),css('--o'),s2>1?4:2);if(s2<=1){const t2=Math.asin(s2);arrow(g,cx,yi,cx+L*Math.sin(t2),yi+L*Math.cos(t2),css('--o'),4);}
+ text(g,'n₁ = '+n1.toFixed(2),60,60,css('--ink'),'left',22);text(g,'n₂ = '+n2.toFixed(2),60,560,css('--ink'),'left',22);text(g,'normal',cx+8,40,css('--muted'),'left',18);}
+let mm=1;document.querySelectorAll('[data-mm]').forEach(b=>b.onclick=()=>{mm=+b.dataset.mm;document.querySelectorAll('[data-mm]').forEach(x=>x.setAttribute('aria-pressed',x===b));});
+function lab2(){const g=ctx('c2'),f=mm*sl('i2f','o2f',v=>v.toFixed(1)),p=sl('i2p','o2p',v=>v.toFixed(1)),q=1/(1/f-1/p),M=-q/p;
+ $('r2a').textContent='1/p + 1/q = 1/f → q = '+(isFinite(q)?q.toFixed(2):'∞')+' cm';$('r2b').textContent='M = −q/p = '+(isFinite(M)?M.toFixed(2):'∞')+'  ('+(q>0?'real, inverted':'virtual, upright')+')';
+ const mx=900,ax=300,sc=7,h=60;seg(g,20,ax,1180,ax,css('--grid'),2);g.strokeStyle=css('--ink');g.lineWidth=4;g.beginPath();if(mm>0)g.arc(mx-2*Math.abs(f)*sc,ax,2*Math.abs(f)*sc,-0.5,0.5);else g.arc(mx+2*Math.abs(f)*sc,ax,2*Math.abs(f)*sc,Math.PI-0.5,Math.PI+0.5);g.stroke();
+ dot(g,mx-f*sc,ax,5,css('--ink'));text(g,'F',mx-f*sc,ax+25,css('--ink'),'center',18);arrow(g,mx-p*sc,ax,mx-p*sc,ax-h,css('--o'),4);text(g,'object',mx-p*sc,ax-h-12,css('--o'),'center',18);if(isFinite(q)&&Math.abs(q)<200){g.setLineDash(q<0?[8,6]:[]);arrow(g,mx-q*sc,ax,mx-q*sc,ax-M*h,css('--r'),4);g.setLineDash([]);text(g,'image',mx-q*sc,ax-M*h+(M>0?-12:28),css('--r'),'center',18);}}
+let ll=1;document.querySelectorAll('[data-ll]').forEach(b=>b.onclick=()=>{ll=+b.dataset.ll;document.querySelectorAll('[data-ll]').forEach(x=>x.setAttribute('aria-pressed',x===b));});
+function lab3(){const g=ctx('c3'),f=ll*sl('i3f','o3f',v=>v.toFixed(1)),p=sl('i3p','o3p',v=>v.toFixed(1)),n=sl('i3n','o3n',v=>v.toFixed(2)),R=sl('i3r','o3r',v=>v.toFixed(1)),q=1/(1/f-1/p),M=-q/p,fm=1/((n-1)*(2/R));
+ $('r3a').textContent='q = '+(isFinite(q)?q.toFixed(2):'∞')+' cm,  M = '+(isFinite(M)?M.toFixed(2):'∞');$('r3b').textContent=q>0?'Real, inverted image':'Virtual, upright image';$('r3c').textContent="Lens maker: 1/f = (n − 1)(1/R₁ − 1/R₂) → f = "+fm.toFixed(2)+' cm';
+ const lx=600,ax=300,sc=7,h=60;seg(g,20,ax,1180,ax,css('--grid'),2);g.strokeStyle=css('--ink');g.lineWidth=3;g.beginPath();g.ellipse(lx,ax,ll>0?14:6,170,0,0,7);g.stroke();dot(g,lx-Math.abs(f)*sc,ax,5,css('--ink'));dot(g,lx+Math.abs(f)*sc,ax,5,css('--ink'));
+ arrow(g,lx-p*sc,ax,lx-p*sc,ax-h,css('--o'),4);seg(g,lx-p*sc,ax-h,lx+(lx-(lx-p*sc))*1.5,ax+h*1.5,css('--b'),1.5);if(isFinite(q)&&Math.abs(q)<120){g.setLineDash(q<0?[8,6]:[]);arrow(g,lx+q*sc,ax,lx+q*sc,ax-M*h,css('--r'),4);g.setLineDash([]);}
+ text(g,'F',lx-Math.abs(f)*sc,ax+25,css('--ink'),'center',18);text(g,'F',lx+Math.abs(f)*sc,ax+25,css('--ink'),'center',18);}
+function lab4(){const g=ctx('c4'),n1=sl('i4a','o4a',v=>v.toFixed(2)),n2=sl('i4b','o4b',v=>v.toFixed(2)),p=sl('i4p','o4p',v=>v.toFixed(1)),q=p*n2/n1;$('r4a').textContent='|q| = (n₂/n₁) p = '+q.toFixed(1)+' cm';
+ const sy=150,sc=2;g.fillStyle=css('--b');g.globalAlpha=.2;g.fillRect(60,sy,1080,420);g.globalAlpha=1;seg(g,60,sy,1140,sy,css('--ink'),2);g.fillStyle='#C9A227';g.beginPath();g.ellipse(500,sy+p*sc,40,12,0,0,7);g.fill();g.globalAlpha=.45;g.beginPath();g.ellipse(500,sy+q*sc,40,12,0,0,7);g.fill();g.globalAlpha=1;
+ text(g,'real',560,sy+p*sc+8,css('--ink'),'left',20);text(g,'apparent',560,sy+q*sc+8,css('--o'),'left',20);text(g,'observer above the surface',600,120,css('--muted'),'center',20);}
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4};
+function loop(t){T=reduce?0:t/1000;const f=LABS[active];if(f)f(t);requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>شهادة إنجاز – البصريات الفيزيائية (عملي)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&family=Tajawal:wght@400;700&family=Amiri:wght@700&display=swap">
+<style>
+:root{--bg:#f3f7fc;--panel:#ffffff;--ink:#14284b;--muted:#4a5d7e;--line:#c9d6e8;--acc:#1f4e8c;--acc2:#e8742a;--chip:#eef4fb;--ok:#1d8a4e;--okbg:#E3F5EC;--bad:#c0392b;--badbg:#FBE6E6}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.65}
+.wrap{max-width:820px;margin:0 auto;padding:14px}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.15rem,3.4vw,1.5rem);margin:.35em 0 .2em}
+h1 span{color:var(--acc)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px}
+.muted{color:var(--muted);font-size:.92rem}
+ul.rules{margin:.4em 0;padding-inline-start:1.2em}
+ul.rules li{margin:.2em 0}
+.btn{font:inherit;font-weight:700;border:0;background:var(--acc);color:#fff;padding:10px 22px;border-radius:12px;cursor:pointer;min-height:46px}
+.btn.ghost{background:transparent;border:1px solid var(--acc2);color:var(--acc2);font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--acc2);width:0}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.q{margin:4px 0 8px;font-size:1.02rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:9px 12px;border-radius:10px;margin:6px 0;cursor:pointer;min-height:44px}
+.opt.sel{border-color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc2)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.big{font-size:2.2rem;font-weight:700;color:var(--acc2);text-align:center}
+.rev{border-top:1px solid var(--line);padding:8px 0;font-size:.92rem}
+.rev b{color:var(--bad)}
+.rev .ok{color:var(--ok)}
+input[type=text]{width:100%;font:inherit;font-size:1.05rem;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+#certImg{width:100%;height:auto;border-radius:8px;display:block;margin-top:10px;-webkit-touch-callout:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hide{display:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+code{font-family:Consolas,"Courier New",monospace;direction:ltr;unicode-bidi:isolate;background:var(--chip);border:1px solid var(--line);padding:0 5px;border-radius:5px;font-size:.92em}
+</style>
+</head>
+<body>
+<div class="wrap">
+<span class="badge">البصريات الفيزيائية (عملي) · <bdi dir="ltr">2035004-4</bdi></span>
+<h1>شهادة إنجاز <span>المعامل الافتراضية</span></h1>
+
+<section id="sIntro" class="card">
+<p>بعد أن تُنهي معامل التجارب الاثنتي عشرة، أجب عن الاختبار الختامي لتحصل على شهادة إنجاز باسمك.</p>
+<ul class="rules">
+<li><b>20 سؤالًا</b> اختيار من متعدد من التجارب الاثنتي عشرة، تُسحب عشوائيًا في كل محاولة.</li>
+<li>درجة النجاح <b>80%</b> (16 سؤالًا صحيحًا على الأقل).</li>
+<li>إن لم تنجح، راجع إجاباتك ثم أعد المحاولة بأسئلة جديدة.</li>
+<li class="muted">لا تُحفظ إجاباتك ولا تُرسل لأحد. هذه شهادة إنجاز ذاتية وليست شهادة رسمية من الجامعة.</li>
+</ul>
+<button class="btn" id="go">ابدأ الاختبار</button>
+</section>
+
+<section id="sQuiz" class="card hide">
+<div class="qn" id="qn"></div>
+<div class="bar"><i id="barI"></i></div>
+<div class="q" id="qt"></div>
+<div id="qo"></div>
+<div class="nav"><button class="btn ghost" id="prev">السابق</button><button class="btn" id="next">التالي</button></div>
+</section>
+
+<section id="sRes" class="card hide">
+<div class="muted" style="text-align:center">نتيجتك</div>
+<div class="big" id="pct"></div>
+<p id="msg" style="text-align:center"></p>
+<div id="passBox" class="hide">
+<label for="nm">اكتب اسمك كما تريده أن يظهر في الشهادة:</label>
+<input type="text" id="nm" maxlength="40" autocomplete="name">
+<button class="btn" id="mk">أنشئ الشهادة</button>
+</div>
+<div id="failBox" class="hide"><button class="btn" id="again">أعد المحاولة بأسئلة جديدة</button></div>
+<div id="review"></div>
+</section>
+
+<section id="sCert" class="card hide">
+<p class="muted" id="saveHint">على الجوال: اضغط مطوّلًا على الشهادة ثم اختر «حفظ الصورة». على الحاسب: استخدم زر التنزيل.</p>
+<img id="certImg" alt="شهادة الإنجاز">
+<div class="row"><a class="btn" id="dl" download="شهادة_إنجاز_البصريات_عملي.png" href="#" style="text-decoration:none;display:inline-flex;align-items:center">تنزيل الشهادة</a><button class="btn ghost" id="back">رجوع</button></div>
+<canvas id="cv" class="hide"></canvas>
+</section>
+</div>
+<script>
+const BANK=[{"c": 1, "q": "عند تحريك مرآة مقياس مايكلسون مسافة <span class=\"eq\" dir=\"ltr\">0.1 mm</span> مرّت <span class=\"eq\" dir=\"ltr\">340</span> هدبة. الطول الموجي:", "o": ["<span class=\"eq\" dir=\"ltr\">294 nm</span>", "<span class=\"eq\" dir=\"ltr\">588 nm</span>", "<span class=\"eq\" dir=\"ltr\">1176 nm</span>", "<span class=\"eq\" dir=\"ltr\">340 nm</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">λ = 2d/N = 2(10<sup>−4</sup>)/340 ≈ 5.88×10<sup>−7</sup> m</span>"}, {"c": 1, "q": "لماذا توضع لوحة تعويض في مقياس مايكلسون؟", "o": ["لتغيير الطول الموجي", "ليجتاز الشعاعان السمك الزجاجي نفسه", "لتقوية الشدة", "لاستقطاب الضوء"], "a": 1, "e": "لوحة التعويض تجعل المسار الزجاجي في الذراعين متساويًا، وهذا مهم مع الضوء الأبيض."}, {"c": 1, "q": "اختفاء الهدب الدائرية وظهور حقل منتظم الإضاءة يعني أن:", "o": ["فرق المسار صفر تقريبًا والمرآتان متوازيتان", "المصدر انطفأ", "المرآة مكسورة", "الطول الموجي تغير"], "a": 0, "e": "عند تساوي الذراعين تتسع الحلقة المركزية حتى تملأ الحقل."}, {"c": 1, "q": "كل هدبة تمر في مقياس مايكلسون تقابل إزاحة للمرآة مقدارها:", "o": ["<span class=\"eq\" dir=\"ltr\">λ</span>", "<span class=\"eq\" dir=\"ltr\">λ/2</span>", "<span class=\"eq\" dir=\"ltr\">2λ</span>", "<span class=\"eq\" dir=\"ltr\">λ/4</span>"], "a": 1, "e": "تغير المسار <span class=\"eq\" dir=\"ltr\">2d = λ</span> لكل هدبة، أي <span class=\"eq\" dir=\"ltr\">d = λ/2</span>."}, {"c": 2, "q": "قيست المسافة بين عشر هدب متتالية <span class=\"eq\" dir=\"ltr\">12 mm</span> والشاشة على بعد <span class=\"eq\" dir=\"ltr\">1.2 m</span> والمسافة بين الشقين <span class=\"eq\" dir=\"ltr\">0.5 mm</span>. الطول الموجي:", "o": ["<span class=\"eq\" dir=\"ltr\">400 nm</span>", "<span class=\"eq\" dir=\"ltr\">500 nm</span>", "<span class=\"eq\" dir=\"ltr\">600 nm</span>", "<span class=\"eq\" dir=\"ltr\">700 nm</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">β = 1.2 mm؛ λ = βd/L = (1.2×10<sup>−3</sup>)(0.5×10<sup>−3</sup>)/1.2 = 500 nm</span>"}, {"c": 2, "q": "لماذا تُقاس المسافة عبر عدة هدب ثم تُقسم على عددها؟", "o": ["لتقليل الخطأ النسبي في القياس", "لأن الهدب غير متساوية", "لزيادة الشدة", "لتغيير الطول الموجي"], "a": 0, "e": "قياس مسافة كبيرة ثم القسمة يقلل الخطأ النسبي."}, {"c": 2, "q": "إذا غُطي أحد الشقين تمامًا، فإن نمط التداخل:", "o": ["يبقى كما هو", "يختفي ويبقى نمط حيود شق واحد", "يتضاعف عدد الهدب", "تنعكس الهدب"], "a": 1, "e": "التداخل يتطلب مصدرين؛ يبقى نمط حيود الشق الواحد فقط."}, {"c": 3, "q": "المسافة بين النهايتين الصغريين الأوليين على جانبي المركز <span class=\"eq\" dir=\"ltr\">8 mm</span>، والشاشة على بعد <span class=\"eq\" dir=\"ltr\">1 m</span>، والطول الموجي <span class=\"eq\" dir=\"ltr\">600 nm</span>. عرض الشق:", "o": ["<span class=\"eq\" dir=\"ltr\">0.075 mm</span>", "<span class=\"eq\" dir=\"ltr\">0.15 mm</span>", "<span class=\"eq\" dir=\"ltr\">0.3 mm</span>", "<span class=\"eq\" dir=\"ltr\">1.5 mm</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">a = 2λL/w = 2(600×10<sup>−9</sup>)(1)/(8×10<sup>−3</sup>) = 0.15 mm</span>"}, {"c": 3, "q": "تقع أول نهاية صغرى في حيود الشق المفرد عند:", "o": ["<span class=\"eq\" dir=\"ltr\">a sinθ = λ/2</span>", "<span class=\"eq\" dir=\"ltr\">a sinθ = λ</span>", "<span class=\"eq\" dir=\"ltr\">a sinθ = 2λ</span>", "<span class=\"eq\" dir=\"ltr\">a sinθ = 0</span>"], "a": 1, "e": "أول صفر عند <span class=\"eq\" dir=\"ltr\">m = 1</span>."}, {"c": 3, "q": "عند زيادة بعد الشاشة عن الشق، فإن عرض القمة المركزية على الشاشة:", "o": ["يقل", "يزداد خطيًا", "لا يتغير", "يقل إلى النصف دائمًا"], "a": 1, "e": "عرض القمة <span class=\"eq\" dir=\"ltr\">2λL/a</span> يتناسب طرديًا مع <span class=\"eq\" dir=\"ltr\">L</span>."}, {"c": 4, "q": "محزوز به <span class=\"eq\" dir=\"ltr\">500</span> خط/مم. المسافة بين خطين متجاورين:", "o": ["<span class=\"eq\" dir=\"ltr\">0.5 µm</span>", "<span class=\"eq\" dir=\"ltr\">2 µm</span>", "<span class=\"eq\" dir=\"ltr\">5 µm</span>", "<span class=\"eq\" dir=\"ltr\">20 µm</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">d = 1/500 mm = 2×10<sup>−3</sup> mm = 2 µm</span>"}, {"c": 4, "q": "باستخدام المحزوز السابق، تظهر الرتبة الأولى لضوء <span class=\"eq\" dir=\"ltr\">500 nm</span> عند زاوية:", "o": ["<span class=\"eq\" dir=\"ltr\">7.5°</span>", "<span class=\"eq\" dir=\"ltr\">14.5°</span>", "<span class=\"eq\" dir=\"ltr\">30°</span>", "<span class=\"eq\" dir=\"ltr\">45°</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">sinθ = λ/d = 0.5/2 = 0.25 ⇒ θ ≈ 14.5°</span>"}, {"c": 4, "q": "أكبر رتبة يمكن مشاهدتها لضوء <span class=\"eq\" dir=\"ltr\">600 nm</span> بمحزوز <span class=\"eq\" dir=\"ltr\">d = 2 µm</span>:", "o": ["2", "3", "4", "6"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">m<sub>max</sub> < d/λ = 3.33</span> فأكبر رتبة 3."}, {"c": 4, "q": "مقارنة بشقي يونغ، تكون قمم المحزوز:", "o": ["أعرض وأضعف", "أحدّ وأشد", "متطابقة تمامًا", "غير موجودة"], "a": 1, "e": "زيادة عدد الشقوق تجعل القمم الرئيسة حادة جدًا وشديدة."}, {"c": 5, "q": "يقيس رفراكتومتر آبي معامل الانكسار اعتمادًا على:", "o": ["الزاوية الحرجة (حد الانعكاس الكلي)", "قانون بير", "التداخل", "الاستقطاب الدوراني"], "a": 0, "e": "يحدد الجهاز حد الظل والضوء الناتج عن الزاوية الحرجة."}, {"c": 5, "q": "لماذا يُضبط تعويض التشتت (الألوان) في جهاز آبي؟", "o": ["لإزالة الحافة الملونة والحصول على حد حاد", "لزيادة درجة الحرارة", "لتكبير الصورة", "لتغيير العينة"], "a": 0, "e": "منشورا أميتشي يلغيان التشتت فيظهر الحد حادًا."}, {"c": 5, "q": "معامل انكسار الماء المقيس بجهاز آبي عند <span class=\"eq\" dir=\"ltr\">20°C</span> يقارب:", "o": ["<span class=\"eq\" dir=\"ltr\">1.000</span>", "<span class=\"eq\" dir=\"ltr\">1.333</span>", "<span class=\"eq\" dir=\"ltr\">1.500</span>", "<span class=\"eq\" dir=\"ltr\">2.42</span>"], "a": 1, "e": "معامل انكسار الماء <span class=\"eq\" dir=\"ltr\">≈ 1.333</span>."}, {"c": 6, "q": "قبل القياس بالمطياف يُضبط الموازي (الكوليماتور) بحيث:", "o": ["يخرج منه ضوء متوازٍ", "يكون الشق مغلقًا", "يكون المنشور مائلًا", "يكون التلسكوب مضاءً فقط"], "a": 0, "e": "يوضع الشق في البؤرة فيخرج الضوء متوازيًا إلى المحزوز."}, {"c": 6, "q": "قيست زاوية الرتبة الأولى يمينًا ويسارًا <span class=\"eq\" dir=\"ltr\">20.2°</span> و<span class=\"eq\" dir=\"ltr\">19.8°</span>. الزاوية المعتمدة:", "o": ["<span class=\"eq\" dir=\"ltr\">20.0°</span>", "<span class=\"eq\" dir=\"ltr\">40.0°</span>", "<span class=\"eq\" dir=\"ltr\">0.4°</span>", "<span class=\"eq\" dir=\"ltr\">19.8°</span>"], "a": 0, "e": "يؤخذ المتوسط لإلغاء أثر عدم تعامد المحزوز تمامًا."}, {"c": 6, "q": "في طيف الزئبق بالمحزوز، الخط الذي يحيد بأكبر زاوية في الرتبة نفسها هو:", "o": ["البنفسجي", "الأخضر", "الأصفر", "كلها بالزاوية نفسها"], "a": 2, "e": "الطول الموجي الأكبر يحيد بزاوية أكبر <span class=\"eq\" dir=\"ltr\">sinθ = mλ/d</span>."}, {"c": 7, "q": "بطريقة انعكاس الضوء عن وجهي المنشور، الزاوية بين الشعاعين المنعكسين تساوي:", "o": ["<span class=\"eq\" dir=\"ltr\">A</span>", "<span class=\"eq\" dir=\"ltr\">2A</span>", "<span class=\"eq\" dir=\"ltr\">A/2</span>", "<span class=\"eq\" dir=\"ltr\">180° − A</span>"], "a": 1, "e": "الزاوية بين الحزمتين المنعكستين ضعف زاوية الرأس."}, {"c": 7, "q": "قيست الزاوية بين الشعاعين المنعكسين <span class=\"eq\" dir=\"ltr\">120°</span>. زاوية رأس المنشور:", "o": ["<span class=\"eq\" dir=\"ltr\">30°</span>", "<span class=\"eq\" dir=\"ltr\">60°</span>", "<span class=\"eq\" dir=\"ltr\">120°</span>", "<span class=\"eq\" dir=\"ltr\">240°</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">A = 120°/2 = 60°</span>"}, {"c": 7, "q": "يجب أن يكون رأس المنشور موجهًا نحو:", "o": ["الموازي (الكوليماتور)", "التلسكوب", "الأعلى", "الأرض"], "a": 0, "e": "يوجَّه الرأس نحو الموازي لتسقط الحزمة على الوجهين معًا."}, {"c": 8, "q": "عند وضع الانحراف الأصغر في المنشور، يمر الشعاع داخله:", "o": ["عموديًا على القاعدة", "موازيًا للقاعدة", "على طول الضلع", "دون انكسار"], "a": 1, "e": "في الانحراف الأصغر يكون المسار متماثلًا ويمر الشعاع موازيًا للقاعدة."}, {"c": 8, "q": "منشور زاوية رأسه <span class=\"eq\" dir=\"ltr\">60°</span> وزاوية انحرافه الأصغر <span class=\"eq\" dir=\"ltr\">38°</span>. معامل انكساره تقريبًا:", "o": ["<span class=\"eq\" dir=\"ltr\">1.31</span>", "<span class=\"eq\" dir=\"ltr\">1.50</span>", "<span class=\"eq\" dir=\"ltr\">1.62</span>", "<span class=\"eq\" dir=\"ltr\">1.76</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">n = sin(49°)/sin(30°) ≈ 0.755/0.5 ≈ 1.51</span>"}, {"c": 8, "q": "عند تدوير المنشور تدريجيًا، يتحرك الطيف ثم:", "o": ["يستمر في الاتجاه نفسه بلا نهاية", "يتوقف ويرتد عائدًا عند الانحراف الأصغر", "يختفي فجأة", "ينقسم إلى طيفين"], "a": 1, "e": "نقطة الارتداد هي موضع الانحراف الأصغر."}, {"c": 8, "q": "معامل انكسار الزجاج للضوء البنفسجي مقارنة بالأحمر:", "o": ["أكبر", "أصغر", "مساوٍ", "صفر"], "a": 0, "e": "التشتت الطبيعي: الطول الموجي الأقصر له معامل انكسار أكبر."}, {"c": 9, "q": "في جهاز UV-Vis، الامتصاصية تساوي:", "o": ["<span class=\"eq\" dir=\"ltr\">A = I/I<sub>0</sub></span>", "<span class=\"eq\" dir=\"ltr\">A = log(I<sub>0</sub>/I)</span>", "<span class=\"eq\" dir=\"ltr\">A = ln(I/I<sub>0</sub>)</span>", "<span class=\"eq\" dir=\"ltr\">A = I<sub>0</sub> − I</span>"], "a": 1, "e": "الامتصاصية لوغاريتم عشري لنسبة الشدة الساقطة إلى النافذة."}, {"c": 9, "q": "نفاذية عينة <span class=\"eq\" dir=\"ltr\">10%</span>. امتصاصيتها:", "o": ["0.1", "1", "2", "10"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">A = −log(0.1) = 1</span>"}, {"c": 9, "q": "لماذا يُقاس المحلول المرجعي (Blank) أولًا؟", "o": ["لطرح امتصاص المذيب والخلية", "لتسخين الجهاز", "لزيادة التركيز", "لمعايرة الكتلة"], "a": 0, "e": "المرجع يزيل إسهام المذيب وجدران الخلية من الطيف."}, {"c": 10, "q": "حلقات نيوتن ناتجة عن تداخل الضوء المنعكس من:", "o": ["سطحي العدسة الخارجيين", "سطحي طبقة الهواء الرقيقة بين العدسة واللوح", "المرآة والمصدر", "شقين"], "a": 1, "e": "سمك طبقة الهواء يتغير شعاعيًا فتتكون حلقات متساوية السمك."}, {"c": 10, "q": "مركز حلقات نيوتن في الضوء المنعكس يكون:", "o": ["مضيئًا", "معتمًا", "ملونًا دائمًا", "غير موجود"], "a": 1, "e": "عند نقطة التماس السمك صفر مع انقلاب طور <span class=\"eq\" dir=\"ltr\">π</span> عند الانعكاس، فيكون المركز معتمًا."}, {"c": 10, "q": "مربع قطر الحلقة المعتمة رقم <span class=\"eq\" dir=\"ltr\">n</span> يتناسب مع:", "o": ["<span class=\"eq\" dir=\"ltr\">√n</span>", "<span class=\"eq\" dir=\"ltr\">n</span>", "<span class=\"eq\" dir=\"ltr\">n²</span>", "<span class=\"eq\" dir=\"ltr\">1/n</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">D<sub>n</sub>² = 4nλR</span> فالعلاقة خطية مع <span class=\"eq\" dir=\"ltr\">n</span>."}, {"c": 10, "q": "رُسم <span class=\"eq\" dir=\"ltr\">D²</span> مقابل <span class=\"eq\" dir=\"ltr\">n</span> فكان الميل <span class=\"eq\" dir=\"ltr\">2.4 mm²</span> لضوء <span class=\"eq\" dir=\"ltr\">600 nm</span>. نصف قطر تكور العدسة:", "o": ["<span class=\"eq\" dir=\"ltr\">0.5 m</span>", "<span class=\"eq\" dir=\"ltr\">1.0 m</span>", "<span class=\"eq\" dir=\"ltr\">2.0 m</span>", "<span class=\"eq\" dir=\"ltr\">4.0 m</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">R = ميل/(4λ) = 2.4×10<sup>−6</sup>/(4×600×10<sup>−9</sup>) = 1.0 m</span>"}, {"c": 11, "q": "عند استخدام مرشح أخضر مع مصباح الزئبق في حلقات نيوتن، الهدف:", "o": ["الحصول على ضوء شبه أحادي اللون", "زيادة السمك", "تغيير نصف القطر", "إطفاء الحلقات"], "a": 0, "e": "الضوء أحادي اللون يعطي حلقات واضحة كثيرة."}, {"c": 11, "q": "عند استبدال الضوء الأخضر بالأصفر، فإن أقطار الحلقات:", "o": ["تقل", "تزداد", "لا تتغير", "تصبح صفرًا"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">D² ∝ λ</span> والأصفر طوله الموجي أكبر."}, {"c": 11, "q": "إذا مُلئت الفجوة بين العدسة واللوح بسائل معامل انكساره <span class=\"eq\" dir=\"ltr\">μ</span>، فإن <span class=\"eq\" dir=\"ltr\">D²</span> لكل حلقة:", "o": ["يزداد بمعامل μ", "يقل بمعامل μ", "لا يتغير", "يزداد بمعامل μ²"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">D<sub>n</sub>² = 4nλR/μ</span>"}, {"c": 12, "q": "يقيس البولاريميتر:", "o": ["معامل الانكسار", "زاوية دوران مستوى الاستقطاب في محلول نشط ضوئيًا", "طول الموجة", "شدة الامتصاص"], "a": 1, "e": "المحاليل النشطة ضوئيًا كالسكر تدير مستوى الاستقطاب."}, {"c": 12, "q": "زاوية الدوران <span class=\"eq\" dir=\"ltr\">θ</span> في محلول سكر تتناسب مع:", "o": ["التركيز وطول الأنبوب", "مربع التركيز فقط", "عكس طول الأنبوب", "شدة الضوء"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">θ = [α] l C</span>"}, {"c": 12, "q": "إذا ضوعف طول الأنبوب مع ثبات التركيز، فإن زاوية الدوران:", "o": ["تقل إلى النصف", "تتضاعف", "لا تتغير", "تتضاعف أربع مرات"], "a": 1, "e": "الدوران يتناسب طرديًا مع طول المسار."}, {"c": 12, "q": "وفق قانون مالوس، إذا كانت الزاوية بين المستقطب والمحلل <span class=\"eq\" dir=\"ltr\">60°</span> فالشدة النافذة نسبة إلى العظمى:", "o": ["<span class=\"eq\" dir=\"ltr\">0.75</span>", "<span class=\"eq\" dir=\"ltr\">0.5</span>", "<span class=\"eq\" dir=\"ltr\">0.25</span>", "<span class=\"eq\" dir=\"ltr\">0.125</span>"], "a": 2, "e": "<span class=\"eq\" dir=\"ltr\">I = I<sub>0</sub>cos²60° = 0.25 I<sub>0</sub></span>"}];
+const N=20,PASS=16;
+const $=id=>document.getElementById(id);
+const show=id=>['sIntro','sQuiz','sRes','sCert'].forEach(s=>$(s).classList.toggle('hide',s!==id));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let Q=[],ans=[],k=0,score=0;
+function draw(){ // two per chapter + the rest random
+  const by={};BANK.forEach((x,i)=>{(by[x.c]=by[x.c]||[]).push(i);});
+  const per=Math.max(1,Math.min(2,Math.floor(N/Object.keys(by).length)));let pick=[];Object.values(by).forEach(l=>pick.push(...shuffle(l).slice(0,per)));pick=shuffle(pick).slice(0,N);
+  const rest=shuffle(BANK.map((_,i)=>i).filter(i=>!pick.includes(i)));
+  pick=pick.concat(rest.slice(0,N-pick.length));
+  Q=shuffle(pick).map(i=>{const x=BANK[i],ord=shuffle(x.o.map((_,j)=>j));return {q:x.q,o:ord.map(j=>x.o[j]),a:ord.indexOf(x.a),e:x.e,c:x.c};});
+  ans=Q.map(()=>-1);k=0;
+}
+function rQ(){
+  const it=Q[k];$('qn').textContent='السؤال '+(k+1)+' من '+N+' · التجربة '+it.c;$('barI').style.width=((k+1)/N*100)+'%';
+  $('qt').innerHTML=it.q;const box=$('qo');box.innerHTML='';
+  it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt'+(ans[k]===j?' sel':'');b.innerHTML=t;b.onclick=()=>{ans[k]=j;rQ();};box.appendChild(b);});
+  $('prev').disabled=k===0;$('next').disabled=ans[k]<0;$('next').textContent=k===N-1?'أنهِ الاختبار':'التالي';
+}
+function finish(){
+  score=Q.filter((x,i)=>ans[i]===x.a).length;const p=Math.round(score/N*100);
+  $('pct').innerHTML='<span class="eq">'+score+' / '+N+'</span> · <span class="eq">'+p+'%</span>';
+  const ok=score>=PASS;$('msg').textContent=ok?'مبارك! اجتزت الاختبار الختامي.':'لم تبلغ 80% بعد. راجع الأسئلة التي أخطأت فيها ثم أعد المحاولة.';
+  $('passBox').classList.toggle('hide',!ok);$('failBox').classList.toggle('hide',ok);
+  const wr=Q.map((x,i)=>({x,i})).filter(o=>ans[o.i]!==o.x.a);
+  $('review').innerHTML=wr.length?'<p class="muted" style="margin-top:14px">الأسئلة التي أخطأت فيها:</p>'+wr.map(o=>'<div class="rev"><div>'+o.x.q+'</div><div><b>إجابتك:</b> '+o.x.o[ans[o.i]]+'</div><div><span class="ok">الصحيح:</span> '+o.x.o[o.x.a]+'</div><div class="muted">'+o.x.e+'</div></div>').join(''):'';
+  show('sRes');window.scrollTo(0,0);
+}
+$('go').onclick=()=>{draw();rQ();show('sQuiz');};
+$('prev').onclick=()=>{k--;rQ();};
+$('next').onclick=()=>{if(k<N-1){k++;rQ();}else finish();};
+$('again').onclick=()=>{draw();rQ();show('sQuiz');window.scrollTo(0,0);};
+$('back').onclick=()=>show('sRes');
+
+/* ---------- certificate (dark ruby theme) ---------- */
+const TH={"bg": "#14284b", "frame": "#e8742a", "accent": "#e8742a", "title": "#f59e4c", "text": "#eef4fb", "muted": "#a9b8d0", "name": "#FFFFFF", "beam": "#4FA3E0"};
+function mixLine(c,segs,cx,y){const ws=segs.map(s=>{c.direction=s.ltr?'ltr':'rtl';return c.measureText(s.t).width;});const tot=ws.reduce((a,b)=>a+b,0);let x=cx+tot/2;
+  segs.forEach((s,i)=>{x-=ws[i];c.direction=s.ltr?'ltr':'rtl';c.textAlign=s.ltr?'left':'right';c.fillText(s.t,s.ltr?x:x+ws[i],y);});c.direction='rtl';c.textAlign='center';}
+function fitFont(c,txt,weight,size,family,maxW){let s=size;do{c.font=weight+' '+s+'px '+family;s-=2;}while(c.measureText(txt).width>maxW&&s>30);}
+function drawCert(cv,d){const t=TH,W=1600,H=1131;cv.width=W;cv.height=H;const c=cv.getContext('2d');c.direction='rtl';c.textAlign='center';c.textBaseline='middle';
+  const AR="Tajawal, 'IBM Plex Sans Arabic', Tahoma, sans-serif",TT="Amiri, Tajawal, serif";
+  c.fillStyle=t.bg;c.fillRect(0,0,W,H);c.strokeStyle=t.frame;c.lineWidth=6;c.strokeRect(40,40,W-80,H-80);c.strokeStyle=t.accent;c.lineWidth=2;c.strokeRect(58,58,W-116,H-116);
+  c.fillStyle=t.accent;[[58,58],[W-58,58],[58,H-58],[W-58,H-58]].forEach(([x,y])=>{c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();});
+  const cx=W/2;c.fillStyle=t.muted;c.font='400 30px '+AR;c.fillText('المعامل الافتراضية · أ.د. نجم الحصيني',cx,150);
+  c.fillStyle=t.title;c.font='700 104px '+TT;c.fillText('شهادة إنجاز',cx,280);
+  const g=c.createLinearGradient(cx-260,0,cx+260,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,t.beam);g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(cx-260,360,520,5);
+  c.fillStyle=t.text;c.font='400 38px '+AR;c.fillText('تشهد المعامل الافتراضية بأن',cx,450);
+  c.fillStyle=t.name;fitFont(c,d.name,'700',76,AR,1250);c.fillText(d.name,cx,550);c.fillStyle=t.accent;c.fillRect(cx-300,610,600,2);
+  c.fillStyle=t.text;c.font='400 38px '+AR;
+  mixLine(c,[{t:'أتمّ معامل مقرر «البصريات الفيزيائية (عملي)» (\u20662035004-4\u2069)'}],cx,690);
+  mixLine(c,[{t:'واجتاز الاختبار الختامي بنسبة '},{t:d.score+'%',ltr:true}],cx,750);
+  c.font='400 28px '+AR;c.fillStyle=t.muted;const fy=920;c.fillText('التاريخ',W-300,fy);c.fillText('أستاذ المقرر',300,fy);
+  c.fillStyle=t.text;c.font='700 34px '+AR;c.direction='ltr';c.fillText(d.date,W-300,fy+50);c.direction='rtl';c.fillText('أ.د. نجم الحصيني',300,fy+50);
+  c.save();c.translate(cx,955);c.fillStyle=t.accent;c.beginPath();c.arc(0,0,62,0,Math.PI*2);c.fill();c.strokeStyle=t.bg;c.lineWidth=3;c.beginPath();c.arc(0,0,50,0,Math.PI*2);c.stroke();
+  c.lineWidth=9;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-22,2);c.lineTo(-6,18);c.lineTo(24,-16);c.stroke();c.restore();}
+$('mk').onclick=async()=>{
+  const name=$('nm').value.replace(/\s+/g,' ').trim();if(name.length<3){$('nm').focus();return;}
+  $('mk').disabled=true;
+  try{await Promise.race([Promise.all([document.fonts.load("700 76px Tajawal",name),document.fonts.load("400 38px Tajawal","أتم"),document.fonts.load("700 104px Amiri","شهادة")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  const d=new Date(),date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+  drawCert($('cv'),{name,score:Math.round(score/N*100),date});
+  const url=$('cv').toDataURL('image/png');$('certImg').src=url;$('dl').href=url;$('mk').disabled=false;show('sCert');window.scrollTo(0,0);
+};
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

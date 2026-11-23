@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل المجالات الكهربية</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل المجالات الكهربية</h1><p>فيزياء عامة 1 – الفصل السادس. غيّر القيم وراقب النتيجة، واستخدم أزرار الأمثلة للتحقق من حلولك.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">قانون كولوم</button><button role="tab" aria-selected="false" data-t="t2">نقطة الاتزان</button><button role="tab" aria-selected="false" data-t="t3">المجال لشحنتين</button><button role="tab" aria-selected="false" data-t="t4">حركة شحنة في مجال</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="القوة بين شحنتين"></canvas><div class="ctrl"><label>q₁ (μC) <b id="o1a">2.0</b></label><input id="i1a" type="range" min="-10" max="10" step="0.1" value="2"><label>q₂ (μC) <b id="o1b">-3.0</b></label><input id="i1b" type="range" min="-10" max="10" step="0.1" value="-3"><label>المسافة r (cm) <b id="o1r">20.0</b></label><input id="i1r" type="range" min="1" max="100" step="0.5" value="20"><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span></div><div class="task"><h3>سؤال</h3>ضاعف المسافة بين الشحنتين. بكم مرة تقل القوة؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="نقطة انعدام القوة بين شحنتين"></canvas><div class="ctrl"><label>q₁ عند x = a (μC) <b id="o2a">15.0</b></label><input id="i2a" type="range" min="1" max="30" step="0.5" value="15"><label>q₂ عند الأصل (μC) <b id="o2b">6.0</b></label><input id="i2b" type="range" min="1" max="30" step="0.5" value="6"><label>المسافة a (m) <b id="o2d">2.00</b></label><input id="i2d" type="range" min="0.5" max="4" step="0.05" value="2"><label>موضع الشحنة السالبة x (m) <b id="o2x">1.000</b></label><input id="i2x" type="range" min="0.01" max="3.99" step="0.005" value="1"><div class="row"><button class="btn" type="button" id="p2">اضبط على نقطة الاتزان</button></div><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span></div><div class="task"><h3>سؤال</h3>لماذا لا توجد نقطة اتزان خارج المنطقة بين الشحنتين الموجبتين؟</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="المجال الكهربي لشحنتين عند نقطة"></canvas><div class="ctrl"><label>q₁ عند (0, y₁) (μC) <b id="o3a">7.0</b></label><input id="i3a" type="range" min="-10" max="10" step="0.5" value="7"><label>y₁ (m) <b id="o3y">0.40</b></label><input id="i3y" type="range" min="0.1" max="1" step="0.01" value="0.4"><label>q₂ عند الأصل (μC) <b id="o3b">-5.0</b></label><input id="i3b" type="range" min="-10" max="10" step="0.5" value="-5"><label>النقطة P عند x (m) <b id="o3x">0.30</b></label><input id="i3x" type="range" min="0.1" max="1" step="0.01" value="0.3"><div class="row"><button class="btn" type="button" id="p3">قيم توضيحية</button></div><div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span></div><div class="task"><h3>سؤال</h3>غيّر إشارة q₂. كيف يتغير اتجاه المجال المحصل عند P؟</div></div></section><section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="جسيم مشحون بين لوحين"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" data-pt="e" aria-pressed="true">إلكترون</button><button class="btn" type="button" data-pt="p" aria-pressed="false">بروتون</button></div><label>المجال E (N/C) <b id="o4e">200</b></label><input id="i4e" type="range" min="0" max="2000" step="10" value="200"><label>السرعة الأفقية vi (×10⁶ m/s) <b id="o4v">3.0</b></label><input id="i4v" type="range" min="0.5" max="10" step="0.1" value="3"><label>طول اللوحين L (cm) <b id="o4l">10.0</b></label><input id="i4l" type="range" min="1" max="20" step="0.5" value="10"><div class="readout"><span class="eq" id="r4a"></span><span class="eq" id="r4b"></span><span class="eq" id="r4c"></span></div><div class="task"><h3>سؤال</h3>لماذا ينحرف الإلكترون أكثر بكثير من البروتون في المجال نفسه؟</div></div></section>
+<footer>أ.د. نجم الحصيني – فيزياء عامة 1، الفصل السادس. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);if(Math.hypot(x1-x0,y1-y0)<4)return;g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function curve(g,f,x0,x1,col,w){g.beginPath();let st=false;for(let q=x0;q<=x1;q+=2){const y=f(q);if(!isFinite(y)){st=false;continue;}st?g.lineTo(q,y):g.moveTo(q,y);st=true;}g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function grid(g,cx,cy,sc,nx,ny){g.strokeStyle=css('--grid');g.lineWidth=1;for(let i=-nx;i<=nx;i++){g.beginPath();g.moveTo(cx+i*sc,cy-ny*sc);g.lineTo(cx+i*sc,cy+ny*sc);g.stroke();}for(let j=-ny;j<=ny;j++){g.beginPath();g.moveTo(cx-nx*sc,cy+j*sc);g.lineTo(cx+nx*sc,cy+j*sc);g.stroke();}seg(g,cx-nx*sc,cy,cx+nx*sc,cy,css('--muted'),2);seg(g,cx,cy-ny*sc,cx,cy+ny*sc,css('--muted'),2);}
+function box(g,x0,y0,w,h){g.fillStyle=css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const deg=Math.PI/180;
+
+
+const sci=(v,d=2)=>{if(!isFinite(v))return '—';if(v===0)return '0';const e=Math.floor(Math.log10(Math.abs(v)));if(e>=-2&&e<4)return v.toFixed(Math.max(0,d-e));return (v/Math.pow(10,e)).toFixed(d)+'×10^'+e;};
+function chg(g,x,y,q,r){dot(g,x,y,r||14,q>0?css('--r'):css('--b'));text(g,q>0?'+':'−',x,y+7,'#fff','center',20);}
+
+const ke=8.99e9;
+function lab1(){const g=ctx('c1'),q1=sl('i1a','o1a',v=>v.toFixed(1))*1e-6,q2=sl('i1b','o1b',v=>v.toFixed(1))*1e-6,r=sl('i1r','o1r',v=>v.toFixed(1))*1e-2,F=ke*Math.abs(q1*q2)/(r*r),att=q1*q2<0;
+ $('r1a').textContent='F = ke|q₁q₂|/r² = '+sci(F)+' N';$('r1b').className='';$('r1b').textContent=q1*q2===0?'لا قوة':(att?'تجاذب':'تنافر')+' — للهيدروجين: Fe = 8.2×10⁻⁸ N و Fg = 3.6×10⁻⁴⁷ N';
+ const c=600,d=Math.min(500,r*800+80);chg(g,c-d/2,250,q1,22);chg(g,c+d/2,250,q2,22);const L=Math.min(250,30+Math.log10(F+1e-12)*15+60);if(F>0){const s=att?1:-1;arrow(g,c-d/2,250,c-d/2+s*L,250,css('--o'),4);arrow(g,c+d/2,250,c+d/2-s*L,250,css('--o'),4);}}
+$('p2').onclick=()=>{const a=+$('i2d').value,q1=+$('i2a').value,q2=+$('i2b').value;$('i2x').value=(a*Math.sqrt(q2)/(Math.sqrt(q1)+Math.sqrt(q2))).toFixed(3);};
+function lab2(){const g=ctx('c2'),q1=sl('i2a','o2a',v=>v.toFixed(1)),q2=sl('i2b','o2b',v=>v.toFixed(1)),a=sl('i2d','o2d',v=>v.toFixed(2)),xs=Math.min(+$('i2x').value,a-0.005);$('o2x').textContent=xs.toFixed(3);
+ const F2=ke*q2*1e-6/(xs*xs),F1=ke*q1*1e-6/((a-xs)**2),x0=a*Math.sqrt(q2)/(Math.sqrt(q1)+Math.sqrt(q2));$('r2a').textContent='x₀ = a√q₂/(√q₁ + √q₂) = '+x0.toFixed(3)+' m';$('r2b').textContent='(F₂ − F₁)/|q₃| = '+sci(F2-F1)+' N/C';
+ const sc=1000/a,X=v=>100+v*sc;seg(g,60,300,1140,300,css('--muted'),2);chg(g,X(0),300,1,20);chg(g,X(a),300,1,24);chg(g,X(xs),300,-1,14);const sF=240/Math.max(F1,F2);arrow(g,X(xs),360,X(xs)-F2*sF,360,css('--b'),4);arrow(g,X(xs),400,X(xs)+F1*sF,400,css('--r'),4);seg(g,X(x0),200,X(x0),460,css('--ink'),1.5,[6,6]);}
+$('p3').onclick=()=>{$('i3a').value=7;$('i3y').value=0.4;$('i3b').value=-5;$('i3x').value=0.3;};
+function lab3(){const g=ctx('c3'),q1=sl('i3a','o3a',v=>v.toFixed(1))*1e-6,y1=sl('i3y','o3y',v=>v.toFixed(2)),q2=sl('i3b','o3b',v=>v.toFixed(1))*1e-6,px=sl('i3x','o3x',v=>v.toFixed(2));
+ const r1=Math.hypot(px,y1),E1=ke*q1/(r1*r1),E1x=E1*px/r1,E1y=-E1*y1/r1,E2=ke*q2/(px*px),Ex=E1x+E2,Ey=E1y,E=Math.hypot(Ex,Ey),th=Math.atan2(Ey,Ex)*180/Math.PI;
+ $('r3a').textContent='E₁ = '+sci(Math.abs(E1))+',  E₂ = '+sci(Math.abs(E2))+' N/C';$('r3b').textContent='E = '+sci(E)+' N/C at '+th.toFixed(1)+'°';
+ const ox=200,oy=480,sc=650,P=(a,b)=>[ox+a*sc,oy-b*sc];grid(g,ox,oy,65,3,4);chg(g,...P(0,y1),q1,18);chg(g,...P(0,0),q2,18);const p=P(px,0),k=120/Math.max(Math.abs(E1),Math.abs(E2),E);
+ arrow(g,p[0],p[1],p[0]+E1x*k,p[1]-E1y*k,css('--r'),3);arrow(g,p[0],p[1],p[0]+E2*k,p[1],css('--b'),3);arrow(g,p[0],p[1],p[0]+Ex*k,p[1]-Ey*k,css('--ink'),4);dot(g,p[0],p[1],6,css('--ink'));text(g,'P',p[0],p[1]+30,css('--ink'),'center');}
+let pt='e';document.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>{pt=b.dataset.pt;document.querySelectorAll('[data-pt]').forEach(x=>x.setAttribute('aria-pressed',x===b));});
+function lab4(){const g=ctx('c4'),E=sl('i4e','o4e'),vi=sl('i4v','o4v',v=>v.toFixed(1))*1e6,L=sl('i4l','o4l',v=>v.toFixed(1))*1e-2,q=pt==='e'?-1.6e-19:1.6e-19,m=pt==='e'?9.11e-31:1.67e-27,a=-q*E/m,tt=L/vi,y=0.5*a*tt*tt;
+ $('r4a').textContent='a = qE/m = '+sci(a)+' m/s²';$('r4b').textContent='t = L/vi = '+sci(tt)+' s';$('r4c').textContent='y = ½at² = '+sci(y*100)+' cm';
+ g.fillStyle=css('--r');g.fillRect(200,100,800,14);g.fillStyle=css('--b');g.fillRect(200,486,800,14);const yp=Math.max(-190,Math.min(190,-y*100*40));curve(g,q=>{const s=(q-200)/800;return 300+yp*s*s;},200,1000,css('--o'),3);seg(g,60,300,200,300,css('--o'),3);text(g,'مسار مكبّر رأسياً',1000,560,css('--muted'),'right',18,1);}
+
+function loop(t){T=reduce?0:t/1000;({t1:typeof lab1!=='undefined'?lab1:null,t2:typeof lab2!=='undefined'?lab2:null,t3:typeof lab3!=='undefined'?lab3:null,t4:typeof lab4!=='undefined'?lab4:null,t5:typeof lab5!=='undefined'?lab5:null})[active]();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

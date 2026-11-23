@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Induced EMF – Virtual Lab (Physics 2, Unit 5)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--g:#1E8A4C;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--g:#5BD08E;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:70ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',Georgia,serif;font-size:1.1rem;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--b)}
+input[type=number]{font:inherit;width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--plot);color:var(--ink)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.readout span{display:block}
+.eq{font-family:'STIX Two Text',Georgia,serif;font-size:1.08rem}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+.hint{font-size:.85rem;color:var(--muted)}
+.hide{display:none!important}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Induced EMF Lab: Faraday's and Lenz's Laws</h1><p>Physics 2 (Engineering &amp; Computing) – Unit 5: Faraday's law of induction, Lenz's law, and applications: motional emf and the AC generator. Change the values, watch the graphs, use the example buttons, then answer the question under each experiment.</p></header>
+<nav class="tabs" role="tablist" aria-label="Experiments">
+<button role="tab" aria-selected="true" data-t="t1">1 · Faraday's law</button>
+<button role="tab" aria-selected="false" data-t="t2">2 · Lenz's law: magnet and loop</button>
+<button role="tab" aria-selected="false" data-t="t3">3 · Sliding bar (motional emf)</button>
+<button role="tab" aria-selected="false" data-t="t4">4 · AC generator</button>
+</nav>
+
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="A coil in a changing magnetic field and graphs of flux and induced emf"></canvas><div class="ctrl">
+<div class="row"><button class="btn" type="button" data-m1="ramp" aria-pressed="true">B ramps up</button><button class="btn" type="button" data-m1="sin" aria-pressed="false">B oscillates</button></div>
+<label><span>Turns N</span> <b id="o1n"></b></label><input id="i1n" type="range" min="1" max="500" step="1" value="200">
+<label><span>Side of the square coil (cm)</span> <b id="o1s"></b></label><input id="i1s" type="range" min="2" max="40" step="1" value="18">
+<label><span>B maximum (T)</span> <b id="o1b"></b></label><input id="i1b" type="range" min="0.05" max="2" step="0.05" value="0.5">
+<label><span id="l1t">Ramp time Δt (s)</span> <b id="o1t"></b></label><input id="i1t" type="range" min="0.1" max="5" step="0.05" value="0.8">
+<label><span>Coil resistance R (Ω)</span> <b id="o1r"></b></label><input id="i1r" type="range" min="0.5" max="20" step="0.5" value="2">
+<div class="row"><button class="btn" type="button" id="p1">Textbook example (200 turns, 18 cm, 0 → 0.50 T in 0.80 s, 2.0 Ω)</button></div>
+<div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span id="r1c"></span></div>
+<div class="task"><h3>Question</h3>The emf exists only while B is changing. Where on the graphs is the emf largest when B oscillates: where B is largest, or where it changes fastest?</div></div></section>
+
+<section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="A bar magnet moving toward and away from a loop, with the induced current"></canvas><div class="ctrl">
+<div class="row"><button class="btn" type="button" data-pole="N" aria-pressed="true">N pole faces the loop</button><button class="btn" type="button" data-pole="S" aria-pressed="false">S pole faces the loop</button></div>
+<label><span>Speed of the magnet</span> <b id="o2w"></b></label><input id="i2w" type="range" min="0.2" max="3" step="0.1" value="1">
+<div class="row"><button class="btn" type="button" id="pause2">❚❚ Pause</button></div>
+<div class="readout"><span id="r2a"></span><span id="r2b"></span><span id="r2c"></span></div>
+<div class="task"><h3>Question</h3>When the magnet approaches, which pole does the loop show to it? When it moves away? In both cases, does the loop help or oppose the motion?</div></div></section>
+
+<section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="A conducting bar sliding on rails in a magnetic field"></canvas><div class="ctrl">
+<div class="row"><button class="btn" type="button" data-m3="push" aria-pressed="true">Pushed at constant v</button><button class="btn" type="button" data-m3="coast" aria-pressed="false">Released with speed v₀</button></div>
+<label><span>Field B into the page (T)</span> <b id="o3b"></b></label><input id="i3b" type="range" min="0.05" max="2" step="0.05" value="0.5">
+<label><span>Rail separation ℓ (m)</span> <b id="o3l"></b></label><input id="i3l" type="range" min="0.05" max="1" step="0.01" value="0.4">
+<label><span>Speed v or v₀ (m/s)</span> <b id="o3v"></b></label><input id="i3v" type="range" min="0.1" max="10" step="0.1" value="2">
+<label><span>Resistance R (Ω)</span> <b id="o3r"></b></label><input id="i3r" type="range" min="0.1" max="10" step="0.1" value="1">
+<label><span>Bar mass m (kg)</span> <b id="o3m"></b></label><input id="i3m" type="range" min="0.01" max="1" step="0.01" value="0.1">
+<div class="row"><button class="btn" type="button" id="go3">↺ Restart</button></div>
+<div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span id="r3c"></span></div>
+<div class="task"><h3>Question</h3>Where does the current flow, and which way does the magnetic force on the bar point? Why must something keep pushing the bar to keep v constant?</div></div></section>
+
+<section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="A coil rotating in a magnetic field and the emf it produces"></canvas><div class="ctrl">
+<label><span>Turns N</span> <b id="o4n"></b></label><input id="i4n" type="range" min="1" max="200" step="1" value="8">
+<label><span>Coil area A (m²)</span> <b id="o4a"></b></label><input id="i4a" type="range" min="0.005" max="0.2" step="0.005" value="0.09">
+<label><span>Field B (T)</span> <b id="o4b"></b></label><input id="i4b" type="range" min="0.05" max="2" step="0.05" value="0.5">
+<label><span>Frequency f (Hz)</span> <b id="o4f"></b></label><input id="i4f" type="range" min="1" max="100" step="1" value="60">
+<label><span>Coil resistance R (Ω)</span> <b id="o4r"></b></label><input id="i4r" type="range" min="1" max="50" step="1" value="12">
+<div class="row"><button class="btn" type="button" id="p4">Textbook example (8 turns, 0.0900 m², 0.500 T, 60 Hz, 12 Ω)</button></div>
+<div class="readout"><span class="eq" id="r4a"></span><span class="eq" id="r4b"></span><span id="r4c"></span></div>
+<div class="task"><h3>Question</h3>At the instant the flux through the coil is largest, is the emf largest or zero? Explain with ε = −N dΦ/dt.</div></div></section>
+
+<footer>Prof. Najm Al-Hosiny – Physics 2 (Engineering &amp; Computing) 203207-4, Unit 5: Induced Electromotive Force. Works on any phone or computer; nothing to install. The animations run in slow motion.</footer>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+function text(g,s,x,y,col,al,sz,bold){g.font=(bold?'700 ':'')+(sz||24)+'px Inter, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction='ltr';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w,d){if(Math.hypot(x1-x0,y1-y0)<3)return;seg(g,x0,y0,x1,y1,col,w,d);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3.2);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const sup={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const sci=(v,d=2)=>{if(!isFinite(v))return '—';if(v===0)return '0';const e=Math.floor(Math.log10(Math.abs(v))+1e-12);if(e>=-2&&e<4)return v.toFixed(Math.max(0,d-e));return (v/Math.pow(10,e)).toFixed(d)+'×10'+String(e).split('').map(c=>sup[c]).join('');};
+function chg(g,x,y,q,r,sel){dot(g,x,y,r||14,q>0?css('--r'):(q<0?css('--b'):css('--muted')));text(g,q>0?'+':(q<0?'−':'0'),x,y+8,'#fff','center',22,true);if(sel){g.strokeStyle=css('--o');g.lineWidth=3;g.beginPath();g.arc(x,y,(r||14)+6,0,7);g.stroke();}}
+function axes(g,x0,y0,x1,y1){seg(g,x0,y1,x1,y1,css('--muted'),2);seg(g,x0,y0,x0,y1,css('--muted'),2);}
+const MU0=4*Math.PI*1e-7,EPS=8.85e-12,ke=8.99e9,PI=Math.PI,QE=1.602e-19,ME=9.11e-31,MP=1.673e-27;
+function xsym(g,x,y,r,col,w){g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();const d=r*0.62;seg(g,x-d,y-d,x+d,y+d,col,w||2);seg(g,x-d,y+d,x+d,y-d,col,w||2);}
+function osym(g,x,y,r,col,w){g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();dot(g,x,y,Math.max(2.5,r*0.28),col);}
+function bgrid(g,into,x0,y0,x1,y1,step,col){for(let x=x0;x<=x1;x+=step)for(let y=y0;y<=y1;y+=step){into?xsym(g,x,y,7,col,1.3):osym(g,x,y,7,col,1.3);}}
+function plotXY(g,X0,Y0,X1,Y1,fns,xmin,xmax,ymin,ymax,cols,lw){axes(g,X0,Y0,X1,Y1);if(ymin<0&&ymax>0){const yz=Y1-(0-ymin)/(ymax-ymin)*(Y1-Y0);seg(g,X0,yz,X1,yz,css('--muted'),1,[4,4]);}
+ fns.forEach((f,k)=>{g.strokeStyle=cols[k];g.lineWidth=lw||3;g.beginPath();let st=false;for(let i=0;i<=400;i++){const x=xmin+(xmax-xmin)*i/400,v=f(x);if(!isFinite(v)||v>ymax*1.02||v<ymin-(ymax-ymin)*0.02){st=false;continue;}const px=X0+(x-xmin)/(xmax-xmin)*(X1-X0),py=Y1-(v-ymin)/(ymax-ymin)*(Y1-Y0);st?g.lineTo(px,py):g.moveTo(px,py);st=true;}g.stroke();});
+ return {px:x=>X0+(x-xmin)/(xmax-xmin)*(X1-X0),py:v=>Y1-(v-ymin)/(ymax-ymin)*(Y1-Y0)};}
+function setPressed(sel,b){document.querySelectorAll(sel).forEach(x=>x.setAttribute('aria-pressed',x===b));}
+function curArrows(g,cx,cy,hw,hh,cw,col){/* current arrows around a rectangle, cw = clockwise on screen */const s=cw?1:-1;
+ arrow(g,cx-30*s,cy-hh,cx+30*s,cy-hh,col,4);arrow(g,cx+30*s,cy+hh,cx-30*s,cy+hh,col,4);arrow(g,cx+hw,cy-30*s,cx+hw,cy+30*s,col,4);arrow(g,cx-hw,cy+30*s,cx-hw,cy-30*s,col,4);}
+/* ---------- 1. Faraday's law ---------- */
+let m1='ramp';document.querySelectorAll('[data-m1]').forEach(b=>b.onclick=()=>{m1=b.dataset.m1;setPressed('[data-m1]',b);$('l1t').textContent=m1==='ramp'?'Ramp time Δt (s)':'Period of B (s)';});
+$('p1').onclick=()=>{m1='ramp';setPressed('[data-m1]',document.querySelector('[data-m1="ramp"]'));$('l1t').textContent='Ramp time Δt (s)';$('i1n').value=200;$('i1s').value=18;$('i1b').value=0.5;$('i1t').value=0.8;$('i1r').value=2;};
+function lab1(now){const g=ctx('c1');const N=sl('i1n','o1n'),s=sl('i1s','o1s')/100,Bm=sl('i1b','o1b',x=>x.toFixed(2)),tt=sl('i1t','o1t',x=>x.toFixed(2)),R=sl('i1r','o1r',x=>x.toFixed(1)),A=s*s;
+ const tmax=m1==='ramp'?tt*1.6:tt*2,Bf=m1==='ramp'?(t=>t<0.15*tt?0:t<1.15*tt?Bm*(t-0.15*tt)/tt:Bm):(t=>Bm*Math.sin(2*PI*t/tt)),dB=t=>(Bf(t+tmax*1e-4)-Bf(t-tmax*1e-4))/(2*tmax*1e-4);
+ const tc=(reduce?0.5:((now/1000)*0.18)%1)*tmax,Bt=Bf(tc),emf=-N*A*dB(tc),emfmax=m1==='ramp'?N*A*Bm/tt:N*A*Bm*2*PI/tt;
+ $('r1a').textContent=m1==='ramp'?'|ε| = NA ΔB/Δt = '+sci(emfmax,3)+' V  (while B changes)':'ε_max = NAB_max ω = '+sci(emfmax,3)+' V';
+ $('r1b').textContent='I = |ε|/R = '+sci(emfmax/R,3)+' A;  A = '+sci(A,3)+' m²';
+ $('r1c').textContent=Math.abs(emf)<1e-9*emfmax+1e-12?'B is not changing now: no emf.':(dB(tc)*1>0?'B out of the page is growing: the induced current flows clockwise (its field points into the page).':'B out of the page is shrinking: the induced current flows counterclockwise.');
+ const cx=230,cy=290,h=150;g.fillStyle='rgba(31,91,214,0.06)';g.fillRect(cx-h,cy-h,2*h,2*h);
+ const sz=Math.min(11,Math.abs(Bt)/Bm*11);if(sz>1)for(let x=cx-h+30;x<cx+h;x+=60)for(let y=cy-h+30;y<cy+h;y+=60)(Bt>0?osym:xsym)(g,x,y,sz,css('--b'),1.5);
+ g.strokeStyle=css('--o');g.lineWidth=6;g.strokeRect(cx-h,cy-h,2*h,2*h);if(Math.abs(emf)>emfmax*0.02)curArrows(g,cx,cy,h,h,emf<0,css('--r'));
+ text(g,'B (⊙ out, ⊗ in)',cx,cy+h+34,css('--b'),'center',18);
+ const G1=plotXY(g,560,40,1170,270,[t=>N*A*Bf(t)],0,tmax,-N*A*Bm*1.15*(m1==='sin'),N*A*Bm*1.15,[css('--b')]);seg(g,G1.px(tc),40,G1.px(tc),270,css('--o'),1.5);text(g,'NΦ_B (Wb)',570,32,css('--b'),'left',17,true);
+ const G2=plotXY(g,560,320,1170,550,[t=>-N*A*dB(t)],0,tmax,-emfmax*1.2,emfmax*1.2,[css('--r')]);seg(g,G2.px(tc),320,G2.px(tc),550,css('--o'),1.5);text(g,'ε = −N dΦ/dt (V)',570,312,css('--r'),'left',17,true);text(g,'t',1170,572,css('--ink'),'right',18);}
+
+/* ---------- 2. Lenz's law ---------- */
+let pole='N',pause2=false,t2=0,last2=0;document.querySelectorAll('[data-pole]').forEach(b=>b.onclick=()=>{pole=b.dataset.pole;setPressed('[data-pole]',b);});
+$('pause2').onclick=()=>{pause2=!pause2;$('pause2').textContent=pause2?'▶ Play':'❚❚ Pause';};const hist=[];
+function lab2(now){const g=ctx('c2');const w=sl('i2w','o2w',x=>x.toFixed(1));const dt=Math.min(0.05,(now-last2)/1000||0);last2=now;if(!pause2&&!reduce)t2+=dt*w;
+ const zc=t=>2.2+1.4*Math.cos(t),Rl=1,phi=t=>(pole==='N'?1:-1)/Math.pow(Rl*Rl+zc(t)**2,1.5),z=zc(t2),em=-(phi(t2+1e-3)-phi(t2-1e-3))/2e-3*w;
+ hist.push(em);if(hist.length>300)hist.shift();
+ const moving=Math.abs(Math.sin(t2))>0.05;
+ $('r2a').textContent='The magnet is '+(moving?(Math.sin(t2)>0?'moving toward':'moving away from'):'momentarily at rest near')+' the loop.';
+ const Bind=em>0?1:-1; // sign of induced field along +x (toward the loop's far side)
+ $('r2b').textContent=Math.abs(em)<0.02?'Flux not changing: no induced current.':'The loop’s face toward the magnet acts as '+((Bind<0)?'an N':'an S')+' pole.';
+ $('r2c').textContent=Math.abs(em)<0.02?'':(Math.sin(t2)>0?'Approaching: like poles face each other, the loop repels the magnet.':'Receding: unlike poles face each other, the loop attracts the magnet back.')+' Lenz: the induced current opposes the change.';
+ const lx=760,cy=260,ry=140,rx=ry*0.34,mx=lx-z*170;
+ g.fillStyle=pole==='N'?css('--r'):css('--b');g.fillRect(mx-50,cy-36,50,72);g.fillStyle=pole==='N'?css('--b'):css('--r');g.fillRect(mx-140,cy-36,90,72);
+ text(g,pole,mx-25,cy+10,'#fff','center',30,true);text(g,pole==='N'?'S':'N',mx-95,cy+10,'#fff','center',30,true);
+ seg(g,40,cy,1160,cy,css('--muted'),1,[5,6]);g.strokeStyle=css('--o');g.lineWidth=8;g.beginPath();g.ellipse(lx,cy,rx,ry,0,0,7);g.stroke();
+ if(Math.abs(em)>0.02){const up=Bind<0;arrow(g,lx+rx+2,cy+(up?40:-40),lx+rx-2,cy+(up?-40:40),css('--r'),4);text(g,'I',lx+rx+18,cy+8,css('--r'),'left',24,true);
+  arrow(g,lx,cy,lx+Bind*110,cy,css('--g'),4);text(g,'B induced',lx+Bind*120,cy-14,css('--g'),Bind>0?'left':'right',18,true);}
+ // galvanometer
+ const gx=1040,gy=470;g.strokeStyle=css('--ink');g.lineWidth=2;g.beginPath();g.arc(gx,gy,60,PI,2*PI);g.stroke();const ang=-PI/2+Math.max(-1.2,Math.min(1.2,em*0.6));seg(g,gx,gy,gx+55*Math.cos(ang),gy+55*Math.sin(ang),css('--r'),3);text(g,'G',gx,gy+24,css('--ink'),'center',20,true);
+ const X0=60,X1=900,Y0=440,Y1=560;seg(g,X0,(Y0+Y1)/2,X1,(Y0+Y1)/2,css('--muted'),1,[4,4]);g.strokeStyle=css('--r');g.lineWidth=2.5;g.beginPath();hist.forEach((v,i)=>{const x=X0+i*(X1-X0)/300,y=(Y0+Y1)/2-Math.max(-1.4,Math.min(1.4,v))*40;i?g.lineTo(x,y):g.moveTo(x,y);});g.stroke();text(g,'induced emf',X0,Y0-6,css('--r'),'left',17,true);}
+
+/* ---------- 3. Sliding bar ---------- */
+let m3='push',t3=0,last3=0;document.querySelectorAll('[data-m3]').forEach(b=>b.onclick=()=>{m3=b.dataset.m3;setPressed('[data-m3]',b);t3=0;});$('go3').onclick=()=>{t3=0;};
+function lab3(now){const g=ctx('c3');const B=sl('i3b','o3b',x=>x.toFixed(2)),l=sl('i3l','o3l',x=>x.toFixed(2)),v0=sl('i3v','o3v',x=>x.toFixed(1)),R=sl('i3r','o3r',x=>x.toFixed(1)),m=sl('i3m','o3m',x=>x.toFixed(2));
+ const dt=Math.min(0.05,(now-last3)/1000||0);last3=now;if(!reduce)t3+=dt*0.5;const tau=m*R/(B*B*l*l),v=m3==='push'?v0:v0*Math.exp(-t3/tau);
+ const emf=B*l*v,I=emf/R,F=I*l*B;
+ $('r3a').textContent='ε = Bℓv = '+sci(emf,3)+' V;  I = ε/R = '+sci(I,3)+' A';
+ $('r3b').textContent='F_B = IℓB = '+sci(F,3)+' N (to the left);  P = I²R = '+sci(I*I*R,3)+' W';
+ $('r3c').textContent=m3==='push'?'An applied force of '+sci(F,3)+' N to the right keeps v constant; its power becomes heat in R.':'No push: the magnetic force slows the bar, v = v₀e^(−t/τ) with τ = mR/B²ℓ² = '+sci(tau,3)+' s.';
+ const X0=120,Yt=150,Yb=450;bgrid(g,true,X0+40,Yt+40,1150,Yb-40,70,css('--grid'));
+ g.fillStyle=css('--ink');g.fillRect(X0,Yt-6,1060,8);g.fillRect(X0,Yb-2,1060,8);g.strokeStyle=css('--ink');g.lineWidth=3;g.beginPath();g.moveTo(X0,Yt);g.lineTo(X0,260);for(let k=0;k<6;k++){g.lineTo(X0+(k%2?-14:14),270+k*12);}g.lineTo(X0,350);g.lineTo(X0,Yb);g.stroke();text(g,'R',X0-24,305,css('--ink'),'right',22,true);
+ let xb;if(m3==='push'){xb=300+((t3*v0*60)%800);}else{xb=300+Math.min(820,v0*tau*(1-Math.exp(-t3/tau))*60);}
+ g.fillStyle=css('--o');g.fillRect(xb-8,Yt-12,16,Yb-Yt+24);arrow(g,xb+14,Yt+60,xb+14+30+12*Math.min(v,10),Yt+60,css('--b'),4);text(g,'v',xb+20,Yt+48,css('--b'),'left',22,true);
+ if(I>1e-6){arrow(g,xb-24,(Yt+Yb)/2+40,xb-24,(Yt+Yb)/2-40,css('--r'),4);text(g,'I',xb-40,(Yt+Yb)/2,css('--r'),'right',22,true);arrow(g,X0+80,Yt+20,X0+40,Yt+20,css('--r'),3);
+  arrow(g,xb-14,Yb-70,xb-14-30-40*Math.min(1,F),Yb-70,css('--g'),4);text(g,'F_B',xb-20,Yb-86,css('--g'),'right',20,true);}
+ text(g,'ℓ',xb+30,Yb-20,css('--muted'),'left',22,true);text(g,'B into the page.  Current counterclockwise (it opposes the growing flux into the page).',600,585,css('--muted'),'center',17);}
+
+/* ---------- 4. AC generator ---------- */
+$('p4').onclick=()=>{$('i4n').value=8;$('i4a').value=0.09;$('i4b').value=0.5;$('i4f').value=60;$('i4r').value=12;};
+function lab4(now){const g=ctx('c4');const N=sl('i4n','o4n'),A=sl('i4a','o4a',x=>x.toFixed(3)),B=sl('i4b','o4b',x=>x.toFixed(2)),f=sl('i4f','o4f'),R=sl('i4r','o4r');
+ const w=2*PI*f,em=N*A*B*w,ph=reduce?0.7:((now/1000)*0.5)%(2*PI);
+ $('r4a').textContent='ε = NABω sin ωt;  ε_max = NABω = '+sci(em,3)+' V';$('r4b').textContent='I_max = ε_max/R = '+sci(em/R,3)+' A;  ω = 2πf = '+sci(w,3)+' rad/s';
+ $('r4c').textContent='The animation is slowed down: one turn here stands for 1/f = '+sci(1/f,3)+' s.';
+ const cx=270,cy=290;g.fillStyle=css('--r');g.fillRect(40,cy-120,70,240);g.fillStyle=css('--b');g.fillRect(430,cy-120,70,240);text(g,'N',75,cy+10,'#fff','center',30,true);text(g,'S',465,cy+10,'#fff','center',30,true);
+ for(let y=cy-90;y<=cy+90;y+=45)arrow(g,115,y,425,y,css('--grid'),2);
+ const wd=130*Math.abs(Math.cos(ph)),hh=110;g.fillStyle='rgba(194,94,0,0.15)';g.fillRect(cx-wd,cy-hh,2*wd,2*hh);g.strokeStyle=css('--o');g.lineWidth=6;g.strokeRect(cx-wd,cy-hh,2*wd,2*hh);seg(g,cx,cy-hh-30,cx,cy+hh+30,css('--muted'),1.5,[5,5]);
+ const n=[Math.sin(ph),Math.cos(ph)];arrow(g,cx,cy,cx+90*Math.cos(ph),cy,css('--b'),3);text(g,'n̂ ⟂ coil',cx,cy+hh+52,css('--muted'),'center',16);
+ const G=plotXY(g,600,60,1170,520,[t=>em*Math.sin(t),t=>em*0.55*Math.cos(t)],0,4*PI,-em*1.2,em*1.2,[css('--r'),css('--b')]);
+ const tc=ph<2*PI?ph:ph;seg(g,G.px(tc),60,G.px(tc),520,css('--o'),1.5);seg(g,G.px(tc+2*PI),60,G.px(tc+2*PI),520,css('--o'),1,[4,4]);dot(g,G.px(tc),G.py(em*Math.sin(tc)),7,css('--r'));
+ text(g,'ε(t)',610,52,css('--r'),'left',18,true);text(g,'Φ_B(t) (scaled)',680,52,css('--b'),'left',18,true);text(g,'ωt',1170,545,css('--ink'),'right',18);}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4};
+function loop(t){T=reduce?0:t/1000;const f=LABS[active];if(f)f(t);requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

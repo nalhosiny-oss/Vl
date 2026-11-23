@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificate of Achievement – Physics (2) – Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=STIX+Two+Text&family=Playfair+Display:wght@700&display=swap">
+<style>
+:root{--bg:#F3F7FC;--panel:#FFFFFF;--ink:#15203A;--muted:#566179;--line:#D3DEEC;--acc:#0F2547;--acc2:#0E7C99;--chip:#F5F9FD;--ok:#2E7D4F;--okbg:#E3F5EC;--bad:#C8322F;--badbg:#FBE6E6}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,'Segoe UI',Arial,sans-serif;line-height:1.65}
+.wrap{max-width:820px;margin:0 auto;padding:14px}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.15rem,3.4vw,1.5rem);margin:.35em 0 .2em}
+h1 span{color:var(--acc)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px}
+.muted{color:var(--muted);font-size:.92rem}
+ul.rules{margin:.4em 0;padding-inline-start:1.2em}
+ul.rules li{margin:.2em 0}
+.btn{font:inherit;font-weight:700;border:0;background:var(--acc);color:#fff;padding:10px 22px;border-radius:12px;cursor:pointer;min-height:46px}
+.btn.ghost{background:transparent;border:1px solid var(--acc2);color:var(--acc2);font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--acc2);width:0}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.q{margin:4px 0 8px;font-size:1.02rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:9px 12px;border-radius:10px;margin:6px 0;cursor:pointer;min-height:44px}
+.opt.sel{border-color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc2)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.big{font-size:2.2rem;font-weight:700;color:var(--acc2);text-align:center}
+.rev{border-top:1px solid var(--line);padding:8px 0;font-size:.92rem}
+.rev b{color:var(--bad)}
+.rev .ok{color:var(--ok)}
+input[type=text]{width:100%;font:inherit;font-size:1.05rem;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+#certImg{width:100%;height:auto;border-radius:8px;display:block;margin-top:10px;-webkit-touch-callout:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hide{display:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+code{font-family:Consolas,"Courier New",monospace;direction:ltr;unicode-bidi:isolate;background:var(--chip);border:1px solid var(--line);padding:0 5px;border-radius:5px;font-size:.92em}
+</style>
+</head>
+<body>
+<div class="wrap">
+<span class="badge">Physics (2) – Lab · 203207-4</span>
+<h1>Certificate of Achievement · <span>Virtual Labs</span></h1>
+
+<section id="sIntro" class="card">
+<p>After you finish the labs of the nine experiments, take the final quiz to earn a certificate in your name.</p>
+<ul class="rules">
+<li><b>20 multiple-choice questions</b> drawn at random from the nine experiments on every attempt.</li>
+<li>The pass mark is <b>80%</b> (at least 16 correct answers).</li>
+<li>If you do not pass, review your answers and try again with new questions.</li>
+<li class="muted">Your answers are not saved or sent anywhere. This is a self-issued certificate of achievement, not an official university certificate.</li>
+</ul>
+<button class="btn" id="go">Start the quiz</button>
+</section>
+
+<section id="sQuiz" class="card hide">
+<div class="qn" id="qn"></div>
+<div class="bar"><i id="barI"></i></div>
+<div class="q" id="qt"></div>
+<div id="qo"></div>
+<div class="nav"><button class="btn ghost" id="prev">Previous</button><button class="btn" id="next">Next</button></div>
+</section>
+
+<section id="sRes" class="card hide">
+<div class="muted" style="text-align:center">Your score</div>
+<div class="big" id="pct"></div>
+<p id="msg" style="text-align:center"></p>
+<div id="passBox" class="hide">
+<label for="nm">Type your name as you want it to appear on the certificate:</label>
+<input type="text" id="nm" maxlength="40" autocomplete="name">
+<button class="btn" id="mk">Create my certificate</button>
+</div>
+<div id="failBox" class="hide"><button class="btn" id="again">Try again with new questions</button></div>
+<div id="review"></div>
+</section>
+
+<section id="sCert" class="card hide">
+<p class="muted" id="saveHint">On a phone: long-press the certificate and choose “Save image”. On a computer: use the download button.</p>
+<img id="certImg" alt="Certificate of achievement">
+<div class="row"><a class="btn" id="dl" download="Certificate_Physics2_Lab.png" href="#" style="text-decoration:none;display:inline-flex;align-items:center">Download certificate</a><button class="btn ghost" id="back">Back</button></div>
+<canvas id="cv" class="hide"></canvas>
+</section>
+</div>
+<script>
+const BANK=[{"c": 1, "q": "Kirchhoff's junction rule is a consequence of conservation of:", "o": ["Energy", "Charge", "Momentum", "Mass"], "a": 1, "e": "Charge cannot accumulate at a junction, so current in = current out."}, {"c": 1, "q": "Kirchhoff's loop rule is a consequence of conservation of:", "o": ["Charge", "Energy", "Momentum", "Current"], "a": 1, "e": "The net change of potential around any closed loop is zero."}, {"c": 1, "q": "Currents of <span class=\"eq\" dir=\"ltr\">2 A</span> and <span class=\"eq\" dir=\"ltr\">3 A</span> enter a junction and one wire leaves. The current in that wire is:", "o": ["<span class=\"eq\" dir=\"ltr\">1 A</span>", "<span class=\"eq\" dir=\"ltr\">5 A</span>", "<span class=\"eq\" dir=\"ltr\">6 A</span>", "<span class=\"eq\" dir=\"ltr\">1.5 A</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">ΣI<sub>in</sub> = ΣI<sub>out</sub></span>"}, {"c": 1, "q": "Crossing a resistor in the direction of the current, the potential change is:", "o": ["<span class=\"eq\" dir=\"ltr\">+IR</span>", "<span class=\"eq\" dir=\"ltr\">−IR</span>", "<span class=\"eq\" dir=\"ltr\">0</span>", "<span class=\"eq\" dir=\"ltr\">+ε</span>"], "a": 1, "e": "Potential drops along the current direction."}, {"c": 1, "q": "A <span class=\"eq\" dir=\"ltr\">12 V</span> battery drives current through <span class=\"eq\" dir=\"ltr\">4 Ω</span> and <span class=\"eq\" dir=\"ltr\">2 Ω</span> in series. The voltage across the <span class=\"eq\" dir=\"ltr\">4 Ω</span> resistor is:", "o": ["<span class=\"eq\" dir=\"ltr\">4 V</span>", "<span class=\"eq\" dir=\"ltr\">6 V</span>", "<span class=\"eq\" dir=\"ltr\">8 V</span>", "<span class=\"eq\" dir=\"ltr\">12 V</span>"], "a": 2, "e": "<span class=\"eq\" dir=\"ltr\">I = 12/6 = 2 A ⇒ V = 2 × 4 = 8 V</span>"}, {"c": 2, "q": "The time constant of an RC circuit is:", "o": ["<span class=\"eq\" dir=\"ltr\">R/C</span>", "<span class=\"eq\" dir=\"ltr\">RC</span>", "<span class=\"eq\" dir=\"ltr\">1/(RC)</span>", "<span class=\"eq\" dir=\"ltr\">√(RC)</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">τ = RC</span>"}, {"c": 2, "q": "With <span class=\"eq\" dir=\"ltr\">R = 100 kΩ</span> and <span class=\"eq\" dir=\"ltr\">C = 47 µF</span>, the time constant is:", "o": ["<span class=\"eq\" dir=\"ltr\">0.47 s</span>", "<span class=\"eq\" dir=\"ltr\">4.7 s</span>", "<span class=\"eq\" dir=\"ltr\">47 s</span>", "<span class=\"eq\" dir=\"ltr\">0.047 s</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">τ = (10<sup>5</sup>)(47×10<sup>−6</sup>) = 4.7 s</span>"}, {"c": 2, "q": "After one time constant of charging, the capacitor voltage reaches about what fraction of the supply voltage?", "o": ["<span class=\"eq\" dir=\"ltr\">37%</span>", "<span class=\"eq\" dir=\"ltr\">50%</span>", "<span class=\"eq\" dir=\"ltr\">63%</span>", "<span class=\"eq\" dir=\"ltr\">100%</span>"], "a": 2, "e": "<span class=\"eq\" dir=\"ltr\">1 − e<sup>−1</sup> ≈ 0.63</span>"}, {"c": 2, "q": "During discharge, the voltage after one time constant falls to about:", "o": ["<span class=\"eq\" dir=\"ltr\">37%</span>", "<span class=\"eq\" dir=\"ltr\">50%</span>", "<span class=\"eq\" dir=\"ltr\">63%</span>", "<span class=\"eq\" dir=\"ltr\">13%</span>"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">e<sup>−1</sup> ≈ 0.37</span>"}, {"c": 2, "q": "A plot of <span class=\"eq\" dir=\"ltr\">ln V</span> versus <span class=\"eq\" dir=\"ltr\">t</span> during discharge gives a straight line of slope:", "o": ["<span class=\"eq\" dir=\"ltr\">RC</span>", "<span class=\"eq\" dir=\"ltr\">−1/(RC)</span>", "<span class=\"eq\" dir=\"ltr\">−RC</span>", "<span class=\"eq\" dir=\"ltr\">1/(RC)</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">V = V<sub>0</sub>e<sup>−t/RC</sup> ⇒ ln V = ln V<sub>0</sub> − t/RC</span>"}, {"c": 3, "q": "A trace occupies 4 horizontal divisions per cycle with the time base at <span class=\"eq\" dir=\"ltr\">0.5 ms/div</span>. The frequency is:", "o": ["<span class=\"eq\" dir=\"ltr\">200 Hz</span>", "<span class=\"eq\" dir=\"ltr\">500 Hz</span>", "<span class=\"eq\" dir=\"ltr\">2 kHz</span>", "<span class=\"eq\" dir=\"ltr\">250 Hz</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">T = 4 × 0.5 ms = 2 ms ⇒ f = 500 Hz</span>"}, {"c": 3, "q": "The vertical deflection of an oscilloscope trace measures:", "o": ["Time", "Voltage", "Current directly", "Resistance"], "a": 1, "e": "The Y-input is calibrated in volts per division."}, {"c": 3, "q": "The trigger control on an oscilloscope is used to:", "o": ["Increase the voltage", "Obtain a stable, stationary trace", "Change the frequency of the signal", "Measure resistance"], "a": 1, "e": "Triggering starts each sweep at the same point of the waveform."}, {"c": 3, "q": "Selecting AC coupling on the input:", "o": ["Removes the DC component of the signal", "Doubles the amplitude", "Converts AC to DC", "Turns off the trace"], "a": 0, "e": "A series capacitor blocks the DC level."}, {"c": 3, "q": "To display a smaller waveform larger on the screen, you should:", "o": ["Increase the volts/div setting", "Decrease the volts/div setting", "Increase the time/div", "Switch to DC coupling"], "a": 1, "e": "Fewer volts per division means more divisions for the same signal."}, {"c": 4, "q": "For a sinusoidal voltage, <span class=\"eq\" dir=\"ltr\">V<sub>rms</sub></span> equals:", "o": ["<span class=\"eq\" dir=\"ltr\">V<sub>m</sub>/2</span>", "<span class=\"eq\" dir=\"ltr\">V<sub>m</sub>/√2</span>", "<span class=\"eq\" dir=\"ltr\">√2 V<sub>m</sub></span>", "<span class=\"eq\" dir=\"ltr\">2V<sub>m</sub></span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">V<sub>rms</sub> = V<sub>m</sub>/√2 ≈ 0.707 V<sub>m</sub></span>"}, {"c": 4, "q": "A sine wave has a peak-to-peak value of <span class=\"eq\" dir=\"ltr\">20 V</span>. Its rms value is about:", "o": ["<span class=\"eq\" dir=\"ltr\">7.07 V</span>", "<span class=\"eq\" dir=\"ltr\">10 V</span>", "<span class=\"eq\" dir=\"ltr\">14.1 V</span>", "<span class=\"eq\" dir=\"ltr\">20 V</span>"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">V<sub>m</sub> = 10 V ⇒ V<sub>rms</sub> ≈ 7.07 V</span>"}, {"c": 4, "q": "A digital multimeter on AC volts normally reads:", "o": ["The peak value", "The peak-to-peak value", "The rms value", "The average value of a full cycle (zero)"], "a": 2, "e": "AC meters are calibrated to display rms values."}, {"c": 4, "q": "Household mains of <span class=\"eq\" dir=\"ltr\">230 V<sub>rms</sub></span> has a peak value of about:", "o": ["<span class=\"eq\" dir=\"ltr\">163 V</span>", "<span class=\"eq\" dir=\"ltr\">230 V</span>", "<span class=\"eq\" dir=\"ltr\">325 V</span>", "<span class=\"eq\" dir=\"ltr\">460 V</span>"], "a": 2, "e": "<span class=\"eq\" dir=\"ltr\">V<sub>m</sub> = √2 × 230 ≈ 325 V</span>"}, {"c": 5, "q": "In a tangent galvanometer, the current is proportional to:", "o": ["<span class=\"eq\" dir=\"ltr\">sinθ</span>", "<span class=\"eq\" dir=\"ltr\">tanθ</span>", "<span class=\"eq\" dir=\"ltr\">cosθ</span>", "<span class=\"eq\" dir=\"ltr\">θ²</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">B<sub>coil</sub> = B<sub>H</sub> tanθ</span> and <span class=\"eq\" dir=\"ltr\">B<sub>coil</sub> ∝ I</span>."}, {"c": 5, "q": "Before use, the plane of the galvanometer coil must be set:", "o": ["Perpendicular to the magnetic meridian", "Along the magnetic meridian (north–south)", "Horizontal", "At 45° to north"], "a": 1, "e": "Then the coil's field is perpendicular to Earth's horizontal field."}, {"c": 5, "q": "The most accurate readings are taken when the deflection is near:", "o": ["<span class=\"eq\" dir=\"ltr\">0°</span>", "<span class=\"eq\" dir=\"ltr\">45°</span>", "<span class=\"eq\" dir=\"ltr\">80°</span>", "<span class=\"eq\" dir=\"ltr\">90°</span>"], "a": 1, "e": "The relative error in tanθ is smallest around 45°."}, {"c": 5, "q": "Reversing the current direction and averaging the readings mainly removes:", "o": ["Errors from coil misalignment", "Earth's magnetic field", "The current", "The compass needle"], "a": 0, "e": "Averaging both deflections cancels a small misalignment."}, {"c": 5, "q": "The magnetic field at the centre of a circular coil of N turns and radius R carrying current I is:", "o": ["<span class=\"eq\" dir=\"ltr\">μ<sub>0</sub>NI/(2R)</span>", "<span class=\"eq\" dir=\"ltr\">μ<sub>0</sub>NI/(2πR)</span>", "<span class=\"eq\" dir=\"ltr\">μ<sub>0</sub>NIR</span>", "<span class=\"eq\" dir=\"ltr\">μ<sub>0</sub>I/(4πR²)</span>"], "a": 0, "e": "This field is balanced against Earth's horizontal field in the tangent galvanometer."}, {"c": 6, "q": "An ideal transformer has 200 primary turns and 50 secondary turns. With <span class=\"eq\" dir=\"ltr\">240 V</span> on the primary, the secondary voltage is:", "o": ["<span class=\"eq\" dir=\"ltr\">60 V</span>", "<span class=\"eq\" dir=\"ltr\">120 V</span>", "<span class=\"eq\" dir=\"ltr\">480 V</span>", "<span class=\"eq\" dir=\"ltr\">960 V</span>"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">V<sub>s</sub> = V<sub>p</sub>(N<sub>s</sub>/N<sub>p</sub>) = 240/4</span>"}, {"c": 6, "q": "A transformer does not work with a steady DC supply because:", "o": ["DC is too strong", "There is no changing magnetic flux to induce an emf", "The core melts", "DC has no voltage"], "a": 1, "e": "Induction requires a changing flux (Faraday's law)."}, {"c": 6, "q": "The iron core of a transformer is laminated to reduce:", "o": ["Copper resistance", "Eddy-current losses", "The turns ratio", "The frequency"], "a": 1, "e": "Thin insulated layers limit circulating eddy currents."}, {"c": 6, "q": "For an ideal step-up transformer, the secondary current compared with the primary current is:", "o": ["Larger", "Smaller", "Equal", "Zero"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">V<sub>p</sub>I<sub>p</sub> = V<sub>s</sub>I<sub>s</sub></span>: higher voltage means lower current."}, {"c": 7, "q": "The inductive reactance of a coil is:", "o": ["<span class=\"eq\" dir=\"ltr\">X<sub>L</sub> = 1/(ωL)</span>", "<span class=\"eq\" dir=\"ltr\">X<sub>L</sub> = ωL</span>", "<span class=\"eq\" dir=\"ltr\">X<sub>L</sub> = L/ω</span>", "<span class=\"eq\" dir=\"ltr\">X<sub>L</sub> = ω/L</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">X<sub>L</sub> = 2πfL</span>"}, {"c": 7, "q": "A <span class=\"eq\" dir=\"ltr\">0.2 H</span> coil at <span class=\"eq\" dir=\"ltr\">50 Hz</span> has a reactance of about:", "o": ["<span class=\"eq\" dir=\"ltr\">10 Ω</span>", "<span class=\"eq\" dir=\"ltr\">31.4 Ω</span>", "<span class=\"eq\" dir=\"ltr\">62.8 Ω</span>", "<span class=\"eq\" dir=\"ltr\">314 Ω</span>"], "a": 2, "e": "<span class=\"eq\" dir=\"ltr\">X<sub>L</sub> = 2π(50)(0.2) ≈ 62.8 Ω</span>"}, {"c": 7, "q": "The impedance of a series RL circuit is:", "o": ["<span class=\"eq\" dir=\"ltr\">R + X<sub>L</sub></span>", "<span class=\"eq\" dir=\"ltr\">√(R² + X<sub>L</sub>²)</span>", "<span class=\"eq\" dir=\"ltr\">R − X<sub>L</sub></span>", "<span class=\"eq\" dir=\"ltr\">R X<sub>L</sub></span>"], "a": 1, "e": "R and <span class=\"eq\" dir=\"ltr\">X<sub>L</sub></span> are 90° out of phase, so they add as vectors."}, {"c": 7, "q": "In an RL circuit, the current:", "o": ["Leads the voltage", "Lags the voltage", "Is in phase with the voltage", "Is always zero"], "a": 1, "e": "An inductor opposes changes in current, so current lags."}, {"c": 8, "q": "The capacitive reactance is:", "o": ["<span class=\"eq\" dir=\"ltr\">X<sub>C</sub> = ωC</span>", "<span class=\"eq\" dir=\"ltr\">X<sub>C</sub> = 1/(ωC)</span>", "<span class=\"eq\" dir=\"ltr\">X<sub>C</sub> = C/ω</span>", "<span class=\"eq\" dir=\"ltr\">X<sub>C</sub> = ω/C</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">X<sub>C</sub> = 1/(2πfC)</span>"}, {"c": 8, "q": "A <span class=\"eq\" dir=\"ltr\">10 µF</span> capacitor at <span class=\"eq\" dir=\"ltr\">50 Hz</span> has a reactance of about:", "o": ["<span class=\"eq\" dir=\"ltr\">31.8 Ω</span>", "<span class=\"eq\" dir=\"ltr\">318 Ω</span>", "<span class=\"eq\" dir=\"ltr\">3.18 kΩ</span>", "<span class=\"eq\" dir=\"ltr\">3.14 Ω</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">X<sub>C</sub> = 1/(2π·50·10<sup>−5</sup>) ≈ 318 Ω</span>"}, {"c": 8, "q": "Increasing the frequency makes the capacitive reactance:", "o": ["Increase", "Decrease", "Stay the same", "Become infinite"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">X<sub>C</sub> ∝ 1/f</span>"}, {"c": 8, "q": "Measuring <span class=\"eq\" dir=\"ltr\">V<sub>C</sub> = 10 V</span> and <span class=\"eq\" dir=\"ltr\">I = 20 mA</span> at <span class=\"eq\" dir=\"ltr\">50 Hz</span> gives a capacitance of about:", "o": ["<span class=\"eq\" dir=\"ltr\">6.4 µF</span>", "<span class=\"eq\" dir=\"ltr\">64 µF</span>", "<span class=\"eq\" dir=\"ltr\">0.64 µF</span>", "<span class=\"eq\" dir=\"ltr\">3.2 µF</span>"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">X<sub>C</sub> = 500 Ω ⇒ C = 1/(2π·50·500) ≈ 6.4 µF</span>"}, {"c": 9, "q": "The resonant frequency of a series RLC circuit is:", "o": ["<span class=\"eq\" dir=\"ltr\">f<sub>0</sub> = 2π√(LC)</span>", "<span class=\"eq\" dir=\"ltr\">f<sub>0</sub> = 1/(2π√(LC))</span>", "<span class=\"eq\" dir=\"ltr\">f<sub>0</sub> = √(L/C)</span>", "<span class=\"eq\" dir=\"ltr\">f<sub>0</sub> = 1/(LC)</span>"], "a": 1, "e": "At resonance <span class=\"eq\" dir=\"ltr\">X<sub>L</sub> = X<sub>C</sub></span>."}, {"c": 9, "q": "With <span class=\"eq\" dir=\"ltr\">L = 10 mH</span> and <span class=\"eq\" dir=\"ltr\">C = 1 µF</span>, the resonant frequency is about:", "o": ["<span class=\"eq\" dir=\"ltr\">159 Hz</span>", "<span class=\"eq\" dir=\"ltr\">1.59 kHz</span>", "<span class=\"eq\" dir=\"ltr\">15.9 kHz</span>", "<span class=\"eq\" dir=\"ltr\">10 kHz</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">f<sub>0</sub> = 1/(2π√(10<sup>−8</sup>)) = 1/(2π×10<sup>−4</sup>) ≈ 1.59 kHz</span>"}, {"c": 9, "q": "At resonance in a series RLC circuit, the current is:", "o": ["Minimum", "Maximum", "Zero", "Lagging by 90°"], "a": 1, "e": "The impedance equals R, its minimum value."}, {"c": 9, "q": "Increasing the resistance in a series RLC circuit makes the resonance curve:", "o": ["Sharper", "Broader and lower", "Shift to a higher frequency", "Unchanged"], "a": 1, "e": "Larger R lowers the quality factor Q, broadening the peak."}];
+const N=20,PASS=16;
+const $=id=>document.getElementById(id);
+const show=id=>['sIntro','sQuiz','sRes','sCert'].forEach(s=>$(s).classList.toggle('hide',s!==id));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let Q=[],ans=[],k=0,score=0;
+function draw(){ // two per chapter + the rest random
+  const by={};BANK.forEach((x,i)=>{(by[x.c]=by[x.c]||[]).push(i);});
+  const per=Math.max(1,Math.min(2,Math.floor(N/Object.keys(by).length)));let pick=[];Object.values(by).forEach(l=>pick.push(...shuffle(l).slice(0,per)));pick=shuffle(pick).slice(0,N);
+  const rest=shuffle(BANK.map((_,i)=>i).filter(i=>!pick.includes(i)));
+  pick=pick.concat(rest.slice(0,N-pick.length));
+  Q=shuffle(pick).map(i=>{const x=BANK[i],ord=shuffle(x.o.map((_,j)=>j));return {q:x.q,o:ord.map(j=>x.o[j]),a:ord.indexOf(x.a),e:x.e,c:x.c};});
+  ans=Q.map(()=>-1);k=0;
+}
+function rQ(){
+  const it=Q[k];$('qn').textContent='Question '+(k+1)+' of '+N+' · Experiment '+it.c;$('barI').style.width=((k+1)/N*100)+'%';
+  $('qt').innerHTML=it.q;const box=$('qo');box.innerHTML='';
+  it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt'+(ans[k]===j?' sel':'');b.innerHTML=t;b.onclick=()=>{ans[k]=j;rQ();};box.appendChild(b);});
+  $('prev').disabled=k===0;$('next').disabled=ans[k]<0;$('next').textContent=k===N-1?'Finish':'Next';
+}
+function finish(){
+  score=Q.filter((x,i)=>ans[i]===x.a).length;const p=Math.round(score/N*100);
+  $('pct').innerHTML='<span class="eq">'+score+' / '+N+'</span> · <span class="eq">'+p+'%</span>';
+  const ok=score>=PASS;$('msg').textContent=ok?'Congratulations! You passed the final quiz.':'You have not reached 80% yet. Review the questions you missed, then try again.';
+  $('passBox').classList.toggle('hide',!ok);$('failBox').classList.toggle('hide',ok);
+  const wr=Q.map((x,i)=>({x,i})).filter(o=>ans[o.i]!==o.x.a);
+  $('review').innerHTML=wr.length?'<p class="muted" style="margin-top:14px">Questions you missed:</p>'+wr.map(o=>'<div class="rev"><div>'+o.x.q+'</div><div><b>Your answer:</b> '+o.x.o[ans[o.i]]+'</div><div><span class="ok">Correct:</span> '+o.x.o[o.x.a]+'</div><div class="muted">'+o.x.e+'</div></div>').join(''):'';
+  show('sRes');window.scrollTo(0,0);
+}
+$('go').onclick=()=>{draw();rQ();show('sQuiz');};
+$('prev').onclick=()=>{k--;rQ();};
+$('next').onclick=()=>{if(k<N-1){k++;rQ();}else finish();};
+$('again').onclick=()=>{draw();rQ();show('sQuiz');window.scrollTo(0,0);};
+$('back').onclick=()=>show('sRes');
+
+/* ---------- certificate (dark ruby theme) ---------- */
+const TH={"bg": "#0F2547", "frame": "#E8A13A", "accent": "#E8A13A", "title": "#F2C15A", "text": "#F3F7FC", "muted": "#9FB0D0", "name": "#FFFFFF", "beam": "#1BA7C9"};
+function mixLine(c,segs,cx,y){const ws=segs.map(s=>{c.direction=s.ltr?'ltr':'rtl';return c.measureText(s.t).width;});const tot=ws.reduce((a,b)=>a+b,0);let x=cx+tot/2;
+  segs.forEach((s,i)=>{x-=ws[i];c.direction=s.ltr?'ltr':'rtl';c.textAlign=s.ltr?'left':'right';c.fillText(s.t,s.ltr?x:x+ws[i],y);});c.direction='rtl';c.textAlign='center';}
+function fitFont(c,txt,weight,size,family,maxW){let s=size;do{c.font=weight+' '+s+'px '+family;s-=2;}while(c.measureText(txt).width>maxW&&s>30);}
+function drawCert(cv,d){const t=TH,W=1600,H=1131;cv.width=W;cv.height=H;const c=cv.getContext('2d');c.direction='ltr';c.textAlign='center';c.textBaseline='middle';
+  const SF="Inter, 'Segoe UI', Arial, sans-serif",TT="'Playfair Display', Georgia, serif";
+  c.fillStyle=t.bg;c.fillRect(0,0,W,H);c.strokeStyle=t.frame;c.lineWidth=6;c.strokeRect(40,40,W-80,H-80);c.strokeStyle=t.accent;c.lineWidth=2;c.strokeRect(58,58,W-116,H-116);
+  c.fillStyle=t.accent;[[58,58],[W-58,58],[58,H-58],[W-58,H-58]].forEach(([x,y])=>{c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();});
+  const cx=W/2;c.fillStyle=t.muted;c.font='400 30px '+SF;c.fillText('Virtual Labs · Prof. Najm Al-Hosiny',cx,150);
+  c.fillStyle=t.title;c.font='700 92px '+TT;c.fillText('Certificate of Achievement',cx,280);
+  const g=c.createLinearGradient(cx-260,0,cx+260,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,t.beam);g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(cx-260,360,520,5);
+  c.fillStyle=t.text;c.font='400 36px '+SF;c.fillText('This certifies that',cx,450);
+  c.fillStyle=t.name;fitFont(c,d.name,'700',76,SF,1250);c.fillText(d.name,cx,550);c.fillStyle=t.accent;c.fillRect(cx-300,610,600,2);
+  const L1='has completed the labs of “Physics (2) – Lab” (203207-4)';c.fillStyle=t.text;fitFont(c,L1,'400',36,SF,1300);c.fillText(L1,cx,690);
+  c.font='400 36px '+SF;c.fillText('and passed the final quiz with a score of '+d.score+'%',cx,750);
+  c.font='400 28px '+SF;c.fillStyle=t.muted;const fy=920;c.fillText('Date',300,fy);c.fillText('Course instructor',W-300,fy);
+  c.fillStyle=t.text;c.font='700 34px '+SF;c.fillText(d.date,300,fy+50);c.fillText('Prof. Najm Al-Hosiny',W-300,fy+50);
+  c.save();c.translate(cx,955);c.fillStyle=t.accent;c.beginPath();c.arc(0,0,62,0,Math.PI*2);c.fill();c.strokeStyle=t.bg;c.lineWidth=3;c.beginPath();c.arc(0,0,50,0,Math.PI*2);c.stroke();
+  c.lineWidth=9;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-22,2);c.lineTo(-6,18);c.lineTo(24,-16);c.stroke();c.restore();}
+$('mk').onclick=async()=>{
+  const name=$('nm').value.replace(/\s+/g,' ').trim();if(name.length<3){$('nm').focus();return;}
+  $('mk').disabled=true;
+  try{await Promise.race([Promise.all([document.fonts.load("700 76px Inter",name),document.fonts.load("400 36px Inter","has"),document.fonts.load("700 92px 'Playfair Display'","Certificate")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  const d=new Date(),date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+  drawCert($('cv'),{name,score:Math.round(score/N*100),date});
+  const url=$('cv').toDataURL('image/png');$('certImg').src=url;$('dl').href=url;$('mk').disabled=false;show('sCert');window.scrollTo(0,0);
+};
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

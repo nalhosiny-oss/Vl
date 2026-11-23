@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab — Experiment 1: Kirchhoff's Laws</title>
+<style>
+ :root{
+  --bg:#F3F7FC; --panel:#FFFFFF; --panel2:#F5F9FD; --line:#D3DEEC; --navy:#0F2547; --ink:#15203A;
+  --cyan:#1BA7C9; --cyanD:#0E7C99; --amber:#E8A13A; --amberD:#A8620A; --red:#C8322F; --green:#2E7D4F; --gray:#566179;
+ }
+ *{box-sizing:border-box}
+ body{margin:0;background:var(--bg);color:var(--ink);font-family:Calibri,"Segoe UI",Candara,Arial,sans-serif;line-height:1.55;font-size:16px}
+ header{background:var(--navy);color:#fff;padding:20px 18px 16px;text-align:center;border-bottom:4px solid var(--amber)}
+ header .tag{display:inline-block;color:#7FDCF2;border:1px solid #7FDCF2;border-radius:20px;padding:1px 14px;font-size:13px;letter-spacing:.3px}
+ h1{margin:8px 0 2px;font-family:Cambria,Georgia,serif;font-size:27px;font-weight:700}
+ h1 span{color:var(--amber)}
+ header p{margin:0;color:#C6D4E8;font-size:15px}
+ .wrap{max-width:1120px;margin:0 auto;padding:14px}
+ .safety{background:#FFF5E6;border:1px solid var(--amber);border-left:6px solid var(--amber);border-radius:10px;padding:9px 14px;margin:12px 0;font-size:15px}
+ .safety b{color:var(--amberD)}
+ nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+ nav button{flex:1 1 150px;background:var(--panel);color:var(--gray);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:15px;cursor:pointer;font-weight:600}
+ nav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+ section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(15,37,71,.06)}
+ section.on{display:block}
+ h2{margin:0 0 10px;font-size:21px;color:var(--navy);font-family:Cambria,Georgia,serif}
+ h3{margin:16px 0 6px;font-size:17px;color:var(--cyanD)}
+ .eq{display:inline-block;font-family:"Cambria Math",Cambria,"Times New Roman",serif;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:2px 10px;margin:2px 0;font-size:17px;color:var(--navy);white-space:nowrap}
+ .eq.big{display:block;text-align:center;font-size:21px;margin:8px auto;max-width:520px;padding:6px 12px;white-space:normal}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+ @media(max-width:820px){.grid,.grid3{grid-template-columns:1fr}}
+ .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+ label{display:block;font-size:15px;color:var(--gray);margin-top:8px}
+ input[type=range]{width:100%;accent-color:var(--cyanD)}
+ select,input[type=number],input[type=text]{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+ .val{color:var(--cyanD);font-weight:bold}
+ .btn{background:var(--navy);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px;font-weight:600}
+ .btn.or{background:var(--amberD)}
+ .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--gray)}
+ .btn:disabled{opacity:.45;cursor:default}
+ canvas{width:100%;display:block;border-radius:10px;background:#fff;border:1px solid var(--line)}
+ table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+ th,td{border:1px solid var(--line);padding:5px;text-align:center}
+ th{background:var(--navy);color:#fff;font-weight:600}
+ td input{text-align:center;padding:4px}
+ .ok{color:var(--green);font-weight:600} .bad{color:var(--red);font-weight:600}
+ .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+ .q p{margin:0 0 6px;font-weight:bold;color:var(--navy)}
+ .opt{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+ .opt.right{border-color:var(--green);background:#E6F4EA}
+ .opt.wrong{border-color:var(--red);background:#FBE9E8}
+ .fb{font-size:15px;color:var(--gray);min-height:1.2em}
+ .note{font-size:15px;color:var(--gray)}
+ .reading{font-size:21px;color:var(--amberD);font-weight:bold}
+ .meter{font-family:Consolas,"Courier New",monospace;background:#10233F;color:#7FF0B0;border-radius:8px;padding:6px 12px;font-size:22px;display:inline-block;min-width:150px;text-align:right}
+ .res{background:#EAF6FB;border:1px solid #BFE3EF;border-radius:10px;padding:10px 14px;margin-top:10px}
+ .res b{color:var(--navy)}
+ .wi{background:var(--panel2);border:1px solid var(--line);border-left:5px solid var(--cyan);border-radius:10px;padding:10px 12px;margin:10px 0}
+ .wi p{margin:0 0 6px;font-weight:600}
+ .wi .ans{display:none;color:var(--ink);background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px;margin-top:6px}
+ .wi.show .ans{display:block}
+ footer{text-align:center;color:var(--gray);font-size:13px;padding:16px}
+ sub,sup{font-size:70%}
+
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header>
+ <span class="tag">Physics 2 (203207-4) — Practical Virtual Lab</span>
+ <h1>Experiment 1: <span>Kirchhoff's Laws</span></h1>
+ <p>Verifying the junction (current) rule and the loop (voltage) rule in a DC circuit</p>
+</header>
+<div class="wrap">
+ <div class="safety">⚠️ <b>Safety:</b> switch the DC supply off while you change connections, start from 0 V and raise the voltage slowly, connect the ammeter in <b>series</b> only (never across a component), and do not exceed the power rating of the resistors.</div>
+ <nav>
+  <button class="on" data-s="s1">1) Pre-lab questions</button>
+  <button data-s="s2">2) Theory</button>
+  <button data-s="s3">3) Simulation &amp; measurement</button>
+  <button data-s="s4">4) Data table &amp; analysis</button>
+  <button data-s="sR">5) My lab readings ✔</button>
+  <button data-s="s5">6) What if…?</button>
+ </nav>
+ <section id="s1" class="on"><h2>Pre-lab questions</h2><p class="note">Answer before you come to the lab. The correction appears as soon as you choose.</p><div id="quiz"></div><p class="reading" id="qscore"></p></section>
+ <section id="s2"><h2>Theory</h2>
+<p>Kirchhoff's two rules let us analyse any DC circuit. They are linked to <b>Physics 1 – current and resistance (Ohm's law)</b> and are the basis of all the AC-circuit experiments later in this course.</p>
+<h3>1. The junction rule (current law, KCL)</h3>
+<p>At any junction (node), the sum of the currents entering equals the sum of the currents leaving. This is <b>conservation of charge</b>: charge cannot pile up at a point.</p>
+<span class="eq big">Σ <i>I</i><sub>in</sub> = Σ <i>I</i><sub>out</sub> &nbsp;→&nbsp; at node A: <i>I</i><sub>1</sub> = <i>I</i><sub>2</sub> + <i>I</i><sub>3</sub></span>
+<h3>2. The loop rule (voltage law, KVL)</h3>
+<p>Around any closed loop, the algebraic sum of the potential differences is zero. This is <b>conservation of energy</b>: a charge returning to its starting point has the same potential energy.</p>
+<span class="eq big">Σ Δ<i>V</i> = 0 &nbsp;→&nbsp; loop 1: <i>ε</i> − <i>V</i><sub>1</sub> − <i>V</i><sub>2</sub> = 0 ; &nbsp; loop 2: <i>V</i><sub>2</sub> − <i>V</i><sub>3</sub> = 0</span>
+<h3>3. Our circuit</h3>
+<p>The supply <i>ε</i> drives current <i>I</i><sub>1</sub> through <i>R</i><sub>1</sub>; the current then divides between <i>R</i><sub>2</sub> and <i>R</i><sub>3</sub>, which are connected in parallel between nodes A and B. The theoretical values are:</p>
+<span class="eq big"><i>R</i><sub>23</sub> = <i>R</i><sub>2</sub><i>R</i><sub>3</sub> / (<i>R</i><sub>2</sub> + <i>R</i><sub>3</sub>), &nbsp; <i>I</i><sub>1</sub> = <i>ε</i> / (<i>R</i><sub>1</sub> + <i>R</i><sub>23</sub>), &nbsp; <i>V</i><sub>2</sub> = <i>V</i><sub>3</sub> = <i>I</i><sub>1</sub><i>R</i><sub>23</sub></span>
+<span class="eq big"><i>I</i><sub>2</sub> = <i>V</i><sub>2</sub> / <i>R</i><sub>2</sub>, &nbsp; <i>I</i><sub>3</sub> = <i>V</i><sub>3</sub> / <i>R</i><sub>3</sub>, &nbsp; percentage error = |experimental − theoretical| / theoretical × 100 %</span>
+<h3>4. Using the multimeter</h3>
+<p>• <b>Voltmeter</b>: connected <b>in parallel</b> (across) the component; it has a very large resistance. • <b>Ammeter</b>: connected <b>in series</b> (the circuit is broken and the meter inserted); it has a very small resistance. • Start on the highest range, then move down to get more significant figures.</p>
+<div class="card"><b>Apparatus:</b> DC power supply (0–12 V), three resistors (different values), connection board, connecting wires, digital multimeter (AVO-meter).</div>
+ </section>
+ <section id="s3"><h2>Simulation &amp; measurement</h2>
+<div class="grid">
+ <div class="card">
+  <label>Supply voltage ε: <span class="val" id="ev"></span></label>
+  <input type="range" id="E" min="0" max="12" step="0.5" value="6">
+  <div class="grid3">
+   <label>R₁ (nominal)<select id="r1"><option>100</option><option selected>220</option><option>330</option><option>470</option></select></label>
+   <label>R₂ (nominal)<select id="r2"><option>220</option><option selected>330</option><option>470</option><option>680</option></select></label>
+   <label>R₃ (nominal)<select id="r3"><option>220</option><option>330</option><option selected>470</option><option>1000</option></select></label>
+  </div>
+  <p class="note">Values in Ω. Real resistors differ from their colour-code value (tolerance ±5 %).</p>
+  <label>Place the multimeter to measure:</label>
+  <select id="where">
+   <option value="E">ε — across the supply (voltmeter)</option><option value="V1">V₁ — across R₁ (voltmeter)</option><option value="V2">V₂ — across R₂ (voltmeter)</option><option value="V3">V₃ — across R₃ (voltmeter)</option>
+   <option value="I1">I₁ — in series with R₁ (ammeter)</option><option value="I2">I₂ — in series with R₂ (ammeter)</option><option value="I3">I₃ — in series with R₃ (ammeter)</option>
+  </select>
+  <p>Multimeter: <span class="meter" id="dmm">0.00 V</span></p>
+  <button class="btn or" id="add">Record all seven readings for this ε</button>
+  <p class="note" id="msg"></p>
+ </div>
+ <div class="card"><canvas id="cc" width="560" height="380"></canvas><p class="note">The meter symbol moves to the position you choose. Voltmeters go across a component; ammeters go in series.</p></div>
+</div>
+ </section>
+ <section id="s4"><h2>Data table &amp; analysis</h2>
+<p class="note">Each row was recorded by the simulation. Fill in the yellow cells yourself (currents in mA), then press “Check”.</p>
+<div style="overflow-x:auto"><table><thead><tr><th>#</th><th>ε (V)</th><th>V₁ (V)</th><th>V₂ (V)</th><th>V₃ (V)</th><th>I₁ (mA)</th><th>I₂ (mA)</th><th>I₃ (mA)</th><th style="background:#7A5200">V₁+V₂ (V)</th><th style="background:#7A5200">I₂+I₃ (mA)</th><th>Result</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="grid3">
+ <label>Your R₁ = V₁/I₁ (Ω) from row 1<input type="number" id="uR1"></label>
+ <label>Your R₂ = V₂/I₂ (Ω) from row 1<input type="number" id="uR2"></label>
+ <label>Your R₃ = V₃/I₃ (Ω) from row 1<input type="number" id="uR3"></label>
+</div>
+<button class="btn or" id="chk">Check</button> <button class="btn ghost" id="clr">Clear</button>
+<div class="res" id="res"><p class="note">Record at least 3 different supply voltages, then check.</p></div>
+ </section>
+ <section id="sR"><h2>My real lab readings — self-check</h2><div id="real"></div></section>
+ <section id="s5"><h2>What if…?</h2><p class="note">Predict first, write your reason, then reveal the explanation.</p><div id="whatif"></div></section>
+</div>
+<footer>Physics 2 (203207-4) · Practical part · Prof. Najm Al-Hosiny</footer>
+<script>
+// ===== shared helpers for Physics 2 practical virtual labs =====
+const $=id=>document.getElementById(id);
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+ document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+ b.classList.add('on'); $(b.dataset.s).classList.add('on');
+ if(window.onTab) window.onTab(b.dataset.s);
+});
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function roundTo(x,step){return Math.round(x/step)*step;}
+function fmt(x,d){return (x===null||x===undefined||isNaN(x))?'—':(+x).toFixed(d);}
+function pct(a,b){return Math.abs(a-b)/Math.abs(b)*100;}
+function close(u,t,tol){return u!==null&&u!==''&&u!==undefined&&!isNaN(u)&&Math.abs(u-t)<=Math.abs(t)*tol+1e-12;}
+function numIn(id){const v=$(id).value.trim().replace(',','.'); return v===''?null:+v;}
+
+function buildQuiz(Q){
+ let score=0,answered=0; const qz=$('quiz');
+ Q.forEach((it,i)=>{
+  const d=document.createElement('div'); d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+String.fromCharCode(97+j)+') '+o+'</button>').join('')+'<div class="fb"></div>';
+  d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+   if(d.dataset.done) return; d.dataset.done=1; answered++;
+   const j=+b.dataset.j; d.querySelectorAll('.opt')[it.a].classList.add('right');
+   if(j===it.a){score++; d.querySelector('.fb').innerHTML='<span class="ok">✔ Correct.</span> '+it.e;}
+   else{b.classList.add('wrong'); d.querySelector('.fb').innerHTML='<span class="bad">✘ Not quite.</span> '+it.e;}
+   if(answered===Q.length) $('qscore').textContent='Your score: '+score+' / '+Q.length;
+  });
+  qz.appendChild(d);
+ });
+}
+function buildWhatIf(W){
+ const box=$('whatif');
+ W.forEach((it,i)=>{
+  const d=document.createElement('div'); d.className='wi';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p><textarea rows="2" style="width:100%;font:inherit;border:1px solid #D3DEEC;border-radius:8px;padding:6px" placeholder="Write your prediction and reason first…"></textarea>'+
+   '<button class="btn ghost">Show the explanation</button><div class="ans">'+it.a+'</div>';
+  d.querySelector('button').onclick=()=>d.classList.toggle('show');
+  box.appendChild(d);
+ });
+}
+function fitLine(xs,ys){
+ const n=xs.length; if(n<2) return null;
+ const sx=xs.reduce((a,b)=>a+b,0), sy=ys.reduce((a,b)=>a+b,0);
+ const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0);
+ const den=n*sxx-sx*sx; if(Math.abs(den)<1e-15) return null;
+ const m=(n*sxy-sx*sy)/den, b=(sy-m*sx)/n;
+ const res=ys.map((y,i)=>y-(m*xs[i]+b)); const s2=n>2?res.reduce((a,r)=>a+r*r,0)/(n-2):0;
+ return {m,b,dm:Math.sqrt(n*s2/den),db:Math.sqrt(s2*sxx/den)};
+}
+function fitOrigin(xs,ys){
+ const n=xs.length; if(n<1) return null;
+ const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0); if(sxx===0) return null;
+ const m=sxy/sxx; const s2=n>1?ys.reduce((a,y,i)=>a+(y-m*xs[i])**2,0)/(n-1):0;
+ return {m,b:0,dm:Math.sqrt(s2/sxx),db:0};
+}
+function niceStep(range){const r=range/6,p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p;return (f<1.5?1:f<3?2:f<7?5:10)*p;}
+function drawPlot(cv,pts,o){
+ o=o||{}; const g=cv.getContext('2d'), W=cv.width,H=cv.height; g.clearRect(0,0,W,H); g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+ const L=74,R=22,T=22,B=58;
+ let xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+ let x0=o.xmin!==undefined?o.xmin:Math.min(0,...xs), x1=o.xmax!==undefined?o.xmax:Math.max(...xs,1e-9);
+ let y0=o.ymin!==undefined?o.ymin:Math.min(0,...ys), y1=o.ymax!==undefined?o.ymax:Math.max(...ys,1e-9);
+ if(!pts.length&&o.xmax===undefined){x0=0;x1=1;}
+ if(!pts.length&&o.ymax===undefined){y0=0;y1=1;}
+ if(o.xmax===undefined) x1+=(x1-x0)*0.08; if(o.ymax===undefined) y1+=(y1-y0)*0.10;
+ if(x0<0&&o.xmin===undefined)x0-=(x1-x0)*0.05; if(y0<0&&o.ymin===undefined)y0-=(y1-y0)*0.05;
+ const X=x=>L+(x-x0)/(x1-x0)*(W-L-R), Y=y=>H-B-(y-y0)/(y1-y0)*(H-T-B);
+ const sxs=niceStep(x1-x0), sys=niceStep(y1-y0);
+ g.font='13px Calibri, Arial'; g.textAlign='center'; g.strokeStyle='#E3EAF3'; g.fillStyle='#566179';
+ const dec=s=>s>=1?0:Math.min(4,Math.ceil(-Math.log10(s)-1e-9));
+ for(let x=Math.ceil(x0/sxs)*sxs;x<=x1+1e-12;x+=sxs){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),H-B);g.stroke();g.fillText(x.toFixed(dec(sxs)),X(x),H-B+17);}
+ g.textAlign='right';
+ for(let y=Math.ceil(y0/sys)*sys;y<=y1+1e-12;y+=sys){g.beginPath();g.moveTo(L,Y(y));g.lineTo(W-R,Y(y));g.stroke();g.fillText(y.toFixed(dec(sys)),L-6,Y(y)+4);}
+ g.strokeStyle='#0F2547'; g.lineWidth=1.5; g.beginPath(); g.moveTo(L,T); g.lineTo(L,H-B); g.lineTo(W-R,H-B); g.stroke();
+ if(x0<0&&x1>0){g.beginPath();g.moveTo(X(0),T);g.lineTo(X(0),H-B);g.stroke();}
+ if(y0<0&&y1>0){g.beginPath();g.moveTo(L,Y(0));g.lineTo(W-R,Y(0));g.stroke();}
+ g.lineWidth=1; g.fillStyle='#0F2547'; g.textAlign='center'; g.font='bold 14px Calibri, Arial';
+ g.fillText(o.xlabel||'x',(L+W-R)/2,H-14);
+ g.save(); g.translate(18,(T+H-B)/2); g.rotate(-Math.PI/2); g.fillText(o.ylabel||'y',0,0); g.restore();
+ const line=(f,col,dash)=>{ if(!f) return; g.strokeStyle=col; g.lineWidth=2; g.setLineDash(dash||[]);
+  const xa=o.extend?x0:Math.min(0,x0), xb=x1; g.beginPath(); g.moveTo(X(xa),Y(f.m*xa+f.b)); g.lineTo(X(xb),Y(f.m*xb+f.b)); g.stroke(); g.setLineDash([]); g.lineWidth=1;};
+ g.save(); g.beginPath(); g.rect(L,T,W-L-R,H-T-B); g.clip();
+ if(o.curve){ g.strokeStyle='#A8620A'; g.lineWidth=2; g.beginPath(); o.curve.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1]))); g.stroke(); g.lineWidth=1; }
+ if(o.series){ o.series.forEach(s=>{ g.strokeStyle=s.col; g.lineWidth=2; g.setLineDash(s.dash||[]); g.beginPath(); s.pts.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1]))); g.stroke(); g.setLineDash([]); g.lineWidth=1; }); }
+ line(o.fit,'#A8620A'); line(o.student,'#0E7C99',[6,5]);
+ if(o.vline!==undefined){g.strokeStyle='#C8322F'; g.setLineDash([4,4]); g.beginPath(); g.moveTo(X(o.vline),T); g.lineTo(X(o.vline),H-B); g.stroke(); g.setLineDash([]);}
+ g.restore();
+ pts.forEach(p=>{g.fillStyle=p[2]||'#0F2547'; g.beginPath(); g.arc(X(p[0]),Y(p[1]),4.5,0,2*Math.PI); g.fill();});
+ g.font='13px Calibri, Arial'; g.textAlign='left'; let ly=T+14;
+ if(o.fit||o.curve){g.fillStyle='#A8620A'; g.fillText(o.fitLabel||'— best-fit line (least squares)',L+10,ly); ly+=16;}
+ if(o.student){g.fillStyle='#0E7C99'; g.fillText('- - line with YOUR slope',L+10,ly); ly+=16;}
+ if(o.legend) o.legend.forEach(l=>{g.fillStyle=l[1]; g.fillText(l[0],L+10,ly); ly+=16;});
+}
+// ===== "My real lab readings" self-check =====
+function buildReal(cfg){
+ const box=$('real'), KEY='p2lab_real_'+cfg.key;
+ let store={}; try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){store={};}
+ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}};
+ const num=v=>{if(v===undefined||v===null) return null; v=String(v).trim().replace(',', '.'); if(v==='') return null; const x=parseFloat(v); return isNaN(x)?null:x;};
+ let h='<p class="note">'+(cfg.intro||'')+' Type the readings you recorded in the laboratory (in your manual), do your own calculations, then press <b>Check my results</b>. '+
+  'Your entries are kept in this browser, so you can come back later. Take a screenshot of the result and attach it at the end of your report.</p>';
+ if(cfg.consts&&cfg.consts.length){h+='<div class="grid3">'+cfg.consts.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+ cfg.tables.forEach(t=>{
+  h+='<h3>'+t.title+'</h3><div style="overflow-x:auto"><table id="rt_'+t.id+'"><thead><tr><th>#</th>'+t.cols.map(c=>'<th'+(c.calc?' style="background:#7A5200"':'')+'>'+c.label+'</th>').join('')+'</tr></thead><tbody></tbody></table></div>';
+  if(t.add!==false) h+='<button class="btn ghost" data-add="'+t.id+'">+ Add a row</button>';
+ });
+ if(cfg.mine&&cfg.mine.length){h+='<h3>Your results from your hand-drawn graph / calculation</h3><div class="grid3">'+cfg.mine.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+ h+='<p><button class="btn or" id="rcheck">Check my results</button> <button class="btn ghost" id="rclear">Clear all my entries</button></p>'+
+  '<p class="note">Yellow-headed columns are your own calculations: they turn <span class="ok">green</span> when correct and <span class="bad">red</span> when not.</p>'+
+  (cfg.plot?'<canvas id="rplot" width="760" height="430"></canvas>':'')+'<div class="res" id="rres"><p class="note">Results appear here after you press Check.</p></div>';
+ box.innerHTML=h;
+ const rowsOf=t=>{ if(!store[t.id]) store[t.id]=[]; const n=Math.max(t.rows||5, store[t.id].length); while(store[t.id].length<n) store[t.id].push({}); return store[t.id]; };
+ function renderTables(){
+  cfg.tables.forEach(t=>{
+   const tb=$('rt_'+t.id).querySelector('tbody'); const R=rowsOf(t);
+   if(t.preset) R.forEach((r,i)=>{ if(t.preset[i]) Object.keys(t.preset[i]).forEach(k=>{ if(r[k]===undefined) r[k]=String(t.preset[i][k]); }); });
+   tb.innerHTML=R.map((r,i)=>'<tr><td>'+(t.rowLabels?t.rowLabels[i]||(i+1):(i+1))+'</td>'+t.cols.map(c=>'<td'+(c.calc?' style="background:#FFF8D6"':'')+'><input type="text" inputmode="decimal" data-t="'+t.id+'" data-r="'+i+'" data-c="'+c.id+'" value="'+(r[c.id]===undefined?'':String(r[c.id]).replace(/"/g,''))+'"></td>').join('')+'</tr>').join('');
+  });
+  box.querySelectorAll('input[data-t]').forEach(inp=>inp.oninput=()=>{store[inp.dataset.t][+inp.dataset.r][inp.dataset.c]=inp.value; inp.style.borderColor=''; save();});
+ }
+ box.querySelectorAll('input[data-k]').forEach(inp=>{ if(store['k_'+inp.dataset.k]!==undefined) inp.value=store['k_'+inp.dataset.k]; inp.oninput=()=>{store['k_'+inp.dataset.k]=inp.value; save();}; });
+ box.querySelectorAll('button[data-add]').forEach(b=>b.onclick=()=>{ store[b.dataset.add].push({}); save(); renderTables(); });
+ let armed=false;
+ $('rclear').onclick=()=>{ if(!armed){armed=true; $('rclear').textContent='Click again to clear everything'; setTimeout(()=>{armed=false; $('rclear').textContent='Clear all my entries';},4000); return;}
+  store={}; save(); box.querySelectorAll('input[data-k]').forEach(i=>i.value=''); renderTables(); $('rres').innerHTML='<p class="note">Cleared.</p>'; if(cfg.plot) drawPlot($('rplot'),[],cfg.plot); armed=false; $('rclear').textContent='Clear all my entries'; };
+ $('rcheck').onclick=()=>{
+  const K={}; box.querySelectorAll('input[data-k]').forEach(i=>K[i.dataset.k]=num(i.value));
+  const T={}; let marks=0, good=0;
+  cfg.tables.forEach(t=>{
+   T[t.id]=[];
+   store[t.id].forEach((r,i)=>{
+    const o={_i:i}; t.cols.forEach(c=>{ if(!c.calc) o[c.id]=num(r[c.id]); });
+    const complete=t.cols.filter(c=>!c.calc&&!c.optional).every(c=>o[c.id]!==null);
+    t.cols.filter(c=>c.calc).forEach(c=>{
+     const inp=box.querySelector('input[data-t="'+t.id+'"][data-r="'+i+'"][data-c="'+c.id+'"]'); const u=num(r[c.id]);
+     if(!complete){ inp.style.borderColor=''; return; }
+     let e=null; try{ e=c.f(o,K); }catch(err){ e=null; } o[c.id]=e; o['your_'+c.id]=u;
+     if(u===null||e===null||!isFinite(e)){ inp.style.borderColor=''; return; }
+     const ok=c.abs!==undefined?Math.abs(u-e)<=c.abs:close(u,e,c.tol||0.02); marks++; if(ok) good++;
+     inp.style.borderColor=ok?'#2E7D4F':'#C8322F'; inp.style.borderWidth='2px'; inp.title=ok?'correct':'expected about '+(+e.toPrecision(4));
+    });
+    if(complete) T[t.id].push(o);
+   });
+  });
+  let out;
+  try{ out=cfg.analyze(T,K)||{}; }catch(err){ out={html:'<span class="bad">Please check your entries: '+err.message+'</span>'}; }
+  let s=marks?'<b>Your calculated columns:</b> '+good+' / '+marks+' correct'+(good<marks?' — hover over (or tap) a red cell to see the expected value.':' ✔')+'<br>':'';
+  $('rres').innerHTML=s+(out.html||'');
+  if(cfg.plot){ const p=out.plot||{pts:[]}; drawPlot($('rplot'),p.pts,Object.assign({},cfg.plot,p)); }
+ };
+ renderTables(); if(cfg.plot) drawPlot($('rplot'),[],cfg.plot);
+}
+function ok5(u,t,lim,txt){ lim=lim||5; if(u===null||u===undefined) return ''; const d=pct(u,t); return d<=lim?'<span class="ok">✔ '+txt+' is within '+lim+' % of the best-fit value</span>':'<span class="bad">✘ '+txt+' differs by '+d.toFixed(1)+' % from the best-fit value — check the two points you read on your line</span>'; }
+// ===== circuit drawing helpers =====
+function cvs(id){const c=$(id); return [c,c.getContext('2d')];}
+function wire(g,pts,col){g.strokeStyle=col||'#15203A'; g.lineWidth=2.2; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.stroke(); g.lineWidth=1;}
+function resistor(g,x1,y,x2,label,vert){ // zig-zag between two points (horizontal) or vertical
+ g.strokeStyle='#15203A'; g.lineWidth=2.2; g.beginPath();
+ const n=6, len=vert?(x2-y):(x2-x1);
+ if(!vert){ const a=x1+len*0.2, b=x2-len*0.2; g.moveTo(x1,y); g.lineTo(a,y); for(let i=0;i<n;i++){ g.lineTo(a+(b-a)*(i+0.5)/n, y+(i%2?8:-8)); } g.lineTo(b,y); g.lineTo(x2,y); }
+ else { const x=x1, ya=y+len*0.2, yb=x2-len*0.2; g.moveTo(x,y); g.lineTo(x,ya); for(let i=0;i<n;i++){ g.lineTo(x+(i%2?8:-8), ya+(yb-ya)*(i+0.5)/n); } g.lineTo(x,yb); g.lineTo(x,x2); }
+ g.stroke(); g.lineWidth=1;
+ if(label){ g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; if(!vert) g.fillText(label,(x1+x2)/2,y-14); else g.fillText(label,x1+30,(y+x2)/2+5); }
+}
+function meterIcon(g,x,y,letter,col){ g.fillStyle='#fff'; g.strokeStyle=col||'#0E7C99'; g.lineWidth=2; g.beginPath(); g.arc(x,y,15,0,2*Math.PI); g.fill(); g.stroke(); g.lineWidth=1; g.fillStyle=col||'#0E7C99'; g.font='bold 15px Calibri'; g.textAlign='center'; g.fillText(letter,x,y+5); }
+function battery(g,x,y,label,vert){ g.strokeStyle='#15203A'; g.lineWidth=2.2;
+ if(!vert){ g.beginPath(); g.moveTo(x-4,y-16); g.lineTo(x-4,y+16); g.stroke(); g.lineWidth=4; g.beginPath(); g.moveTo(x+4,y-9); g.lineTo(x+4,y+9); g.stroke(); }
+ else { g.beginPath(); g.moveTo(x-16,y-4); g.lineTo(x+16,y-4); g.stroke(); g.lineWidth=4; g.beginPath(); g.moveTo(x-9,y+4); g.lineTo(x+9,y+4); g.stroke(); }
+ g.lineWidth=1; if(label){ g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; vert?g.fillText(label,x-36,y+5):g.fillText(label,x,y-22);} }
+function acSource(g,x,y,label){ g.fillStyle='#fff'; g.strokeStyle='#15203A'; g.lineWidth=2.2; g.beginPath(); g.arc(x,y,16,0,2*Math.PI); g.fill(); g.stroke(); g.beginPath(); for(let i=0;i<=20;i++){const t=i/20; const px=x-9+18*t, py=y-6*Math.sin(2*Math.PI*t); i?g.lineTo(px,py):g.moveTo(px,py);} g.stroke(); g.lineWidth=1; if(label){g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; g.fillText(label,x,y-24);} }
+function capacitor(g,x,y,label,vert){ g.strokeStyle='#15203A'; g.lineWidth=3;
+ if(!vert){ g.beginPath(); g.moveTo(x-5,y-14); g.lineTo(x-5,y+14); g.moveTo(x+5,y-14); g.lineTo(x+5,y+14); g.stroke(); }
+ else { g.beginPath(); g.moveTo(x-14,y-5); g.lineTo(x+14,y-5); g.moveTo(x-14,y+5); g.lineTo(x+14,y+5); g.stroke(); }
+ g.lineWidth=1; if(label){g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; vert?g.fillText(label,x+34,y+5):g.fillText(label,x,y-20);} }
+function inductor(g,x1,y,x2,label){ g.strokeStyle='#15203A'; g.lineWidth=2.2; g.beginPath(); const a=x1+(x2-x1)*0.15,b=x2-(x2-x1)*0.15, n=4, w=(b-a)/n; g.moveTo(x1,y); g.lineTo(a,y); for(let i=0;i<n;i++){ g.arc(a+w*(i+0.5),y,w/2,Math.PI,0,false);} g.lineTo(x2,y); g.stroke(); g.lineWidth=1; if(label){g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; g.fillText(label,(x1+x2)/2,y-18);} }
+function dot(g,x,y){g.fillStyle='#15203A'; g.beginPath(); g.arc(x,y,4,0,2*Math.PI); g.fill();}
+function txt(g,s,x,y,col,font,al){g.fillStyle=col||'#0F2547'; g.font=font||'14px Calibri'; g.textAlign=al||'center'; g.fillText(s,x,y);}
+// ===== oscilloscope screen =====
+function drawScope(cv,fn,vdiv,tdiv,ypos,opt){ opt=opt||{}; const g=cv.getContext('2d'), W=cv.width, H=cv.height, dx=W/10, dy=H/8;
+ g.fillStyle='#0B1A2E'; g.fillRect(0,0,W,H); g.strokeStyle='#23415F'; g.lineWidth=1;
+ for(let i=0;i<=10;i++){g.beginPath();g.moveTo(i*dx,0);g.lineTo(i*dx,H);g.stroke();}
+ for(let j=0;j<=8;j++){g.beginPath();g.moveTo(0,j*dy);g.lineTo(W,j*dy);g.stroke();}
+ g.strokeStyle='#3C6A92'; g.beginPath(); g.moveTo(W/2,0); g.lineTo(W/2,H); g.moveTo(0,H/2); g.lineTo(W,H/2); g.stroke();
+ for(let i=0;i<50;i++){ const x=i*dx/5; g.beginPath(); g.moveTo(x,H/2-4); g.lineTo(x,H/2+4); g.stroke(); }
+ for(let j=0;j<40;j++){ const y=j*dy/5; g.beginPath(); g.moveTo(W/2-4,y); g.lineTo(W/2+4,y); g.stroke(); }
+ g.strokeStyle='#5CF2A0'; g.lineWidth=2.2; g.shadowColor='#5CF2A0'; g.shadowBlur=4; g.beginPath();
+ for(let px=0;px<=W;px++){ const t=px/dx*tdiv; let v=fn(t)/vdiv; let y=H/2-(v+ypos)*dy; y=Math.max(-5,Math.min(H+5,y)); px?g.lineTo(px,y):g.moveTo(px,y); }
+ g.stroke(); g.shadowBlur=0; g.lineWidth=1;
+ g.fillStyle='#9FC3E6'; g.font='13px Consolas, monospace'; g.textAlign='left';
+ g.fillText('CH1  '+fmtV(vdiv)+'/div',8,H-8); g.textAlign='right'; g.fillText('TIME '+fmtT(tdiv)+'/div',W-8,H-8);
+}
+function fmtV(v){return v<1?(v*1000).toFixed(0)+' mV':v+' V';}
+function fmtT(t){return t<1e-3?(t*1e6).toFixed(0)+' µs':(t*1e3).toFixed(t<1e-2?1:0)+' ms';}
+
+</script>
+<script>
+buildQuiz([
+ {q:'Kirchhoff’s junction (current) rule is a statement of conservation of:',o:['energy','charge','momentum','power'],a:1,e:'Charge cannot accumulate at a node, so what flows in must flow out.'},
+ {q:'Kirchhoff’s loop (voltage) rule is a statement of conservation of:',o:['charge','mass','energy','current'],a:2,e:'A charge going round a closed loop returns to the same potential, so the gains and drops of energy add to zero.'},
+ {q:'An ammeter must be connected:',o:['in parallel with the component','in series with the component','across the supply','in any way'],a:1,e:'The current to be measured must pass through the ammeter, so it is inserted in series.'},
+ {q:'If 30 mA enters a junction and 12 mA leaves through one branch, the other branch carries:',o:['42 mA','18 mA','12 mA','30 mA'],a:1,e:'30 = 12 + I → I = 18 mA.'},
+ {q:'Two resistors in parallel always have:',o:['the same current','the same potential difference','the same power','the same resistance'],a:1,e:'Both are connected between the same two nodes, so V₂ = V₃ (this is loop 2 of the experiment).'}
+]);
+buildWhatIf([
+ {q:'What if R₃ is removed (open circuit)?',a:'I₃ = 0, so I₁ = I₂. The total resistance rises to R₁ + R₂, I₁ falls, and V₂ rises (R₂ now takes a bigger share of ε). Try it by choosing a very large R₃ (1000 Ω) and compare.'},
+ {q:'What if the ammeter were connected across R₂ by mistake?',a:'Its tiny resistance would short-circuit R₂: almost all the current passes through the meter, V₂ ≈ 0 and I₁ rises. With a large supply voltage the meter’s fuse may blow — this is why the ammeter goes in series only.'},
+ {q:'What if you double ε?',a:'Every voltage and every current doubles (the circuit is linear), but V₁+V₂ = ε and I₁ = I₂+I₃ still hold exactly. The resistances V/I do not change.'},
+ {q:'What if R₂ = R₃?',a:'The current divides equally: I₂ = I₃ = I₁/2, and the parallel pair is equivalent to R₂/2.'}
+]);
+const nom=()=>({R1:+r1.value,R2:+r2.value,R3:+r3.value});
+const tolF={}; function act(R){ if(!tolF[R]) tolF[R]=1+0.04*(Math.random()*2-1); return R*tolF[R]; }
+function solve(){ const n=nom(), R1=act(n.R1),R2=act(n.R2),R3=act(n.R3), E=+$('E').value, Rin=0.5; // supply internal resistance 0.5 Ω
+ const R23=R2*R3/(R2+R3), I1=E/(R1+R23+Rin), V2=I1*R23; return {E:E-I1*Rin,V1:I1*R1,V2,V3:V2,I1:I1*1000,I2:V2/R2*1000,I3:V2/R3*1000}; }
+function rd(q,v){ // DMM reading with small noise and resolution
+ if(q[0]==='I'){ const r=v<200?0.01:0.1; return roundTo(v*(1+0.003*gauss()),r); }
+ const r=v<20?0.01:0.1; return roundTo(v*(1+0.002*gauss()),r); }
+let rows=[], ext=null;
+function draw(){ const [c,g]=cvs('cc'); g.clearRect(0,0,c.width,c.height); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height);
+ const n=nom(); const xL=60,xA=300,xB=300,yT=70,yB=320, x2=250,x3=440;
+ wire(g,[[xL,yB],[xL,yT],[130,yT]]); resistor(g,130,yT,230,'R₁ = '+n.R1+' Ω'); wire(g,[[230,yT],[x3,yT]]);
+ dot(g,x2,yT); dot(g,x2,yB); txt(g,'A',x2-14,yT-8,'#A8620A','bold 15px Calibri');
+ wire(g,[[x2,yT],[x2,140]]); resistor(g,x2,140,250,'',true); wire(g,[[x2,250],[x2,yB]]); txt(g,'R₂',x2-30,200,'#0F2547','bold 14px Calibri'); txt(g,n.R2+' Ω',x2-30,218,'#566179','13px Calibri');
+ wire(g,[[x3,yT],[x3,140]]); resistor(g,x3,140,250,'',true); wire(g,[[x3,250],[x3,yB]]); txt(g,'R₃',x3+34,200,'#0F2547','bold 14px Calibri'); txt(g,n.R3+' Ω',x3+34,218,'#566179','13px Calibri');
+ wire(g,[[x3,yB],[xL,yB]]); txt(g,'B',x2-14,yB+20,'#A8620A','bold 15px Calibri');
+ g.fillStyle='#fff'; g.fillRect(xL-20,180,40,40); battery(g,xL,200,'ε',true); wire(g,[[xL,180],[xL,192]]); wire(g,[[xL,208],[xL,220]]);
+ const w=$('where').value; const pos={E:[xL+50,200,'V'],V1:[180,yT-45,'V'],V2:[x2+40,200,'V'],V3:[x3-40,200,'V'],I1:[100,yT,'A'],I2:[x2,110,'A'],I3:[x3,110,'A']}[w];
+ if(w[0]==='V'||w==='E'){ const ends={E:[[xL,180],[xL,220]],V1:[[130,yT],[230,yT]],V2:[[x2,140],[x2,250]],V3:[[x3,140],[x3,250]]}[w];
+  g.setLineDash([5,4]); wire(g,[ends[0],[pos[0],pos[1]]],'#0E7C99'); wire(g,[ends[1],[pos[0],pos[1]]],'#0E7C99'); g.setLineDash([]); }
+ meterIcon(g,pos[0],pos[1],pos[2],pos[2]==='A'?'#A8620A':'#0E7C99');
+ // current arrows
+ g.fillStyle='#A8620A'; g.font='13px Calibri'; g.textAlign='left'; g.fillText('I₁ →',150,yT+22); g.fillText('I₂ ↓',x2+8,280); g.fillText('I₃ ↓',x3+8,280);
+}
+function upd(){ $('ev').textContent=(+$('E').value).toFixed(1)+' V'; const s=solve(), w=$('where').value; const v=rd(w,s[w]);
+ $('dmm').textContent=(w[0]==='I'?v.toFixed(w==='I1'&&v>=200?1:2)+' mA':v.toFixed(2)+' V'); draw(); }
+['E','r1','r2','r3','where'].forEach(id=>$(id).addEventListener('input',upd));
+$('add').onclick=()=>{ if(+$('E').value<1){$('msg').textContent='Raise ε above 1 V first.';return;} const s=solve(); const r={}; ['E','V1','V2','V3','I1','I2','I3'].forEach(k=>r[k]=rd(k,s[k])); r.n=nom(); r.u={};
+ rows.push(r); $('msg').textContent='Recorded. Change ε and record again.'; render(); };
+function render(){ const tb=$('tb'); tb.innerHTML='';
+ rows.forEach((r,i)=>{ const tr=document.createElement('tr'); const inp=k=>'<td style="background:#FFF8D6"><input type="number" step="0.01" data-k="'+k+'" value="'+(r.u[k]??'')+'"></td>';
+  tr.innerHTML='<td>'+(i+1)+'</td>'+['E','V1','V2','V3'].map(k=>'<td>'+r[k].toFixed(2)+'</td>').join('')+['I1','I2','I3'].map(k=>'<td>'+r[k].toFixed(2)+'</td>').join('')+inp('sv')+inp('si')+'<td>'+(r.res||'')+'</td>';
+  tr.querySelectorAll('input').forEach(x=>x.oninput=()=>{r.u[x.dataset.k]=x.value===''?null:+x.value;}); tb.appendChild(tr); }); }
+$('chk').onclick=()=>{ if(rows.length<3){alert('Record at least 3 supply voltages.');return;}
+ rows.forEach(r=>{ const sv=r.V1+r.V2, si=r.I2+r.I3; const ok=close(r.u.sv,sv,0.005)&&close(r.u.si,si,0.005);
+  r.res=ok?'<span class="ok">✔</span>':'<span class="bad">✘ '+sv.toFixed(2)+' V, '+si.toFixed(2)+' mA</span>'; });
+ render(); const r=rows[0], n=r.n;
+ const R23=n.R2*n.R3/(n.R2+n.R3), I1t=r.E/(n.R1+R23)*1000, V2t=I1t/1000*R23;
+ let s='<b>Row 1 — experimental vs theoretical (from the nominal values):</b><br>'+
+  'I₁: '+r.I1.toFixed(2)+' mA vs '+I1t.toFixed(2)+' mA (error '+pct(r.I1,I1t).toFixed(1)+' %) · V₂: '+r.V2.toFixed(2)+' V vs '+V2t.toFixed(2)+' V (error '+pct(r.V2,V2t).toFixed(1)+' %)<br>'+
+  '<b>KVL loop 1:</b> ε − (V₁+V₂) = '+(r.E-r.V1-r.V2).toFixed(2)+' V · <b>KVL loop 2:</b> V₂ − V₃ = '+(r.V2-r.V3).toFixed(2)+' V · <b>KCL at A:</b> I₁ − (I₂+I₃) = '+(r.I1-r.I2-r.I3).toFixed(2)+' mA<br>';
+ [['uR1','V1','I1','R1'],['uR2','V2','I2','R2'],['uR3','V3','I3','R3']].forEach(([id,v,i,R])=>{ const u=numIn(id); if(u===null) return; const e=r[v]/(r[i]/1000);
+  s+='Your '+({R1:'R₁',R2:'R₂',R3:'R₃'})[R]+' = '+u+' Ω: '+(close(u,e,0.01)?'<span class="ok">✔ correct (V/I = '+e.toFixed(0)+' Ω); colour code '+n[R]+' Ω → difference '+pct(e,n[R]).toFixed(1)+' %</span>':'<span class="bad">✘ V/I = '+e.toFixed(0)+' Ω (remember to change mA to A)</span>')+'<br>'; });
+ s+='<span class="note">The small non-zero sums come only from the last digit of the meter readings — Kirchhoff’s rules hold.</span>';
+ $('res').innerHTML=s; };
+$('clr').onclick=()=>{rows=[];render();$('res').innerHTML='<p class="note">Record at least 3 different supply voltages, then check.</p>';};
+upd(); render(); window.onTab=()=>upd();
+buildReal({key:'exp1', intro:'One row for each supply voltage. Currents in mA.',
+ consts:[{id:'R1',label:'R₁ colour-code value (Ω)'},{id:'R2',label:'R₂ colour-code value (Ω)'},{id:'R3',label:'R₃ colour-code value (Ω)'}],
+ tables:[{id:'K',title:'Your Kirchhoff readings',rows:4,cols:[
+  {id:'E',label:'ε (V)'},{id:'V1',label:'V₁ (V)'},{id:'V2',label:'V₂ (V)'},{id:'V3',label:'V₃ (V)'},{id:'I1',label:'I₁ (mA)'},{id:'I2',label:'I₂ (mA)'},{id:'I3',label:'I₃ (mA)'},
+  {id:'sv',label:'V₁+V₂ (V)',calc:1,abs:0.011,f:o=>o.V1+o.V2},{id:'si',label:'I₂+I₃ (mA)',calc:1,abs:0.011,f:o=>o.I2+o.I3}]}],
+ mine:[{id:'uR1',label:'Your R₁ = V₁/I₁ (Ω)'},{id:'uR2',label:'Your R₂ = V₂/I₂ (Ω)'},{id:'uR3',label:'Your R₃ = V₃/I₃ (Ω)'}],
+ analyze:(T,K)=>{ const R=T.K; if(!R.length) return {html:'Enter at least one complete row.'};
+  let s='<table><tr><th>#</th><th>ε − (V₁+V₂) (V)</th><th>KVL error %</th><th>I₁ − (I₂+I₃) (mA)</th><th>KCL error %</th></tr>'+R.map((o,i)=>'<tr><td>'+(i+1)+'</td><td>'+fmt(o.E-o.V1-o.V2,2)+'</td><td>'+fmt(pct(o.V1+o.V2,o.E),1)+'</td><td>'+fmt(o.I1-o.I2-o.I3,2)+'</td><td>'+fmt(pct(o.I2+o.I3,o.I1),1)+'</td></tr>').join('')+'</table>';
+  const avg=(v,i)=>R.reduce((a,o)=>a+o[v]/(o[i]/1000),0)/R.length; const Rs={R1:avg('V1','I1'),R2:avg('V2','I2'),R3:avg('V3','I3')};
+  s+='<b>Average resistances from V/I:</b> R₁ = '+fmt(Rs.R1,0)+' Ω, R₂ = '+fmt(Rs.R2,0)+' Ω, R₃ = '+fmt(Rs.R3,0)+' Ω<br>';
+  ['R1','R2','R3'].forEach(k=>{ if(K[k]) s+=({R1:'R₁',R2:'R₂',R3:'R₃'})[k]+': colour code '+K[k]+' Ω → difference '+fmt(pct(Rs[k],K[k]),1)+' % '+(pct(Rs[k],K[k])<=5?'<span class="ok">(within the ±5 % tolerance)</span>':'<span class="bad">(outside ±5 % — check the readings)</span>')+'<br>';
+   const u=K['u'+k]; if(u!==null&&u!==undefined) s+='Your '+k+' = '+u+' Ω: '+(pct(u,Rs[k])<=3?'<span class="ok">✔ agrees with V/I</span>':'<span class="bad">✘ V/I gives '+fmt(Rs[k],0)+' Ω</span>')+'<br>'; });
+  return {html:s}; }});
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

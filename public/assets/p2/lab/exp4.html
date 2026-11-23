@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab — Experiment 4: V<sub>pp</sub>, V<sub>m</sub> and V<sub>rms</sub></title>
+<style>
+ :root{
+  --bg:#F3F7FC; --panel:#FFFFFF; --panel2:#F5F9FD; --line:#D3DEEC; --navy:#0F2547; --ink:#15203A;
+  --cyan:#1BA7C9; --cyanD:#0E7C99; --amber:#E8A13A; --amberD:#A8620A; --red:#C8322F; --green:#2E7D4F; --gray:#566179;
+ }
+ *{box-sizing:border-box}
+ body{margin:0;background:var(--bg);color:var(--ink);font-family:Calibri,"Segoe UI",Candara,Arial,sans-serif;line-height:1.55;font-size:16px}
+ header{background:var(--navy);color:#fff;padding:20px 18px 16px;text-align:center;border-bottom:4px solid var(--amber)}
+ header .tag{display:inline-block;color:#7FDCF2;border:1px solid #7FDCF2;border-radius:20px;padding:1px 14px;font-size:13px;letter-spacing:.3px}
+ h1{margin:8px 0 2px;font-family:Cambria,Georgia,serif;font-size:27px;font-weight:700}
+ h1 span{color:var(--amber)}
+ header p{margin:0;color:#C6D4E8;font-size:15px}
+ .wrap{max-width:1120px;margin:0 auto;padding:14px}
+ .safety{background:#FFF5E6;border:1px solid var(--amber);border-left:6px solid var(--amber);border-radius:10px;padding:9px 14px;margin:12px 0;font-size:15px}
+ .safety b{color:var(--amberD)}
+ nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+ nav button{flex:1 1 150px;background:var(--panel);color:var(--gray);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:15px;cursor:pointer;font-weight:600}
+ nav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+ section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(15,37,71,.06)}
+ section.on{display:block}
+ h2{margin:0 0 10px;font-size:21px;color:var(--navy);font-family:Cambria,Georgia,serif}
+ h3{margin:16px 0 6px;font-size:17px;color:var(--cyanD)}
+ .eq{display:inline-block;font-family:"Cambria Math",Cambria,"Times New Roman",serif;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:2px 10px;margin:2px 0;font-size:17px;color:var(--navy);white-space:nowrap}
+ .eq.big{display:block;text-align:center;font-size:21px;margin:8px auto;max-width:520px;padding:6px 12px;white-space:normal}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+ @media(max-width:820px){.grid,.grid3{grid-template-columns:1fr}}
+ .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+ label{display:block;font-size:15px;color:var(--gray);margin-top:8px}
+ input[type=range]{width:100%;accent-color:var(--cyanD)}
+ select,input[type=number],input[type=text]{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+ .val{color:var(--cyanD);font-weight:bold}
+ .btn{background:var(--navy);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px;font-weight:600}
+ .btn.or{background:var(--amberD)}
+ .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--gray)}
+ .btn:disabled{opacity:.45;cursor:default}
+ canvas{width:100%;display:block;border-radius:10px;background:#fff;border:1px solid var(--line)}
+ table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+ th,td{border:1px solid var(--line);padding:5px;text-align:center}
+ th{background:var(--navy);color:#fff;font-weight:600}
+ td input{text-align:center;padding:4px}
+ .ok{color:var(--green);font-weight:600} .bad{color:var(--red);font-weight:600}
+ .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+ .q p{margin:0 0 6px;font-weight:bold;color:var(--navy)}
+ .opt{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+ .opt.right{border-color:var(--green);background:#E6F4EA}
+ .opt.wrong{border-color:var(--red);background:#FBE9E8}
+ .fb{font-size:15px;color:var(--gray);min-height:1.2em}
+ .note{font-size:15px;color:var(--gray)}
+ .reading{font-size:21px;color:var(--amberD);font-weight:bold}
+ .meter{font-family:Consolas,"Courier New",monospace;background:#10233F;color:#7FF0B0;border-radius:8px;padding:6px 12px;font-size:22px;display:inline-block;min-width:150px;text-align:right}
+ .res{background:#EAF6FB;border:1px solid #BFE3EF;border-radius:10px;padding:10px 14px;margin-top:10px}
+ .res b{color:var(--navy)}
+ .wi{background:var(--panel2);border:1px solid var(--line);border-left:5px solid var(--cyan);border-radius:10px;padding:10px 12px;margin:10px 0}
+ .wi p{margin:0 0 6px;font-weight:600}
+ .wi .ans{display:none;color:var(--ink);background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px;margin-top:6px}
+ .wi.show .ans{display:block}
+ footer{text-align:center;color:var(--gray);font-size:13px;padding:16px}
+ sub,sup{font-size:70%}
+
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header>
+ <span class="tag">Physics 2 (203207-4) — Practical Virtual Lab</span>
+ <h1>Experiment 4: <span>V<sub>pp</sub>, V<sub>m</sub> and V<sub>rms</sub></span></h1>
+ <p>Calibrating the oscilloscope against an AC voltmeter and verifying V<sub>m</sub> = √2 V<sub>rms</sub></p>
+</header>
+<div class="wrap">
+ <div class="safety">⚠️ <b>Safety:</b> use only the low-voltage AC output of the supply (step-down transformer or variac set below 15 V); never connect the oscilloscope or the meter to the mains directly; switch off before changing connections.</div>
+ <nav>
+  <button class="on" data-s="s1">1) Pre-lab questions</button>
+  <button data-s="s2">2) Theory</button>
+  <button data-s="s3">3) Simulation &amp; measurement</button>
+  <button data-s="s4">4) Data table &amp; analysis</button>
+  <button data-s="sR">5) My lab readings ✔</button>
+  <button data-s="s5">6) What if…?</button>
+ </nav>
+ <section id="s1" class="on"><h2>Pre-lab questions</h2><p class="note">Answer before you come to the lab. The correction appears as soon as you choose.</p><div id="quiz"></div><p class="reading" id="qscore"></p></section>
+ <section id="s2"><h2>Theory</h2>
+<p>An alternating voltage changes all the time, so we need special values to describe it. Linked to <b>Chapter 6 – AC sources: V<sub>rms</sub> and I<sub>rms</sub></b>.</p>
+<span class="eq big"><i>v</i>(<i>t</i>) = <i>V</i><sub>m</sub> sin(2π<i>ft</i>)</span>
+<h3>1. Three values of the same voltage</h3>
+<p>• <b>V<sub>m</sub></b> (peak or maximum value): the largest value, measured from zero. • <b>V<sub>pp</sub></b> (peak-to-peak): from the top to the bottom of the wave, <i>V</i><sub>pp</sub> = 2<i>V</i><sub>m</sub>; this is what we read on the oscilloscope. • <b>V<sub>rms</sub></b> (root-mean-square or effective value): the DC voltage that would give the same heating in a resistor; this is what an AC voltmeter shows.</p>
+<span class="eq big"><i>V</i><sub>rms</sub> = <i>V</i><sub>m</sub> / √2 = 0.707 <i>V</i><sub>m</sub> &nbsp;⇔&nbsp; <i>V</i><sub>m</sub> = √2 <i>V</i><sub>rms</sub></span>
+<span class="eq big"><i>V</i><sub>pp</sub> = 2<i>V</i><sub>m</sub> = 2√2 <i>V</i><sub>rms</sub> = 2.83 <i>V</i><sub>rms</sub></span>
+<h3>2. The graph</h3>
+<p>Plot <i>V</i><sub>pp</sub> (from the oscilloscope) on the <i>y</i>-axis against <i>V</i><sub>rms</sub> (from the voltmeter) on the <i>x</i>-axis. The result is a straight line through the origin with <b>slope = 2√2 ≈ 2.83</b>. Equivalently, <i>V</i><sub>m</sub>/<i>V</i><sub>rms</sub> = √2 ≈ 1.414.</p>
+<p>The oscilloscope (and the voltmeter) is <b>calibrated</b> when the measured ratio agrees with √2. The calibration accuracy is</p>
+<span class="eq big">error % = |(<i>V</i><sub>m</sub>/<i>V</i><sub>rms</sub>) − 1.414| / 1.414 × 100 %</span>
+<p class="note">Example: the mains in Saudi Arabia is 220 V rms, so its peak value is 311 V and its peak-to-peak value is 622 V.</p>
+<div class="card"><b>Apparatus:</b> low-voltage AC supply (60 Hz) with a variable output (variac or potentiometer), AC voltmeter, oscilloscope, connecting wires.</div>
+ </section>
+ <section id="s3"><h2>Simulation &amp; measurement</h2>
+<div class="grid">
+ <div class="card">
+  <label>AC supply output (adjust the variac): <span class="val" id="sv"></span></label><input type="range" id="S" min="0" max="100" step="1" value="30">
+  <p>AC voltmeter: <span class="meter" id="vm">0.00 V~</span></p>
+  <div class="grid"><label>VOLTS/DIV<select id="vd"></select></label><label>TIME/DIV<select id="td"></select></label></div>
+  <label>Vertical POSITION: <span class="val" id="pv"></span></label><input type="range" id="pos" min="-3" max="3" step="0.05" value="0">
+  <p><button class="btn or" id="add">Record this voltage in the table</button></p>
+  <p class="note" id="msg">Set the voltmeter to about 2, 4, 6 … 14 V in turn.</p>
+ </div>
+ <div class="card"><canvas id="scr" width="600" height="480"></canvas><canvas id="cc" width="600" height="190" style="margin-top:8px"></canvas></div>
+</div>
+ </section>
+ <section id="s4"><h2>Data table &amp; analysis</h2>
+<p class="note">Read V<sub>pp</sub> from the screen for each row; fill in the yellow cells and press “Check”.</p>
+<div style="overflow-x:auto"><table><thead><tr><th>#</th><th>V<sub>rms</sub> voltmeter (V)</th><th>VOLTS/DIV</th><th style="background:#7A5200">vertical div (p–p)</th><th style="background:#7A5200">V<sub>pp</sub> (V)</th><th style="background:#7A5200">V<sub>m</sub> = V<sub>pp</sub>/2 (V)</th><th style="background:#7A5200">V<sub>m</sub>/V<sub>rms</sub></th><th>Result</th></tr></thead><tbody id="tb"></tbody></table></div>
+<canvas id="plot" width="900" height="360" style="margin-top:10px"></canvas>
+<div class="grid"><label>Slope of YOUR V<sub>pp</sub> – V<sub>rms</sub> line<input type="number" id="uS" step="0.01"></label><label>Your accuracy of the oscilloscope (%)<input type="number" id="uE" step="0.1"></label></div>
+<button class="btn or" id="chk">Check</button> <button class="btn ghost" id="clr">Clear</button>
+<div class="res" id="res"><p class="note">Record at least 5 voltages, then check.</p></div>
+ </section>
+ <section id="sR"><h2>My real lab readings — self-check</h2><div id="real"></div></section>
+ <section id="s5"><h2>What if…?</h2><p class="note">Predict first, write your reason, then reveal the explanation.</p><div id="whatif"></div></section>
+</div>
+<footer>Physics 2 (203207-4) · Practical part · Prof. Najm Al-Hosiny</footer>
+<script>
+// ===== shared helpers for Physics 2 practical virtual labs =====
+const $=id=>document.getElementById(id);
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+ document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+ b.classList.add('on'); $(b.dataset.s).classList.add('on');
+ if(window.onTab) window.onTab(b.dataset.s);
+});
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function roundTo(x,step){return Math.round(x/step)*step;}
+function fmt(x,d){return (x===null||x===undefined||isNaN(x))?'—':(+x).toFixed(d);}
+function pct(a,b){return Math.abs(a-b)/Math.abs(b)*100;}
+function close(u,t,tol){return u!==null&&u!==''&&u!==undefined&&!isNaN(u)&&Math.abs(u-t)<=Math.abs(t)*tol+1e-12;}
+function numIn(id){const v=$(id).value.trim().replace(',','.'); return v===''?null:+v;}
+
+function buildQuiz(Q){
+ let score=0,answered=0; const qz=$('quiz');
+ Q.forEach((it,i)=>{
+  const d=document.createElement('div'); d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+String.fromCharCode(97+j)+') '+o+'</button>').join('')+'<div class="fb"></div>';
+  d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+   if(d.dataset.done) return; d.dataset.done=1; answered++;
+   const j=+b.dataset.j; d.querySelectorAll('.opt')[it.a].classList.add('right');
+   if(j===it.a){score++; d.querySelector('.fb').innerHTML='<span class="ok">✔ Correct.</span> '+it.e;}
+   else{b.classList.add('wrong'); d.querySelector('.fb').innerHTML='<span class="bad">✘ Not quite.</span> '+it.e;}
+   if(answered===Q.length) $('qscore').textContent='Your score: '+score+' / '+Q.length;
+  });
+  qz.appendChild(d);
+ });
+}
+function buildWhatIf(W){
+ const box=$('whatif');
+ W.forEach((it,i)=>{
+  const d=document.createElement('div'); d.className='wi';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p><textarea rows="2" style="width:100%;font:inherit;border:1px solid #D3DEEC;border-radius:8px;padding:6px" placeholder="Write your prediction and reason first…"></textarea>'+
+   '<button class="btn ghost">Show the explanation</button><div class="ans">'+it.a+'</div>';
+  d.querySelector('button').onclick=()=>d.classList.toggle('show');
+  box.appendChild(d);
+ });
+}
+function fitLine(xs,ys){
+ const n=xs.length; if(n<2) return null;
+ const sx=xs.reduce((a,b)=>a+b,0), sy=ys.reduce((a,b)=>a+b,0);
+ const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0);
+ const den=n*sxx-sx*sx; if(Math.abs(den)<1e-15) return null;
+ const m=(n*sxy-sx*sy)/den, b=(sy-m*sx)/n;
+ const res=ys.map((y,i)=>y-(m*xs[i]+b)); const s2=n>2?res.reduce((a,r)=>a+r*r,0)/(n-2):0;
+ return {m,b,dm:Math.sqrt(n*s2/den),db:Math.sqrt(s2*sxx/den)};
+}
+function fitOrigin(xs,ys){
+ const n=xs.length; if(n<1) return null;
+ const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0); if(sxx===0) return null;
+ const m=sxy/sxx; const s2=n>1?ys.reduce((a,y,i)=>a+(y-m*xs[i])**2,0)/(n-1):0;
+ return {m,b:0,dm:Math.sqrt(s2/sxx),db:0};
+}
+function niceStep(range){const r=range/6,p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p;return (f<1.5?1:f<3?2:f<7?5:10)*p;}
+function drawPlot(cv,pts,o){
+ o=o||{}; const g=cv.getContext('2d'), W=cv.width,H=cv.height; g.clearRect(0,0,W,H); g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+ const L=74,R=22,T=22,B=58;
+ let xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+ let x0=o.xmin!==undefined?o.xmin:Math.min(0,...xs), x1=o.xmax!==undefined?o.xmax:Math.max(...xs,1e-9);
+ let y0=o.ymin!==undefined?o.ymin:Math.min(0,...ys), y1=o.ymax!==undefined?o.ymax:Math.max(...ys,1e-9);
+ if(!pts.length&&o.xmax===undefined){x0=0;x1=1;}
+ if(!pts.length&&o.ymax===undefined){y0=0;y1=1;}
+ if(o.xmax===undefined) x1+=(x1-x0)*0.08; if(o.ymax===undefined) y1+=(y1-y0)*0.10;
+ if(x0<0&&o.xmin===undefined)x0-=(x1-x0)*0.05; if(y0<0&&o.ymin===undefined)y0-=(y1-y0)*0.05;
+ const X=x=>L+(x-x0)/(x1-x0)*(W-L-R), Y=y=>H-B-(y-y0)/(y1-y0)*(H-T-B);
+ const sxs=niceStep(x1-x0), sys=niceStep(y1-y0);
+ g.font='13px Calibri, Arial'; g.textAlign='center'; g.strokeStyle='#E3EAF3'; g.fillStyle='#566179';
+ const dec=s=>s>=1?0:Math.min(4,Math.ceil(-Math.log10(s)-1e-9));
+ for(let x=Math.ceil(x0/sxs)*sxs;x<=x1+1e-12;x+=sxs){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),H-B);g.stroke();g.fillText(x.toFixed(dec(sxs)),X(x),H-B+17);}
+ g.textAlign='right';
+ for(let y=Math.ceil(y0/sys)*sys;y<=y1+1e-12;y+=sys){g.beginPath();g.moveTo(L,Y(y));g.lineTo(W-R,Y(y));g.stroke();g.fillText(y.toFixed(dec(sys)),L-6,Y(y)+4);}
+ g.strokeStyle='#0F2547'; g.lineWidth=1.5; g.beginPath(); g.moveTo(L,T); g.lineTo(L,H-B); g.lineTo(W-R,H-B); g.stroke();
+ if(x0<0&&x1>0){g.beginPath();g.moveTo(X(0),T);g.lineTo(X(0),H-B);g.stroke();}
+ if(y0<0&&y1>0){g.beginPath();g.moveTo(L,Y(0));g.lineTo(W-R,Y(0));g.stroke();}
+ g.lineWidth=1; g.fillStyle='#0F2547'; g.textAlign='center'; g.font='bold 14px Calibri, Arial';
+ g.fillText(o.xlabel||'x',(L+W-R)/2,H-14);
+ g.save(); g.translate(18,(T+H-B)/2); g.rotate(-Math.PI/2); g.fillText(o.ylabel||'y',0,0); g.restore();
+ const line=(f,col,dash)=>{ if(!f) return; g.strokeStyle=col; g.lineWidth=2; g.setLineDash(dash||[]);
+  const xa=o.extend?x0:Math.min(0,x0), xb=x1; g.beginPath(); g.moveTo(X(xa),Y(f.m*xa+f.b)); g.lineTo(X(xb),Y(f.m*xb+f.b)); g.stroke(); g.setLineDash([]); g.lineWidth=1;};
+ g.save(); g.beginPath(); g.rect(L,T,W-L-R,H-T-B); g.clip();
+ if(o.curve){ g.strokeStyle='#A8620A'; g.lineWidth=2; g.beginPath(); o.curve.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1]))); g.stroke(); g.lineWidth=1; }
+ if(o.series){ o.series.forEach(s=>{ g.strokeStyle=s.col; g.lineWidth=2; g.setLineDash(s.dash||[]); g.beginPath(); s.pts.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1]))); g.stroke(); g.setLineDash([]); g.lineWidth=1; }); }
+ line(o.fit,'#A8620A'); line(o.student,'#0E7C99',[6,5]);
+ if(o.vline!==undefined){g.strokeStyle='#C8322F'; g.setLineDash([4,4]); g.beginPath(); g.moveTo(X(o.vline),T); g.lineTo(X(o.vline),H-B); g.stroke(); g.setLineDash([]);}
+ g.restore();
+ pts.forEach(p=>{g.fillStyle=p[2]||'#0F2547'; g.beginPath(); g.arc(X(p[0]),Y(p[1]),4.5,0,2*Math.PI); g.fill();});
+ g.font='13px Calibri, Arial'; g.textAlign='left'; let ly=T+14;
+ if(o.fit||o.curve){g.fillStyle='#A8620A'; g.fillText(o.fitLabel||'— best-fit line (least squares)',L+10,ly); ly+=16;}
+ if(o.student){g.fillStyle='#0E7C99'; g.fillText('- - line with YOUR slope',L+10,ly); ly+=16;}
+ if(o.legend) o.legend.forEach(l=>{g.fillStyle=l[1]; g.fillText(l[0],L+10,ly); ly+=16;});
+}
+// ===== "My real lab readings" self-check =====
+function buildReal(cfg){
+ const box=$('real'), KEY='p2lab_real_'+cfg.key;
+ let store={}; try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){store={};}
+ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}};
+ const num=v=>{if(v===undefined||v===null) return null; v=String(v).trim().replace(',', '.'); if(v==='') return null; const x=parseFloat(v); return isNaN(x)?null:x;};
+ let h='<p class="note">'+(cfg.intro||'')+' Type the readings you recorded in the laboratory (in your manual), do your own calculations, then press <b>Check my results</b>. '+
+  'Your entries are kept in this browser, so you can come back later. Take a screenshot of the result and attach it at the end of your report.</p>';
+ if(cfg.consts&&cfg.consts.length){h+='<div class="grid3">'+cfg.consts.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+ cfg.tables.forEach(t=>{
+  h+='<h3>'+t.title+'</h3><div style="overflow-x:auto"><table id="rt_'+t.id+'"><thead><tr><th>#</th>'+t.cols.map(c=>'<th'+(c.calc?' style="background:#7A5200"':'')+'>'+c.label+'</th>').join('')+'</tr></thead><tbody></tbody></table></div>';
+  if(t.add!==false) h+='<button class="btn ghost" data-add="'+t.id+'">+ Add a row</button>';
+ });
+ if(cfg.mine&&cfg.mine.length){h+='<h3>Your results from your hand-drawn graph / calculation</h3><div class="grid3">'+cfg.mine.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+ h+='<p><button class="btn or" id="rcheck">Check my results</button> <button class="btn ghost" id="rclear">Clear all my entries</button></p>'+
+  '<p class="note">Yellow-headed columns are your own calculations: they turn <span class="ok">green</span> when correct and <span class="bad">red</span> when not.</p>'+
+  (cfg.plot?'<canvas id="rplot" width="760" height="430"></canvas>':'')+'<div class="res" id="rres"><p class="note">Results appear here after you press Check.</p></div>';
+ box.innerHTML=h;
+ const rowsOf=t=>{ if(!store[t.id]) store[t.id]=[]; const n=Math.max(t.rows||5, store[t.id].length); while(store[t.id].length<n) store[t.id].push({}); return store[t.id]; };
+ function renderTables(){
+  cfg.tables.forEach(t=>{
+   const tb=$('rt_'+t.id).querySelector('tbody'); const R=rowsOf(t);
+   if(t.preset) R.forEach((r,i)=>{ if(t.preset[i]) Object.keys(t.preset[i]).forEach(k=>{ if(r[k]===undefined) r[k]=String(t.preset[i][k]); }); });
+   tb.innerHTML=R.map((r,i)=>'<tr><td>'+(t.rowLabels?t.rowLabels[i]||(i+1):(i+1))+'</td>'+t.cols.map(c=>'<td'+(c.calc?' style="background:#FFF8D6"':'')+'><input type="text" inputmode="decimal" data-t="'+t.id+'" data-r="'+i+'" data-c="'+c.id+'" value="'+(r[c.id]===undefined?'':String(r[c.id]).replace(/"/g,''))+'"></td>').join('')+'</tr>').join('');
+  });
+  box.querySelectorAll('input[data-t]').forEach(inp=>inp.oninput=()=>{store[inp.dataset.t][+inp.dataset.r][inp.dataset.c]=inp.value; inp.style.borderColor=''; save();});
+ }
+ box.querySelectorAll('input[data-k]').forEach(inp=>{ if(store['k_'+inp.dataset.k]!==undefined) inp.value=store['k_'+inp.dataset.k]; inp.oninput=()=>{store['k_'+inp.dataset.k]=inp.value; save();}; });
+ box.querySelectorAll('button[data-add]').forEach(b=>b.onclick=()=>{ store[b.dataset.add].push({}); save(); renderTables(); });
+ let armed=false;
+ $('rclear').onclick=()=>{ if(!armed){armed=true; $('rclear').textContent='Click again to clear everything'; setTimeout(()=>{armed=false; $('rclear').textContent='Clear all my entries';},4000); return;}
+  store={}; save(); box.querySelectorAll('input[data-k]').forEach(i=>i.value=''); renderTables(); $('rres').innerHTML='<p class="note">Cleared.</p>'; if(cfg.plot) drawPlot($('rplot'),[],cfg.plot); armed=false; $('rclear').textContent='Clear all my entries'; };
+ $('rcheck').onclick=()=>{
+  const K={}; box.querySelectorAll('input[data-k]').forEach(i=>K[i.dataset.k]=num(i.value));
+  const T={}; let marks=0, good=0;
+  cfg.tables.forEach(t=>{
+   T[t.id]=[];
+   store[t.id].forEach((r,i)=>{
+    const o={_i:i}; t.cols.forEach(c=>{ if(!c.calc) o[c.id]=num(r[c.id]); });
+    const complete=t.cols.filter(c=>!c.calc&&!c.optional).every(c=>o[c.id]!==null);
+    t.cols.filter(c=>c.calc).forEach(c=>{
+     const inp=box.querySelector('input[data-t="'+t.id+'"][data-r="'+i+'"][data-c="'+c.id+'"]'); const u=num(r[c.id]);
+     if(!complete){ inp.style.borderColor=''; return; }
+     let e=null; try{ e=c.f(o,K); }catch(err){ e=null; } o[c.id]=e; o['your_'+c.id]=u;
+     if(u===null||e===null||!isFinite(e)){ inp.style.borderColor=''; return; }
+     const ok=c.abs!==undefined?Math.abs(u-e)<=c.abs:close(u,e,c.tol||0.02); marks++; if(ok) good++;
+     inp.style.borderColor=ok?'#2E7D4F':'#C8322F'; inp.style.borderWidth='2px'; inp.title=ok?'correct':'expected about '+(+e.toPrecision(4));
+    });
+    if(complete) T[t.id].push(o);
+   });
+  });
+  let out;
+  try{ out=cfg.analyze(T,K)||{}; }catch(err){ out={html:'<span class="bad">Please check your entries: '+err.message+'</span>'}; }
+  let s=marks?'<b>Your calculated columns:</b> '+good+' / '+marks+' correct'+(good<marks?' — hover over (or tap) a red cell to see the expected value.':' ✔')+'<br>':'';
+  $('rres').innerHTML=s+(out.html||'');
+  if(cfg.plot){ const p=out.plot||{pts:[]}; drawPlot($('rplot'),p.pts,Object.assign({},cfg.plot,p)); }
+ };
+ renderTables(); if(cfg.plot) drawPlot($('rplot'),[],cfg.plot);
+}
+function ok5(u,t,lim,txt){ lim=lim||5; if(u===null||u===undefined) return ''; const d=pct(u,t); return d<=lim?'<span class="ok">✔ '+txt+' is within '+lim+' % of the best-fit value</span>':'<span class="bad">✘ '+txt+' differs by '+d.toFixed(1)+' % from the best-fit value — check the two points you read on your line</span>'; }
+// ===== circuit drawing helpers =====
+function cvs(id){const c=$(id); return [c,c.getContext('2d')];}
+function wire(g,pts,col){g.strokeStyle=col||'#15203A'; g.lineWidth=2.2; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.stroke(); g.lineWidth=1;}
+function resistor(g,x1,y,x2,label,vert){ // zig-zag between two points (horizontal) or vertical
+ g.strokeStyle='#15203A'; g.lineWidth=2.2; g.beginPath();
+ const n=6, len=vert?(x2-y):(x2-x1);
+ if(!vert){ const a=x1+len*0.2, b=x2-len*0.2; g.moveTo(x1,y); g.lineTo(a,y); for(let i=0;i<n;i++){ g.lineTo(a+(b-a)*(i+0.5)/n, y+(i%2?8:-8)); } g.lineTo(b,y); g.lineTo(x2,y); }
+ else { const x=x1, ya=y+len*0.2, yb=x2-len*0.2; g.moveTo(x,y); g.lineTo(x,ya); for(let i=0;i<n;i++){ g.lineTo(x+(i%2?8:-8), ya+(yb-ya)*(i+0.5)/n); } g.lineTo(x,yb); g.lineTo(x,x2); }
+ g.stroke(); g.lineWidth=1;
+ if(label){ g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; if(!vert) g.fillText(label,(x1+x2)/2,y-14); else g.fillText(label,x1+30,(y+x2)/2+5); }
+}
+function meterIcon(g,x,y,letter,col){ g.fillStyle='#fff'; g.strokeStyle=col||'#0E7C99'; g.lineWidth=2; g.beginPath(); g.arc(x,y,15,0,2*Math.PI); g.fill(); g.stroke(); g.lineWidth=1; g.fillStyle=col||'#0E7C99'; g.font='bold 15px Calibri'; g.textAlign='center'; g.fillText(letter,x,y+5); }
+function battery(g,x,y,label,vert){ g.strokeStyle='#15203A'; g.lineWidth=2.2;
+ if(!vert){ g.beginPath(); g.moveTo(x-4,y-16); g.lineTo(x-4,y+16); g.stroke(); g.lineWidth=4; g.beginPath(); g.moveTo(x+4,y-9); g.lineTo(x+4,y+9); g.stroke(); }
+ else { g.beginPath(); g.moveTo(x-16,y-4); g.lineTo(x+16,y-4); g.stroke(); g.lineWidth=4; g.beginPath(); g.moveTo(x-9,y+4); g.lineTo(x+9,y+4); g.stroke(); }
+ g.lineWidth=1; if(label){ g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; vert?g.fillText(label,x-36,y+5):g.fillText(label,x,y-22);} }
+function acSource(g,x,y,label){ g.fillStyle='#fff'; g.strokeStyle='#15203A'; g.lineWidth=2.2; g.beginPath(); g.arc(x,y,16,0,2*Math.PI); g.fill(); g.stroke(); g.beginPath(); for(let i=0;i<=20;i++){const t=i/20; const px=x-9+18*t, py=y-6*Math.sin(2*Math.PI*t); i?g.lineTo(px,py):g.moveTo(px,py);} g.stroke(); g.lineWidth=1; if(label){g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; g.fillText(label,x,y-24);} }
+function capacitor(g,x,y,label,vert){ g.strokeStyle='#15203A'; g.lineWidth=3;
+ if(!vert){ g.beginPath(); g.moveTo(x-5,y-14); g.lineTo(x-5,y+14); g.moveTo(x+5,y-14); g.lineTo(x+5,y+14); g.stroke(); }
+ else { g.beginPath(); g.moveTo(x-14,y-5); g.lineTo(x+14,y-5); g.moveTo(x-14,y+5); g.lineTo(x+14,y+5); g.stroke(); }
+ g.lineWidth=1; if(label){g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; vert?g.fillText(label,x+34,y+5):g.fillText(label,x,y-20);} }
+function inductor(g,x1,y,x2,label){ g.strokeStyle='#15203A'; g.lineWidth=2.2; g.beginPath(); const a=x1+(x2-x1)*0.15,b=x2-(x2-x1)*0.15, n=4, w=(b-a)/n; g.moveTo(x1,y); g.lineTo(a,y); for(let i=0;i<n;i++){ g.arc(a+w*(i+0.5),y,w/2,Math.PI,0,false);} g.lineTo(x2,y); g.stroke(); g.lineWidth=1; if(label){g.fillStyle='#0F2547'; g.font='bold 14px Calibri'; g.textAlign='center'; g.fillText(label,(x1+x2)/2,y-18);} }
+function dot(g,x,y){g.fillStyle='#15203A'; g.beginPath(); g.arc(x,y,4,0,2*Math.PI); g.fill();}
+function txt(g,s,x,y,col,font,al){g.fillStyle=col||'#0F2547'; g.font=font||'14px Calibri'; g.textAlign=al||'center'; g.fillText(s,x,y);}
+// ===== oscilloscope screen =====
+function drawScope(cv,fn,vdiv,tdiv,ypos,opt){ opt=opt||{}; const g=cv.getContext('2d'), W=cv.width, H=cv.height, dx=W/10, dy=H/8;
+ g.fillStyle='#0B1A2E'; g.fillRect(0,0,W,H); g.strokeStyle='#23415F'; g.lineWidth=1;
+ for(let i=0;i<=10;i++){g.beginPath();g.moveTo(i*dx,0);g.lineTo(i*dx,H);g.stroke();}
+ for(let j=0;j<=8;j++){g.beginPath();g.moveTo(0,j*dy);g.lineTo(W,j*dy);g.stroke();}
+ g.strokeStyle='#3C6A92'; g.beginPath(); g.moveTo(W/2,0); g.lineTo(W/2,H); g.moveTo(0,H/2); g.lineTo(W,H/2); g.stroke();
+ for(let i=0;i<50;i++){ const x=i*dx/5; g.beginPath(); g.moveTo(x,H/2-4); g.lineTo(x,H/2+4); g.stroke(); }
+ for(let j=0;j<40;j++){ const y=j*dy/5; g.beginPath(); g.moveTo(W/2-4,y); g.lineTo(W/2+4,y); g.stroke(); }
+ g.strokeStyle='#5CF2A0'; g.lineWidth=2.2; g.shadowColor='#5CF2A0'; g.shadowBlur=4; g.beginPath();
+ for(let px=0;px<=W;px++){ const t=px/dx*tdiv; let v=fn(t)/vdiv; let y=H/2-(v+ypos)*dy; y=Math.max(-5,Math.min(H+5,y)); px?g.lineTo(px,y):g.moveTo(px,y); }
+ g.stroke(); g.shadowBlur=0; g.lineWidth=1;
+ g.fillStyle='#9FC3E6'; g.font='13px Consolas, monospace'; g.textAlign='left';
+ g.fillText('CH1  '+fmtV(vdiv)+'/div',8,H-8); g.textAlign='right'; g.fillText('TIME '+fmtT(tdiv)+'/div',W-8,H-8);
+}
+function fmtV(v){return v<1?(v*1000).toFixed(0)+' mV':v+' V';}
+function fmtT(t){return t<1e-3?(t*1e6).toFixed(0)+' µs':(t*1e3).toFixed(t<1e-2?1:0)+' ms';}
+
+</script>
+<script>
+buildQuiz([
+ {q:'An AC voltmeter reads:',o:['the peak value V_m','the peak-to-peak value V_pp','the rms (effective) value','the average value, which is zero'],a:2,e:'AC meters are scaled to show V_rms.'},
+ {q:'For a sine wave, V_m equals:',o:['V_rms/√2','√2 V_rms','2 V_rms','V_rms'],a:1,e:'V_m = √2 V_rms ≈ 1.414 V_rms.'},
+ {q:'The voltmeter reads 5.0 V. The peak-to-peak voltage on the oscilloscope should be about:',o:['7.1 V','10 V','14.1 V','3.5 V'],a:2,e:'V_pp = 2√2 × 5.0 = 14.1 V.'},
+ {q:'The slope of the V_pp (y) against V_rms (x) graph should be:',o:['1.414','0.707','2.83','2'],a:2,e:'V_pp = 2√2 V_rms.'},
+ {q:'The rms value of an AC voltage is defined as:',o:['its largest value','the DC voltage giving the same heating effect in a resistor','half the peak-to-peak value','the value at t = 0'],a:1,e:'That is why V_rms is called the effective value.'}
+]);
+buildWhatIf([
+ {q:'What if the slope of your graph is 2.0 instead of 2.83?',a:'You probably used V_m instead of V_pp on the y-axis (V_m = √2 V_rms gives slope 1.41), or read the screen wrongly. 2.0 would mean the voltmeter reads V_m/2 — check the VOLTS/DIV and that the CAL knob is in its calibrated position.'},
+ {q:'What if the signal were a square wave?',a:'For a square wave V_rms = V_m, so V_m/V_rms = 1, not √2. The relation √2 is true for sine waves only.'},
+ {q:'What if you use a DC voltmeter on the AC supply?',a:'A DC (moving-coil) meter responds to the average value, which is zero for a full sine wave: the needle just vibrates around zero.'},
+ {q:'What is the peak voltage of the 220 V household supply?',a:'V_m = √2 × 220 ≈ 311 V, and V_pp ≈ 622 V. Insulation must withstand the peak, not the rms value.'}
+]);
+const VD=[0.5,1,2,5,10], TD=[0.001,0.002,0.005,0.01];
+VD.forEach(v=>$('vd').insertAdjacentHTML('beforeend','<option value="'+v+'">'+fmtV(v)+'</option>')); TD.forEach(v=>$('td').insertAdjacentHTML('beforeend','<option value="'+v+'">'+fmtT(v)+'</option>'));
+$('vd').value='5'; $('td').value='0.005';
+const cal=1+0.012*(Math.random()*2-1); // small calibration offset of this oscilloscope
+const Vrms=()=> 15*(+$('S').value)/100;
+let rows=[], ext=null;
+function drawC(){ const [c,g]=cvs('cc'); g.clearRect(0,0,c.width,c.height); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height);
+ acSource(g,70,95,'AC 60 Hz'); wire(g,[[70,79],[70,40],[520,40],[520,150],[70,150],[70,111]]);
+ resistor(g,170,40,260,'load'); dot(g,330,40); dot(g,330,150); dot(g,450,40); dot(g,450,150);
+ wire(g,[[330,40],[330,80]]); wire(g,[[330,120],[330,150]]); meterIcon(g,330,100,'V'); txt(g,'AC voltmeter',330,175,'#566179','13px Calibri');
+ wire(g,[[450,40],[450,80]]); wire(g,[[450,120],[450,150]]); g.fillStyle='#0B1A2E'; g.fillRect(425,80,50,40); txt(g,'CRO',450,105,'#5CF2A0','bold 13px Calibri'); txt(g,'oscilloscope CH1',450,175,'#566179','13px Calibri'); }
+function upd(){ const v=Vrms(); $('sv').textContent=(+$('S').value)+' %'; $('pv').textContent=(+$('pos').value).toFixed(2)+' div';
+ $('vm').textContent=v.toFixed(2)+' V~'; const Vm=Math.SQRT2*v*cal; drawScope($('scr'),t=>Vm*Math.sin(2*Math.PI*60*t),+$('vd').value,+$('td').value,+$('pos').value); drawC(); }
+['S','vd','td','pos'].forEach(id=>$(id).addEventListener('input',upd));
+$('add').onclick=()=>{ const v=+Vrms().toFixed(2); if(v<0.5){alert('Increase the supply output first.');return;} const vd=+$('vd').value, ny=2*Math.SQRT2*v*cal/vd;
+ if(ny>8.2){alert('The trace is taller than the screen — increase VOLTS/DIV.');return;} if(ny<2&&!confirm('The trace is less than 2 div high: choose a smaller VOLTS/DIV for a better reading. Record anyway?')) return;
+ rows.push({v,vd,ny,u:{}}); rows.sort((a,b)=>a.v-b.v); render(); };
+function render(){ const tb=$('tb'); tb.innerHTML='';
+ rows.forEach((r,i)=>{ const tr=document.createElement('tr'); const inp=k=>'<td style="background:#FFF8D6"><input type="number" step="0.01" data-k="'+k+'" value="'+(r.u[k]??'')+'"></td>';
+  tr.innerHTML='<td>'+(i+1)+'</td><td>'+r.v.toFixed(2)+'</td><td>'+fmtV(r.vd)+'</td>'+inp('ny')+inp('vpp')+inp('vm')+inp('ratio')+'<td>'+(r.res||'')+'</td>';
+  tr.querySelectorAll('input').forEach(x=>x.oninput=()=>{r.u[x.dataset.k]=x.value===''?null:+x.value;}); tb.appendChild(tr); });
+ drawPlot($('plot'),rows.filter(r=>r.u.vpp!=null).map(r=>[r.v,r.u.vpp]),Object.assign({xlabel:'V_rms (V)',ylabel:'V_pp (V)'},ext||{})); }
+$('chk').onclick=()=>{ if(rows.length<5){alert('Record at least 5 voltages.');return;}
+ rows.forEach(r=>{ const u=r.u, m=[]; if([u.ny,u.vpp,u.vm,u.ratio].some(x=>x==null)){r.res='<span class="bad">fill all cells</span>';return;}
+  if(Math.abs(u.ny-r.ny)>0.15) m.push('screen shows '+r.ny.toFixed(1)+' div');
+  if(!close(u.vpp,u.ny*r.vd,0.01)) m.push('V_pp = '+(u.ny*r.vd).toFixed(2));
+  if(!close(u.vm,u.vpp/2,0.01)) m.push('V_m = '+(u.vpp/2).toFixed(2));
+  if(!close(u.ratio,u.vm/r.v,0.01)) m.push('ratio = '+(u.vm/r.v).toFixed(3));
+  r.res=m.length?'<span class="bad">✘ '+m.join('; ')+'</span>':'<span class="ok">✔</span>'; });
+ const P=rows.filter(r=>r.u.vpp!=null); const f=fitOrigin(P.map(r=>r.v),P.map(r=>r.u.vpp)); const us=numIn('uS'), ue=numIn('uE');
+ ext={fit:f, student:us!==null?{m:us,b:0}:null}; render();
+ const acc=pct(f.m/2,Math.SQRT2); let s='<b>Best-fit slope</b> = '+f.m.toFixed(3)+' (theory 2√2 = 2.828) → V_m/V_rms = '+(f.m/2).toFixed(3)+' → <b>accuracy (error) of the oscilloscope = '+acc.toFixed(1)+' %</b><br>';
+ if(us!==null) s+=ok5(us,f.m,3,'Your slope')+'<br>'; if(ue!==null&&us) { const e=pct(us/2,Math.SQRT2); s+='Your accuracy: '+(Math.abs(ue-e)<0.3?'<span class="ok">✔ correctly calculated from your slope</span>':'<span class="bad">✘ from your slope: |'+(us/2).toFixed(3)+' − 1.414|/1.414 = '+e.toFixed(1)+' %</span>'); }
+ $('res').innerHTML=s; };
+$('clr').onclick=()=>{rows=[];ext=null;render();$('res').innerHTML='<p class="note">Record at least 5 voltages.</p>';};
+upd(); render(); window.onTab=()=>{upd();render();};
+buildReal({key:'exp4', intro:'One row for each voltmeter reading.',
+ tables:[{id:'V',title:'Your readings',rows:7,cols:[{id:'vr',label:'V_rms voltmeter (V)'},{id:'vd',label:'VOLTS/DIV (V)'},{id:'ny',label:'vertical div (p–p)'},
+  {id:'vpp',label:'V_pp (V)',calc:1,tol:0.01,f:o=>o.ny*o.vd},{id:'vm',label:'V_m (V)',calc:1,tol:0.01,f:o=>o.ny*o.vd/2},{id:'ratio',label:'V_m/V_rms',calc:1,tol:0.01,f:o=>o.ny*o.vd/2/o.vr}]}],
+ mine:[{id:'slope',label:'Slope of your V_pp – V_rms line'},{id:'acc',label:'Your accuracy of the oscilloscope (%)'}],
+ plot:{xlabel:'V_rms (V)', ylabel:'V_pp (V)'},
+ analyze:(T,K)=>{ const P=T.V.map(o=>[o.vr,o.ny*o.vd]); if(P.length<3) return {html:'Enter at least 3 rows.',plot:{pts:P}}; const f=fitOrigin(P.map(p=>p[0]),P.map(p=>p[1]));
+  let s='<b>Best-fit slope</b> = '+fmt(f.m,3)+' (theory 2.828) → V_m/V_rms = '+fmt(f.m/2,3)+' → <b>error = '+fmt(pct(f.m/2,Math.SQRT2),1)+' %</b><br>'+ok5(K.slope,f.m,3,'Your slope');
+  return {html:s, plot:{pts:P, fit:f, student:K.slope?{m:K.slope,b:0}:null}}; }});
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

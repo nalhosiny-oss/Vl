@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل النظرية الموجية للضوء</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.4rem,4vw,2.1rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>معمل النظرية الموجية للضوء</h1>
+  <p>البصريات الفيزيائية – الفصل الثاني. غيّر القيم وراقب النتيجة، واستخدم أزرار الأمثلة للتحقق من حلولك.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="المعامل">
+  <button role="tab" aria-selected="true" data-t="t1">الحركة التوافقية</button>
+  <button role="tab" aria-selected="false" data-t="t2">الموجة المسافرة</button>
+  <button role="tab" aria-selected="false" data-t="t3">فرق الطور</button>
+  <button role="tab" aria-selected="false" data-t="t4">الشدة والانتشار الكروي</button>
+  <button role="tab" aria-selected="false" data-t="t5">الامتصاص</button>
+</nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="600" aria-label="دائرة دوارة ومسقطها والموجة الجيبية"></canvas>
+  <div class="ctrl">
+    <label>السعة a <b id="o1a">1.0</b></label><input id="i1a" type="range" min="0.2" max="1" step="0.05" value="1">
+    <label>التردد f (Hz) <b id="o1f">0.25</b></label><input id="i1f" type="range" min="0.05" max="1" step="0.05" value="0.25">
+    <label>الطور الابتدائي α <b id="o1p">0°</b></label><input id="i1p" type="range" min="0" max="360" step="5" value="0">
+    <div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span></div>
+    <div class="task"><h3>سؤال</h3>عندما تكون النقطة في أعلى الدائرة، أين يكون مسقطها؟ وما سرعته في تلك اللحظة؟</div>
+  </div>
+</section>
+
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="600" aria-label="موجة مسافرة وجسيم يهتز"></canvas>
+  <div class="ctrl">
+    <label>الطول الموجي λ (m) <b id="o2l">2.0</b></label><input id="i2l" type="range" min="0.5" max="4" step="0.1" value="2">
+    <label>التردد f (Hz) <b id="o2f">0.50</b></label><input id="i2f" type="range" min="0.1" max="1.5" step="0.05" value="0.5">
+    <div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span></div>
+    <label>حاسبة الضوء: λ (nm) <b id="o2n">600</b></label><input id="i2n" type="range" min="380" max="750" step="5" value="600">
+    <div class="readout"><span class="eq" id="r2c"></span></div>
+    <label>حاسبة الوسط: η (×10⁹ Pa) <b id="o2e">3.6</b></label><input id="i2e" type="range" min="0.1" max="200" step="0.1" value="3.6">
+    <label>كثافة الوسط ρ (kg/m³) <b id="o2r">1600</b></label><input id="i2r" type="range" min="500" max="20000" step="100" value="1600">
+    <div class="row"><button class="btn" type="button" id="p2a">مثال الطول الموجي 600</button><button class="btn" type="button" id="p2b">المسألة 3</button></div>
+    <div class="readout"><span class="eq" id="r2d"></span></div>
+    <div class="task"><h3>سؤال</h3>الجسيم الأحمر يهتز في مكانه بينما تتقدم القمة الزرقاء. ما الذي ينتقل فعلاً مع الموجة؟</div>
+  </div>
+</section>
+
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="600" aria-label="موجتان بينهما فرق مسار"></canvas>
+  <div class="ctrl">
+    <label>فرق المسار Δx (بوحدة λ) <b id="o3x">0.25</b></label><input id="i3x" type="range" min="0" max="2" step="0.01" value="0.25">
+    <div class="row"><button class="btn" type="button" data-dx="0.25">λ/4</button><button class="btn" type="button" data-dx="0.5">λ/2</button><button class="btn" type="button" data-dx="1">λ</button></div>
+    <div class="readout"><span class="eq" id="r3a"></span><span id="r3b"></span></div>
+    <div class="task"><h3>سؤال</h3>ما فرق المسار الذي يجعل الموجتين متعاكستين تماماً؟ وما الذي يجعلهما متطابقتين مرة أخرى؟</div>
+  </div>
+</section>
+
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="600" aria-label="مصدر نقطي وشدة تتناقص مع البعد"></canvas>
+  <div class="ctrl">
+    <label>قدرة المصدر P (W) <b id="o4p">100</b></label><input id="i4p" type="range" min="10" max="500" step="10" value="100">
+    <label>البعد عن المصدر r (m) <b id="o4r">1.0</b></label><input id="i4r" type="range" min="0.5" max="4" step="0.1" value="1">
+    <label>نسبة السعة a/a₀ <b id="o4a">1.0</b></label><input id="i4a" type="range" min="0.5" max="3" step="0.1" value="1">
+    <div class="row"><button class="btn" type="button" id="p4">المسألة 1</button></div>
+    <div class="readout"><span class="eq" id="r4a"></span><span class="eq" id="r4b"></span></div>
+    <div class="task"><h3>سؤال</h3>ضاعف البعد r. بكم تقل الشدة؟ ثم ضاعف السعة. بكم تزيد؟</div>
+  </div>
+</section>
+
+<section class="lab" id="t5" role="tabpanel">
+  <canvas id="c5" width="1200" height="600" aria-label="ضوء يمر في وسط ماص"></canvas>
+  <div class="ctrl">
+    <label>الشدة الابتدائية I₀ (W/m²) <b id="o5i">10</b></label><input id="i5i" type="range" min="1" max="20" step="1" value="10">
+    <label>معامل الامتصاص β (m⁻¹) <b id="o5b">0.40</b></label><input id="i5b" type="range" min="0.05" max="2" step="0.05" value="0.4">
+    <label>المسافة x (m) <b id="o5x">2.0</b></label><input id="i5x" type="range" min="0" max="5" step="0.1" value="2">
+    <div class="row"><button class="btn" type="button" id="p5">المسألة 2</button></div>
+    <div class="readout"><span class="eq" id="r5a"></span><span class="eq" id="r5b"></span></div>
+    <div class="task"><h3>سؤال</h3>كم يلزم من المسافة لتنخفض الشدة إلى النصف؟ وهل تعتمد هذه المسافة على I₀؟</div>
+  </div>
+</section>
+
+<footer>أ.د. نجم الحصيني – البصريات الفيزيائية، الفصل الثاني. يعمل على الجوال دون تثبيت.</footer>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+const sci=(v,d=2)=>{const e=Math.floor(Math.log10(Math.abs(v)));if(e>=-2&&e<4)return v.toFixed(Math.max(0,d-e));return (v/Math.pow(10,e)).toFixed(d)+'×10^'+e;};
+function text(g,s,x,y,col,al,sz){g.font=(sz||26)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction='ltr';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function curve(g,f,x0,x1,col,w){g.beginPath();for(let q=x0;q<=x1;q+=2){const y=f(q);q===x0?g.moveTo(q,y):g.lineTo(q,y);}g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+const tt=()=>reduce?0:T;
+
+/* 1 SHM */
+function lab1(){const g=$('c1').getContext('2d');g.clearRect(0,0,1200,600);const a=+$('i1a').value,f=+$('i1f').value,al=+$('i1p').value*Math.PI/180,w=2*Math.PI*f,th=w*tt()+al;
+ $('o1a').textContent=a.toFixed(1);$('o1f').textContent=f.toFixed(2);$('o1p').textContent=Math.round(al*180/Math.PI)+'°';
+ $('r1a').textContent='ω = 2πf = '+w.toFixed(2)+' rad/s,  τ = 1/f = '+(1/f).toFixed(2)+' s';$('r1b').textContent='y = a sin(ωt + α) = '+(a*Math.sin(th)).toFixed(2);
+ const cx=230,cy=300,R=200*a,X0=480;g.strokeStyle=css('--grid');g.lineWidth=2;g.beginPath();g.arc(cx,cy,R,0,7);g.stroke();seg(g,cx,cy-220,cx,cy+220,css('--muted'),1.5);seg(g,cx-220,cy,cx+220,cy,css('--muted'),1.5);
+ const px=cx+R*Math.cos(th),py=cy-R*Math.sin(th);seg(g,cx,cy,px,py,css('--ink'),3);seg(g,px,py,X0,py,css('--muted'),1.5,[6,6]);dot(g,px,py,10,css('--ink'));dot(g,cx,py,10,css('--o'));
+ seg(g,X0,cy,1180,cy,css('--muted'),1.5);curve(g,q=>cy-R*Math.sin(th-(q-X0)/110),X0,1180,css('--o'),4);dot(g,X0,py,9,css('--o'));}
+
+/* 2 travelling wave */
+$('p2a').onclick=()=>{$('i2n').value=600};$('p2b').onclick=()=>{$('i2e').value=3.6;$('i2r').value=1600};
+function lab2(){const g=$('c2').getContext('2d');g.clearRect(0,0,1200,600);const l=+$('i2l').value,f=+$('i2f').value,v=f*l,k=2*Math.PI/l,w=2*Math.PI*f;
+ $('o2l').textContent=l.toFixed(1);$('o2f').textContent=f.toFixed(2);$('r2a').textContent='v = fλ = '+v.toFixed(2)+' m/s,  τ = '+(1/f).toFixed(2)+' s';$('r2b').textContent='k = 2π/λ = '+k.toFixed(2)+' m⁻¹,  ω = '+w.toFixed(2)+' rad/s';
+ const ln=+$('i2n').value,fl=3e8/(ln*1e-9);$('o2n').textContent=ln;$('r2c').textContent='f = c/λ = '+sci(fl)+' Hz,  τ = '+sci(1/fl)+' s';
+ const eta=+$('i2e').value*1e9,rho=+$('i2r').value;$('o2e').textContent=(+$('i2e').value).toFixed(1);$('o2r').textContent=rho;$('r2d').textContent='v = √(η/ρ) = '+sci(Math.sqrt(eta/rho))+' m/s';
+ const sx=1100/8,y0=300,A=150,X=q=>(q-50)/sx;seg(g,50,y0,1150,y0,css('--grid'),2);curve(g,q=>y0-A*Math.sin(k*X(q)-w*tt()),50,1150,css('--ink'),4);
+ const xp=600;seg(g,xp,y0-A-30,xp,y0+A+30,css('--muted'),1.5,[6,6]);dot(g,xp,y0-A*Math.sin(k*X(xp)-w*tt()),12,css('--r'));
+ const c0=((v*tt()+l/4)%l);for(let s=c0;s<8;s+=l){dot(g,50+s*sx,y0-A,10,css('--b'));}
+ seg(g,50,y0+A+60,50+l*sx,y0+A+60,css('--o'),3);text(g,'λ',50+l*sx/2,y0+A+95,css('--o'),'center');for(let m=0;m<=8;m++)text(g,m+' m',50+m*sx,590,css('--muted'),'center',18);}
+
+/* 3 phase difference */
+document.querySelectorAll('[data-dx]').forEach(b=>b.onclick=()=>{$('i3x').value=b.dataset.dx;});
+function lab3(){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,600);const dx=+$('i3x').value,al=2*Math.PI*dx,lam=320,w=tt()*2;
+ $('o3x').textContent=dx.toFixed(2);$('r3a').textContent='α = 2πΔx/λ = '+(al/Math.PI).toFixed(2)+'π rad = '+Math.round(al*180/Math.PI)+'°';
+ const fr=dx%1;$('r3b').textContent=(fr<0.02||fr>0.98)?'متفقتان في الطور':(Math.abs(fr-0.5)<0.02?'متعاكستان في الطور':'فرق طور جزئي');
+ [170,430].forEach(y=>seg(g,40,y,880,y,css('--grid'),2));curve(g,q=>170-100*Math.sin(2*Math.PI*(q-40)/lam-w),40,880,css('--o'),4);curve(g,q=>430-100*Math.sin(2*Math.PI*(q-40-dx*lam)/lam-w),40,880,css('--b'),4);
+ const cx=1040,cy=300,R=120;g.strokeStyle=css('--grid');g.lineWidth=2;g.beginPath();g.arc(cx,cy,R,0,7);g.stroke();seg(g,cx,cy,cx+R,cy,css('--o'),4);seg(g,cx,cy,cx+R*Math.cos(al),cy-R*Math.sin(al),css('--b'),4);
+ g.strokeStyle=css('--ink');g.lineWidth=2;g.beginPath();g.arc(cx,cy,40,-al%(2*Math.PI),0);g.stroke();}
+
+/* 4 inverse square and amplitude */
+$('p4').onclick=()=>{$('i4a').value=2;$('i4r').value=1;};
+function lab4(){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,600);const P=+$('i4p').value,r=+$('i4r').value,a=+$('i4a').value,I=P/(4*Math.PI*r*r)*a*a;
+ $('o4p').textContent=P;$('o4r').textContent=r.toFixed(1);$('o4a').textContent=a.toFixed(1);$('r4a').textContent='I = P/(4πr²) × (a/a₀)² = '+I.toFixed(2)+' W/m²';$('r4b').textContent='I/I(r = 1 m, a = a₀) = '+(a*a/(r*r)).toFixed(2);
+ const sx=60,sy=300;dot(g,sx,sy,14,css('--o'));for(let k=0;k<6;k++){const rr=((tt()*90+k*120)%720);g.strokeStyle=css('--o');g.globalAlpha=Math.max(0,1-rr/720);g.lineWidth=2;g.beginPath();g.arc(sx,sy,rr,-0.6,0.6);g.stroke();}g.globalAlpha=1;
+ const X=sx+r*240,hh=40*r;seg(g,sx,sy,X,sy-hh,css('--muted'),1.5,[6,6]);seg(g,sx,sy,X,sy+hh,css('--muted'),1.5,[6,6]);g.fillStyle=css('--o');g.globalAlpha=Math.min(1,0.15+I/60);g.fillRect(X-10,sy-hh,20,2*hh);g.globalAlpha=1;g.strokeStyle=css('--ink');g.strokeRect(X-10,sy-hh,20,2*hh);
+ text(g,'r = '+r.toFixed(1)+' m',X,sy+hh+40,css('--ink'),'center',22);const bh=Math.min(400,I*4);g.fillStyle=css('--b');g.fillRect(1080,520-bh,70,bh);seg(g,1050,520,1180,520,css('--muted'),2);text(g,'I',1115,560,css('--ink'),'center');}
+
+/* 5 absorption */
+$('p5').onclick=()=>{$('i5i').value=10;$('i5b').value=0.4;$('i5x').value=2;};
+function lab5(){const g=$('c5').getContext('2d');g.clearRect(0,0,1200,600);const I0=+$('i5i').value,b=+$('i5b').value,xx=+$('i5x').value,I=I0*Math.exp(-b*xx);
+ $('o5i').textContent=I0;$('o5b').textContent=b.toFixed(2);$('o5x').textContent=xx.toFixed(1);$('r5a').textContent='I = I₀ e^(−βx) = '+I.toFixed(2)+' W/m²';$('r5b').textContent='x½ = ln2/β = '+(Math.LN2/b).toFixed(2)+' m';
+ const X0=120,X1=1120,sc=(X1-X0)/5;g.fillStyle=css('--fill');g.fillRect(X0,40,X1-X0,140);for(let q=X0;q<X1;q+=4){g.fillStyle=css('--o');g.globalAlpha=0.9*Math.exp(-b*(q-X0)/sc);g.fillRect(q,85,4,50);}g.globalAlpha=1;g.fillStyle=css('--o');g.fillRect(20,85,X0-20,50);
+ const Y0=540,gy=300;seg(g,X0,Y0,X1,Y0,css('--muted'),2);seg(g,X0,Y0,X0,Y0-gy-20,css('--muted'),2);curve(g,q=>Y0-gy*Math.exp(-b*(q-X0)/sc),X0,X1,css('--o'),4);
+ const px=X0+xx*sc,py=Y0-gy*I/I0;seg(g,px,Y0,px,py,css('--muted'),1.5,[6,6]);dot(g,px,py,9,css('--b'));seg(g,X0+Math.LN2/b*sc,Y0,X0+Math.LN2/b*sc,Y0-gy/2,css('--ink'),1.5,[4,6]);
+ for(let m=0;m<=5;m++)text(g,m+' m',X0+m*sc,Y0+28,css('--muted'),'center',18);text(g,'I/I₀',X0,Y0-gy-30,css('--muted'),'center',20);}
+
+function loop(t){T=t/1000;({t1:lab1,t2:lab2,t3:lab3,t4:lab4,t5:lab5})[active]();requestAnimationFrame(loop);}requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

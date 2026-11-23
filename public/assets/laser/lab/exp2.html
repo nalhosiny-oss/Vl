@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المعمل الافتراضي — التجربة 2: مرآة فرنيل</title>
+<style>
+  :root{
+    --bg:#120a0b; --panel:#1e1214; --panel2:#28181b; --line:#3d262a;
+    --ruby:#c2183b; --ruby2:#e8435f; --gold:#d4a64a; --gold2:#f0cf86;
+    --text:#f3e9e4; --muted:#bfa9a3; --ok:#5fbf7f; --bad:#e8435f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#3a0f18 0%,var(--bg) 55%);color:var(--text);
+       font-family:"Segoe UI",Tahoma,"Geeza Pro","Arial",sans-serif;line-height:1.7}
+  header{padding:22px 18px 10px;text-align:center;border-bottom:1px solid var(--line)}
+  header .tag{display:inline-block;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:2px 14px;font-size:13px}
+  h1{margin:8px 0 2px;font-size:26px;color:var(--text)}
+  h1 span{color:var(--ruby2)}
+  header p{margin:0;color:var(--muted);font-size:14px}
+  .wrap{max-width:1100px;margin:0 auto;padding:14px}
+  .safety{background:linear-gradient(90deg,#4a1220,#2a1014);border:1px solid var(--ruby);border-radius:12px;padding:10px 14px;margin:12px 0;font-size:14px}
+  .safety b{color:var(--gold2)}
+  nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  nav button{flex:1 1 150px;background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:10px;
+             font:inherit;font-size:15px;cursor:pointer}
+  nav button.on{background:var(--ruby);color:#fff;border-color:var(--ruby)}
+  section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+  section.on{display:block}
+  h2{margin:0 0 10px;font-size:20px;color:var(--gold2)}
+  h3{margin:14px 0 6px;font-size:16px;color:var(--ruby2)}
+  .eq{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:"Cambria Math","Times New Roman",serif;font-style:italic;
+      background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 12px;margin:4px 0;font-size:18px;color:#fff}
+  .eq.big{display:block;text-align:center;font-size:22px;margin:8px auto;max-width:420px}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  label{display:block;font-size:14px;color:var(--muted);margin-top:8px}
+  input[type=range]{width:100%;accent-color:var(--ruby)}
+  select,input[type=number],input[type=text]{background:#0f0809;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+  .val{color:var(--gold2);font-weight:bold}
+  .btn{background:var(--ruby);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px}
+  .btn.gold{background:var(--gold);color:#1a0d0f}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px;background:#07040a;border:1px solid var(--line)}
+  #screenCv{cursor:crosshair}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+  th,td{border:1px solid var(--line);padding:6px;text-align:center}
+  th{background:#3a1520;color:var(--gold2)}
+  td input{text-align:center}
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+  .q p{margin:0 0 6px;font-weight:bold}
+  .opt{display:block;width:100%;text-align:right;background:#0f0809;color:var(--text);border:1px solid var(--line);border-radius:8px;
+       padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+  .opt.right{border-color:var(--ok);background:#13301e}
+  .opt.wrong{border-color:var(--bad);background:#3a121a}
+  .fb{font-size:14px;color:var(--muted);min-height:1.2em}
+  .note{font-size:14px;color:var(--muted)}
+  .reading{font-size:20px;color:var(--gold2)}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:16px}
+  .pill{display:inline-block;background:#3a1520;border:1px solid var(--ruby);border-radius:20px;padding:1px 10px;font-size:13px;margin:2px}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header>
+  <span class="tag">فيزياء الليزر وتطبيقاته — المعمل الافتراضي للعملي</span>
+  <h1>التجربة 2: <span>مرآة فرنيل</span></h1>
+  <p>Interference at a Fresnel's Mirror — تعيين الطول الموجي لليزر الهيليوم-نيون</p>
+</header>
+
+<div class="wrap">
+  <div class="safety">⚠️ <b>تنبيه سلامة:</b> لا تنظر إلى الشعاع ولا إلى انعكاسه من المرآة؛ فالمرآة تعكس الشعاع في اتجاهات قد لا تتوقعها أثناء ضبط ميلها. أبقِ الشعاع تحت مستوى العين وأطفئ الليزر عند تحريك المرآة باليد.</div>
+
+  <nav>
+    <button class="on" data-s="s1">1) أسئلة التحضير</button>
+    <button data-s="s2">2) فكرة التجربة</button>
+    <button data-s="s3">3) المحاكاة والقياس</button>
+    <button data-s="s4">4) الجدول والحسابات</button>
+    <button data-s="s5">5) ماذا لو…؟</button>
+  </nav>
+
+  <section id="s1" class="on">
+    <h2>أسئلة التحضير قبل المعمل</h2>
+    <p class="note">أجب عنها قبل حضور التجربة؛ يظهر التصحيح مباشرة بعد اختيارك.</p>
+    <div id="quiz"></div>
+    <p class="reading" id="qscore"></p>
+  </section>
+
+  <section id="s2">
+    <h2>فكرة التجربة</h2>
+    <p>تتكون مرآة فرنيل من مرآتين مستويتين تميل إحداهما على الأخرى بزاوية صغيرة جدًا. عندما يسقط شعاع الليزر الموسَّع على الحافة الفاصلة بينهما
+       ينعكس جزء منه عن كل مرآة، فيبدو الضوء المنعكس كأنه صادر من مصدرين تقديريين (افتراضيين) <span class="eq">S<sub>1</sub></span> و<span class="eq">S<sub>2</sub></span>
+       مترابطين لأنهما صورتان لمصدر واحد، تفصلهما مسافة صغيرة <span class="eq">d</span>. تتداخل الحزمتان على الشاشة فتظهر أهداب مضيئة ومظلمة.</p>
+    <h3>1) المسافة بين هدبين مضيئين متتاليين</h3>
+    <p>تُقاس على الشاشة بلا عدسة. لتقليل الخطأ نقيس امتداد عدد كبير من الأهداب <span class="eq">N</span> ثم نقسم:</p>
+    <span class="eq big">y = (امتداد N هدبًا) / N = λ L / d</span>
+    <p>حيث <span class="eq">L</span> بُعد الشاشة عن المصدرين التقديريين.</p>
+    <h3>2) إيجاد d بإسقاط المصدرين بعدسة</h3>
+    <p>نضع عدسة بعدها البؤري <span class="eq">f = 200 mm</span> ونحرّكها حتى تظهر على الشاشة صورتان حادتان للمصدرين تفصلهما مسافة <span class="eq">D</span>،
+       و<span class="eq">q</span> بُعد الشاشة عن العدسة. من قانون العدسات والتكبير:</p>
+    <span class="eq big">d = f D / (q − f)  ,   L = q² / (q − f)</span>
+    <h3>3) الطول الموجي</h3>
+    <p>بالتعويض في <span class="eq">λ = y d / L</span> تختصر <span class="eq">(q − f)</span>:</p>
+    <span class="eq big">λ = f D y / q²</span>
+    <div class="card">
+      <b>الأجهزة:</b> ليزر هيليوم-نيون — عدسة <span class="ltr">f = 5 mm</span> لتوسيع الشعاع — مرآة فرنيل مع مسمار ضبط الميل — عدسة <span class="ltr">f = 200 mm</span> — شاشة — منضدة ضوئية مدرّجة — ورنية.
+    </div>
+  </section>
+
+  <section id="s3">
+    <h2>المحاكاة والقياس</h2>
+    <div class="grid">
+      <div class="card">
+        <label>مسمار ميل المرآة (يتحكم في d): <span class="val ltr" id="tv"></span></label>
+        <input type="range" id="tilt" min="1" max="10" step="1" value="5">
+        <label>بُعد الشاشة عن المصدرين L: <span class="val ltr" id="Lv"></span></label>
+        <input type="range" id="L" min="1.6" max="2.6" step="0.05" value="2.0">
+        <label>مصدر الضوء</label>
+        <select id="src">
+          <option value="632.8" selected>ليزر هيليوم-نيون — معلوم ⁦λ = 632.8 nm⁩</option>
+          <option value="unknown">ليزر مجهول الطول الموجي — للتدريب</option>
+        </select>
+        <label><input type="checkbox" id="lensOn" style="width:auto"> أدخل العدسة ⁦f = 200 mm⁩ لإسقاط المصدرين</label>
+        <div id="lensBox" style="display:none">
+          <label>موضع العدسة على المنضدة: <span class="val ltr" id="pv"></span></label>
+          <input type="range" id="lp" min="150" max="1200" step="0.5" value="400">
+          <p class="note" id="sharp"></p>
+        </div>
+      </div>
+      <div class="card">
+        <canvas dir="ltr" id="setupCv" width="640" height="260"></canvas>
+        <p class="note">منظر علوي للتركيب (ليس بمقياس رسم). تدريج المنضدة يبدأ من موضع المصدرين التقديريين.</p>
+      </div>
+    </div>
+
+    <h3 id="scrTitle">الشاشة — اسحب على الشاشة من منتصف هدب مضيء إلى منتصف هدب آخر لقياس الامتداد</h3>
+    <canvas dir="ltr" id="screenCv" width="1060" height="190"></canvas>
+    <div class="grid" style="margin-top:8px">
+      <div class="card">
+        <div id="measFringe">
+          <span>الامتداد المقاس:</span> <span class="reading ltr" id="spanOut">—</span><br>
+          <label>عدد الفترات بين الهدبين اللذين قِست بينهما N</label>
+          <input type="number" id="Nin" min="1" max="30" value="7">
+        </div>
+        <div id="measLens" style="display:none">
+          <span>المسافة بين صورتي المصدرين D:</span> <span class="reading ltr" id="Dout">—</span><br>
+          <span>بُعد الشاشة عن العدسة q (من تدريج المنضدة):</span> <span class="reading ltr" id="qout">—</span>
+        </div>
+        <button class="btn" id="saveF">احفظ قياس الأهداب</button>
+        <button class="btn" id="saveL">احفظ قياس D و q</button>
+        <p class="note" id="trialNote"></p>
+      </div>
+      <div class="card note">
+        • بلا عدسة: اسحب بالفأرة (أو بإصبعك) من منتصف هدب مضيء إلى منتصف هدب مضيء آخر، وعُدّ الفترات بينهما N.<br>
+        • بالعدسة: حرّك العدسة حتى تصبح صورتا المصدرين نقطتين حادتين، فتظهر قيمتا D و q.<br>
+        • كل محاولة = قياس أهداب + قياس D و q بنفس ميل المرآة. غيّر الميل بين المحاولات.
+      </div>
+    </div>
+  </section>
+
+  <section id="s4">
+    <h2>جدول القراءات والحسابات</h2>
+    <p class="note">احسب <span class="ltr">y = span/N</span> ثم <span class="ltr">λ = f D y / q²</span> بنفسك (<span class="ltr">f = 200 mm</span>) واضغط «تحقّق».</p>
+    <table>
+      <thead><tr><th>المحاولة</th><th>الامتداد (mm)</th><th>N</th><th>D (mm)</th><th>q (mm)</th><th>λ التي حسبتها (nm)</th><th>النتيجة</th></tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+    <button class="btn gold" id="chkBtn">تحقّق من حساباتي</button>
+    <button class="btn ghost" id="clrBtn">مسح الجدول</button>
+    <div class="card" id="resBox" style="margin-top:10px"><p class="note">تظهر هنا النتائج بعد التحقق.</p></div>
+    <p class="note">📄 ملف Excel للتحقق الذاتي موجود في صفحة التجربة: أدخل قراءاتك فيه بعد حسابك اليدوي، وأرفق صورة نتيجته في آخر تقريرك.</p>
+  </section>
+
+  <section id="s5">
+    <h2>ماذا لو…؟</h2>
+    <p class="note">توقّع الإجابة أولًا، ثم جرّب في المحاكاة واضغط «أظهر التفسير».</p>
+    <div id="whatif"></div>
+  </section>
+</div>
+<footer>إعداد: أ.د. نجم الحصيني — قسم الفيزياء، جامعة الطائف</footer>
+
+<script>
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); document.getElementById(b.dataset.s).classList.add('on'); draw();
+});
+const Q=[
+ {q:'لماذا يكون المصدران التقديريان في مرآة فرنيل مترابطين؟',o:['لأنهما ليزران مختلفان','لأنهما صورتان لمصدر واحد فيبقى فرق الطور بينهما ثابتًا','لأن المرآة تزيد شدة الضوء','لأن العدسة تجعلهما متوازيين'],a:1,
+  e:'كل مصدر تقديري هو صورة للمصدر نفسه بالانعكاس، فيتغير طوراهما معًا ويبقى فرق الطور ثابتًا.'},
+ {q:'إذا زِدنا زاوية الميل بين نصفي المرآة فإن المسافة بين المصدرين d والمسافة بين الأهداب y:',o:['d تزيد و y تقل','d تقل و y تزيد','كلاهما يزيد','كلاهما ثابت'],a:0,
+  e:'d تتناسب مع زاوية الميل، و y = λL/d فتتقارب الأهداب.'},
+ {q:'ما وظيفة العدسة ذات البعد البؤري 5 mm؟',o:['إسقاط المصدرين على الشاشة','توسيع شعاع الليزر ليغطي حافة المرآة','قياس الطول الموجي','تقليل شدة الليزر إلى الصفر'],a:1,
+  e:'توسّع الشعاع الضيق ليسقط على نصفي المرآة معًا عند الحافة الفاصلة.'},
+ {q:'لماذا نقيس امتداد عدة أهداب ثم نقسم على عددها بدل قياس هدب واحد؟',o:['لأن الهدب الواحد لا يُرى','لتقليل الخطأ النسبي في قياس المسافة الصغيرة','لأن القانون يتطلب ذلك','لزيادة شدة الأهداب'],a:1,
+  e:'خطأ الورنية ثابت تقريبًا، فقسمته على مسافة أكبر تعطي خطأ نسبيًا أصغر.'},
+ {q:'العلاقة الصحيحة لحساب الطول الموجي في هذه التجربة هي:',o:['λ = f D y / q²','λ = D y / (f q)','λ = q² / (f D y)','λ = y d / (n R)'],a:0,
+  e:'من d = fD/(q−f) و L = q²/(q−f) و λ = yd/L.'}
+];
+let score=0,answered=0; const qz=document.getElementById('quiz');
+Q.forEach((it,i)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+(/[=λ]/.test(o)?'<span class="ltr">'+o+'</span>':o)+'</button>').join('')+'<div class="fb"></div>';
+  d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ if(d.dataset.done)return; d.dataset.done=1; answered++; const j=+b.dataset.j;
+    d.querySelectorAll('.opt')[it.a].classList.add('right');
+    if(j===it.a){score++;d.querySelector('.fb').innerHTML='<span class="ok">✔ صحيح.</span> '+it.e;}
+    else{b.classList.add('wrong');d.querySelector('.fb').innerHTML='<span class="bad">✘ ليس هذا.</span> '+it.e;}
+    if(answered===Q.length)document.getElementById('qscore').textContent='نتيجتك: '+score+' من '+Q.length;});
+  qz.appendChild(d);});
+
+// ---------- physics ----------
+const F=200; // mm
+const unknownSet=[650.0,532.0,594.1,543.5];
+const lamUnknown=unknownSet[Math.floor(Math.random()*unknownSet.length)];
+function P(){
+  const tilt=+document.getElementById('tilt').value;
+  const d=0.25+0.06*tilt;                     // mm, separation of virtual sources
+  const L=+document.getElementById('L').value*1000; // mm
+  const unk=document.getElementById('src').value==='unknown';
+  const lam=unk?lamUnknown:632.8;
+  const lensOn=document.getElementById('lensOn').checked;
+  const p=+document.getElementById('lp').value;     // lens distance from sources (mm)
+  const q=L-p;
+  return {tilt,d,L,lam,known:!unk,lensOn,p,q};
+}
+const yFr=s=>s.lam*1e-6*s.L/s.d;   // mm
+function blur(s){ // defocus: image distance needed vs actual
+  const qi=1/(1/F-1/s.p); return Math.abs(s.q-qi)/qi; }
+const ctr=[255,40,30];
+const sc=document.getElementById('screenCv'),sx=sc.getContext('2d');
+const st=document.getElementById('setupCv'),tx=st.getContext('2d');
+const HS=15; // mm half span
+let drag=null, span=null, saved=[], cur={};
+function draw(){
+  const s=P();
+  document.getElementById('tv').textContent='الدرجة '+s.tilt;
+  document.getElementById('Lv').textContent='L = '+(s.L/1000).toFixed(2)+' m';
+  document.getElementById('lensBox').style.display=s.lensOn?'block':'none';
+  document.getElementById('measLens').style.display=s.lensOn?'block':'none';
+  document.getElementById('measFringe').style.display=s.lensOn?'none':'block';
+  document.getElementById('scrTitle').textContent=s.lensOn?'الشاشة — صورتا المصدرين التقديريين عبر العدسة':'الشاشة — اسحب من منتصف هدب مضيء إلى منتصف هدب آخر لقياس الامتداد';
+  document.getElementById('pv').textContent=s.p+' mm';
+  // setup drawing
+  tx.fillStyle='#07040a';tx.fillRect(0,0,640,260);
+  tx.fillStyle='#3d262a';tx.fillRect(10,105,70,34);tx.strokeStyle='#d4a64a';tx.strokeRect(10,105,70,34);
+  tx.fillStyle='#f3e9e4';tx.font='13px Tahoma, Arial';tx.fillText('Laser',25,127);
+  tx.strokeStyle='rgb(255,40,30)';tx.lineWidth=3;tx.beginPath();tx.moveTo(80,122);tx.lineTo(110,122);tx.stroke();
+  tx.fillStyle='#9fc3ff';tx.beginPath();tx.ellipse(115,122,4,14,0,0,7);tx.fill(); // f=5 lens
+  tx.globalAlpha=.35;tx.strokeStyle='rgb(255,40,30)';tx.lineWidth=1;
+  for(let k=-3;k<=3;k++){tx.beginPath();tx.moveTo(115,122);tx.lineTo(180,170+k*4);tx.stroke();}
+  tx.globalAlpha=1;
+  // mirror (two halves)
+  tx.strokeStyle='#d4a64a';tx.lineWidth=4;tx.beginPath();tx.moveTo(150,185);tx.lineTo(185,180);tx.stroke();
+  tx.beginPath();tx.moveTo(185,180);tx.lineTo(225,178-s.tilt*0.6);tx.stroke();
+  tx.fillStyle='#d4a64a';tx.font='12px Tahoma, Arial';tx.fillText('Fresnel',165,205);
+  // reflected beams to screen
+  tx.globalAlpha=.4;tx.strokeStyle='rgb(255,40,30)';tx.lineWidth=1;
+  for(let k=0;k<6;k++){tx.beginPath();tx.moveTo(185,178);tx.lineTo(600,90+k*14);tx.stroke();}
+  tx.globalAlpha=1;
+  // virtual sources
+  tx.fillStyle='#e8435f';tx.beginPath();tx.arc(140,150,3,0,7);tx.arc(140,150+4+s.tilt*.6,3,0,7);tx.fill();
+  tx.fillStyle='#bfa9a3';tx.fillText('S1,S2',100,148);
+  // lens 200
+  const lx=160+(s.p/s.L)*440;
+  if(s.lensOn){tx.fillStyle='#9fc3ff';tx.beginPath();tx.ellipse(lx,140,6,40,0,0,7);tx.fill();tx.fillStyle='#9fc3ff';tx.fillText('f=200',lx-16,95);}
+  tx.fillStyle='#f3e9e4';tx.fillRect(600,60,8,140);
+  // bench scale
+  tx.strokeStyle='#bfa9a3';tx.beginPath();tx.moveTo(140,235);tx.lineTo(604,235);tx.stroke();
+  tx.fillStyle='#bfa9a3';
+  for(let m=0;m<=s.L;m+=250){const X=140+m/s.L*464;tx.fillRect(X,230,1,10);tx.fillText((m/10)+' cm',X-14,252);}
+  if(s.lensOn){tx.fillStyle='#9fc3ff';tx.fillRect(lx,225,2,20);}
+  // screen pattern
+  const W=sc.width,H=sc.height; sx.fillStyle='#000';sx.fillRect(0,0,W,H);
+  const img=sx.createImageData(W,120);
+  if(!s.lensOn){
+    const yf=yFr(s);
+    for(let x=0;x<W;x++){const y=(x-W/2)/(W/2)*HS;
+      const env=Math.exp(-((y/(HS*0.9))**4));
+      const v=env*Math.pow(Math.cos(Math.PI*y/yf),2);
+      for(let r=0;r<120;r++){const i=(r*W+x)*4;img.data[i]=ctr[0]*v;img.data[i+1]=ctr[1]*v;img.data[i+2]=ctr[2]*v;img.data[i+3]=255;}}
+  } else {
+    const M=s.q/s.p, Dimg=s.d*M, b=blur(s), sig=0.25+b*40; // mm
+    for(let x=0;x<W;x++){const y=(x-W/2)/(W/2)*HS;
+      let v=Math.exp(-((y-Dimg/2)**2)/(2*sig*sig))+Math.exp(-((y+Dimg/2)**2)/(2*sig*sig));
+      v=Math.min(1,v*Math.min(1,0.6/sig+0.15));
+      for(let r=0;r<120;r++){const rr=(r-60)/60*HS*0.4; const vv=v*Math.exp(-(rr*rr)/(2*sig*sig+0.2));
+        const i=(r*W+x)*4;img.data[i]=ctr[0]*vv;img.data[i+1]=ctr[1]*vv;img.data[i+2]=ctr[2]*vv;img.data[i+3]=255;}}
+    const ok=b<0.035;
+    document.getElementById('sharp').innerHTML= ok?'<span class="ok">✔ الصورتان حادتان — سجّل القراءة.</span>':'حرّك العدسة حتى تصبح الصورتان نقطتين حادتين.';
+    document.getElementById('Dout').textContent= ok?('D = '+(Math.round(Dimg*10)/10).toFixed(1)+' mm'):'—';
+    document.getElementById('qout').textContent= ok?('q = '+Math.round(s.q)+' mm'):'—';
+    cur.D= ok?Math.round(Dimg*10)/10:null; cur.q= ok?Math.round(s.q):null;
+  }
+  sx.putImageData(img,0,10);
+  // ruler
+  sx.fillStyle='#1e1214';sx.fillRect(0,135,W,55);sx.strokeStyle='#f3e9e4';sx.fillStyle='#f3e9e4';sx.font='12px Tahoma, Arial';sx.textAlign='center';
+  for(let m=-HS*2;m<=HS*2;m++){const x=W/2+m/2/HS*(W/2);const L=m%10===0?20:(m%2===0?13:7);sx.beginPath();sx.moveTo(x,135);sx.lineTo(x,135+L);sx.stroke();if(m%10===0)sx.fillText(Math.abs(m/2)+'',x,175);}
+  sx.fillText('mm',W-22,185);sx.textAlign='start';
+  if(!s.lensOn&&drag&&drag.x1!=null){sx.strokeStyle='#d4a64a';sx.lineWidth=2;
+    [drag.x0,drag.x1].forEach(x=>{sx.beginPath();sx.moveTo(x,5);sx.lineTo(x,150);sx.stroke();});
+    sx.beginPath();sx.moveTo(drag.x0,20);sx.lineTo(drag.x1,20);sx.stroke();sx.lineWidth=1;}
+  document.getElementById('trialNote').textContent='المحاولة الحالية: '+(saved.length+1)+(cur.fringe?' — قياس الأهداب محفوظ':'');
+}
+function toMM(e){const r=sc.getBoundingClientRect();const t=e.touches?e.touches[0]:e;const x=(t.clientX-r.left)*sc.width/r.width;return x;}
+function startD(e){if(P().lensOn)return;drag={x0:toMM(e),x1:null};}
+function moveD(e){if(!drag)return;drag.x1=toMM(e);upd();draw();if(e.cancelable)e.preventDefault();}
+function endD(){if(drag&&drag.x1==null)drag=null;}
+function upd(){const mm=Math.abs(drag.x1-drag.x0)/(sc.width/2)*HS;span=Math.round(mm*10)/10;document.getElementById('spanOut').textContent=span.toFixed(1)+' mm';}
+sc.addEventListener('mousedown',startD);sc.addEventListener('mousemove',e=>{if(e.buttons)moveD(e);});sc.addEventListener('mouseup',endD);
+sc.addEventListener('touchstart',startD,{passive:true});sc.addEventListener('touchmove',moveD,{passive:false});sc.addEventListener('touchend',endD);
+['tilt','L','src'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{cur={};drag=null;span=null;document.getElementById('spanOut').textContent='—';draw();}));
+['lensOn','lp'].forEach(id=>document.getElementById(id).addEventListener('input',draw));
+document.getElementById('saveF').onclick=()=>{
+  if(P().lensOn){alert('أخرج العدسة أولًا لقياس الأهداب.');return;}
+  if(span==null){alert('اسحب على الشاشة لقياس امتداد عدد من الأهداب.');return;}
+  const N=+document.getElementById('Nin').value; if(!(N>=1)){alert('أدخل عدد الفترات N.');return;}
+  cur.fringe={span,N}; cur.tilt=P().tilt; draw();};
+document.getElementById('saveL').onclick=()=>{
+  const s=P(); if(!cur.fringe){alert('سجّل قياس الأهداب أولًا (بلا عدسة).');return;}
+  if(!s.lensOn||cur.D==null){alert('أدخل العدسة واضبطها حتى تصبح الصورتان حادتين.');return;}
+  if(s.tilt!==cur.tilt){alert('غيّرت ميل المرآة بعد قياس الأهداب؛ أعد القياس.');return;}
+  saved.push({span:cur.fringe.span,N:cur.fringe.N,D:cur.D,q:cur.q,lam:s.lam,u:null});
+  cur={}; drag=null; span=null; document.getElementById('lensOn').checked=false; renderTable(); draw();
+  alert('حُفظت المحاولة '+saved.length+'. غيّر ميل المرآة للمحاولة التالية.');};
+function renderTable(){const tb=document.getElementById('tb');tb.innerHTML='';
+  saved.forEach((r,i)=>{const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+(i+1)+'</td><td>'+r.span.toFixed(1)+'</td><td>'+r.N+'</td><td>'+r.D.toFixed(1)+'</td><td>'+r.q+'</td><td><input type="number" step="0.1" value="'+(r.u??'')+'"></td><td>'+(r.res||'')+'</td>';
+    tr.querySelector('input').oninput=e=>{r.u=e.target.value===''?null:+e.target.value;}; tb.appendChild(tr);});}
+document.getElementById('clrBtn').onclick=()=>{saved=[];renderTable();};
+document.getElementById('chkBtn').onclick=()=>{
+  if(saved.length<2){alert('سجّل محاولتين على الأقل.');return;}
+  const lams=[];saved.forEach(r=>{const y=r.span/r.N;const lt=F*r.D*y/(r.q*r.q)*1e6;r.lt=lt;lams.push(lt);
+    r.res= r.u==null?'<span class="bad">لم تحسب</span>':(Math.abs(r.u-lt)/lt<0.02?'<span class="ok">✔ صحيح</span>':'<span class="bad">✘ راجع: '+lt.toFixed(1)+'</span>');});
+  renderTable();
+  const avg=lams.reduce((a,b)=>a+b,0)/lams.length;
+  const sd=Math.sqrt(lams.reduce((a,b)=>a+(b-avg)**2,0)/(lams.length-1));
+  const ref=saved[0].lam, err=Math.abs(avg-ref)/ref*100;
+  const known=P().known;
+  document.getElementById('resBox').innerHTML='<span class="ltr">λ<sub>avg</sub> = '+avg.toFixed(1)+' ± '+(sd/Math.sqrt(lams.length)).toFixed(1)+' nm</span><br>'+
+   (known?'نسبة الخطأ مقارنة بالقيمة <span class="ltr">632.8 nm</span>: <span class="ltr val">'+err.toFixed(2)+' %</span>'
+         :'الطول الموجي الحقيقي للمصدر المجهول: <span class="ltr val">'+ref.toFixed(1)+' nm</span> — نسبة الخطأ <span class="ltr">'+err.toFixed(2)+' %</span>');};
+
+const WI=[
+ {q:'ماذا يحدث للأهداب إذا زدت ميل نصفي المرآة؟',a:'تزيد d فتتقارب الأهداب (y = λL/d) ويصعب قياسها. جرّب بمنزلق الميل.'},
+ {q:'ماذا لو حجبت أحد نصفي المرآة بورقة؟',a:'يبقى مصدر تقديري واحد فيختفي التداخل وتبقى بقعة إضاءة دون أهداب.'},
+ {q:'لماذا توجد موضعان للعدسة يعطيان صورة حادة؟',a:'لأن 1/p + 1/q = 1/f يتحقق لموضعين تتبادل فيهما p و q؛ أحدهما يكبّر الصورة والآخر يصغّرها. نختار الموضع المكبِّر (العدسة قريبة من المرآة) لأن D أكبر وقياسها أدق.'},
+ {q:'ماذا لو استخدمنا ضوء مصباح أبيض بدل الليزر؟',a:'تظهر أهداب ملونة قليلة قرب المركز فقط ثم تختفي، لأن ترابط الضوء الأبيض قصير وكل لون له y مختلفة.'},
+ {q:'إذا أخطأت في قياس q بمقدار 1% فكم يكون الخطأ تقريبًا في λ؟',a:'نحو 2%، لأن q مربعة في المقام (λ ∝ 1/q²)؛ لذلك يجب قياس q بعناية.'}
+];
+const wi=document.getElementById('whatif');
+WI.forEach((w,i)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+w.q+'</p><button class="btn ghost">أظهر التفسير</button><div class="fb" style="display:none;margin-top:6px">'+w.a+'</div>';
+  d.querySelector('button').onclick=()=>{d.querySelector('.fb').style.display='block';};wi.appendChild(d);});
+draw();
+</script>
+<script>window.REAL_CFG={
+ id:'exp2', intro:'اكتب قراءاتك من المعمل الحقيقي لكل محاولة، واحسب λ = f D y / q² بيدك (y = الامتداد ÷ N).', minRows:1,
+ consts:[{id:'f',label:'البعد البؤري لعدسة الإسقاط f (mm)',def:200}],
+ tables:[{rows:3, cols:[{key:'span',label:'الامتداد (mm)'},{key:'N',label:'N'},{key:'D',label:'D (mm)'},{key:'q',label:'q (mm)'}],
+   calc:[{label:'y (mm)', f:o=>o.span/o.N, d:3}],
+   user:{label:'λ التي حسبتها (nm)', ref:(o,c)=>c.f*o.D*(o.span/o.N)/(o.q*o.q)*1e6, tol:{rel:0.02}, d:1}}],
+ extras:[],
+ result:(D,c)=>{const L=D[0].map(o=>c.f*o.D*(o.span/o.N)/(o.q*o.q)*1e6); const N=L.length;
+  const avg=L.reduce((a,b)=>a+b,0)/N; const sd=N>1?Math.sqrt(L.reduce((a,b)=>a+(b-avg)**2,0)/(N-1)):0;
+  return {lines:['<span class="ltr">λ = '+L.map(v=>v.toFixed(1)).join(' , ')+' nm</span>',
+   '<span class="ltr">λ<sub>avg</sub> = '+avg.toFixed(1)+(N>1?' ± '+(sd/Math.sqrt(N)).toFixed(1):'')+' nm</span>',
+   'نسبة الخطأ مقارنة بـ <span class="ltr">632.8 nm</span>: <span class="ltr val">'+(Math.abs(avg-632.8)/632.8*100).toFixed(2)+' %</span>']};}
+};</script>
+<script>// ===== Real-lab readings mode (shared engine) =====
+(function(){
+const CFG = window.REAL_CFG;
+const KEY = 'laserlab_real_' + CFG.id;
+let st = {consts:{}, tables:[], extras:{}};
+try { const s = localStorage.getItem(KEY); if (s) st = JSON.parse(s); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e) {} };
+const num = v => (v === '' || v == null || isNaN(+v)) ? null : +v;
+const close = (u, ref, t) => t.abs != null ? Math.abs(u - ref) <= t.abs : Math.abs(u - ref) / Math.abs(ref) <= (t.rel || 0.02);
+const fmt = (v, d) => (v == null || !isFinite(v)) ? '—' : v.toFixed(d);
+
+const s4 = document.getElementById('s4');
+const h2 = s4.querySelector('h2');
+const sim = document.createElement('div'); sim.id = 'simMode';
+while (h2.nextSibling) sim.appendChild(h2.nextSibling);
+// remove Excel note from simulation mode
+sim.querySelectorAll('p.note').forEach(p => { if (p.textContent.indexOf('Excel') >= 0) p.remove(); });
+const sw = document.createElement('div'); sw.className = 'modesw';
+sw.innerHTML = '<button class="btn gold" id="mReal">قراءات المعمل الحقيقي</button><button class="btn ghost" id="mSim">قراءات من المحاكاة</button>';
+const real = document.createElement('div'); real.id = 'realMode';
+h2.after(sw); sw.after(real); real.after(sim);
+
+const css = document.createElement('style');
+css.textContent = '.modesw{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}#realMode input.rin{background:#3a2e10;border:1px solid #d4a64a;color:#fff6dc;border-radius:6px;padding:6px;width:100%;min-width:70px;text-align:center;font-size:15px}' +
+ '#realMode .cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}#realMode .cgrid label{display:block;font-size:14px;margin-bottom:3px}#realMode td.calc{color:#bfa9a3}#realMode .tblwrap{overflow-x:auto}#realMode .rtools{margin:6px 0}#realMode h3{margin:14px 0 6px}';
+document.head.appendChild(css);
+
+function setMode(r) {
+  real.style.display = r ? '' : 'none'; sim.style.display = r ? 'none' : '';
+  document.getElementById('mReal').className = 'btn ' + (r ? 'gold' : 'ghost');
+  document.getElementById('mSim').className = 'btn ' + (r ? 'ghost' : 'gold');
+  if (!r && typeof drawPlot === 'function') { try { drawPlot(); } catch(e) {} }
+}
+
+function build() {
+  let h = '<p class="note">' + CFG.intro + ' الخانات الذهبية لقراءاتك وحساباتك؛ تُحفظ تلقائيًا في هذا الجهاز. بعد «تحقّق» التقط صورة لهذه الصفحة وأرفقها في آخر تقريرك.</p>';
+  if (CFG.consts && CFG.consts.length) {
+    h += '<div class="cgrid">';
+    CFG.consts.forEach(c => { const v = st.consts[c.id] ?? c.def ?? ''; h += '<div><label>' + c.label + '</label><input class="rin ltr" type="number" step="any" data-c="' + c.id + '" value="' + v + '"></div>'; });
+    h += '</div>';
+  }
+  CFG.tables.forEach((T, ti) => {
+    if (!st.tables[ti]) st.tables[ti] = [];
+    const rows = st.tables[ti];
+    while (rows.length < (T.rows || 5)) rows.push({});
+    if (T.title) h += '<h3>' + T.title + '</h3>';
+    h += '<div class="tblwrap"><table><thead><tr>';
+    T.cols.forEach(c => h += '<th>' + c.label + '</th>');
+    (T.calc || []).forEach(c => h += '<th>' + c.label + '</th>');
+    if (T.user) h += '<th>' + T.user.label + '</th><th>النتيجة</th>';
+    h += '</tr></thead><tbody>';
+    rows.forEach((r, ri) => {
+      h += '<tr>';
+      T.cols.forEach(c => h += '<td><input class="rin ltr" type="number" step="any" data-t="' + ti + '" data-r="' + ri + '" data-k="' + c.key + '" value="' + (r[c.key] ?? (c.fixed ? c.fixed(ri) : '')) + '"></td>');
+      (T.calc || []).forEach((c, ci) => h += '<td class="calc ltr" id="rc' + ti + '_' + ri + '_' + ci + '"></td>');
+      if (T.user) h += '<td><input class="rin ltr" type="number" step="any" data-t="' + ti + '" data-r="' + ri + '" data-k="_u" value="' + (r._u ?? '') + '"></td><td class="st" id="rs' + ti + '_' + ri + '"></td>';
+      h += '</tr>';
+    });
+    h += '</tbody></table></div><div class="rtools"><button class="btn ghost" data-add="' + ti + '">+ صف</button></div>';
+  });
+  if (CFG.extras && CFG.extras.length) {
+    h += '<div class="cgrid">';
+    CFG.extras.forEach(e => h += '<div><label>' + e.label + '</label><input class="rin ltr" type="number" step="any" data-e="' + e.id + '" value="' + (st.extras[e.id] ?? '') + '"></div>');
+    h += '</div>';
+  }
+  h += '<button class="btn gold" id="rChk">تحقّق من نتائجي</button> <button class="btn ghost" id="rClr">مسح كل القراءات</button>';
+  h += '<div class="grid" style="margin-top:10px">';
+  (CFG.plots || []).forEach((p, i) => h += '<div class="card"><canvas dir="ltr" id="rPlot' + i + '" width="520" height="300"></canvas></div>');
+  h += '<div class="card" id="rRes"><p class="note">تظهر هنا النتائج بعد التحقق.</p></div></div>';
+  real.innerHTML = h;
+  real.querySelectorAll('input[data-c]').forEach(i => i.oninput = () => { st.consts[i.dataset.c] = i.value; save(); refreshCalc(); });
+  real.querySelectorAll('input[data-t]').forEach(i => i.oninput = () => { st.tables[+i.dataset.t][+i.dataset.r][i.dataset.k] = i.value; save(); refreshCalc(); });
+  real.querySelectorAll('input[data-e]').forEach(i => i.oninput = () => { st.extras[i.dataset.e] = i.value; save(); });
+  real.querySelectorAll('button[data-add]').forEach(b => b.onclick = () => { st.tables[+b.dataset.add].push({}); save(); build(); });
+  document.getElementById('rChk').onclick = check;
+  document.getElementById('rClr').onclick = () => { if (!confirmClear()) return; st = {consts:{}, tables:[], extras:{}}; save(); build(); };
+  refreshCalc(); drawPlots(false);
+}
+let clrArm = false;
+function confirmClear() { const b = document.getElementById('rClr'); if (clrArm) { clrArm = false; return true; } clrArm = true; b.textContent = 'اضغط مرة أخرى للتأكيد'; setTimeout(() => { clrArm = false; if (b) b.textContent = 'مسح كل القراءات'; }, 3000); return false; }
+
+function C() { const o = {}; (CFG.consts || []).forEach(c => o[c.id] = num(st.consts[c.id] ?? c.def)); return o; }
+function data(ti) {
+  const T = CFG.tables[ti];
+  return (st.tables[ti] || []).map((r, ri) => { const o = {_ri: ri}; T.cols.forEach(c => o[c.key] = num(r[c.key] ?? (c.fixed ? c.fixed(ri) : null))); o._u = num(r._u); return o; })
+    .filter(o => T.cols.every(c => o[c.key] != null));
+}
+function refreshCalc() {
+  const c = C();
+  CFG.tables.forEach((T, ti) => { (T.calc || []).forEach((cc, ci) => {
+    (st.tables[ti] || []).forEach((r, ri) => {
+      const o = {}; T.cols.forEach(k => o[k.key] = num(r[k.key] ?? (k.fixed ? k.fixed(ri) : null)));
+      const ok = T.cols.every(k => o[k.key] != null);
+      const el = document.getElementById('rc' + ti + '_' + ri + '_' + ci); if (el) el.textContent = ok ? fmt(cc.f(o, c), cc.d ?? 2) : '';
+    });
+  }); });
+}
+function fitOrigin(xs, ys) { let a = 0, b = 0; xs.forEach((x, i) => { a += x * ys[i]; b += x * x; }); return b ? a / b : null; }
+function check() {
+  const c = C(); const miss = (CFG.consts || []).filter(k => c[k.id] == null);
+  const box = document.getElementById('rRes');
+  if (miss.length) { box.innerHTML = '<p class="bad">أدخل أولًا: ' + miss.map(k => k.label).join('، ') + '</p>'; return; }
+  const D = CFG.tables.map((T, ti) => data(ti));
+  if (D.every(d => d.length < (CFG.minRows || 2))) { box.innerHTML = '<p class="bad">أدخل ' + (CFG.minRows || 2) + ' قراءات على الأقل.</p>'; return; }
+  let ok = 0, tot = 0;
+  CFG.tables.forEach((T, ti) => {
+    (st.tables[ti] || []).forEach((r, ri) => { const el = document.getElementById('rs' + ti + '_' + ri); if (el) el.innerHTML = ''; });
+    if (!T.user) return;
+    D[ti].forEach(o => {
+      const ref = T.user.ref(o, c); const el = document.getElementById('rs' + ti + '_' + o._ri); tot++;
+      if (o._u == null) el.innerHTML = '<span class="bad">لم تحسب</span>';
+      else if (close(o._u, ref, T.user.tol || {})) { el.innerHTML = '<span class="ok">✔ صحيح</span>'; ok++; }
+      else el.innerHTML = '<span class="bad">✘ راجع: ' + fmt(ref, T.user.d ?? 1) + '</span>';
+    });
+  });
+  const R = CFG.result(D, c, fitOrigin);
+  let h = '';
+  if (tot) h += '<b>حساباتك الصحيحة في الجدول:</b> ' + ok + ' من ' + tot + '<br>';
+  (CFG.extras || []).forEach(e => {
+    const u = num(st.extras[e.id]); const ref = e.ref(R, D, c);
+    if (ref == null || !isFinite(ref)) return;
+    h += e.label + ': ' + (u == null ? '<span class="bad">لم تُدخل</span>' : close(u, ref, e.tol || {}) ? '<span class="ok">✔ قريب من الصحيح</span>' : '<span class="bad">✘ راجع (الصحيح ≈ <span class="ltr">' + fmt(ref, e.d ?? 3) + '</span>)</span>') + '<br>';
+  });
+  h += '<hr style="border-color:#3a2a2e">' + R.lines.join('<br>');
+  box.innerHTML = h;
+  drawPlots(true, R);
+}
+function drawPlots(withFit, R) {
+  (CFG.plots || []).forEach((P, i) => {
+    const cv = document.getElementById('rPlot' + i); if (!cv) return; const x = cv.getContext('2d');
+    const W = cv.width, H = cv.height, m = 48;
+    x.fillStyle = '#07040a'; x.fillRect(0, 0, W, H);
+    const d = data(P.table); const c = C();
+    const pts = d.map(o => [P.x(o, c), P.y(o, c)]).filter(p => isFinite(p[0]) && isFinite(p[1]));
+    x.strokeStyle = '#bfa9a3'; x.fillStyle = '#bfa9a3'; x.font = '13px Tahoma, Arial'; x.textAlign = 'center';
+    let xmin = Math.min(0, ...pts.map(p => p[0])), xmax = Math.max(1, ...pts.map(p => p[0]));
+    let ymin = Math.min(0, ...pts.map(p => p[1])), ymax = Math.max(1, ...pts.map(p => p[1]));
+    if (P.noZero) { xmin = Math.min(...pts.map(p => p[0]), xmax - 1); ymin = Math.min(...pts.map(p => p[1]), ymax - 1); }
+    const px = (xmax - xmin) * 0.08 || 1, py = (ymax - ymin) * 0.1 || 1; xmax += px; ymax += py; if (xmin < 0) xmin -= px; if (ymin < 0) ymin -= py;
+    const X = v => m + (v - xmin) / (xmax - xmin) * (W - m - 15), Y = v => H - m + 10 - (v - ymin) / (ymax - ymin) * (H - m - 15);
+    x.beginPath(); x.moveTo(m, 8); x.lineTo(m, H - m + 10); x.lineTo(W - 8, H - m + 10); x.stroke();
+    if (xmin < 0) { x.beginPath(); x.moveTo(X(0), 8); x.lineTo(X(0), H - m + 10); x.setLineDash([3, 3]); x.stroke(); x.setLineDash([]); }
+    if (ymin < 0) { x.beginPath(); x.moveTo(m, Y(0)); x.lineTo(W - 8, Y(0)); x.setLineDash([3, 3]); x.stroke(); x.setLineDash([]); }
+    const nice = r => { const e = Math.pow(10, Math.floor(Math.log10(r / 4))); const f = r / 4 / e; return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * e; };
+    const sx = nice(xmax - xmin), sy = nice(ymax - ymin), lbl = v => +(+v.toFixed(6)).toPrecision(4) + '';
+    for (let v = Math.ceil(xmin / sx) * sx; v <= xmax + 1e-9; v += sx) x.fillText(lbl(v), X(v), H - m + 26);
+    x.textAlign = 'right'; for (let v = Math.ceil(ymin / sy) * sy; v <= ymax + 1e-9; v += sy) x.fillText(lbl(v), m - 5, Y(v) + 4); x.textAlign = 'center';
+    x.fillText(P.xl, W / 2, H - 6); x.save(); x.translate(13, H / 2); x.rotate(-Math.PI / 2); x.fillText(P.yl, 0, 0); x.restore();
+    if (withFit && P.fit && R && R[P.fit] != null) { const s = R[P.fit]; x.strokeStyle = '#d4a64a'; x.lineWidth = 2; x.beginPath(); x.moveTo(X(xmin), Y(s * xmin)); x.lineTo(X(xmax), Y(s * xmax)); x.stroke(); x.lineWidth = 1; }
+    if (withFit && P.join) { const q = pts.slice().sort((a, b) => a[0] - b[0]); x.strokeStyle = '#d4a64a'; x.beginPath(); q.forEach((p, k) => k ? x.lineTo(X(p[0]), Y(p[1])) : x.moveTo(X(p[0]), Y(p[1]))); x.stroke(); }
+    x.fillStyle = '#e8435f'; pts.forEach(p => { x.beginPath(); x.arc(X(p[0]), Y(p[1]), 5, 0, 7); x.fill(); });
+    if (P.title) { x.fillStyle = '#d4a64a'; x.textAlign = 'right'; x.fillText(P.title, W - 10, 20); }
+  });
+}
+document.getElementById('mReal').onclick = () => setMode(true);
+document.getElementById('mSim').onclick = () => setMode(false);
+build(); setMode(true);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

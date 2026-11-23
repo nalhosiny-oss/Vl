@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المعمل الافتراضي — التجربة 2: البندول البسيط</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap">
+<style>:root{--bg:#F6EEDF;--panel:#FFFBF4;--panel2:#FBF4E6;--line:#E3D3B6;--brown:#5A3A22;--ink:#3B2A1F;--ter:#B4532A;--oli:#5E6B2B;--mut:#7A6552;--sand:#F3DFB6;--red:#C8322F;--green:#2E7D4F}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",Dubai,Tahoma,Arial,sans-serif;line-height:1.75;font-size:16px}
+header{background:linear-gradient(135deg,#5A3A22,#7A4A2A);color:#fff;padding:20px 18px 16px;text-align:center;border-bottom:5px solid var(--ter)}
+header .tag{display:inline-block;color:#F3DFB6;border:1px solid #F3DFB6;border-radius:20px;padding:1px 14px;font-size:13px}
+h1{margin:8px 0 2px;font-size:26px;font-weight:700} h1 span{color:#F3C98B}
+header p{margin:0;color:#EADCC4;font-size:15px}
+.wrap{max-width:1140px;margin:0 auto;padding:14px}
+.safety{background:#FFF1E4;border:1px solid var(--ter);border-right:6px solid var(--ter);border-radius:10px;padding:9px 14px;margin:12px 0;font-size:15px}
+.safety b{color:var(--ter)}
+nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+nav button{flex:1 1 150px;background:var(--panel);color:var(--mut);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:15px;cursor:pointer;font-weight:600}
+nav button.on{background:var(--brown);color:#fff;border-color:var(--brown)}
+nav button.flash{background:var(--oli);color:#fff;transition:background .2s}
+section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(90,58,34,.07)}
+section.on{display:block}
+h2{margin:0 0 10px;font-size:22px;color:var(--brown)} h3{margin:16px 0 6px;font-size:17px;color:var(--ter)}
+.link{background:#EEF0E2;border:1px solid #CFD3B3;border-radius:10px;padding:6px 12px}
+.eqrow{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0}
+.eq{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:"Cambria Math",Cambria,"STIX Two Math","Times New Roman",serif;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 12px;font-size:18px;color:var(--brown);white-space:nowrap}
+.eq.big{font-size:21px;padding:8px 16px} .eq i{font-style:italic} .eq .ar{font-family:"IBM Plex Sans Arabic",Dubai,Tahoma;font-style:normal;font-size:.85em}
+.eqn{color:var(--mut);font-size:14px;direction:ltr}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.fr>span{line-height:1.25}
+.sq>span{border-top:1.5px solid currentColor;padding:0 2px}
+.vec{position:relative;display:inline-block} .vec:after{content:"→";position:absolute;top:-.85em;left:0;right:0;text-align:center;font-size:.7em;font-style:normal}
+.tip{background:#EEF0E2;border:1px solid #CFD3B3;border-right:5px solid var(--oli);border-radius:10px;padding:9px 12px;margin:10px 0}
+figure{margin:12px 0;text-align:center} figcaption{color:var(--mut);font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px} .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:820px){.grid,.grid3{grid-template-columns:1fr}}
+.grid>*,.grid3>*{min-width:0}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+label{display:block;font-size:15px;color:var(--mut);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--ter)}
+select,input[type=number],input[type=text],textarea{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+.val{color:var(--ter);font-weight:bold;direction:ltr;unicode-bidi:isolate}
+.btn{background:var(--brown);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px;font-weight:600}
+.btn.or{background:var(--ter)} .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--mut)}
+canvas{direction:ltr;width:100%;display:block;border-radius:10px;background:#fff;border:1px solid var(--line)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+th,td{border:1px solid var(--line);padding:5px;text-align:center}
+th{background:var(--brown);color:#fff;font-weight:600} th.calc{background:#8A6A1F} td.calc{background:#FFF6D6} td.raw{direction:ltr;font-weight:600}
+td.ltr{direction:ltr}
+td input{text-align:center;padding:4px;direction:ltr}
+.ok{color:var(--green);font-weight:600} .bad{color:var(--red);font-weight:600}
+.q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+.q p{margin:0 0 6px;font-weight:bold;color:var(--brown)}
+.opt{display:block;width:100%;text-align:right;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+.opt.right{border-color:var(--green);background:#E6F4EA} .opt.wrong{border-color:var(--red);background:#FBE9E8}
+.fb{font-size:15px;color:var(--mut);min-height:1.2em}
+.note{font-size:15px;color:var(--mut)}
+.reading{font-size:21px;color:var(--ter);font-weight:bold}
+.mono{font-family:Consolas,"DejaVu Sans Mono",monospace;direction:ltr;display:inline-block;margin:0 8px}
+.meter{background:#2B2420;color:#F3DFB6;border-radius:10px;padding:8px 12px;text-align:center}
+.meter span{display:block;font-size:13px;color:#C9B48F} .meter b{font-family:Consolas,"DejaVu Sans Mono",monospace;font-size:24px;color:#9BE58A;direction:ltr;display:block}
+.meter.big b{font-size:32px}
+.res{background:#F1F3E6;border:1px solid #CFD3B3;border-radius:10px;padding:10px 14px;margin-top:10px}
+.res b{color:var(--brown)}
+.wi{background:var(--panel2);border:1px solid var(--line);border-right:5px solid var(--oli);border-radius:10px;padding:10px 12px;margin:10px 0}
+.wi p{margin:0 0 6px;font-weight:600}
+.wi .ans{display:none;background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px;margin-top:6px}
+.wi.show .ans{display:block}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:16px}
+sub,sup{font-size:70%}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><span class="tag">فيزياء عامة 1 (2031204-4) — المعمل الافتراضي للجزء العملي</span>
+<h1>التجربة 2: <span>البندول البسيط</span></h1><p>الحركة التوافقية البسيطة وتعيين عجلة السقوط الحر g</p></header>
+<div class="wrap"><div class="safety">⚠️ <b>السلامة:</b> ثبّت الحامل جيدًا على الطاولة حتى لا ينقلب، وأبعد الثقل المتأرجح عن الوجوه، واجعل سعة الاهتزاز صغيرة.</div>
+<nav id="navtop"><button class="on" data-s="s1">1) أسئلة التحضير</button><button data-s="s2">2) النظرية والخطوات</button><button data-s="s3">3) المحاكاة والقياس</button><button data-s="s4">4) جدول المحاكاة والتحليل</button><button data-s="sR">5) قراءاتي في المعمل ✔</button><button data-s="s5">6) ماذا لو…؟</button></nav>
+<section id="s1" class="on"><h2>أسئلة التحضير</h2><p class="note">أجب عنها قبل حضورك إلى المعمل؛ يظهر التصحيح فور اختيارك.</p><div id="quiz"></div><p class="reading" id="qscore"></p></section>
+<section id="s2"><h2>النظرية والخطوات</h2><p class="link">🔗 ترتبط هذه التجربة بـ <b>الفصل 2: الحركة في بعد واحد (السقوط الحر) والفصل 3: قوانين الحركة</b> في المحاضرات.</p><h3>الأهداف</h3><ul><li>إثبات أن البندول المتأرجح بزاوية صغيرة يتحرك حركة توافقية بسيطة.</li><li>دراسة اعتماد الزمن الدوري على الطول، والتحقق من عدم اعتماده على كتلة الثقل.</li><li>تعيين عجلة السقوط الحر <bdi dir="ltr">g</bdi> من ميل منحنى <bdi dir="ltr">T²</bdi> – <bdi dir="ltr">L</bdi>.</li></ul><p>البندول البسيط ثقل صغير كتلته <bdi dir="ltr">M</bdi> معلق بخيط خفيف غير قابل للاستطالة، ويُقاس طوله <bdi dir="ltr">L</bdi> من نقطة التعليق إلى مركز الثقل.</p><figure><img src="DATAIMG" style="max-width:560px;display:block;margin:6px auto" alt=""><figcaption>الشكل 2-1: القوى المؤثرة في ثقل بندول مُزاح بزاوية θ.</figcaption></figure><p>عند إزاحة الثقل بزاوية <bdi dir="ltr">θ</bdi> تعيده مركبة وزنه المماسية نحو أدنى نقطة. ولزاوية صغيرة (<bdi dir="ltr">θ</bdi> بالراديان) يكون <bdi dir="ltr">sin θ</bdi> ≈ <bdi dir="ltr">θ</bdi>، وطول القوس <bdi dir="ltr">x = Lθ</bdi>، فإن:</p><div class="eqrow"><span class="eq big"><i>F</i> = − <i>M</i> <i>g</i> sin <i>θ</i> ≈ − <i>M</i> <i>g</i> <i>θ</i> = − (<span class="fr"><span><i>M</i> <i>g</i></span><span><i>L</i></span></span>) <i>x</i></span><span class="eqn">(2-1)</span></div><p>القوة المعيدة تتناسب مع الإزاحة وتعاكسها، وهذا شرط الحركة التوافقية البسيطة. ويعطي قانون نيوتن الثاني التسارع <bdi dir="ltr">a = −(g/L) x</bdi>، والزمن الدوري لاهتزازة كاملة:</p><div class="eqrow"><span class="eq big"><i>T</i> = 2<i>π</i> <span class="sq">√<span><span class="fr"><span><i>L</i></span><span><i>g</i></span></span></span></span></span><span class="eqn">(2-2)</span></div><p>لا يعتمد الزمن الدوري على كتلة الثقل، ولا — للزوايا الصغيرة — على السعة. وبتربيع المعادلة <bdi dir="ltr">(2-2)</bdi> نحصل على خط مستقيم يمر بنقطة الأصل عند رسم <bdi dir="ltr">T²</bdi> مقابل <bdi dir="ltr">L</bdi>:</p><div class="eqrow"><span class="eq big"><i>T</i><sup>2</sup> = (<span class="fr"><span>4<i>π</i><sup>2</sup></span><span><i>g</i></span></span>) <i>L</i>   ⇒   <i>g</i> = <span class="fr"><span>4<i>π</i><sup>2</sup></span><span><span class="ar">الميل</span></span></span></span><span class="eqn">(2-3)</span></div><div class="tip"><b>ممارسات جيدة:</b> اجعل السعة أقل من <bdi dir="ltr">10°</bdi> تقريبًا. وقِّت 10 اهتزازات كاملة (ذهابًا وإيابًا = اهتزازة واحدة) واقسم على 10، فيصغر خطأ زمن رد الفعل عشر مرات. ابدأ التوقيت وأوقفه عند مرور الثقل بأدنى نقطة حيث سرعته أكبر ما يمكن. استبعد المحاولة إذا تأرجح الثقل في مسار بيضاوي.</div><h3>الأدوات</h3><ul><li>ثقل بندول بخيط قطني، وفلّينة مشقوقة، وماسك وحامل.</li><li>مسطرة مترية، وقدمة ذات ورنية (لقطر الثقل)، وساعة إيقاف.</li><li>مؤشر ثابت تحت أدنى نقطة من مسار التأرجح.</li></ul><h3>خطوات العمل</h3><ol><li>ثبّت الفلّينة المشقوقة في الماسك جيدًا بحيث يتدلى البندول خارج حافة الطاولة، والمؤشر أسفل أدنى نقطة مباشرة.</li><li>قِس قطر الثقل وسجّل نصف قطره <bdi dir="ltr">r</bdi>. اضبط الخيط ليكون طوله ℓ من الفلّينة إلى أعلى الثقل نحو <bdi dir="ltr">20 cm</bdi>، فيكون <bdi dir="ltr">L</bdi> = ℓ + <bdi dir="ltr">r</bdi>.</li><li>أزح الثقل جانبًا بزاوية صغيرة وأطلقه دون دفع.</li><li>وقِّت 10 اهتزازات كاملة، ثم 10 أخرى وخذ المتوسط؛ الزمن الدوري <bdi dir="ltr">T = t<sub>avg</sub> / 10</bdi>.</li><li>زِد الطول بخطوات نحو <bdi dir="ltr">20 cm</bdi> حتى <bdi dir="ltr">120 cm</bdi> تقريبًا، وكرّر الخطوتين 3 و 4 لكل طول.</li><li>ارسم <bdi dir="ltr">T²</bdi> (المحور <bdi dir="ltr">y</bdi>) مقابل <bdi dir="ltr">L</bdi> (المحور <bdi dir="ltr">x</bdi>)، وارسم أفضل خط مستقيم يمر بالأصل، وأوجد ميله واحسب <bdi dir="ltr">g</bdi> من المعادلة <bdi dir="ltr">(2-3)</bdi>.</li><li>قارن <bdi dir="ltr">g</bdi> بالقيمة المقبولة في الطائف <bdi dir="ltr">9.79 m/s²</bdi>، واحسب نسبة الخطأ.</li></ol></section>
+<section id="s3"><h2>المحاكاة والقياس</h2>
+<div class="grid">
+ <div class="card">
+  <label>طول الخيط ℓ من الفلّينة إلى أعلى الثقل: <span class="val" id="lv"></span></label><input type="range" id="ell" min="19" max="119" step="1" value="59">
+  <p class="note">قطر الثقل <b>2.0 cm</b>، لذا L = ℓ + 1.0 cm (حتى مركز الثقل).</p>
+  <label>زاوية الإزاحة (السعة): <span class="val" id="av"></span></label><input type="range" id="amp" min="3" max="40" step="1" value="8">
+  <label>الثقل</label><select id="bob"><option value="50">ثقل نحاسي 50 g</option><option value="100">ثقل فولاذي 100 g</option><option value="20">ثقل خشبي 20 g</option></select>
+  <p><button class="btn" id="go">أطلق الثقل</button> <button class="btn ghost" id="stopP">أوقف البندول</button></p>
+  <div class="card" style="background:#fff">
+   <b>ساعة الإيقاف</b> <span class="reading mono" id="sw">0.00 s</span><br>
+   <button class="btn or" id="swBtn">ابدأ</button> <button class="btn ghost" id="swRst">صفّر</button>
+   <label><input type="checkbox" id="cnt" style="width:auto"> أظهر عدّاد الاهتزازات (للتأكد من عدّك)</label><span class="note" id="cntOut"></span>
+  </div>
+  <p><button class="btn or" id="add">أضف هذا الزمن (t₁) إلى الجدول</button> <button class="btn ghost" id="add2">أضفه زمنًا ثانيًا (t₂) للطول نفسه</button></p>
+  <p class="note" id="warn"></p>
+ </div>
+ <div class="card"><canvas id="pc" width="520" height="620"></canvas>
+  <p class="note">ابدأ ساعة الإيقاف وأوقفها لحظة مرور الثقل بالمؤشر عند أدنى نقطة. وقّت 10 اهتزازات كاملة.</p></div>
+</div>
+</section>
+<section id="s4"><h2>جدول المحاكاة والتحليل</h2><div id="simtab"></div></section>
+<section id="sR"><h2>قراءاتي الحقيقية في المعمل — التحقق الذاتي</h2><div id="real"></div></section>
+<section id="s5"><h2>ماذا لو…؟</h2><p class="note">توقّع أولًا واكتب سببك، ثم أظهر التفسير.</p><div id="whatif"></div></section>
+</div>
+<footer>فيزياء عامة 1 (2031204-4) · الجزء العملي · أ.د. نجم الحصيني</footer>
+<script>// ===== General Physics 1 practical virtual labs — shared engine (Arabic, RTL) =====
+const $=id=>document.getElementById(id);
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); $(b.dataset.s).classList.add('on');
+  if(window.onTab) window.onTab(b.dataset.s);
+  window.scrollTo({top:$('navtop').offsetTop-6,behavior:'smooth'});
+});
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function roundTo(x,step){return Math.round(x/step)*step;}
+function fmt(x,d){return (x===null||x===undefined||isNaN(x)||!isFinite(x))?'—':(+x).toFixed(d);}
+function pct(a,b){return Math.abs(a-b)/Math.abs(b)*100;}
+function close(u,t,tol){return u!==null&&u!==undefined&&u!==''&&!isNaN(u)&&Math.abs(u-t)<=Math.abs(t)*tol+1e-12;}
+const OKS=t=>'<span class="ok">✔ '+t+'</span>', BADS=t=>'<span class="bad">✘ '+t+'</span>';
+
+// ----- pre-lab quiz -----
+function buildQuiz(Q){
+  let score=0,answered=0; const qz=$('quiz');
+  Q.forEach((it,i)=>{
+    const d=document.createElement('div'); d.className='q';
+    d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+'أبجد'[j]+') '+o+'</button>').join('')+'<div class="fb"></div>';
+    d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(d.dataset.done) return; d.dataset.done=1; answered++;
+      const j=+b.dataset.j; d.querySelectorAll('.opt')[it.a].classList.add('right');
+      if(j===it.a){score++; d.querySelector('.fb').innerHTML=OKS('إجابة صحيحة.')+' '+it.e;}
+      else{b.classList.add('wrong'); d.querySelector('.fb').innerHTML=BADS('ليست الإجابة الصحيحة.')+' '+it.e;}
+      if(answered===Q.length) $('qscore').textContent='درجتك: '+score+' من '+Q.length;
+    });
+    qz.appendChild(d);
+  });
+}
+// ----- what if...? -----
+function buildWhatIf(W){
+  const box=$('whatif');
+  W.forEach((it,i)=>{
+    const d=document.createElement('div'); d.className='wi';
+    d.innerHTML='<p>'+(i+1)+') '+it.q+'</p><textarea rows="2" placeholder="اكتب توقعك وسببه أولًا…"></textarea>'+
+      '<button class="btn ghost">أظهر التفسير</button><div class="ans">'+it.a+'</div>';
+    d.querySelector('button').onclick=()=>d.classList.toggle('show');
+    box.appendChild(d);
+  });
+}
+// ----- least squares -----
+function fitLine(xs,ys){
+  const n=xs.length; if(n<2) return null;
+  const sx=xs.reduce((a,b)=>a+b,0), sy=ys.reduce((a,b)=>a+b,0);
+  const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0);
+  const den=n*sxx-sx*sx; if(Math.abs(den)<1e-15) return null;
+  const m=(n*sxy-sx*sy)/den, b=(sy-m*sx)/n;
+  const s2=n>2?ys.reduce((a,y,i)=>a+(y-(m*xs[i]+b))**2,0)/(n-2):0;
+  return {m,b,dm:Math.sqrt(n*s2/den),db:Math.sqrt(s2*sxx/den)};
+}
+function fitOrigin(xs,ys){
+  const n=xs.length; if(n<1) return null;
+  const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0); if(sxx===0) return null;
+  const m=sxy/sxx; const s2=n>1?ys.reduce((a,y,i)=>a+(y-m*xs[i])**2,0)/(n-1):0;
+  return {m,b:0,dm:Math.sqrt(s2/sxx),db:0};
+}
+// ----- plot -----
+function niceStep(range){const r=range/6,p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p;return (f<1.5?1:f<3?2:f<7?5:10)*p;}
+function drawPlot(cv,pts,o){
+  o=o||{}; const g=cv.getContext('2d'), W=cv.width,H=cv.height; g.clearRect(0,0,W,H); g.fillStyle='#FFFDF8'; g.fillRect(0,0,W,H);
+  const L=78,R=22,T=24,B=60;
+  const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  let x0=o.xmin!==undefined?o.xmin:Math.min(0,...xs), x1=o.xmax!==undefined?o.xmax:Math.max(...xs,1e-9);
+  let y0=o.ymin!==undefined?o.ymin:Math.min(0,...ys), y1=o.ymax!==undefined?o.ymax:Math.max(...ys,1e-9);
+  if(!pts.length){x0=0;x1=1;y0=0;y1=1;}
+  x1+=(x1-x0)*0.08; y1+=(y1-y0)*0.10; if(x0<0)x0-=(x1-x0)*0.05; if(y0<0)y0-=(y1-y0)*0.05;
+  const X=x=>L+(x-x0)/(x1-x0)*(W-L-R), Y=y=>H-B-(y-y0)/(y1-y0)*(H-T-B);
+  const sxs=niceStep(x1-x0), sys=niceStep(y1-y0), dec=s=>s>=1?0:Math.min(4,Math.ceil(-Math.log10(s)-1e-9));
+  g.font='13px "IBM Plex Sans Arabic", Tahoma, Arial'; g.textAlign='center'; g.strokeStyle='#EADCC4'; g.fillStyle='#7A6552'; g.direction='ltr';
+  for(let x=Math.ceil(x0/sxs)*sxs;x<=x1+1e-12;x+=sxs){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),H-B);g.stroke();g.fillText((+x.toFixed(6)).toFixed(dec(sxs)),X(x),H-B+17);}
+  g.textAlign='right';
+  for(let y=Math.ceil(y0/sys)*sys;y<=y1+1e-12;y+=sys){g.beginPath();g.moveTo(L,Y(y));g.lineTo(W-R,Y(y));g.stroke();g.fillText((+y.toFixed(6)).toFixed(dec(sys)),L-6,Y(y)+4);}
+  g.strokeStyle='#3B2A1F'; g.lineWidth=1.5; g.beginPath(); g.moveTo(L,T); g.lineTo(L,H-B); g.lineTo(W-R,H-B); g.stroke();
+  if(x0<0&&x1>0){g.beginPath();g.moveTo(X(0),T);g.lineTo(X(0),H-B);g.stroke();}
+  if(y0<0&&y1>0){g.beginPath();g.moveTo(L,Y(0));g.lineTo(W-R,Y(0));g.stroke();}
+  g.lineWidth=1; g.fillStyle='#3B2A1F'; g.textAlign='center'; g.font='bold 14px "IBM Plex Sans Arabic", Tahoma, Arial';
+  g.direction='rtl'; g.fillText(o.xlabel||'x',(L+W-R)/2,H-14);
+  g.save(); g.translate(18,(T+H-B)/2); g.rotate(-Math.PI/2); g.fillText(o.ylabel||'y',0,0); g.restore(); g.direction='ltr';
+  const line=(f,col,dash)=>{ if(!f) return; g.strokeStyle=col; g.lineWidth=2; g.setLineDash(dash||[]);
+    const xa=Math.min(0,x0), xb=x1; g.beginPath(); g.moveTo(X(xa),Y(f.m*xa+f.b)); g.lineTo(X(xb),Y(f.m*xb+f.b)); g.stroke(); g.setLineDash([]); g.lineWidth=1;};
+  g.save(); g.beginPath(); g.rect(L,T,W-L-R,H-T-B); g.clip();
+  line(o.fit,'#B4532A'); line(o.student,'#5E6B2B',[6,5]);
+  g.restore();
+  pts.forEach(p=>{g.fillStyle='#3B2A1F'; g.beginPath(); g.arc(X(p[0]),Y(p[1]),4.5,0,2*Math.PI); g.fill();});
+  if(o.fit||o.student){g.font='13px "IBM Plex Sans Arabic", Tahoma, Arial'; g.textAlign='right'; g.direction='rtl';
+    if(o.fit){g.fillStyle='#B4532A'; g.fillText('— أفضل خط (المربعات الصغرى)',W-R-10,T+16);}
+    if(o.student){g.fillStyle='#5E6B2B'; g.fillText('- - خط بميلك أنت',W-R-10,T+34);} g.direction='ltr';}
+}
+
+// ===== table engine: used by the simulation table (mode "sim") and by "My lab readings" (mode "real") =====
+function DataTable(boxId, cfg, mode){
+  const box=$(boxId), sim=mode==='sim', KEY='gp1lab_'+mode+'_'+cfg.key;
+  let store={}; if(!sim){ try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){store={};} }
+  const save=()=>{ if(sim) return; try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){} };
+  const num=v=>{if(v===undefined||v===null) return null; v=String(v).trim().replace('،','.').replace(',','.'); if(v==='') return null; const x=parseFloat(v); return isNaN(x)?null:x;};
+  const P='d_'+mode+'_';
+  let h='<p class="note">'+(sim?(cfg.simIntro||'تُضاف قراءات المحاكاة إلى هذا الجدول تلقائيًّا. احسب الأعمدة الصفراء بنفسك، ثم اضغط «تحقّق».')
+     :((cfg.intro||'')+' اكتب القراءات التي سجلتها في المعمل (في مذكرتك)، وأجرِ حساباتك بنفسك، ثم اضغط <b>تحقّق من نتائجي</b>. تُحفظ مدخلاتك في هذا المتصفح لتعود إليها لاحقًا. خذ صورة للنتيجة وأرفقها في آخر تقريرك.'))+'</p>';
+  if(cfg.consts&&cfg.consts.length){h+='<div class="grid3">'+cfg.consts.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"'+(sim&&c.sim!==undefined?' value="'+c.sim+'" readonly':'')+'></label>').join('')+'</div>';}
+  cfg.tables.forEach(t=>{
+    h+='<h3>'+t.title+'</h3><div class="tw"><table id="'+P+t.id+'"><thead><tr><th>#</th>'+t.cols.map(c=>'<th'+(c.calc?' class="calc"':'')+'>'+c.label+'</th>').join('')+'</tr></thead><tbody></tbody></table></div>';
+    if(!sim&&t.add!==false) h+='<button class="btn ghost" data-add="'+t.id+'">+ أضف صفًّا</button>';
+  });
+  if(cfg.mine&&cfg.mine.length){h+='<h3>نتائجك من رسمك البياني اليدوي / حسابك</h3><div class="grid3">'+cfg.mine.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+  h+='<p><button class="btn or" data-act="check">'+(sim?'تحقّق':'تحقّق من نتائجي')+'</button> <button class="btn ghost" data-act="clear">'+(sim?'امسح الجدول':'امسح كل مدخلاتي')+'</button></p>'+
+     '<p class="note">الأعمدة ذات العناوين الصفراء حساباتك أنت: تصبح <span class="ok">خضراء</span> إذا كانت صحيحة و<span class="bad">حمراء</span> إذا لم تكن.</p>'+
+     (cfg.plot?'<canvas class="plot" width="860" height="440"></canvas>':'')+'<div class="res"><p class="note">تظهر النتائج هنا بعد الضغط على زر التحقق.</p></div>';
+  box.innerHTML=h;
+  const res=box.querySelector('.res'), cv=box.querySelector('canvas.plot');
+  const rowsOf=t=>{ if(!store[t.id]) store[t.id]=[]; if(!sim||t.simEdit||t.fixedRows){const n=Math.max(t.rows||5, store[t.id].length); while(store[t.id].length<n) store[t.id].push({});} return store[t.id]; };
+  function render(){
+    cfg.tables.forEach(t=>{
+      const tb=$(P+t.id).querySelector('tbody'); const R=rowsOf(t);
+      if((!sim||t.simEdit)&&t.preset) R.forEach((r,i)=>{ if(t.preset[i]) Object.keys(t.preset[i]).forEach(k=>{ if(r[k]===undefined) r[k]=String(t.preset[i][k]); }); });
+      tb.innerHTML=R.map((r,i)=>'<tr><td>'+(t.rowLabels?t.rowLabels[i]||(i+1):(i+1))+'</td>'+t.cols.map(c=>{
+        const v=r[c.id]===undefined||r[c.id]===null?'':String(r[c.id]).replace(/"/g,'');
+        if(sim&&!c.calc&&!t.simEdit) return '<td class="raw">'+v+'</td>';
+        return '<td'+(c.calc?' class="calc"':'')+'><input type="text" inputmode="decimal" data-t="'+t.id+'" data-r="'+i+'" data-c="'+c.id+'" value="'+v+'"></td>';}).join('')+'</tr>').join('');
+    });
+    box.querySelectorAll('input[data-t]').forEach(inp=>inp.oninput=()=>{store[inp.dataset.t][+inp.dataset.r][inp.dataset.c]=inp.value; inp.style.borderColor=''; save();});
+  }
+  box.querySelectorAll('input[data-k]').forEach(inp=>{ if(!inp.readOnly&&store['k_'+inp.dataset.k]!==undefined) inp.value=store['k_'+inp.dataset.k]; inp.oninput=()=>{store['k_'+inp.dataset.k]=inp.value; save();}; });
+  box.querySelectorAll('button[data-add]').forEach(b=>b.onclick=()=>{ store[b.dataset.add].push({}); save(); render(); });
+  let armed=false; const clr=box.querySelector('[data-act=clear]');
+  clr.onclick=()=>{ if(!sim&&!armed){armed=true; clr.textContent='اضغط مرة أخرى لمسح كل شيء'; setTimeout(()=>{armed=false; clr.textContent='امسح كل مدخلاتي';},4000); return;}
+    store={}; save(); box.querySelectorAll('input[data-k]').forEach(i=>{if(!i.readOnly) i.value='';}); render(); res.innerHTML='<p class="note">تم المسح.</p>'; if(cv) drawPlot(cv,[],cfg.plot); armed=false; if(!sim) clr.textContent='امسح كل مدخلاتي'; };
+  box.querySelector('[data-act=check]').onclick=()=>{
+    const K={}; box.querySelectorAll('input[data-k]').forEach(i=>K[i.dataset.k]=num(i.value));
+    const T={}; let marks=0, good=0;
+    cfg.tables.forEach(t=>{
+      T[t.id]=[];
+      (store[t.id]||[]).forEach((r,i)=>{
+        const o={_i:i}; t.cols.forEach(c=>{ if(!c.calc) o[c.id]=num(r[c.id]); });
+        const complete=t.cols.filter(c=>!c.calc&&!c.optional).every(c=>o[c.id]!==null);
+        t.cols.filter(c=>c.calc).forEach(c=>{
+          const inp=box.querySelector('input[data-t="'+t.id+'"][data-r="'+i+'"][data-c="'+c.id+'"]'); const u=num(r[c.id]);
+          if(!complete){ if(inp) inp.style.borderColor=''; return; }
+          let e=null; try{ e=c.f(o,K); }catch(err){ e=null; } o[c.id]=e; o['your_'+c.id]=u;
+          if(u===null||e===null||!isFinite(e)){ if(inp) inp.style.borderColor=''; return; }
+          const ok=c.abs!==undefined?Math.abs(u-e)<=c.abs:close(u,e,c.tol||0.02); marks++; if(ok) good++;
+          inp.style.borderColor=ok?'#2E7D4F':'#C8322F'; inp.style.borderWidth='2px'; inp.title=ok?'صحيح':'القيمة المتوقعة نحو '+(+e.toPrecision(4));
+        });
+        if(complete) T[t.id].push(o);
+      });
+    });
+    let out; try{ out=cfg.analyze(T,K)||{}; }catch(err){ out={html:BADS('راجع مدخلاتك: '+err.message)}; }
+    const s=marks?'<b>أعمدتك المحسوبة:</b> '+good+' من '+marks+' صحيحة'+(good<marks?' — مرّر المؤشر فوق الخلية الحمراء (أو المسها) لترى القيمة المتوقعة.':' ✔')+'<br>':'';
+    res.innerHTML=s+(out.html||'');
+    if(cv){ const p=out.plot||{pts:[]}; drawPlot(cv,p.pts,Object.assign({},cfg.plot,p)); }
+  };
+  render(); if(cv) drawPlot(cv,[],cfg.plot);
+  return { addRow(tid,obj,replaceKey){ if(!store[tid]) store[tid]=[]; if(obj._row!==undefined){ const tt=cfg.tables.find(x=>x.id===tid); rowsOf(tt); store[tid][obj._row]=obj; render(); return; } if(replaceKey){ store[tid]=store[tid].filter(r=>r[replaceKey]!==obj[replaceKey]); } store[tid].push(obj); if(cfg.sortBy) store[tid].sort((a,b)=>a[cfg.sortBy]-b[cfg.sortBy]); render(); },
+           count(tid){return (store[tid]||[]).length;}, redraw(){ if(cv&&!res.querySelector('b')) drawPlot(cv,[],cfg.plot); } };
+}
+function okPct(u,t,lim,txt){ lim=lim||5; if(u===null||u===undefined) return ''; const d=pct(u,t); return d<=lim?OKS(txt+' ضمن '+lim+'% من قيمة أفضل خط'):BADS(txt+' يختلف بنسبة '+d.toFixed(1)+'% عن قيمة أفضل خط — راجع النقطتين اللتين قرأتهما على خطك'); }
+function addSimRow(dt,tid,obj,key){ dt.addRow(tid,obj,key); const b=document.querySelector('nav button[data-s="s4"]'); b.classList.add('flash'); setTimeout(()=>b.classList.remove('flash'),900); }
+</script>
+<script>
+buildQuiz([{"q": "يعتمد الزمن الدوري للبندول البسيط على:", "o": ["كتلة الثقل", "الطول L و g", "السعة فقط", "لون الخيط"], "a": 1, "e": "T = 2π√(L/g): على L و g فقط (للسعات الصغيرة)."}, {"q": "إذا أصبح طول البندول أربعة أمثاله فإن زمنه الدوري يصبح:", "o": ["4 أمثاله", "مثليه", "كما هو", "نصفه"], "a": 1, "e": "T ∝ √L و √4 = 2."}, {"q": "في منحنى T² (المحور y) مقابل L (المحور x) يساوي الميل:", "o": ["g", "4π²/g", "g/4π²", "√g"], "a": 1, "e": "T² = (4π²/g) L، فالميل 4π²/g و g = 4π²/الميل."}, {"q": "لماذا نوقّت 10 اهتزازات بدل واحدة؟", "o": ["لتسريع البندول", "لتقليل أثر زمن رد الفعل في T", "لأن الاهتزازة الأولى خاطئة", "لزيادة السعة"], "a": 1, "e": "خطأ رد الفعل يتوزع على 10 أزمنة دورية."}, {"q": "يُقاس طول البندول L من نقطة التعليق إلى:", "o": ["أعلى الثقل", "أسفل الثقل", "مركز الثقل", "الأرض"], "a": 2, "e": "يتصرف الثقل كأن كتلته مركزة في مركزه."}]);
+buildWhatIf([{"q": "ماذا يحدث للزمن الدوري إذا استُبدل الثقل النحاسي بثقل خشبي أخف له الحجم نفسه؟ ولماذا؟", "a": "لا يتغير؛ فالقوة المعيدة (Mg sin θ) والقصور الذاتي (M) يتناسبان كلاهما مع الكتلة فتختصر."}, {"q": "ماذا يحدث للزمن الدوري إذا أصبح الطول أربعة أمثاله؟", "a": "يتضاعف، لأن T ∝ √L و √4 = 2."}, {"q": "لماذا نوقّت 10 اهتزازات بدل اهتزازة واحدة؟", "a": "لأن خطأ زمن رد الفعل (نحو 0.2 s) يتوزع على 10 أزمنة دورية فيصبح خطأ T نحو 0.02 s."}, {"q": "كيف يتغير الزمن الدوري لو أُجريت التجربة على سطح القمر حيث g نحو سدس قيمتها على الأرض؟", "a": "يزداد بنحو √6 ≈ 2.5 مرة، ويصبح ميل منحنى T² – L أكبر بنحو 6 مرات."}]);
+
+const CFG={key:'exp2', sortBy:'L', intro:'صف لكل طول L (حتى مركز الثقل).',
+ tables:[{id:'P',title:'قراءات البندول',rows:6,cols:[{id:'L',label:'L (m)'},{id:'t1',label:'t₁ لـ 10 اهتزازات (s)'},{id:'t2',label:'t₂ لـ 10 اهتزازات (s)',optional:1},
+   {id:'T',label:'T (s)',calc:1,tol:0.01,f:o=>(o.t2===null?o.t1:(o.t1+o.t2)/2)/10},
+   {id:'T2',label:'T² (s²)',calc:1,tol:0.02,f:o=>((o.t2===null?o.t1:(o.t1+o.t2)/2)/10)**2}]}],
+ mine:[{id:'slope',label:'ميل خط T² – L الذي رسمته (s²/m)'},{id:'g',label:'g = 4π²/الميل (m/s²)'}],
+ plot:{xlabel:'L (m)', ylabel:'T² (s²)'},
+ analyze:(T,K)=>{
+  const P=T.P.map(o=>[o.L,o.T2]); const f=fitOrigin(P.map(p=>p[0]),P.map(p=>p[1]));
+  if(!f||P.length<3) return {html:'أدخل ثلاثة أطوال على الأقل.', plot:{pts:P}};
+  const g=4*Math.PI**2/f.m, dg=g*f.dm/f.m;
+  let s='<b>أفضل خط يمر بالأصل:</b> الميل = '+fmt(f.m,3)+' s²/m ← <b>g = '+fmt(g,2)+' ± '+fmt(dg,2)+' m/s²</b>؛ نسبة الخطأ عن 9.79 m/s² (الطائف) = '+fmt(pct(g,9.79),1)+'%<br>'+okPct(K.slope,f.m,5,'ميلك');
+  if(K.g!==null&&K.slope) s+='<br>'+(close(K.g,4*Math.PI**2/K.slope,0.01)?OKS('حسبت g من ميلك حسابًا صحيحًا'):BADS('4π²/'+K.slope+' = '+fmt(4*Math.PI**2/K.slope,2)+' m/s²'));
+  return {html:s, plot:{pts:P, fit:f, student:K.slope?{m:K.slope,b:0}:null}};
+ }};
+const G=9.79, D2R=Math.PI/180; const pc=$('pc'), g=pc.getContext('2d');
+let th0=8*D2R, th=0, running=false, last=null, tSim=0, cross=0, prevSide=0;
+const ell=$('ell'), amp=$('amp'), bob=$('bob');
+function Lm(){return (+ell.value+1.0)/100;}
+function trueT(){const a=+amp.value*D2R; return 2*Math.PI*Math.sqrt(Lm()/G)*(1+a*a/16+11*a**4/3072);}
+function upd(){ $('lv').textContent='ℓ = '+ell.value+' cm'; $('av').textContent=amp.value+'°'; $('warn').innerHTML=+amp.value>12?BADS('السعة كبيرة: التقريب sin θ ≈ θ لم يعد دقيقًا.'):''; }
+function drawP(){
+ const W=pc.width,H=pc.height,top=40,sx=W/2+30; g.clearRect(0,0,W,H); g.fillStyle='#FFFDF8'; g.fillRect(0,0,W,H);
+ g.fillStyle='#7A6552'; g.fillRect(sx-70,10,140,14); g.fillStyle='#C9A66B'; g.fillRect(sx-9,18,18,22);
+ const Lpx=40+(+ell.value)/120*480, scale=Lpx/((+ell.value+1)/100), bx=sx+Lpx*Math.sin(th), by=top+Lpx*Math.cos(th);
+ g.strokeStyle='#EADCC4'; g.setLineDash([5,5]); g.beginPath(); g.moveTo(sx,top); g.lineTo(sx,top+Lpx+30); g.stroke(); g.setLineDash([]);
+ g.strokeStyle='#3B2A1F'; g.lineWidth=1.5; g.beginPath(); g.moveTo(sx,top); g.lineTo(bx,by); g.stroke(); g.lineWidth=1;
+ const r=Math.max(7,0.01*scale), col=bob.value==='100'?'#8C96A8':bob.value==='20'?'#C9A66B':'#D4A13A';
+ g.fillStyle=col; g.beginPath(); g.arc(bx,by,r,0,2*Math.PI); g.fill(); g.strokeStyle='#3B2A1F'; g.stroke();
+ g.fillStyle='#B4532A'; g.beginPath(); g.moveTo(sx,top+Lpx+r+6); g.lineTo(sx-8,top+Lpx+r+22); g.lineTo(sx+8,top+Lpx+r+22); g.fill();
+ g.fillStyle='#7A6552'; g.font='13px Tahoma'; g.textAlign='right'; g.direction='rtl'; g.fillText('المؤشر (أدنى نقطة)',sx-14,top+Lpx+r+20); g.direction='ltr'; g.textAlign='left';
+ g.fillStyle='#F3DFB6'; g.fillRect(24,top,34,Lpx+20); g.strokeStyle='#8B5E34'; g.strokeRect(24,top,34,Lpx+20); g.fillStyle='#3B2A1F'; g.font='11px Tahoma';
+ const pxcm=Lpx/(+ell.value+1); for(let c=0;c<=+ell.value+1;c++){ const y=top+c*pxcm, l=c%10===0?14:(c%5===0?9:4); g.beginPath(); g.moveTo(58,y); g.lineTo(58-l,y); g.stroke(); if(c%10===0) g.fillText(String(c),27,y+4); }
+}
+function step(ts){ if(!running){last=null;return;} if(last===null) last=ts; const dt=Math.min(0.05,(ts-last)/1000); last=ts;
+ tSim+=dt; const ph=2*Math.PI*tSim/trueT(); th=th0*Math.exp(-tSim/400)*Math.cos(ph);
+ const side=Math.sign(Math.sin(ph)); if(prevSide!==0&&side!==prevSide) cross++; prevSide=side;
+ if($('cnt').checked) $('cntOut').textContent=' الاهتزازات منذ الإطلاق: '+Math.floor(cross/2);
+ drawP(); requestAnimationFrame(step); }
+$('go').onclick=()=>{th0=+amp.value*D2R; tSim=0; cross=0; prevSide=0; if(!running){running=true; requestAnimationFrame(step);} };
+$('stopP').onclick=()=>{running=false; th=0; drawP();};
+['ell','amp','bob'].forEach(id=>$(id).addEventListener('input',()=>{running=false; th=0; upd(); drawP();}));
+let swOn=false, swT0=0, swVal=0;
+function swTick(){ if(!swOn) return; swVal=(performance.now()-swT0)/1000; $('sw').textContent=swVal.toFixed(2)+' s'; requestAnimationFrame(swTick); }
+$('swBtn').onclick=()=>{ if(!swOn){swOn=true; swT0=performance.now()-swVal*1000; $('swBtn').textContent='أوقف'; swTick();} else {swOn=false; $('swBtn').textContent='ابدأ'; $('sw').textContent=swVal.toFixed(2)+' s';} };
+$('swRst').onclick=()=>{swOn=false; swVal=0; $('sw').textContent='0.00 s'; $('swBtn').textContent='ابدأ';};
+const rowsByL={};
+function addT(which){ if(swOn||swVal<1){alert('وقّت 10 اهتزازات بساعة الإيقاف أولًا (ابدأ ثم أوقف).');return;}
+ const tt=trueT()*10; if(Math.abs(swVal-tt)/tt>0.15 && !confirm('زمنك بعيد عن 10 اهتزازات لهذا البندول. هل تضيفه رغم ذلك؟')) return;
+ const L=+Lm().toFixed(3); const r=rowsByL[L]||{L:L}; r[which]=+swVal.toFixed(2); rowsByL[L]=r; addSimRow(SIMT,'P',Object.assign({},r),'L'); $('swRst').onclick(); }
+$('add').onclick=()=>addT('t1'); $('add2').onclick=()=>addT('t2');
+upd(); drawP(); window.onTab=()=>drawP();
+
+const SIMT=DataTable('simtab',CFG,'sim'); DataTable('real',CFG,'real');
+const _ot=window.onTab; window.onTab=s=>{ if(_ot) _ot(s); };
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html> 

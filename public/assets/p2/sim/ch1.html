@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Electric Fields – Virtual Lab (Physics 2, Unit 1)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--g:#1E8A4C;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--g:#5BD08E;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:70ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+#c4{touch-action:none;cursor:grab}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',Georgia,serif;font-size:1.1rem;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--b)}
+input[type=number]{font:inherit;width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--plot);color:var(--ink)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.readout span{display:block}
+.eq{font-family:'STIX Two Text',Georgia,serif;font-size:1.08rem}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+.hint{font-size:.85rem;color:var(--muted)}
+.hide{display:none!important}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Electric Fields Lab</h1><p>Physics 2 (Engineering &amp; Computing) – Unit 1: field of a continuous charge distribution, electric field lines, and motion of a charged particle in a uniform field. Change the values, watch the result, use the example buttons to check your solutions, then answer the question under each experiment.</p></header>
+<nav class="tabs" role="tablist" aria-label="Experiments">
+<button role="tab" aria-selected="true" data-t="t1">1 · Charged rod</button>
+<button role="tab" aria-selected="false" data-t="t2">2 · Charged ring</button>
+<button role="tab" aria-selected="false" data-t="t3">3 · Charged disk</button>
+<button role="tab" aria-selected="false" data-t="t4">4 · Field lines</button>
+<button role="tab" aria-selected="false" data-t="t5">5 · Particle in a uniform field</button>
+</nav>
+
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="A charged rod divided into elements, and the field each element produces at point P"></canvas><div class="ctrl">
+<label><span>Total charge Q (μC)</span> <b id="o1q"></b></label><input id="i1q" type="range" min="-50" max="50" step="0.5" value="22">
+<label><span>Rod length L (cm)</span> <b id="o1L"></b></label><input id="i1L" type="range" min="2" max="40" step="0.5" value="14">
+<label><span>Distance of P from rod centre d (cm)</span> <b id="o1d"></b></label><input id="i1d" type="range" min="1" max="100" step="0.5" value="36">
+<label><span>Number of elements N</span> <b id="o1n"></b></label><input id="i1n" type="range" min="1" max="60" step="1" value="8">
+<div class="row"><button class="btn" type="button" id="p1">Exercise values (22 μC, 14 cm, 36 cm)</button></div>
+<div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span><span id="r1d"></span></div>
+<div class="task"><h3>Question</h3>Increase N from 1 to 60. Why does the sum of the elements approach the exact integral? Now make d much larger than L: which simple formula does E approach, and why?</div></div></section>
+
+<section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="A charged ring, the fields of two opposite elements at P, and a graph of E against x"></canvas><div class="ctrl">
+<label><span>Total charge Q (μC)</span> <b id="o2q"></b></label><input id="i2q" type="range" min="-100" max="100" step="1" value="75">
+<label><span>Ring radius a (cm)</span> <b id="o2a"></b></label><input id="i2a" type="range" min="2" max="30" step="0.5" value="10">
+<label><span>Distance on the axis x (cm)</span> <b id="o2x"></b></label><input id="i2x" type="range" min="0" max="120" step="0.5" value="30">
+<div class="row"><button class="btn" type="button" data-x2="1">x = 1 cm</button><button class="btn" type="button" data-x2="5">5 cm</button><button class="btn" type="button" data-x2="30">30 cm</button><button class="btn" type="button" data-x2="100">100 cm</button></div>
+<div class="row"><button class="btn" type="button" id="p2">Exercise values (75 μC, 10 cm)</button><button class="btn" type="button" id="p2m">Go to the maximum</button></div>
+<div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span id="r2c"></span></div>
+<div class="task"><h3>Question</h3>Why is the field zero at the centre of the ring (x = 0)? It is also nearly zero far away, so where must it be largest? Check with the button.</div></div></section>
+
+<section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="A charged disk and a log-log graph comparing its field with an infinite plane and a point charge"></canvas><div class="ctrl">
+<label><span>Surface density σ (×10⁻³ C/m²)</span> <b id="o3s"></b></label><input id="i3s" type="range" min="0.5" max="10" step="0.1" value="7.9">
+<label><span>Disk radius R (cm)</span> <b id="o3R"></b></label><input id="i3R" type="range" min="5" max="50" step="0.5" value="35">
+<label><span>Distance on the axis x (cm)</span> <b id="o3x"></b></label><input id="i3x" type="range" min="0.5" max="250" step="0.5" value="5">
+<div class="row"><button class="btn" type="button" data-x3="5">x = 5 cm</button><button class="btn" type="button" data-x3="10">10 cm</button><button class="btn" type="button" data-x3="50">50 cm</button><button class="btn" type="button" data-x3="200">200 cm</button></div>
+<div class="row"><button class="btn" type="button" id="p3">Homework values (σ = 7.90×10⁻³, R = 35 cm)</button></div>
+<div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span class="eq" id="r3c"></span></div>
+<div class="task"><h3>Question</h3>Close to the disk its field equals that of an infinite plane; far away it equals that of a point charge. Find, on the graph, roughly the value of x/R where each approximation stops being good (within 10%).</div></div></section>
+
+<section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="Electric field lines of point charges that can be dragged"></canvas><div class="ctrl">
+<div class="row"><button class="btn" type="button" data-pre="single">+q</button><button class="btn" type="button" data-pre="neg">−q</button><button class="btn" type="button" data-pre="dipole">Dipole</button><button class="btn" type="button" data-pre="like">Two +q</button><button class="btn" type="button" data-pre="unequal">+2q and −q</button></div>
+<div class="row"><button class="btn" type="button" id="add4p">Add +q</button><button class="btn" type="button" id="add4n">Add −q</button><button class="btn" type="button" id="del4">Remove selected</button></div>
+<label><span>Selected charge (units of q)</span> <b id="o4q"></b></label><input id="i4q" type="range" min="-4" max="4" step="1" value="1">
+<p class="hint">Drag a charge to move it; tap a charge to select it. The number of lines leaving or entering a charge is proportional to its charge (8 lines per q).</p>
+<div class="readout"><span id="r4a"></span><span id="r4b"></span></div>
+<div class="task"><h3>Question</h3>Choose “+2q and −q”. How many lines leave +2q, and how many of them end on −q? Where do the rest go? Why do two field lines never cross?</div></div></section>
+
+<section class="lab" id="t5" role="tabpanel"><canvas id="c5" width="1200" height="600" aria-label="A charged particle accelerated or deflected by a uniform electric field"></canvas><div class="ctrl">
+<div class="row"><button class="btn" type="button" data-md="a" aria-pressed="true">Released from rest</button><button class="btn" type="button" data-md="b" aria-pressed="false">Enters between plates</button></div>
+<div class="row"><button class="btn" type="button" data-pt="e" aria-pressed="true">Electron</button><button class="btn" type="button" data-pt="p" aria-pressed="false">Proton</button></div>
+<label><span>Field E (N/C)</span> <b id="o5e"></b></label><input id="i5e" type="range" min="10" max="2000" step="10" value="520">
+<div id="mA" class="ctrl"><label><span>Time after release t (ns)</span></label><input id="i5t" type="number" min="0" step="any" value="48">
+<div class="row"><button class="btn" type="button" id="play5">▶ Play</button><button class="btn" type="button" id="p5a">Exercise 1 (520 N/C, 48 ns)</button><button class="btn" type="button" id="p5b">Exercise 2 (proton, 640 N/C, v = 1.20×10⁶ m/s)</button></div></div>
+<div id="mB" class="ctrl hide">
+<label><span>Entry speed vᵢ (×10⁶ m/s)</span> <b id="o5v"></b></label><input id="i5v" type="range" min="0.5" max="10" step="0.1" value="3">
+<label><span>Plate length ℓ (cm)</span> <b id="o5l"></b></label><input id="i5l" type="range" min="1" max="20" step="0.5" value="10">
+<label><span>Plate separation (cm)</span> <b id="o5g"></b></label><input id="i5g" type="range" min="1" max="10" step="0.5" value="5">
+<div class="row"><button class="btn" type="button" id="p5c">Textbook example (e⁻, 200 N/C, 3×10⁶ m/s, 10 cm)</button></div></div>
+<div class="readout"><span class="eq" id="r5a"></span><span class="eq" id="r5b"></span><span class="eq" id="r5c"></span><span class="eq" id="r5d"></span></div>
+<div class="task"><h3>Question</h3><span id="q5">An electron and a proton are released in the same field. Which one gains more speed in 48 ns, and by what factor? Which one gains more kinetic energy?</span></div></div></section>
+
+<footer>Prof. Najm Al-Hosiny – Physics 2 (Engineering &amp; Computing) 203207-4, Unit 1: Electric Fields. Works on any phone or computer; nothing to install. k = 8.99×10⁹ N·m²/C².</footer>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+function text(g,s,x,y,col,al,sz,bold){g.font=(bold?'700 ':'')+(sz||24)+'px Inter, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction='ltr';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w,d){if(Math.hypot(x1-x0,y1-y0)<3)return;seg(g,x0,y0,x1,y1,col,w,d);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3.2);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const sup={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const sci=(v,d=2)=>{if(!isFinite(v))return '—';if(v===0)return '0';const e=Math.floor(Math.log10(Math.abs(v))+1e-12);if(e>=-2&&e<4)return v.toFixed(Math.max(0,d-e));return (v/Math.pow(10,e)).toFixed(d)+'×10'+String(e).split('').map(c=>sup[c]).join('');};
+function chg(g,x,y,q,r,sel){dot(g,x,y,r||14,q>0?css('--r'):(q<0?css('--b'):css('--muted')));text(g,q>0?'+':(q<0?'−':'0'),x,y+8,'#fff','center',22,true);if(sel){g.strokeStyle=css('--o');g.lineWidth=3;g.beginPath();g.arc(x,y,(r||14)+6,0,7);g.stroke();}}
+function axes(g,x0,y0,x1,y1){seg(g,x0,y1,x1,y1,css('--muted'),2);seg(g,x0,y0,x0,y1,css('--muted'),2);}
+const ke=8.99e9,PI=Math.PI;
+
+/* ---------- 1. Charged rod ---------- */
+$('p1').onclick=()=>{$('i1q').value=22;$('i1L').value=14;$('i1d').value=36;};
+function lab1(){const g=ctx('c1');const Qu=sl('i1q','o1q',v=>v.toFixed(1)),Lc=sl('i1L','o1L',v=>v.toFixed(1)),N=sl('i1n','o1n');
+ let dc=+$('i1d').value;if(dc<Lc/2+0.5){dc=Lc/2+0.5;}$('o1d').textContent=dc.toFixed(1);
+ const Q=Qu*1e-6,L=Lc/100,d=dc/100,Eex=ke*Q/(d*d-L*L/4),Ept=ke*Q/(d*d);
+ let parts=[],Es=0;for(let i=0;i<N;i++){const xi=-L/2+(i+.5)*L/N,dE=ke*(Q/N)/((d-xi)**2);parts.push(dE);Es+=dE;}
+ $('r1a').textContent='Exact: E = kQ / [d² − (L/2)²] = '+sci(Math.abs(Eex))+' N/C';
+ $('r1b').textContent='Sum of '+N+' elements: '+sci(Math.abs(Es))+' N/C (error '+(Math.abs(Es-Eex)/Math.abs(Eex||1)*100).toFixed(2)+'%)';
+ $('r1c').textContent='Point charge kQ/d² = '+sci(Math.abs(Ept))+' N/C';
+ $('r1d').textContent=Q===0?'No charge, no field.':(Q>0?'Direction: along +x, away from the rod.':'Direction: along −x, toward the rod.');
+ const sc=760/(d+L/2),X=v=>110+(v+L/2)*sc,yR=260,cP=X(d);
+ seg(g,40,yR,1160,yR,css('--muted'),1.5,[5,6]);
+ const hi=reduce?0:Math.floor(T*1.6)%N;
+ for(let i=0;i<N;i++){const x0=X(-L/2+i*L/N),x1=X(-L/2+(i+1)*L/N),hue=200+160*i/Math.max(1,N-1);g.fillStyle='hsl('+hue+',65%,'+(i===hi?'45%':'62%')+')';g.fillRect(x0,yR-14,x1-x0,28);g.strokeStyle=css('--panel');g.lineWidth=N>30?0.5:1.5;g.strokeRect(x0,yR-14,x1-x0,28);}
+ text(g,(Q>=0?'+':'−')+' rod, λ = Q/L',X(0),yR-30,css('--ink'),'center',22);
+ dot(g,cP,yR,8,css('--ink'));text(g,'P',cP,yR-22,css('--ink'),'center',24,true);
+ const xh=-L/2+(hi+.5)*L/N;seg(g,X(xh),yR+20,X(xh),yR+70,css('--o'),2);seg(g,X(xh),yR+70,cP,yR+70,css('--o'),2,[6,5]);seg(g,cP,yR+20,cP,yR+70,css('--o'),2);
+ text(g,'r = d − x',(X(xh)+cP)/2,yR+98,css('--o'),'center',20);text(g,'dq = λ dx',X(xh),yR+128,css('--o'),'center',20);
+ const tot=Math.abs(Es)||1,len=Math.min(320,1180-cP-10),s=Q>=0?1:-1;let xs=cP;
+ if(Q!==0)for(let i=0;i<N;i++){const l=Math.abs(parts[i])/tot*len,hue=200+160*i/Math.max(1,N-1);g.strokeStyle='hsl('+hue+',65%,'+(i===hi?'40%':'55%')+')';g.lineWidth=i===hi?16:10;g.beginPath();g.moveTo(xs,yR-60);g.lineTo(xs+s*l,yR-60);g.stroke();xs+=s*l;}
+ if(Q!==0){arrow(g,cP,yR-90,cP+s*len,yR-90,css('--ink'),3);text(g,'E (each colour = one element dE)',cP+s*len/2,yR-108,css('--ink'),'center',18);}
+ seg(g,X(0),yR+170,cP,yR+170,css('--muted'),1.5);seg(g,X(0),yR+160,X(0),yR+180,css('--muted'),2);seg(g,cP,yR+160,cP,yR+180,css('--muted'),2);text(g,'d',(X(0)+cP)/2,yR+200,css('--muted'),'center',22);
+ seg(g,X(-L/2),yR+230,X(L/2),yR+230,css('--muted'),1.5);text(g,'L',X(0),yR+262,css('--muted'),'center',22);
+ text(g,'Nearer elements contribute more (dE ∝ 1/r²)',1180,40,css('--muted'),'right',20);}
+
+/* ---------- 2. Charged ring ---------- */
+document.querySelectorAll('[data-x2]').forEach(b=>b.onclick=()=>{$('i2x').value=b.dataset.x2;});
+$('p2').onclick=()=>{$('i2q').value=75;$('i2a').value=10;};
+$('p2m').onclick=()=>{$('i2x').value=(+$('i2a').value/Math.SQRT2).toFixed(1);};
+function lab2(){const g=ctx('c2');const Qu=sl('i2q','o2q',v=>v.toFixed(0)),ac=sl('i2a','o2a',v=>v.toFixed(1)),xc=sl('i2x','o2x',v=>v.toFixed(1));
+ const Q=Qu*1e-6,a=ac/100,x=xc/100,E=ke*Q*x/((x*x+a*a)**1.5),xm=a/Math.SQRT2,Em=ke*Q*xm/((xm*xm+a*a)**1.5);
+ $('r2a').textContent='E = kQx / (x² + a²)^(3/2) = '+sci(Math.abs(E))+' N/C';
+ $('r2b').textContent='Maximum at x = a/√2 = '+(ac/Math.SQRT2).toFixed(2)+' cm: E = '+sci(Math.abs(Em))+' N/C';
+ $('r2c').textContent=E===0?(xc===0?'At the centre all contributions cancel: E = 0.':'No charge.'):(Q>0?'Direction: along the axis, away from the ring.':'Direction: along the axis, toward the ring.');
+ // diagram
+ const cx=170,cy=300,s=150/a,k=0.38,xpx=Math.min(x*s,330),P=[cx+xpx,cy];
+ seg(g,30,cy,640,cy,css('--muted'),1.5,[5,6]);
+ g.strokeStyle=Q>=0?css('--r'):css('--b');g.lineWidth=7;g.beginPath();g.ellipse(cx,cy,k*150,150,0,0,7);g.stroke();
+ text(g,'a',cx+10,cy-75,css('--muted'),'left',22);seg(g,cx,cy,cx,cy-150,css('--muted'),1.5,[4,4]);
+ dot(g,P[0],P[1],7,css('--ink'));text(g,'P',P[0],P[1]+36,css('--ink'),'center',24,true);
+ if(x*s>330)text(g,'(P drawn closer than scale)',P[0],P[1]+62,css('--muted'),'center',16);
+ const phi=reduce?1:T*0.8,sg=Q>=0?1:-1;let sx=0,sy=0;
+ [phi,phi+PI].forEach((p,j)=>{const yy=a*Math.cos(p),zz=a*Math.sin(p),ex=[cx+zz*s*k,cy-yy*s];const r=Math.hypot(x,a)||1e-9,u=[x/r,-yy/r,-zz/r];
+  dot(g,ex[0],ex[1],9,css('--o'));text(g,'dq',ex[0]+(j?-14:14),ex[1]+(yy>0?-14:28),css('--o'),j?'right':'left',18);
+  seg(g,ex[0],ex[1],P[0],P[1],css('--o'),1,[3,5]);
+  if(x>0){const L0=Math.min(120,(660-P[0])/2)*sg,vx=(u[0]+u[2]*k)*L0,vy=-u[1]*L0;arrow(g,P[0],P[1],P[0]+vx,P[1]+vy,css('--o'),3);sx+=vx;sy+=vy;
+   seg(g,P[0]+vx,P[1]+vy,P[0]+u[0]*L0,P[1],css('--muted'),1.2,[4,4]);}});
+ if(x>0){arrow(g,P[0],P[1],P[0]+sx,P[1],css('--ink'),5);text(g,'dE₁ + dE₂',P[0]+sx/2,P[1]+30,css('--ink'),'center',18);text(g,'perpendicular parts cancel',330,560,css('--muted'),'center',18);}
+ // plot
+ const X0=700,Y0=60,X1=1170,Y1=520,xmax=Math.max(4*a,x*1.15),f=t=>Math.abs(ke*Q*t/((t*t+a*a)**1.5)),ymax=Math.abs(Em)*1.15||1;
+ axes(g,X0,Y0,X1,Y1);const px=t=>X0+t/xmax*(X1-X0),py=v=>Y1-v/ymax*(Y1-Y0);
+ g.strokeStyle=css('--b');g.lineWidth=3;g.beginPath();for(let i=0;i<=300;i++){const t=xmax*i/300;i?g.lineTo(px(t),py(f(t))):g.moveTo(px(t),py(f(t)));}g.stroke();
+ seg(g,px(xm),Y0,px(xm),Y1,css('--g'),1.5,[6,6]);text(g,'a/√2',px(xm),Y1+26,css('--g'),'center',18);
+ dot(g,px(x),py(Math.abs(E)),8,css('--o'));text(g,'|E|',X0+8,Y0-14,css('--ink'),'left',20);text(g,'x',X1,Y1+26,css('--ink'),'right',20);text(g,xmax*100>=10?(xmax*100).toFixed(0)+' cm':(xmax*100).toFixed(1)+' cm',X1,Y1+50,css('--muted'),'right',16);}
+
+/* ---------- 3. Charged disk ---------- */
+document.querySelectorAll('[data-x3]').forEach(b=>b.onclick=()=>{$('i3x').value=b.dataset.x3;});
+$('p3').onclick=()=>{$('i3s').value=7.9;$('i3R').value=35;};
+function lab3(){const g=ctx('c3');const su=sl('i3s','o3s',v=>v.toFixed(2)),Rc=sl('i3R','o3R',v=>v.toFixed(1)),xc=sl('i3x','o3x',v=>v.toFixed(1));
+ const sg=su*1e-3,R=Rc/100,x=xc/100,Ep=2*PI*ke*sg,Ed=Ep*(1-x/Math.sqrt(x*x+R*R)),Q=sg*PI*R*R,Eq=ke*Q/(x*x);
+ $('r3a').textContent='Disk: E = 2πkσ[1 − x/√(x²+R²)] = '+sci(Ed)+' N/C';
+ $('r3b').textContent='Infinite plane: σ/2ε₀ = '+sci(Ep)+' N/C ('+((Ep/Ed-1)*100).toFixed(1)+'% off)';
+ $('r3c').textContent='Point charge Q = σπR²: kQ/x² = '+sci(Eq)+' N/C ('+((Eq/Ed-1)*100).toFixed(1)+'% off)';
+ const cx=150,cy=300,k=0.38,rp=140;g.fillStyle=css('--fill');g.beginPath();g.ellipse(cx,cy,k*rp,rp,0,0,7);g.fill();
+ for(let i=1;i<=6;i++){g.strokeStyle=i===4?css('--o'):css('--r');g.lineWidth=i===4?3:1.2;g.beginPath();g.ellipse(cx,cy,k*rp*i/6,rp*i/6,0,0,7);g.stroke();}
+ text(g,'one ring',cx+20,cy-rp*4/6-10,css('--o'),'left',16);
+ seg(g,30,cy,620,cy,css('--muted'),1.5,[5,6]);const xp=cx+Math.min(x/R*rp,440);dot(g,xp,cy,7,css('--ink'));text(g,'P',xp,cy+34,css('--ink'),'center',24,true);
+ arrow(g,xp,cy,xp+70,cy,css('--ink'),4);text(g,'E',xp+72,cy-14,css('--ink'),'center',22,true);text(g,'R',cx-k*rp-10,cy-rp/2,css('--muted'),'right',22);seg(g,cx,cy,cx,cy-rp,css('--muted'),1.5,[4,4]);
+ // log-log plot of E/Eplane vs x/R
+ const X0=680,Y0=50,X1=1170,Y1=510,lx0=-2,lx1=2,ly0=-5,ly1=1,px=l=>X0+(l-lx0)/(lx1-lx0)*(X1-X0),py=l=>Y1-(l-ly0)/(ly1-ly0)*(Y1-Y0);
+ g.strokeStyle=css('--grid');g.lineWidth=1;for(let i=lx0;i<=lx1;i++){seg(g,px(i),Y0,px(i),Y1,css('--grid'),1);text(g,'10'+String(i).split('').map(c=>sup[c]).join(''),px(i),Y1+24,css('--muted'),'center',16);}
+ for(let j=ly0;j<=ly1;j++){seg(g,X0,py(j),X1,py(j),css('--grid'),1);text(g,'10'+String(j).split('').map(c=>sup[c]).join(''),X0-8,py(j)+6,css('--muted'),'right',16);}
+ axes(g,X0,Y0,X1,Y1);
+ const curve=(fn,col,w,d)=>{g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();let st=false;for(let i=0;i<=300;i++){const l=lx0+(lx1-lx0)*i/300,u=Math.pow(10,l),v=fn(u);if(!(v>0)){st=false;continue;}const lv=Math.log10(v);if(lv>ly1+0.3){st=false;continue;}st?g.lineTo(px(l),py(lv)):g.moveTo(px(l),py(lv));st=true;}g.stroke();g.setLineDash([]);};
+ g.save();g.beginPath();g.rect(X0,Y0,X1-X0,Y1-Y0);g.clip();
+ curve(u=>1,css('--g'),2.5,[10,6]);curve(u=>1/(2*u*u),css('--r'),2.5,[3,5]);curve(u=>1-u/Math.sqrt(u*u+1),css('--b'),3.5);
+ const u0=x/R;dot(g,px(Math.log10(u0)),py(Math.log10(Ed/Ep)),8,css('--o'));g.restore();
+ text(g,'E / (σ/2ε₀)',X0+6,Y0-16,css('--ink'),'left',18);text(g,'x / R',X1,Y1+48,css('--ink'),'right',18);
+ text(g,'— disk',X0+16,Y1-84,css('--b'),'left',18,true);text(g,'– – infinite plane',X0+16,Y1-58,css('--g'),'left',18);text(g,'··· point charge',X0+16,Y1-32,css('--r'),'left',18);}
+
+/* ---------- 4. Field lines ---------- */
+const cv4=$('c4');let Q4=[],sel=0,lines=[],dirty=true,drag=-1;
+const pres={single:[[600,300,1]],neg:[[600,300,-1]],dipole:[[450,300,1],[750,300,-1]],like:[[450,300,1],[750,300,1]],unequal:[[470,300,2],[730,300,-1]]};
+function setPre(n){Q4=pres[n].map(c=>({x:c[0],y:c[1],q:c[2]}));sel=0;$('i4q').value=Q4[0].q;dirty=true;}
+document.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>setPre(b.dataset.pre));setPre('dipole');
+$('add4p').onclick=()=>{Q4.push({x:300+Math.random()*600,y:150+Math.random()*300,q:1});sel=Q4.length-1;$('i4q').value=1;dirty=true;};
+$('add4n').onclick=()=>{Q4.push({x:300+Math.random()*600,y:150+Math.random()*300,q:-1});sel=Q4.length-1;$('i4q').value=-1;dirty=true;};
+$('del4').onclick=()=>{if(Q4.length>1){Q4.splice(sel,1);sel=0;$('i4q').value=Q4[0].q;dirty=true;}};
+$('i4q').oninput=()=>{if(Q4[sel]){Q4[sel].q=+$('i4q').value;dirty=true;}};
+const cpos=e=>{const r=cv4.getBoundingClientRect();return [(e.clientX-r.left)*1200/r.width,(e.clientY-r.top)*600/r.height];};
+cv4.addEventListener('pointerdown',e=>{const [x,y]=cpos(e);let best=-1,bd=40;Q4.forEach((c,i)=>{const dd=Math.hypot(c.x-x,c.y-y);if(dd<bd){bd=dd;best=i;}});if(best>=0){drag=best;sel=best;$('i4q').value=Q4[best].q;cv4.setPointerCapture(e.pointerId);cv4.style.cursor='grabbing';}});
+cv4.addEventListener('pointermove',e=>{if(drag<0)return;const [x,y]=cpos(e);Q4[drag].x=Math.max(20,Math.min(1180,x));Q4[drag].y=Math.max(20,Math.min(580,y));dirty=true;});
+const up=()=>{drag=-1;cv4.style.cursor='grab';};cv4.addEventListener('pointerup',up);cv4.addEventListener('pointercancel',up);
+function field(x,y){let ex=0,ey=0;for(const c of Q4){const dx=x-c.x,dy=y-c.y,r2=dx*dx+dy*dy,r=Math.sqrt(r2)+1e-9;ex+=c.q*dx/(r2*r);ey+=c.q*dy/(r2*r);}return [ex,ey];}
+function trace(x,y,sgn,startQ){const pts=[[x,y]];for(let n=0;n<1600;n++){const [ex,ey]=field(x,y),m=Math.hypot(ex,ey);if(m===0)break;x+=sgn*4*ex/m;y+=sgn*4*ey/m;pts.push([x,y]);
+  if(x<-300||x>1500||y<-300||y>900)return {pts,end:null};for(const c of Q4){if(c!==startQ&&c.q!==0&&Math.hypot(x-c.x,y-c.y)<12)return {pts,end:c};}}return {pts,end:null};}
+function build(){lines=[];for(const c of Q4){if(c.q===0)continue;const n=8*Math.abs(c.q),sgn=c.q>0?1:-1;for(let i=0;i<n;i++){const an=2*PI*(i+.5)/n;const t=trace(c.x+16*Math.cos(an),c.y+16*Math.sin(an),sgn,c);
+  if(sgn<0&&t.end&&t.end.q>0)continue;lines.push(sgn>0?t.pts:t.pts.reverse());}}dirty=false;
+ const pos=Q4.filter(c=>c.q>0).reduce((s,c)=>s+c.q,0),neg=Q4.filter(c=>c.q<0).reduce((s,c)=>s-c.q,0);
+ $('r4a').textContent='Lines out of positive charges: '+8*pos+' · into negative charges: '+8*neg;
+ $('r4b').textContent=pos===neg?'Net charge 0: every line that leaves a + charge ends on a − charge.':(pos>neg?(8*(pos-neg))+' lines go off to infinity (net charge +'+(pos-neg)+'q).':(8*(neg-pos))+' lines come in from infinity (net charge −'+(neg-pos)+'q).');}
+function lab4(){const g=ctx('c4');$('o4q').textContent=Q4[sel]?((Q4[sel].q>0?'+':'')+Q4[sel].q+' q'):'';if(dirty)build();
+ g.strokeStyle=css('--ink');g.lineWidth=1.6;for(const p of lines){g.beginPath();g.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)g.lineTo(p[i][0],p[i][1]);g.stroke();
+  const m=Math.min(p.length-2,Math.max(1,Math.floor(p.length*0.35)));if(p.length>4){const a=p[m],b=p[m+1];const an=Math.atan2(b[1]-a[1],b[0]-a[0]);g.fillStyle=css('--o');g.beginPath();g.moveTo(a[0]+9*Math.cos(an),a[1]+9*Math.sin(an));g.lineTo(a[0]-7*Math.cos(an-.5),a[1]-7*Math.sin(an-.5));g.lineTo(a[0]-7*Math.cos(an+.5),a[1]-7*Math.sin(an+.5));g.closePath();g.fill();}}
+ Q4.forEach((c,i)=>chg(g,c.x,c.y,c.q,18+3*Math.abs(c.q),i===sel));text(g,'Drag the charges',1180,585,css('--muted'),'right',18);}
+
+/* ---------- 5. Particle in a uniform field ---------- */
+let pt='e',md='a',playStart=-1;
+document.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>{pt=b.dataset.pt;document.querySelectorAll('[data-pt]').forEach(x=>x.setAttribute('aria-pressed',x===b));});
+function setMode(m){md=m;document.querySelectorAll('[data-md]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.md===m));$('mA').classList.toggle('hide',m!=='a');$('mB').classList.toggle('hide',m!=='b');
+ $('q5').textContent=m==='a'?'An electron and a proton are released in the same field. Which one gains more speed in 48 ns, and by what factor? Which one gains more kinetic energy?':'Reduce the entry speed until the electron hits the plate. Why does halving vᵢ make the deflection four times larger?';}
+document.querySelectorAll('[data-md]').forEach(b=>b.onclick=()=>setMode(b.dataset.md));
+const setP=p=>{pt=p;document.querySelectorAll('[data-pt]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pt===p));};
+$('p5a').onclick=()=>{setMode('a');$('i5e').value=520;$('i5t').value=48;playStart=-1;};
+$('p5b').onclick=()=>{setMode('a');setP('p');$('i5e').value=640;$('i5t').value=(1.2e6*1.67e-27/(1.6e-19*640)*1e9).toFixed(0);playStart=-1;};
+$('p5c').onclick=()=>{setMode('b');setP('e');$('i5e').value=200;$('i5v').value=3;$('i5l').value=10;};
+$('play5').onclick=()=>{playStart=performance.now();};
+function lab5(now){const g=ctx('c5');const E=sl('i5e','o5e'),q=pt==='e'?-1.6e-19:1.6e-19,m=pt==='e'?9.11e-31:1.67e-27,a=Math.abs(q)*E/m,name=pt==='e'?'electron':'proton',pc=pt==='e'?css('--b'):css('--r');
+ if(md==='a'){const tf=Math.max(0,+$('i5t').value||0)*1e-9;let fr=1;if(playStart>=0){fr=Math.min(1,(now-playStart)/2500);if(fr>=1)playStart=-1;}
+  const t=tf*fr,v=a*t,dx=0.5*a*t*t,K=0.5*m*v*v,D=0.5*a*tf*tf||1;
+  $('r5a').textContent='a = |q|E/m = '+sci(a)+' m/s²';$('r5b').textContent='v = at = '+sci(v)+' m/s';$('r5c').textContent='Δx = ½at² = '+sci(dx)+' m';$('r5d').textContent='K = ½mv² = '+sci(K)+' J';
+  // field region: + plate left, − plate right, E to the right
+  g.fillStyle=css('--r');g.fillRect(60,120,16,360);g.fillStyle=css('--b');g.fillRect(1124,120,16,360);text(g,'+',68,105,css('--r'),'center',30,true);text(g,'−',1132,105,css('--b'),'center',30,true);
+  for(let yy=160;yy<=440;yy+=70)arrow(g,110,yy,190,yy,css('--muted'),2);text(g,'E',150,520,css('--muted'),'center',24,true);
+  const x0=pt==='e'?1090:110,dir=pt==='e'?-1:1,X=s=>x0+dir*s/D*960;
+  for(let i=1;i<=8;i++){const ti=tf*fr*i/8;if(ti<=0)break;dot(g,X(0.5*a*ti*ti),300,4,css('--muted'));}
+  text(g,'dots: equal time steps — spacing grows (constant acceleration)',600,580,css('--muted'),'center',18);
+  dot(g,X(dx),300,14,pc);text(g,pt==='e'?'e⁻':'p⁺',X(dx),266,pc,'center',22,true);if(v>0){const xa=Math.max(95,Math.min(1105,X(dx)+dir*Math.min(160,40+fr*120)));arrow(g,X(dx),300,xa,300,css('--o'),4);}
+  text(g,'start (at rest)',x0+(pt==='e'?10:-10),360,css('--muted'),pt==='e'?'right':'left',18);text(g,'full width = '+sci(D)+' m',600,40,css('--muted'),'center',18);text(g,'The '+name+' moves '+(pt==='e'?'opposite to E':'along E'),600,70,css('--ink'),'center',20);
+ } else {const vi=sl('i5v','o5v',v=>v.toFixed(1))*1e6,l=sl('i5l','o5l',v=>v.toFixed(1))/100,gap=sl('i5g','o5g',v=>v.toFixed(1))/100;
+  const tt=l/vi,y=0.5*a*tt*tt,vy=a*tt,hit=y>gap/2,th=Math.atan2(vy,vi)*180/PI;let xh=l;if(hit){xh=vi*Math.sqrt(gap/a);}
+  $('r5a').textContent='a = |q|E/m = '+sci(a)+' m/s²';$('r5b').textContent='t = ℓ/vᵢ = '+sci(tt)+' s';
+  $('r5c').textContent=hit?'Hits the plate at x = '+sci(xh*100)+' cm':'Deflection y = ½at² = '+sci(y*100)+' cm';
+  $('r5d').textContent=hit?'(the gap is only '+(gap*100).toFixed(1)+' cm)':'Exit angle = '+th.toFixed(1)+'° below/above the axis';
+  const X0=200,X1=1000,Yt=110,Yb=490,cy=300,sx=(X1-X0)/l,sy=(Yb-Yt)/gap,up=pt==='e'?-1:1; // + plate top, E downward; electron goes up
+  g.fillStyle=css('--r');g.fillRect(X0,Yt-14,X1-X0,14);g.fillStyle=css('--b');g.fillRect(X0,Yb,X1-X0,14);
+  text(g,'+ + + + + + + + +',600,Yt-24,css('--r'),'center',22);text(g,'− − − − − − − − −',600,Yb+44,css('--b'),'center',22);
+  for(let xx=260;xx<=940;xx+=170)arrow(g,xx,160,xx,230,css('--muted'),2);text(g,'E',X1+40,200,css('--muted'),'center',24,true);
+  seg(g,40,cy,X0,cy,css('--o'),3);g.strokeStyle=css('--o');g.lineWidth=3;g.beginPath();g.moveTo(X0,cy);const xe=hit?xh:l;
+  for(let i=1;i<=200;i++){const xx=xe*i/200,tc=xx/vi,yy=0.5*a*tc*tc;g.lineTo(X0+xx*sx,cy+up*yy*sy);}g.stroke();
+  if(!hit){const ye=cy+up*y*sy;g.setLineDash([8,6]);g.beginPath();g.moveTo(X1,ye);g.lineTo(1180,ye+up*(vy/vi)*(sy/sx)*180);g.stroke();g.setLineDash([]);}
+  const f=reduce?1:(T*0.5)%1,xx=xe*f,tc=xx/vi;dot(g,X0+xx*sx,cy+up*0.5*a*tc*tc*sy,11,pc);
+  text(g,'Vertical scale ≠ horizontal scale',1180,585,css('--muted'),'right',18);}}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4,t5:lab5};
+function loop(t){T=reduce?0:t/1000;const f=LABS[active];if(f)f(t);requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

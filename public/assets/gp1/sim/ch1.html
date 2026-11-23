@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل المتجهات</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل المتجهات</h1><p>فيزياء عامة 1 – الفصل الأول. غيّر القيم وراقب النتيجة، واستخدم أزرار الأمثلة للتحقق من حلولك.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">الإحداثيات القطبية</button><button role="tab" aria-selected="false" data-t="t2">الجمع بالرسم</button><button role="tab" aria-selected="false" data-t="t3">المركبات</button><button role="tab" aria-selected="false" data-t="t4">الجمع بالمركبات</button><button role="tab" aria-selected="false" data-t="t5">الضرب في عدد</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="نقطة بالإحداثيات الكارتيزية والقطبية"></canvas><div class="ctrl"><label>الإحداثي x (m) <b id="o1x">-3.50</b></label><input id="i1x" type="range" min="-5" max="5" step="0.05" value="-3.5"><label>الإحداثي y (m) <b id="o1y">-2.50</b></label><input id="i1y" type="range" min="-4" max="4" step="0.05" value="-2.5"><div class="row"><button class="btn" type="button" id="p1">مثال 1.3</button></div><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span></div><div class="task"><h3>سؤال</h3>حرّك النقطة إلى كل ربع من الأرباع الأربعة. متى نضيف 180° إلى الزاوية التي تعطيها الآلة الحاسبة؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="جمع متجهين بطريقة المثلث"></canvas><div class="ctrl"><label>مقدار A <b id="o2a">20.0</b></label><input id="i2a" type="range" min="0" max="40" step="0.5" value="20"><label>اتجاه A (من الشرق) <b id="o2t">90°</b></label><input id="i2t" type="range" min="0" max="360" step="1" value="90"><label>مقدار B <b id="o2b">35.0</b></label><input id="i2b" type="range" min="0" max="40" step="0.5" value="35"><label>اتجاه B (من الشرق) <b id="o2u">150°</b></label><input id="i2u" type="range" min="0" max="360" step="1" value="150"><div class="row"><button class="btn" type="button" id="p2">مثال 2.3</button></div><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span></div><div class="task"><h3>سؤال</h3>هل يتغير المتجه R إذا بدأت بالمتجه B ثم أضفت A؟ جرّب ذلك ذهنياً ثم تحقق من المقدار.</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="تحليل متجه إلى مركبتين"></canvas><div class="ctrl"><label>المقدار A <b id="o3a">5.0</b></label><input id="i3a" type="range" min="0" max="10" step="0.1" value="5"><label>الزاوية θ <b id="o3t">30°</b></label><input id="i3t" type="range" min="0" max="360" step="1" value="30"><div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span class="eq" id="r3c"></span></div><div class="task"><h3>سؤال</h3>عند أي زوايا تصبح Ax سالبة؟ وعند أيها تنعدم Ay؟</div></div></section><section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="جمع المتجهات بالمركبات"></canvas><div class="ctrl"><label>Ax <b id="o4ax">2.0</b></label><input id="i4ax" type="range" min="-5" max="5" step="0.5" value="2"><label>Ay <b id="o4ay">2.0</b></label><input id="i4ay" type="range" min="-5" max="5" step="0.5" value="2"><label>Bx <b id="o4bx">2.0</b></label><input id="i4bx" type="range" min="-5" max="5" step="0.5" value="2"><label>By <b id="o4by">-4.0</b></label><input id="i4by" type="range" min="-5" max="5" step="0.5" value="-4"><div class="row"><button class="btn" type="button" id="p4">مثال 3.3</button></div><div class="readout"><span class="eq" id="r4a"></span><span class="eq" id="r4b"></span></div><div class="task"><h3>سؤال</h3>اجعل B = −A. ماذا يكون المتجه المحصل؟</div></div></section><section class="lab" id="t5" role="tabpanel"><canvas id="c5" width="1200" height="600" aria-label="ضرب متجه في عدد"></canvas><div class="ctrl"><label>العدد m <b id="o5m">1.5</b></label><input id="i5m" type="range" min="-3" max="3" step="0.1" value="1.5"><div class="readout"><span class="eq" id="r5a"></span><span class="eq" id="r5b"></span></div><div class="task"><h3>سؤال</h3>ما قيمة m التي تعطي متجهاً معاكساً لـ A بنصف طوله؟</div></div></section>
+<footer>أ.د. نجم الحصيني – فيزياء عامة 1، الفصل الأول. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);if(Math.hypot(x1-x0,y1-y0)<4)return;g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function curve(g,f,x0,x1,col,w){g.beginPath();let st=false;for(let q=x0;q<=x1;q+=2){const y=f(q);if(!isFinite(y)){st=false;continue;}st?g.lineTo(q,y):g.moveTo(q,y);st=true;}g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function grid(g,cx,cy,sc,nx,ny){g.strokeStyle=css('--grid');g.lineWidth=1;for(let i=-nx;i<=nx;i++){g.beginPath();g.moveTo(cx+i*sc,cy-ny*sc);g.lineTo(cx+i*sc,cy+ny*sc);g.stroke();}for(let j=-ny;j<=ny;j++){g.beginPath();g.moveTo(cx-nx*sc,cy+j*sc);g.lineTo(cx+nx*sc,cy+j*sc);g.stroke();}seg(g,cx-nx*sc,cy,cx+nx*sc,cy,css('--muted'),2);seg(g,cx,cy-ny*sc,cx,cy+ny*sc,css('--muted'),2);}
+function box(g,x0,y0,w,h){g.fillStyle=css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const deg=Math.PI/180;
+
+
+$('p1').onclick=()=>{$('i1x').value=-3.5;$('i1y').value=-2.5};
+function lab1(){const g=ctx('c1'),X=sl('i1x','o1x',v=>v.toFixed(2)),Y=sl('i1y','o1y',v=>v.toFixed(2)),r=Math.hypot(X,Y);let th=Math.atan2(Y,X)/deg;if(th<0)th+=360;
+ $('r1a').textContent='r = √(x² + y²) = '+r.toFixed(2)+' m';$('r1b').textContent='θ = '+th.toFixed(1)+'°  (tan φ = |y/x| = '+(X?Math.abs(Y/X).toFixed(3):'∞')+')';
+ const cx=600,cy=300,sc=55;grid(g,cx,cy,sc,10,5);const px=cx+X*sc,py=cy-Y*sc;seg(g,px,py,px,cy,css('--muted'),1.5,[6,6]);seg(g,px,py,cx,py,css('--muted'),1.5,[6,6]);arrow(g,cx,cy,px,py,css('--o'),4);dot(g,px,py,8,css('--ink'));
+ g.strokeStyle=css('--b');g.lineWidth=3;g.beginPath();g.arc(cx,cy,40,0,-th*deg,true);g.stroke();}
+$('p2').onclick=()=>{$('i2a').value=20;$('i2t').value=90;$('i2b').value=35;$('i2u').value=150;};
+function lab2(){const g=ctx('c2'),A=sl('i2a','o2a',v=>v.toFixed(1)),ta=sl('i2t','o2t',v=>v+'°'),Bm=sl('i2b','o2b',v=>v.toFixed(1)),tb=sl('i2u','o2u',v=>v+'°');
+ const Ax=A*Math.cos(ta*deg),Ay=A*Math.sin(ta*deg),Bx=Bm*Math.cos(tb*deg),By=Bm*Math.sin(tb*deg),Rx=Ax+Bx,Ry=Ay+By,R=Math.hypot(Rx,Ry);let th=Math.atan2(Ry,Rx)/deg;if(th<0)th+=360;
+ $('r2a').textContent='R = '+R.toFixed(1)+',  θ = '+th.toFixed(1)+'°';$('r2b').className='';$('r2b').textContent='الزاوية بين R والشمال = '+Math.abs(90-th).toFixed(1)+'°';
+ const cx=650,cy=420,sc=7;grid(g,cx,cy,50,11,5);const a=[cx+Ax*sc,cy-Ay*sc],b=[a[0]+Bx*sc,a[1]-By*sc];arrow(g,cx,cy,a[0],a[1],css('--o'),4);arrow(g,a[0],a[1],b[0],b[1],css('--b'),4);arrow(g,cx,cy,b[0],b[1],css('--ink'),5);
+ text(g,'A',(cx+a[0])/2+10,(cy+a[1])/2,css('--o'));text(g,'B',(a[0]+b[0])/2+10,(a[1]+b[1])/2,css('--b'));text(g,'R',(cx+b[0])/2-25,(cy+b[1])/2,css('--ink'));text(g,'N',cx+8,cy-245,css('--muted'),'left',20);}
+function lab3(){const g=ctx('c3'),A=sl('i3a','o3a',v=>v.toFixed(1)),th=sl('i3t','o3t',v=>v+'°'),Ax=A*Math.cos(th*deg),Ay=A*Math.sin(th*deg);
+ $('r3a').textContent='Ax = A cosθ = '+Ax.toFixed(2);$('r3b').textContent='Ay = A sinθ = '+Ay.toFixed(2);$('r3c').textContent='A = '+Ax.toFixed(2)+' î + '+Ay.toFixed(2)+' ĵ';
+ const cx=600,cy=300,sc=50;grid(g,cx,cy,sc,10,5);arrow(g,cx,cy,cx+Ax*sc,cy,css('--o'),5);arrow(g,cx+Ax*sc,cy,cx+Ax*sc,cy-Ay*sc,css('--b'),5);arrow(g,cx,cy,cx+Ax*sc,cy-Ay*sc,css('--ink'),5);
+ text(g,'Ax',cx+Ax*sc/2,cy+(Ay>0?30:-12),css('--o'),'center');text(g,'Ay',cx+Ax*sc+(Ax>0?12:-12),cy-Ay*sc/2,css('--b'),Ax>0?'left':'right');}
+$('p4').onclick=()=>{$('i4ax').value=2;$('i4ay').value=2;$('i4bx').value=2;$('i4by').value=-4;};
+function lab4(){const g=ctx('c4'),ax=sl('i4ax','o4ax',v=>v.toFixed(1)),ay=sl('i4ay','o4ay',v=>v.toFixed(1)),bx=sl('i4bx','o4bx',v=>v.toFixed(1)),by=sl('i4by','o4by',v=>v.toFixed(1)),rx=ax+bx,ry=ay+by,R=Math.hypot(rx,ry);let th=Math.atan2(ry,rx)/deg;
+ $('r4a').textContent='R = ('+rx.toFixed(1)+') î + ('+ry.toFixed(1)+') ĵ';$('r4b').textContent='|R| = '+R.toFixed(2)+',  θ = '+th.toFixed(1)+'°';
+ const cx=600,cy=300,sc=28;grid(g,cx,cy,sc,20,10);const a=[cx+ax*sc,cy-ay*sc],b=[a[0]+bx*sc,a[1]-by*sc];arrow(g,cx,cy,a[0],a[1],css('--o'),4);arrow(g,a[0],a[1],b[0],b[1],css('--b'),4);arrow(g,cx,cy,b[0],b[1],css('--ink'),5);
+ seg(g,cx,cy+5,cx+rx*sc,cy+5,css('--o'),2,[6,6]);seg(g,cx+rx*sc,cy,cx+rx*sc,cy-ry*sc,css('--b'),2,[6,6]);}
+function lab5(){const g=ctx('c5'),m=sl('i5m','o5m',v=>v.toFixed(1));$('r5a').textContent='|mA| = '+Math.abs(m).toFixed(1)+' |A|';$('r5b').textContent=m>0?'الاتجاه نفسه':(m<0?'الاتجاه معاكس':'متجه صفري');
+ const cx=600,cy=300,A=[110,-50];grid(g,cx,cy,50,10,5);seg(g,cx,cy,cx+A[0],cy+A[1],css('--muted'),3,[8,6]);text(g,'A',cx+A[0]+10,cy+A[1],css('--muted'));if(Math.abs(m)>0.01)arrow(g,cx,cy,cx+m*A[0],cy+m*A[1],m>0?css('--o'):css('--r'),5);}
+
+function loop(t){T=reduce?0:t/1000;({t1:typeof lab1!=='undefined'?lab1:null,t2:typeof lab2!=='undefined'?lab2:null,t3:typeof lab3!=='undefined'?lab3:null,t4:typeof lab4!=='undefined'?lab4:null,t5:typeof lab5!=='undefined'?lab5:null})[active]();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المعمل الافتراضي — التجربة 8: معامل انكسار الأوساط بالمنشور</title>
+<style>
+  :root{
+    --bg:#f3f7fc; --panel:#ffffff; --panel2:#eef4fb; --line:#c9d6e8;
+    --navy:#14284b; --navy2:#1f4e8c; --sun:#e8742a; --sun2:#f59e4c;
+    --text:#14284b; --muted:#4a5d7e; --ok:#1d8a4e; --bad:#c0392b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#e6effa 0%,var(--bg) 260px);color:var(--text);
+       font-family:"Segoe UI",Tahoma,"Geeza Pro","Arial",sans-serif;line-height:1.7}
+  header{padding:22px 18px 12px;text-align:center;border-bottom:3px solid var(--sun);background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff}
+  header .tag{display:inline-block;color:#ffd7b5;border:1px solid var(--sun2);border-radius:20px;padding:2px 14px;font-size:13px}
+  h1{margin:8px 0 2px;font-size:26px;color:#fff}
+  h1 span{color:var(--sun2)}
+  header p{margin:0;color:#d3e0f2;font-size:14px}
+  .wrap{max-width:1100px;margin:0 auto;padding:14px}
+  .safety{background:#fff3e6;border:1px solid var(--sun);border-right:6px solid var(--sun);border-radius:12px;padding:10px 14px;margin:12px 0;font-size:14px}
+  .safety b{color:#b4511a}
+  nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  nav button{flex:1 1 150px;background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:10px;
+             font:inherit;font-size:15px;cursor:pointer}
+  nav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(20,40,75,.06)}
+  section.on{display:block}
+  h2{margin:0 0 10px;font-size:20px;color:var(--navy)}
+  h3{margin:14px 0 6px;font-size:16px;color:var(--sun)}
+  .eq{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:"Cambria Math","Times New Roman",serif;font-style:italic;
+      background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:2px 10px;margin:2px 0;font-size:18px;color:var(--navy)}
+  .eq.big{display:block;text-align:center;font-size:22px;margin:8px auto;max-width:460px}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  label{display:block;font-size:14px;color:var(--muted);margin-top:8px}
+  input[type=range]{width:100%;accent-color:var(--sun);direction:ltr}
+  select,input[type=number],input[type=text]{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+  .val{color:var(--sun);font-weight:bold}
+  .btn{background:var(--navy2);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px}
+  .btn.gold{background:var(--sun);color:#fff}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px;background:#fff;border:1px solid var(--line)}
+  canvas.dark{background:#05070d}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+  th,td{border:1px solid var(--line);padding:6px;text-align:center}
+  th{background:var(--navy);color:#fff}
+  td input{text-align:center}
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+  .q p{margin:0 0 6px;font-weight:bold}
+  .opt{display:block;width:100%;text-align:right;background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;
+       padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+  .opt.right{border-color:var(--ok);background:#e3f5ea}
+  .opt.wrong{border-color:var(--bad);background:#fbe7e4}
+  .fb{font-size:14px;color:var(--muted);min-height:1.2em}
+  .note{font-size:14px;color:var(--muted)}
+  .reading{font-size:20px;color:var(--sun);font-weight:bold}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:16px}
+  .pill{display:inline-block;background:#fff3e6;border:1px solid var(--sun);border-radius:20px;padding:1px 10px;font-size:13px;margin:2px}
+  div.reading.ltr{display:block;text-align:center}
+
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header>
+  <span class="tag">البصريات الفيزيائية <span class="ltr">2035004-4</span> — المعمل الافتراضي للعملي</span>
+  <h1>التجربة 8: <span>معامل انكسار أوساط مختلفة بطريقة الانحراف الأصغر</span></h1>
+  <p>Refractive Index of Different Media by the Minimum-Deviation Method</p>
+</header>
+<div class="wrap">
+  <div class="safety">⚠️ <b>تنبيه سلامة:</b> أمسك المنشور من قاعدته المصنفرة فقط. عند ملء المنشور المجوّف بسائل املأه فوق صينية وأغلقه جيدًا وجفّف أي سائل على المنضدة. لا تنظر إلى مصباح الزئبق مباشرة.</div>
+  <nav>
+    <button class="on" data-s="s1">1) أسئلة التحضير</button>
+    <button data-s="s2">2) فكرة التجربة</button>
+    <button data-s="s3">3) المحاكاة والقياس</button>
+    <button data-s="s4">4) الجدول والحسابات</button>
+    <button data-s="s5">5) ماذا لو…؟</button>
+  </nav>
+
+  <section id="s1" class="on">
+    <h2>أسئلة التحضير قبل المعمل</h2>
+    <p class="note">أجب عنها قبل حضور التجربة؛ يظهر التصحيح مباشرة بعد اختيارك.</p>
+    <div id="quiz"></div><p class="reading" id="qscore"></p>
+  </section>
+
+  <section id="s2">
+    <h2>فكرة التجربة</h2>
+    <p>عندما يمر شعاع ضوء خلال منشور ينحرف عن مساره بزاوية <span class="eq">D</span> تسمى زاوية الانحراف. إذا أدرنا المنشور تتغير زاوية الانحراف، وتمر بقيمة <b>صغرى</b> <span class="eq">D_min</span>
+       عندما يعبر الشعاع المنشور متماثلًا (موازيًا للقاعدة). عند هذا الوضع:</p>
+    <span class="eq big">n = sin((A + D_min)/2) / sin(A/2)</span>
+    <p>حيث <span class="eq">A</span> زاوية رأس المنشور (من التجربة السابقة).</p>
+    <h3>كيف نجد وضع الانحراف الأصغر؟</h3>
+    <p>ننظر إلى الخط الطيفي في التلسكوب وندير منضدة المنشور ببطء في اتجاه واحد؛ يتحرك الخط ثم <b>يتوقف ويعكس اتجاهه</b>. لحظة التوقف هي وضع الانحراف الأصغر، فنضع التقاطع على الخط ونقرأ <span class="eq">E</span>.
+       ثم نعكس وضع المنشور ليحرف الضوء إلى الجهة الأخرى ونكرر فنقرأ <span class="eq">F</span>. الزاوية بين الوضعين ضعف الانحراف الأصغر:</p>
+    <span class="eq big">D_min = (E − F) / 2</span>
+    <h3>أوساط مختلفة</h3>
+    <p>نكرر القياس لمنشور من زجاج التاج، ومنشور من زجاج الصوان، ومنشور مجوّف رقيق الجدران نملؤه بالماء ثم بالجلسرين. ولكل وسط يمكن القياس لأكثر من لون لملاحظة <b>التشتت</b>: معامل الانكسار للأزرق أكبر منه للأصفر.</p>
+    <div class="card"><b>الأجهزة:</b> مطياف بورنية — منشور زجاج تاج — منشور زجاج صوان — منشور مجوّف — ماء وجلسرين — مصباح زئبق.</div>
+  </section>
+
+  <section id="s3">
+    <h2>المحاكاة والقياس</h2>
+    <div class="grid">
+      <div class="card">
+        <canvas id="fv" dir="ltr" width="300" height="300" style="max-width:300px;margin:auto;background:#04060b;border-radius:50%"></canvas>
+        <p class="note" style="text-align:center">مجال رؤية التلسكوب</p>
+        <canvas id="vc" dir="ltr" width="460" height="110" style="max-width:460px;margin:auto"></canvas>
+      </div>
+      <div class="card">
+        <label>الوسط (المنشور)</label>
+        <select id="med"></select>
+        <p>زاوية رأس هذا المنشور: <span class="reading ltr" id="Ashow"></span></p>
+        <label>اللون (مرشح)</label>
+        <select id="col"><option value="578.0">أصفر ⁦578.0 nm⁩</option><option value="546.1">أخضر ⁦546.1 nm⁩</option><option value="435.8">أزرق ⁦435.8 nm⁩</option></select>
+        <label>جهة الانحراف</label>
+        <select id="sd"><option value="1">الجهة الأولى (قراءة E)</option><option value="-1">الجهة الثانية (قراءة F)</option></select>
+        <label>تدوير منضدة المنشور (زاوية السقوط)</label>
+        <input type="range" id="inc" min="20" max="85" step="0.05" value="70">
+        <button class="btn ghost" id="im"><span class="ltr">−0.05°</span></button><button class="btn ghost" id="ip"><span class="ltr">+0.05°</span></button>
+        <label>تدوير التلسكوب</label>
+        <input type="range" id="ts" min="100" max="260" step="0.05" value="180">
+        <button class="btn ghost" id="tm"><span class="ltr">−0.05°</span></button><button class="btn ghost" id="tp"><span class="ltr">+0.05°</span></button>
+        <label>القراءة التي تقرؤها (°)</label>
+        <input type="number" id="readIn" step="0.05" style="max-width:200px">
+        <button class="btn gold" id="rec">سجّل القراءة</button>
+        <button class="btn ghost" id="reset">ابدأ من جديد</button>
+        <p class="note" id="msg">أدر المنضدة ببطء وتابع الخط بالتلسكوب؛ عند الانحراف الأصغر يتوقف الخط ثم يعود.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="s4">
+    <h2>جدول القراءات والحسابات</h2>
+    <p class="note">احسب لكل صف <span class="eq">D_min = (E − F)/2</span> ثم <span class="eq">n</span>، وأدخلهما ثم اضغط «تحقّق».</p>
+    <table><thead><tr><th>الوسط</th><th>اللون</th><th>A (°)</th><th>E (°)</th><th>F (°)</th><th>D_min التي حسبتها (°)</th><th>n التي حسبتها</th><th>النتيجة</th></tr></thead><tbody id="tb"></tbody></table>
+    <button class="btn gold" id="chkBtn">تحقّق من حساباتي</button>
+    <div class="card" id="resBox" style="margin-top:10px"><p class="note">تظهر هنا النتائج بعد التحقق.</p></div>
+  </section>
+
+  <section id="s5">
+    <h2>ماذا لو…؟</h2>
+    <p class="note">توقّع الإجابة أولًا، ثم اضغط «أظهر التفسير».</p>
+    <div id="whatif"></div>
+  </section>
+</div>
+<footer>إعداد: أ.د. نجم الحصيني — قسم الفيزياء، جامعة الطائف</footer>
+<script>
+function onTab(){ if(typeof refresh==='function') refresh(); }
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');document.getElementById(b.dataset.s).classList.add('on');onTab();});
+function wrapLtr(o){return /^[\sλθαμω0-9.,\/=+\-−×·°%()a-zA-Z²³⁻¹]+$/.test(o)?'<span class="ltr">'+o+'</span>':o;}
+// Shared spectrometer parts: telescope field of view + main scale/vernier (0.05°)
+function makeField(cvId){
+  const cv=document.getElementById(cvId), cx=cv.getContext('2d');
+  // lines: [{ang, col:[r,g,b], I}] ; T telescope reading ; scale px per degree
+  return {draw(lines,T,pxDeg){const W=cv.width,H=cv.height;cx.fillStyle='#04060b';cx.fillRect(0,0,W,H);
+      lines.forEach(L=>{const x=W/2+(L.ang-T)*pxDeg; if(x<-20||x>W+20)return; const w=L.w||3;
+        const g=cx.createLinearGradient(x-w*2,0,x+w*2,0); const c='rgba('+L.col.join(',')+',';
+        g.addColorStop(0,c+'0)');g.addColorStop(0.5,c+(L.I||1)+')');g.addColorStop(1,c+'0)');cx.fillStyle=g;cx.fillRect(x-w*2,H*0.12,w*4,H*0.76);});
+      cx.strokeStyle='rgba(255,255,255,.75)';cx.lineWidth=1;cx.beginPath();cx.moveTo(W/2-H*0.35,H*0.15);cx.lineTo(W/2+H*0.35,H*0.85);cx.moveTo(W/2+H*0.35,H*0.15);cx.lineTo(W/2-H*0.35,H*0.85);cx.stroke();
+      cx.beginPath();cx.arc(W/2,H/2,H/2-2,0,7);cx.strokeStyle='#14284b';cx.lineWidth=4;cx.stroke();}};
+}
+function makeVernier(cvId){
+  const sc=document.getElementById(cvId), sx=sc.getContext('2d');
+  return {draw(r){const S=sc.width,P=26,mid=S/2;sx.fillStyle='#fffdf5';sx.fillRect(0,0,S,sc.height);sx.strokeStyle='#14284b';sx.fillStyle='#14284b';sx.font='12px Tahoma';sx.textAlign='center';
+    const x0=v=>mid-80+(v-r)*P/0.5;
+    for(let v=Math.floor((r-4)*2)/2;v<=r+5;v+=0.5){const x=x0(v);const whole=Math.abs(v-Math.round(v))<1e-6;sx.beginPath();sx.moveTo(x,20);sx.lineTo(x,whole?50:38);sx.stroke();if(whole)sx.fillText(((Math.round(v)%360)+360)%360,x,15);}
+    sx.fillStyle='#e8742a';sx.strokeStyle='#e8742a';
+    for(let k=0;k<=10;k++){const x=mid-80+k*P*0.9;sx.beginPath();sx.moveTo(x,51);sx.lineTo(x,k%5===0?80:68);sx.stroke();if(k%5===0)sx.fillText(k,x,96);}
+    sx.textAlign='right';sx.fillStyle='#4a5d7e';sx.fillText('الورنية',mid-95,74);}};
+}
+// telescope controls helper: slider id, fine buttons, returns getter
+function telescope(ids,onChange){const s=document.getElementById(ids.s);
+  document.getElementById(ids.m).onclick=()=>{s.value=(+s.value-0.05).toFixed(2);onChange();};
+  document.getElementById(ids.p).onclick=()=>{s.value=(+s.value+0.05).toFixed(2);onChange();};
+  s.oninput=onChange; return ()=>+s.value;}
+
+const Q=[
+ {q:'عند وضع الانحراف الأصغر يكون مسار الشعاع داخل المنشور:',o:['عموديًا على القاعدة','موازيًا للقاعدة (مرورًا متماثلًا)','منطبقًا على أحد الوجهين','لا يمر بالمنشور'],a:1,e:'زاوية السقوط تساوي زاوية الخروج.'},
+ {q:'كيف نعرف أننا وصلنا إلى وضع الانحراف الأصغر؟',o:['يختفي الخط','يتوقف الخط عن الحركة ثم يعكس اتجاهه مع استمرار تدوير المنضدة','يصبح الخط أعرض','يتغير لونه'],a:1,e:'الانحراف يمر بقيمة صغرى فيبدو الخط ثابتًا لحظيًا.'},
+ {q:'إذا كان A = 60° و D_min = 38.9° فإن n تساوي تقريبًا:',o:['1.33','1.52','1.62','1.47'],a:1,e:'n = sin(49.45°)/sin(30°) = 0.7600/0.5 ≈ 1.520.'},
+ {q:'أي الألوان له أكبر معامل انكسار في الزجاج؟',o:['الأصفر','الأخضر','الأزرق','كلها متساوية'],a:2,e:'التشتت العادي: n يزداد كلما قصر الطول الموجي.'},
+ {q:'لماذا يجب أن تكون جدران المنشور المجوّف رقيقة ومتوازية؟',o:['لتقليل الوزن','حتى لا يسبب الزجاج نفسه انحرافًا، فيكون الانحراف كله من السائل','لتسهيل الملء','لا سبب'],a:1,e:'الصفيحة متوازية الوجهين لا تحرف الشعاع، بل تزيحه فقط.'}
+];
+const WI=[
+ {q:'ماذا لو ملأنا المنشور المجوّف بماء مالح بدل الماء النقي؟',a:'يزداد معامل الانكسار قليلًا فتزداد D_min، كما وجدنا في تجربة جهاز آبي.'},
+ {q:'لماذا يعطي زجاج الصوان طيفًا أعرض من زجاج التاج؟',a:'لأن تشتته أكبر: الفرق بين n للأزرق و n للأصفر فيه أكبر، فتتباعد الألوان أكثر.'},
+ {q:'ماذا لو أخطأنا في A بمقدار 0.2°؟',a:'يتغير n في الرقم الثالث تقريبًا (نحو 0.003)، ولذلك يجب قياس A بعناية في التجربة 7.'},
+ {q:'هل يمكن أن ينحرف الضوء خلال المنشور المجوّف المملوء بالهواء؟',a:'لا؛ لأن معامل انكسار الهواء داخله يساوي معامل انكسار الهواء خارجه، فتكون D_min صفرًا تقريبًا.'},
+ {q:'ماذا لو قسنا D وليس D_min (دون إيجاد نقطة التوقف)؟',a:'تكون الزاوية أكبر من D_min فنحصل على قيمة n أكبر من الحقيقية.'}
+];
+const Ag=+(59.6+Math.random()*0.8).toFixed(2);
+const MED=[{nm:'زجاج التاج (Crown)',a:1.5046,b:0.00420,A:Ag},{nm:'زجاج الصوان (Flint)',a:1.5968,b:0.00802,A:+(59.7+Math.random()*0.6).toFixed(2)},{nm:'منشور مجوّف + ماء',a:1.3240,b:0.00312,A:60.00},{nm:'منشور مجوّف + جلسرين',a:1.4610,b:0.00410,A:60.00}];
+const ms=document.getElementById('med');MED.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.nm;ms.appendChild(o);});
+const Tdir=+(178+Math.random()*4).toFixed(2);
+function M(){return MED[+ms.value];} function lamv(){return +document.getElementById('col').value;}
+function nOf(){const l=lamv()/1000;return M().a+M().b/(l*l);}
+const R=Math.PI/180;
+function Dev(i){const n=nOf(),A=M().A;const r1=Math.asin(Math.sin(i*R)/n),r2=A*R-r1;const s=n*Math.sin(r2);if(Math.abs(s)>=1)return null;return i+Math.asin(s)/R-A;}
+function Dmin(){const n=nOf(),A=M().A;return 2*Math.asin(n*Math.sin(A/2*R))/R-A;}
+function side(){return +document.getElementById('sd').value;}
+function inc(){return +document.getElementById('inc').value;}
+function linePos(){const d=Dev(inc());return d==null?null:Tdir+side()*d;}
+const FV=makeField('fv'),VC=makeVernier('vc');const T=telescope({s:'ts',m:'tm',p:'tp'},draw);telescope({s:'inc',m:'im',p:'ip'},draw);
+const CL={'578.0':[255,225,60],'546.1':[90,255,90],'435.8':[80,120,255]};
+function draw(){document.getElementById('Ashow').textContent='A = '+M().A.toFixed(2)+'°';const p=linePos();FV.draw(p==null?[]:[{ang:p,col:CL[document.getElementById('col').value],I:1,w:2.5}],T(),90);VC.draw(T());}
+['med','col','sd'].forEach(id=>document.getElementById(id).onchange=draw);
+let rows=[],cur={};
+function key(){return ms.value+'|'+document.getElementById('col').value;}
+document.getElementById('reset').onclick=()=>{rows=[];cur={};render();};
+document.getElementById('rec').onclick=()=>{const el=document.getElementById('msg'),r=document.getElementById('readIn').value,p=linePos();
+  if(p==null){el.innerHTML='<span class="bad">لا يخرج ضوء من المنشور عند هذه الزاوية (انعكاس كلي). أدر المنضدة.</span>';return;}
+  if(Math.abs(Dev(inc())-Dmin())>0.05){el.innerHTML='<span class="bad">المنشور ليس في وضع الانحراف الأصغر بعد. أدر المنضدة ببطء حتى يتوقف الخط ويعكس اتجاهه.</span>';return;}
+  if(Math.abs(T()-p)>0.04){el.innerHTML='<span class="bad">التقاطع ليس على الخط. حرّك التلسكوب.</span>';return;}
+  if(r===''||Math.abs(+r-T())>0.051){el.innerHTML='<span class="bad">قراءتك لا تطابق التدريج والورنية.</span>';return;}
+  const k=key();cur[k]=cur[k]||{};cur[k][side()===1?'E':'F']=+(+r).toFixed(2);
+  if(cur[k].E!=null&&cur[k].F!=null){rows=rows.filter(x=>x.k!==k);rows.push({k,m:+ms.value,l:lamv(),A:M().A,E:cur[k].E,F:cur[k].F});render();el.innerHTML='<span class="ok">اكتمل هذا الصف. اختر وسطًا أو لونًا آخر.</span>';}
+  else el.innerHTML='<span class="ok">سُجّلت. الآن اعكس جهة الانحراف وكرر.</span>';};
+const CN={'578':'أصفر','546.1':'أخضر','435.8':'أزرق'};
+function render(){document.getElementById('tb').innerHTML=rows.map((x,i)=>'<tr><td>'+MED[x.m].nm+'</td><td>'+CN[String(x.l)]+'</td><td class="ltr">'+x.A.toFixed(2)+'</td><td class="ltr">'+x.E.toFixed(2)+'</td><td class="ltr">'+x.F.toFixed(2)+'</td><td><input type="number" step="0.01" id="d'+i+'"></td><td><input type="number" step="0.0001" id="n'+i+'"></td><td id="q'+i+'"></td></tr>').join('');}
+document.getElementById('chkBtn').onclick=()=>{if(!rows.length){document.getElementById('resBox').innerHTML='<span class="bad">أكمل صفًا واحدًا على الأقل.</span>';return;}
+  let ok=0,h='';rows.forEach((x,i)=>{const D=Math.abs(x.E-x.F)/2,n=Math.sin((x.A+D)/2*R)/Math.sin(x.A/2*R),ud=document.getElementById('d'+i).value,un=document.getElementById('n'+i).value;
+    const okD=ud!==''&&Math.abs(+ud-D)<=0.011,okN=un!==''&&Math.abs(+un-n)<=0.0015;if(okD&&okN)ok++;
+    document.getElementById('q'+i).innerHTML=(okD?'<span class="ok">D ✔</span>':'<span class="bad">D ≈ '+D.toFixed(3)+'</span>')+' / '+(okN?'<span class="ok">n ✔</span>':'<span class="bad">n ≈ '+n.toFixed(4)+'</span>');
+    const nt=MED[x.m].a+MED[x.m].b/((x.l/1000)**2);h+=MED[x.m].nm+' — '+CN[String(x.l)]+': <span class="ltr val">n = '+n.toFixed(4)+'</span> (القيمة الحقيقية <span class="ltr">'+nt.toFixed(4)+'</span>)<br>';});
+  document.getElementById('resBox').innerHTML='صفوفك الصحيحة: '+ok+' من '+rows.length+'<hr style="border-color:#c9d6e8">'+h;};
+function refresh(){draw();}
+draw();
+(function(){let score=0,answered=0;const qz=document.getElementById('quiz');
+Q.forEach((it,i)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+wrapLtr(o)+'</button>').join('')+'<div class="fb"></div>';
+  d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(d.dataset.done)return;d.dataset.done=1;answered++;const j=+b.dataset.j;
+    d.querySelectorAll('.opt')[it.a].classList.add('right');
+    if(j===it.a){score++;d.querySelector('.fb').innerHTML='<span class="ok">✔ صحيح.</span> '+it.e;}
+    else{b.classList.add('wrong');d.querySelector('.fb').innerHTML='<span class="bad">✘ ليس هذا.</span> '+it.e;}
+    if(answered===Q.length)document.getElementById('qscore').textContent='نتيجتك: '+score+' من '+Q.length;});
+  qz.appendChild(d);});
+const wi=document.getElementById('whatif');
+WI.forEach((w,i)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+w.q+'</p><button class="btn ghost">أظهر التفسير</button><div class="fb" style="display:none;margin-top:6px">'+w.a+'</div>';
+  d.querySelector('button').onclick=()=>{d.querySelector('.fb').style.display='block';};wi.appendChild(d);});
+})();
+</script>
+<script>window.REAL_CFG={
+ id:'exp8', intro:'لكل وسط ولون: أدخل زاوية رأس المنشور A وقراءتي التلسكوب E و F عند الانحراف الأصغر، واحسب n بيدك.', minRows:1,
+ consts:[],
+ tables:[{rows:4, cols:[{key:'A',label:'A (°)'},{key:'E',label:'E (°)'},{key:'F',label:'F (°)'}],
+   calc:[{label:'D_min (°)',f:o=>Math.abs(o.E-o.F)/2,d:3}],
+   user:{label:'n التي حسبتها',ref:o=>{const R=Math.PI/180,D=Math.abs(o.E-o.F)/2;return Math.sin((o.A+D)/2*R)/Math.sin(o.A/2*R);},tol:{abs:0.0015},d:4}}],
+ extras:[], plots:[],
+ result:(D)=>({lines:D[0].map((o,i)=>{const R=Math.PI/180,d=Math.abs(o.E-o.F)/2;return '<span class="ltr">row '+(i+1)+': D_min = '+d.toFixed(2)+'°, n = '+(Math.sin((o.A+d)/2*R)/Math.sin(o.A/2*R)).toFixed(4)+'</span>';})})
+};</script>
+<script>// ===== Real-lab readings mode (shared engine) =====
+(function(){
+const CFG = window.REAL_CFG;
+const KEY = 'optlab_real_' + CFG.id;
+let st = {consts:{}, tables:[], extras:{}};
+try { const s = localStorage.getItem(KEY); if (s) st = JSON.parse(s); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e) {} };
+const num = v => (v === '' || v == null || isNaN(+v)) ? null : +v;
+const close = (u, ref, t) => t.abs != null ? Math.abs(u - ref) <= t.abs : Math.abs(u - ref) / Math.abs(ref) <= (t.rel || 0.02);
+const fmt = (v, d) => (v == null || !isFinite(v)) ? '—' : v.toFixed(d);
+
+const s4 = document.getElementById('s4');
+const h2 = s4.querySelector('h2');
+const sim = document.createElement('div'); sim.id = 'simMode';
+while (h2.nextSibling) sim.appendChild(h2.nextSibling);
+// remove Excel note from simulation mode
+sim.querySelectorAll('p.note').forEach(p => { if (p.textContent.indexOf('Excel') >= 0) p.remove(); });
+const sw = document.createElement('div'); sw.className = 'modesw';
+sw.innerHTML = '<button class="btn gold" id="mReal">قراءات المعمل الحقيقي</button><button class="btn ghost" id="mSim">قراءات من المحاكاة</button>';
+const real = document.createElement('div'); real.id = 'realMode';
+h2.after(sw); sw.after(real); real.after(sim);
+
+const css = document.createElement('style');
+css.textContent = '.modesw{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}#realMode input.rin{background:#fff3e6;border:1px solid #e8742a;color:#14284b;border-radius:6px;padding:6px;width:100%;min-width:70px;text-align:center;font-size:15px}' +
+ '#realMode .cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}#realMode .cgrid label{display:block;font-size:14px;margin-bottom:3px}#realMode td.calc{color:#4a5d7e}#realMode .tblwrap{overflow-x:auto}#realMode .rtools{margin:6px 0}#realMode h3{margin:14px 0 6px}';
+document.head.appendChild(css);
+
+function setMode(r) {
+  real.style.display = r ? '' : 'none'; sim.style.display = r ? 'none' : '';
+  document.getElementById('mReal').className = 'btn ' + (r ? 'gold' : 'ghost');
+  document.getElementById('mSim').className = 'btn ' + (r ? 'ghost' : 'gold');
+  if (!r && typeof drawPlot === 'function') { try { drawPlot(); } catch(e) {} }
+}
+
+function build() {
+  let h = '<p class="note">' + CFG.intro + ' الخانات الذهبية لقراءاتك وحساباتك؛ تُحفظ تلقائيًا في هذا الجهاز. بعد «تحقّق» التقط صورة لهذه الصفحة وأرفقها في آخر تقريرك.</p>';
+  if (CFG.consts && CFG.consts.length) {
+    h += '<div class="cgrid">';
+    CFG.consts.forEach(c => { const v = st.consts[c.id] ?? c.def ?? ''; h += '<div><label>' + c.label + '</label><input class="rin ltr" type="number" step="any" data-c="' + c.id + '" value="' + v + '"></div>'; });
+    h += '</div>';
+  }
+  CFG.tables.forEach((T, ti) => {
+    if (!st.tables[ti]) st.tables[ti] = [];
+    const rows = st.tables[ti];
+    while (rows.length < (T.rows || 5)) rows.push({});
+    if (T.title) h += '<h3>' + T.title + '</h3>';
+    h += '<div class="tblwrap"><table><thead><tr>';
+    T.cols.forEach(c => h += '<th>' + c.label + '</th>');
+    (T.calc || []).forEach(c => h += '<th>' + c.label + '</th>');
+    if (T.user) h += '<th>' + T.user.label + '</th><th>النتيجة</th>';
+    h += '</tr></thead><tbody>';
+    rows.forEach((r, ri) => {
+      h += '<tr>';
+      T.cols.forEach(c => h += '<td><input class="rin ltr" type="number" step="any" data-t="' + ti + '" data-r="' + ri + '" data-k="' + c.key + '" value="' + (r[c.key] ?? (c.fixed ? c.fixed(ri) : '')) + '"></td>');
+      (T.calc || []).forEach((c, ci) => h += '<td class="calc" style="direction:ltr" id="rc' + ti + '_' + ri + '_' + ci + '"></td>');
+      if (T.user) h += '<td><input class="rin ltr" type="number" step="any" data-t="' + ti + '" data-r="' + ri + '" data-k="_u" value="' + (r._u ?? '') + '"></td><td class="st" id="rs' + ti + '_' + ri + '"></td>';
+      h += '</tr>';
+    });
+    h += '</tbody></table></div><div class="rtools"><button class="btn ghost" data-add="' + ti + '">+ صف</button></div>';
+  });
+  if (CFG.extras && CFG.extras.length) {
+    h += '<div class="cgrid">';
+    CFG.extras.forEach(e => h += '<div><label>' + e.label + '</label><input class="rin ltr" type="number" step="any" data-e="' + e.id + '" value="' + (st.extras[e.id] ?? '') + '"></div>');
+    h += '</div>';
+  }
+  h += '<button class="btn gold" id="rChk">تحقّق من نتائجي</button> <button class="btn ghost" id="rClr">مسح كل القراءات</button>';
+  h += '<div class="grid" style="margin-top:10px">';
+  (CFG.plots || []).forEach((p, i) => h += '<div class="card"><canvas dir="ltr" id="rPlot' + i + '" width="520" height="300"></canvas></div>');
+  h += '<div class="card" id="rRes"><p class="note">تظهر هنا النتائج بعد التحقق.</p></div></div>';
+  real.innerHTML = h;
+  real.querySelectorAll('input[data-c]').forEach(i => i.oninput = () => { st.consts[i.dataset.c] = i.value; save(); refreshCalc(); });
+  real.querySelectorAll('input[data-t]').forEach(i => i.oninput = () => { st.tables[+i.dataset.t][+i.dataset.r][i.dataset.k] = i.value; save(); refreshCalc(); });
+  real.querySelectorAll('input[data-e]').forEach(i => i.oninput = () => { st.extras[i.dataset.e] = i.value; save(); });
+  real.querySelectorAll('button[data-add]').forEach(b => b.onclick = () => { st.tables[+b.dataset.add].push({}); save(); build(); });
+  document.getElementById('rChk').onclick = check;
+  document.getElementById('rClr').onclick = () => { if (!confirmClear()) return; st = {consts:{}, tables:[], extras:{}}; save(); build(); };
+  refreshCalc(); drawPlots(false);
+}
+let clrArm = false;
+function confirmClear() { const b = document.getElementById('rClr'); if (clrArm) { clrArm = false; return true; } clrArm = true; b.textContent = 'اضغط مرة أخرى للتأكيد'; setTimeout(() => { clrArm = false; if (b) b.textContent = 'مسح كل القراءات'; }, 3000); return false; }
+
+function C() { const o = {}; (CFG.consts || []).forEach(c => o[c.id] = num(st.consts[c.id] ?? c.def)); return o; }
+function data(ti) {
+  const T = CFG.tables[ti];
+  return (st.tables[ti] || []).map((r, ri) => { const o = {_ri: ri}; T.cols.forEach(c => o[c.key] = num(r[c.key] ?? (c.fixed ? c.fixed(ri) : null))); o._u = num(r._u); return o; })
+    .filter(o => T.cols.every(c => o[c.key] != null));
+}
+function refreshCalc() {
+  const c = C();
+  CFG.tables.forEach((T, ti) => { (T.calc || []).forEach((cc, ci) => {
+    (st.tables[ti] || []).forEach((r, ri) => {
+      const o = {}; T.cols.forEach(k => o[k.key] = num(r[k.key] ?? (k.fixed ? k.fixed(ri) : null)));
+      const ok = T.cols.every(k => o[k.key] != null);
+      const el = document.getElementById('rc' + ti + '_' + ri + '_' + ci); if (el) el.textContent = ok ? fmt(cc.f(o, c), cc.d ?? 2) : '';
+    });
+  }); });
+}
+function fitLin(xs, ys) { const n = xs.length; if (n < 2) return null; const mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n; let sxy = 0, sxx = 0; xs.forEach((x, i) => { sxy += (x - mx) * (ys[i] - my); sxx += (x - mx) ** 2; }); const m = sxy / sxx; return {m, b: my - m * mx}; }
+function fitOrigin(xs, ys) { let a = 0, b = 0; xs.forEach((x, i) => { a += x * ys[i]; b += x * x; }); return b ? a / b : null; }
+function check() {
+  const c = C(); const miss = (CFG.consts || []).filter(k => c[k.id] == null);
+  const box = document.getElementById('rRes');
+  if (miss.length) { box.innerHTML = '<p class="bad">أدخل أولًا: ' + miss.map(k => k.label).join('، ') + '</p>'; return; }
+  const D = CFG.tables.map((T, ti) => data(ti));
+  if (D.every(d => d.length < (CFG.minRows || 2))) { box.innerHTML = '<p class="bad">أدخل ' + (CFG.minRows || 2) + ' قراءات على الأقل.</p>'; return; }
+  let ok = 0, tot = 0;
+  CFG.tables.forEach((T, ti) => {
+    (st.tables[ti] || []).forEach((r, ri) => { const el = document.getElementById('rs' + ti + '_' + ri); if (el) el.innerHTML = ''; });
+    if (!T.user) return;
+    D[ti].forEach(o => {
+      const ref = T.user.ref(o, c); const el = document.getElementById('rs' + ti + '_' + o._ri); tot++;
+      if (o._u == null) el.innerHTML = '<span class="bad">لم تحسب</span>';
+      else if (close(o._u, ref, T.user.tol || {})) { el.innerHTML = '<span class="ok">✔ صحيح</span>'; ok++; }
+      else el.innerHTML = '<span class="bad">✘ راجع: ' + fmt(ref, T.user.d ?? 1) + '</span>';
+    });
+  });
+  const R = CFG.result(D, c, fitOrigin, fitLin);
+  let h = '';
+  if (tot) h += '<b>حساباتك الصحيحة في الجدول:</b> ' + ok + ' من ' + tot + '<br>';
+  (CFG.extras || []).forEach(e => {
+    const u = num(st.extras[e.id]); const ref = e.ref(R, D, c);
+    if (ref == null || !isFinite(ref)) return;
+    h += e.label + ': ' + (u == null ? '<span class="bad">لم تُدخل</span>' : close(u, ref, e.tol || {}) ? '<span class="ok">✔ قريب من الصحيح</span>' : '<span class="bad">✘ راجع (الصحيح ≈ <span class="ltr">' + fmt(ref, e.d ?? 3) + '</span>)</span>') + '<br>';
+  });
+  h += '<hr style="border-color:#c9d6e8">' + R.lines.join('<br>');
+  box.innerHTML = h;
+  drawPlots(true, R);
+}
+function drawPlots(withFit, R) {
+  (CFG.plots || []).forEach((P, i) => {
+    const cv = document.getElementById('rPlot' + i); if (!cv) return; const x = cv.getContext('2d');
+    const W = cv.width, H = cv.height, m = 48;
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H);
+    const d = data(P.table); const c = C();
+    const pts = d.map(o => [P.x(o, c), P.y(o, c)]).filter(p => isFinite(p[0]) && isFinite(p[1]));
+    x.strokeStyle = '#4a5d7e'; x.fillStyle = '#4a5d7e'; x.font = '13px Tahoma, Arial'; x.textAlign = 'center';
+    let xmin = Math.min(0, ...pts.map(p => p[0])), xmax = Math.max(1, ...pts.map(p => p[0]));
+    let ymin = Math.min(0, ...pts.map(p => p[1])), ymax = Math.max(1, ...pts.map(p => p[1]));
+    if (P.noZero) { xmin = Math.min(...pts.map(p => p[0]), xmax - 1); ymin = Math.min(...pts.map(p => p[1]), ymax - 1); }
+    const px = (xmax - xmin) * 0.08 || 1, py = (ymax - ymin) * 0.1 || 1; xmax += px; ymax += py; if (xmin < 0) xmin -= px; if (ymin < 0) ymin -= py;
+    const X = v => m + (v - xmin) / (xmax - xmin) * (W - m - 15), Y = v => H - m + 10 - (v - ymin) / (ymax - ymin) * (H - m - 15);
+    x.beginPath(); x.moveTo(m, 8); x.lineTo(m, H - m + 10); x.lineTo(W - 8, H - m + 10); x.stroke();
+    if (xmin < 0) { x.beginPath(); x.moveTo(X(0), 8); x.lineTo(X(0), H - m + 10); x.setLineDash([3, 3]); x.stroke(); x.setLineDash([]); }
+    if (ymin < 0) { x.beginPath(); x.moveTo(m, Y(0)); x.lineTo(W - 8, Y(0)); x.setLineDash([3, 3]); x.stroke(); x.setLineDash([]); }
+    const nice = r => { const e = Math.pow(10, Math.floor(Math.log10(r / 4))); const f = r / 4 / e; return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * e; };
+    const sx = nice(xmax - xmin), sy = nice(ymax - ymin), lbl = v => +(+v.toFixed(6)).toPrecision(4) + '';
+    for (let v = Math.ceil(xmin / sx) * sx; v <= xmax + 1e-9; v += sx) x.fillText(lbl(v), X(v), H - m + 26);
+    x.textAlign = 'right'; for (let v = Math.ceil(ymin / sy) * sy; v <= ymax + 1e-9; v += sy) x.fillText(lbl(v), m - 5, Y(v) + 4); x.textAlign = 'center';
+    x.fillText(P.xl, W / 2, H - 6); x.save(); x.translate(13, H / 2); x.rotate(-Math.PI / 2); x.fillText(P.yl, 0, 0); x.restore();
+    if (withFit && P.fit && R && R[P.fit] != null) { const s = R[P.fit], b0 = P.fitB ? (R[P.fitB] || 0) : 0; x.strokeStyle = '#e8742a'; x.lineWidth = 2; x.beginPath(); x.moveTo(X(xmin), Y(s * xmin + b0)); x.lineTo(X(xmax), Y(s * xmax + b0)); x.stroke(); x.lineWidth = 1; }
+    if (withFit && P.join) { const q = pts.slice().sort((a, b) => a[0] - b[0]); x.strokeStyle = '#e8742a'; x.beginPath(); q.forEach((p, k) => k ? x.lineTo(X(p[0]), Y(p[1])) : x.moveTo(X(p[0]), Y(p[1]))); x.stroke(); }
+    x.fillStyle = '#1f4e8c'; pts.forEach(p => { x.beginPath(); x.arc(X(p[0]), Y(p[1]), 5, 0, 7); x.fill(); });
+    if (P.title) { x.fillStyle = '#e8742a'; x.textAlign = 'right'; x.fillText(P.title, W - 10, 20); }
+  });
+}
+document.getElementById('mReal').onclick = () => setMode(true);
+document.getElementById('mSim').onclick = () => setMode(false);
+build(); setMode(true);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

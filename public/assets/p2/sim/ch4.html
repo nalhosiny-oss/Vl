@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sources of the Magnetic Field – Virtual Lab (Physics 2, Unit 4)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--g:#1E8A4C;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--g:#5BD08E;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:70ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',Georgia,serif;font-size:1.1rem;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--b)}
+input[type=number]{font:inherit;width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--plot);color:var(--ink)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.readout span{display:block}
+.eq{font-family:'STIX Two Text',Georgia,serif;font-size:1.08rem}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+.hint{font-size:.85rem;color:var(--muted)}
+.hide{display:none!important}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Sources of the Magnetic Field Lab</h1><p>Physics 2 (Engineering &amp; Computing) – Unit 4: the Biot–Savart law, the force between parallel conductors, Ampère's law, the field of a solenoid, and magnetic flux. Change the values, use the example buttons, then answer the question under each experiment.</p></header>
+<nav class="tabs" role="tablist" aria-label="Experiments">
+<button role="tab" aria-selected="true" data-t="t1">1 · Biot–Savart: a straight wire</button>
+<button role="tab" aria-selected="false" data-t="t2">2 · Biot–Savart: a loop</button>
+<button role="tab" aria-selected="false" data-t="t3">3 · Parallel conductors</button>
+<button role="tab" aria-selected="false" data-t="t4">4 · Ampère's law</button>
+<button role="tab" aria-selected="false" data-t="t5">5 · Solenoid</button>
+<button role="tab" aria-selected="false" data-t="t6">6 · Magnetic flux</button>
+</nav>
+
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="A straight wire divided into current elements and their fields at point P"></canvas><div class="ctrl">
+<label><span>Current I (A)</span> <b id="o1i"></b></label><input id="i1i" type="range" min="0.5" max="20" step="0.5" value="5">
+<label><span>Distance of P from the wire a (cm)</span> <b id="o1a"></b></label><input id="i1a" type="range" min="1" max="30" step="0.5" value="5">
+<label><span>Wire length L (cm)</span> <b id="o1l"></b></label><input id="i1l" type="range" min="2" max="200" step="1" value="20">
+<label><span>Number of elements N</span> <b id="o1n"></b></label><input id="i1n" type="range" min="1" max="40" step="1" value="10">
+<div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span id="r1c"></span></div>
+<div class="task"><h3>Question</h3>Make the wire much longer than a. Which simple formula does B approach? Which elements contribute most, and why do the far ones add almost nothing?</div></div></section>
+
+<section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="A current loop and the magnetic field along its axis"></canvas><div class="ctrl">
+<label><span>Current I (A)</span> <b id="o2i"></b></label><input id="i2i" type="range" min="0.5" max="20" step="0.5" value="5">
+<label><span>Loop radius R (cm)</span> <b id="o2r"></b></label><input id="i2r" type="range" min="1" max="30" step="0.5" value="10">
+<label><span>Number of turns N</span> <b id="o2n"></b></label><input id="i2n" type="range" min="1" max="200" step="1" value="1">
+<label><span>Point on the axis x (cm)</span> <b id="o2x"></b></label><input id="i2x" type="range" min="0" max="60" step="0.5" value="0">
+<div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span id="r2c"></span></div>
+<div class="task"><h3>Question</h3>Where on the axis is the field largest? Far from the loop, how fast does B fall off, and what other source falls off the same way?</div></div></section>
+
+<section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="Two parallel wires seen end-on, their fields and the forces between them"></canvas><div class="ctrl">
+<label><span>Current I₁ (A, + out of the page)</span> <b id="o3a"></b></label><input id="i3a" type="range" min="-20" max="20" step="0.5" value="5">
+<label><span>Current I₂ (A, + out of the page)</span> <b id="o3b"></b></label><input id="i3b" type="range" min="-20" max="20" step="0.5" value="5">
+<label><span>Separation a (cm)</span> <b id="o3d"></b></label><input id="i3d" type="range" min="0.5" max="100" step="0.5" value="10">
+<div class="row"><button class="btn" type="button" id="p3">Definition of the ampere (1 A, 1 A, 1 m)</button></div>
+<div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span id="r3c"></span></div>
+<div class="task"><h3>Question</h3>Reverse one current. Why do parallel currents attract while antiparallel currents repel? Are the two forces always equal in size?</div></div></section>
+
+<section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="Ampère's law: a current distribution, an Amperian loop and a graph of B against r"></canvas><div class="ctrl">
+<div class="row"><button class="btn" type="button" data-m4="wire" aria-pressed="true">Thick wire</button><button class="btn" type="button" data-m4="toroid" aria-pressed="false">Toroid</button></div>
+<label><span id="l4i">Current I (A)</span> <b id="o4i"></b></label><input id="i4i" type="range" min="1" max="100" step="1" value="20">
+<label><span id="l4R">Wire radius R (cm)</span> <b id="o4R"></b></label><input id="i4R" type="range" min="1" max="20" step="0.5" value="5">
+<label id="lab4n" class="hide"><span>Turns N</span> <b id="o4n"></b></label><input id="i4n" class="hide" type="range" min="10" max="1000" step="10" value="500">
+<label><span>Amperian loop radius r (cm)</span> <b id="o4r"></b></label><input id="i4r" type="range" min="0.5" max="30" step="0.5" value="3">
+<div class="readout"><span class="eq" id="r4a"></span><span class="eq" id="r4b"></span><span id="r4c"></span></div>
+<div class="task"><h3>Question</h3><span id="q4">Inside the wire B grows with r, outside it falls as 1/r. Explain both from the current enclosed by the Amperian loop.</span></div></div></section>
+
+<section class="lab" id="t5" role="tabpanel"><canvas id="c5" width="1200" height="600" aria-label="A solenoid and the magnetic field along its axis"></canvas><div class="ctrl">
+<label><span>Turns N</span> <b id="o5n"></b></label><input id="i5n" type="range" min="10" max="2000" step="10" value="300">
+<label><span>Length ℓ (cm)</span> <b id="o5l"></b></label><input id="i5l" type="range" min="2" max="100" step="1" value="30">
+<label><span>Radius R (cm)</span> <b id="o5r"></b></label><input id="i5r" type="range" min="0.5" max="15" step="0.5" value="3">
+<label><span>Current I (A)</span> <b id="o5i"></b></label><input id="i5i" type="range" min="0.1" max="20" step="0.1" value="2">
+<div class="readout"><span class="eq" id="r5a"></span><span class="eq" id="r5b"></span><span id="r5c"></span></div>
+<div class="task"><h3>Question</h3>Make the solenoid short and fat, then long and thin. When is B = μ₀nI a good answer? What is B at the ends of a long solenoid?</div></div></section>
+
+<section class="lab" id="t6" role="tabpanel"><canvas id="c6" width="1200" height="600" aria-label="Magnetic flux through a loop"></canvas><div class="ctrl">
+<div class="row"><button class="btn" type="button" data-m6="u" aria-pressed="true">Uniform field</button><button class="btn" type="button" data-m6="w" aria-pressed="false">Loop near a long wire</button></div>
+<div id="m6u" class="ctrl"><label><span>Field B (T)</span> <b id="o6b"></b></label><input id="i6b" type="range" min="0.01" max="2" step="0.01" value="0.5">
+<label><span>Area A (cm²)</span> <b id="o6a"></b></label><input id="i6a" type="range" min="10" max="2000" step="10" value="400">
+<label><span>Angle θ between B and the normal</span> <b id="o6t"></b></label><input id="i6t" type="range" min="0" max="180" step="1" value="30"></div>
+<div id="m6w" class="ctrl hide"><label><span>Wire current I (A)</span> <b id="o6i"></b></label><input id="i6i" type="range" min="1" max="100" step="1" value="20">
+<label><span>Distance to the near side c (cm)</span> <b id="o6c"></b></label><input id="i6c" type="range" min="0.5" max="30" step="0.5" value="2">
+<label><span>Loop width a (cm)</span> <b id="o6w"></b></label><input id="i6w" type="range" min="1" max="40" step="0.5" value="10">
+<label><span>Loop length b (cm)</span> <b id="o6l"></b></label><input id="i6l" type="range" min="1" max="60" step="0.5" value="20"></div>
+<div class="readout"><span class="eq" id="r6a"></span><span class="eq" id="r6b"></span><span id="r6c"></span></div>
+<div class="task"><h3>Question</h3><span id="q6">At what angle is the flux largest? Zero? Negative? What does a negative flux mean?</span></div></div></section>
+
+<footer>Prof. Najm Al-Hosiny – Physics 2 (Engineering &amp; Computing) 203207-4, Unit 4: Sources of the Magnetic Field. Works on any phone or computer; nothing to install. μ₀ = 4π×10⁻⁷ T·m/A.</footer>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+function text(g,s,x,y,col,al,sz,bold){g.font=(bold?'700 ':'')+(sz||24)+'px Inter, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction='ltr';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w,d){if(Math.hypot(x1-x0,y1-y0)<3)return;seg(g,x0,y0,x1,y1,col,w,d);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3.2);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const sup={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const sci=(v,d=2)=>{if(!isFinite(v))return '—';if(v===0)return '0';const e=Math.floor(Math.log10(Math.abs(v))+1e-12);if(e>=-2&&e<4)return v.toFixed(Math.max(0,d-e));return (v/Math.pow(10,e)).toFixed(d)+'×10'+String(e).split('').map(c=>sup[c]).join('');};
+function chg(g,x,y,q,r,sel){dot(g,x,y,r||14,q>0?css('--r'):(q<0?css('--b'):css('--muted')));text(g,q>0?'+':(q<0?'−':'0'),x,y+8,'#fff','center',22,true);if(sel){g.strokeStyle=css('--o');g.lineWidth=3;g.beginPath();g.arc(x,y,(r||14)+6,0,7);g.stroke();}}
+function axes(g,x0,y0,x1,y1){seg(g,x0,y1,x1,y1,css('--muted'),2);seg(g,x0,y0,x0,y1,css('--muted'),2);}
+const MU0=4*Math.PI*1e-7,EPS=8.85e-12,ke=8.99e9,PI=Math.PI,QE=1.602e-19,ME=9.11e-31,MP=1.673e-27;
+function xsym(g,x,y,r,col,w){g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();const d=r*0.62;seg(g,x-d,y-d,x+d,y+d,col,w||2);seg(g,x-d,y+d,x+d,y-d,col,w||2);}
+function osym(g,x,y,r,col,w){g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();dot(g,x,y,Math.max(2.5,r*0.28),col);}
+function bgrid(g,into,x0,y0,x1,y1,step,col){for(let x=x0;x<=x1;x+=step)for(let y=y0;y<=y1;y+=step){into?xsym(g,x,y,7,col,1.3):osym(g,x,y,7,col,1.3);}}
+function plotXY(g,X0,Y0,X1,Y1,fns,xmin,xmax,ymin,ymax,cols,lw){axes(g,X0,Y0,X1,Y1);if(ymin<0&&ymax>0){const yz=Y1-(0-ymin)/(ymax-ymin)*(Y1-Y0);seg(g,X0,yz,X1,yz,css('--muted'),1,[4,4]);}
+ fns.forEach((f,k)=>{g.strokeStyle=cols[k];g.lineWidth=lw||3;g.beginPath();let st=false;for(let i=0;i<=400;i++){const x=xmin+(xmax-xmin)*i/400,v=f(x);if(!isFinite(v)||v>ymax*1.02||v<ymin-(ymax-ymin)*0.02){st=false;continue;}const px=X0+(x-xmin)/(xmax-xmin)*(X1-X0),py=Y1-(v-ymin)/(ymax-ymin)*(Y1-Y0);st?g.lineTo(px,py):g.moveTo(px,py);st=true;}g.stroke();});
+ return {px:x=>X0+(x-xmin)/(xmax-xmin)*(X1-X0),py:v=>Y1-(v-ymin)/(ymax-ymin)*(Y1-Y0)};}
+function setPressed(sel,b){document.querySelectorAll(sel).forEach(x=>x.setAttribute('aria-pressed',x===b));}
+/* ---------- 1. Biot–Savart: straight wire ---------- */
+function lab1(){const g=ctx('c1');const I=sl('i1i','o1i',x=>x.toFixed(1)),a=sl('i1a','o1a',x=>x.toFixed(1))/100,L=sl('i1l','o1l')/100,N=sl('i1n','o1n');
+ const h=L/2,B=MU0*I/(4*PI*a)*2*h/Math.sqrt(h*h+a*a),Binf=MU0*I/(2*PI*a);let parts=[],Bs=0;
+ for(let i=0;i<N;i++){const y=-h+(i+.5)*L/N,dy=L/N,d=MU0*I*dy*a/(4*PI*Math.pow(y*y+a*a,1.5));parts.push(d);Bs+=d;}
+ $('r1a').textContent='B = (μ₀I/4πa)(2y/√(y²+a²)) = '+sci(B,3)+' T  (sum of N: '+sci(Bs,3)+')';
+ $('r1b').textContent='Infinite wire: μ₀I/2πa = '+sci(Binf,3)+' T  ('+(B/Binf*100).toFixed(1)+'%)';
+ $('r1c').textContent='Every element gives dB into the page at P (dl × r̂ points into the page).';
+ const cx=380,cy=300,S=Math.min(250/Math.max(h,a*0.4),2600),wy=Math.min(h*S,270),sc=wy/h,px=cx+Math.min(a*S,520);
+ seg(g,cx,cy-280,cx,cy+280,css('--grid'),2,[6,6]);
+ const hi=reduce?0:Math.floor(T*1.5)%N;
+ for(let i=0;i<N;i++){const y0=cy+wy-(i+1)*2*wy/N,hgt=2*wy/N,hue=200+160*i/Math.max(1,N-1);g.fillStyle='hsl('+hue+',65%,'+(i===hi?'42%':'60%')+')';g.fillRect(cx-7,y0,14,hgt);g.strokeStyle=css('--panel');g.lineWidth=1;g.strokeRect(cx-7,y0,14,hgt);}
+ arrow(g,cx-30,cy+60,cx-30,cy-60,css('--ink'),3);text(g,'I',cx-46,cy,css('--ink'),'right',24,true);
+ const yh=cy+wy-(hi+.5)*2*wy/N;seg(g,cx,yh,px,cy,css('--o'),1.5,[5,4]);text(g,'r',(cx+px)/2,(yh+cy)/2-8,css('--o'),'center',20,true);
+ dot(g,px,cy,6,css('--ink'));text(g,'P',px+12,cy-14,css('--ink'),'left',22,true);xsym(g,px+60,cy,16,css('--r'),3);text(g,'B',px+84,cy+8,css('--r'),'left',24,true);
+ const tot=Bs||1,len=300;
+ let x0=px+20;g.lineWidth=12;for(let i=0;i<N;i++){const l=parts[i]/tot*len,hue=200+160*i/Math.max(1,N-1);g.strokeStyle='hsl('+hue+',65%,'+(i===hi?'40%':'55%')+')';g.beginPath();g.moveTo(x0,cy+90);g.lineTo(x0+l,cy+90);g.stroke();x0+=l;}
+ text(g,'share of each element in B',px+20,cy+125,css('--muted'),'left',17);text(g,'a',(cx+px)/2,cy+26,css('--muted'),'center',20,true);seg(g,cx,cy+10,px,cy+10,css('--muted'),1.2);}
+
+/* ---------- 2. Loop on its axis ---------- */
+function lab2(){const g=ctx('c2');const I=sl('i2i','o2i',x=>x.toFixed(1)),R=sl('i2r','o2r',x=>x.toFixed(1))/100,N=sl('i2n','o2n'),x=sl('i2x','o2x',x=>x.toFixed(1))/100;
+ const f=t=>N*MU0*I*R*R/(2*Math.pow(R*R+t*t,1.5)),B=f(x),B0=f(0);
+ $('r2a').textContent='B = Nμ₀IR²/2(R²+x²)^(3/2) = '+sci(B,3)+' T';$('r2b').textContent='At the centre: Nμ₀I/2R = '+sci(B0,3)+' T';
+ $('r2c').textContent=x>3*R?'Far away B ≈ μ₀(NIπR²)/2πx³: it falls as 1/x³, like a dipole.':'B points along the axis (right-hand rule).';
+ const cx=200,cy=300,ry=150,rx=ry*0.36;g.strokeStyle=css('--o');g.lineWidth=7;g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,7);g.stroke();
+ seg(g,40,cy,600,cy,css('--muted'),1.5,[6,6]);arrow(g,cx+rx+2,cy-40,cx+rx-2,cy+40,css('--ink'),3);text(g,'I',cx+rx+16,cy+10,css('--ink'),'left',22,true);
+ const pX=cx+Math.min(x/R*ry,360);dot(g,pX,cy,7,css('--ink'));text(g,'P',pX,cy+32,css('--ink'),'center',22,true);arrow(g,pX,cy,pX+40+60*B/B0,cy,css('--r'),4);text(g,'B',pX+50+60*B/B0,cy-10,css('--r'),'left',22,true);
+ const xm=0.6,G=plotXY(g,680,60,1170,520,[f],0,xm,0,B0*1.15,[css('--b')]);dot(g,G.px(x),G.py(B),8,css('--o'));seg(g,G.px(R),60,G.px(R),520,css('--muted'),1.2,[5,5]);text(g,'x = R',G.px(R),540,css('--muted'),'center',16);
+ text(g,'B (T)',690,46,css('--ink'),'left',18);text(g,'x (up to 60 cm)',1170,545,css('--ink'),'right',17);}
+
+/* ---------- 3. Parallel conductors ---------- */
+$('p3').onclick=()=>{$('i3a').value=1;$('i3b').value=1;$('i3d').value=100;};
+function lab3(){const g=ctx('c3');const I1=sl('i3a','o3a',x=>x.toFixed(1)),I2=sl('i3b','o3b',x=>x.toFixed(1));let a=+$('i3d').value;$('o3d').textContent=a.toFixed(1);a/=100;
+ const B1=MU0*Math.abs(I1)/(2*PI*a),FL=MU0*I1*I2/(2*PI*a);
+ $('r3a').textContent='B₁ at wire 2 = μ₀I₁/2πa = '+sci(B1,3)+' T';$('r3b').textContent='F/ℓ = μ₀I₁I₂/2πa = '+sci(Math.abs(FL),3)+' N/m';
+ $('r3c').textContent=FL===0?'One current is zero: no force.':(FL>0?'Same direction: the wires attract.':'Opposite directions: the wires repel.')+' Equal and opposite forces (Newton’s third law).';
+ const x1=420,x2=780,cy=300;[[x1,I1],[x2,I2]].forEach(([x,I])=>{for(let r=50;r<=230;r+=60){g.strokeStyle=css('--grid');g.lineWidth=1.5;g.beginPath();g.arc(x,cy,r,0,7);g.stroke();
+   if(I!==0){const s=I>0?-1:1,ang=-PI/2;const tx=x+r*Math.cos(ang),ty=cy+r*Math.sin(ang);arrow(g,tx-8*s,ty,tx+8*s,ty,css('--muted'),1.6);}}
+  g.fillStyle=css('--o');g.beginPath();g.arc(x,cy,22,0,7);g.fill();if(I>0)osym(g,x,cy,15,'#fff',3);else if(I<0)xsym(g,x,cy,15,'#fff',3);});
+ text(g,'1',x1,cy+52,css('--ink'),'center',22,true);text(g,'2',x2,cy+52,css('--ink'),'center',22,true);
+ if(FL!==0){const L=40+80*Math.min(1,Math.abs(FL)/2e-4),s=FL>0?1:-1;arrow(g,x2-30*s*0+(s>0?-28:28),cy,x2+(s>0?-28-L:28+L),cy,css('--r'),5);arrow(g,x1+(s>0?28:-28),cy,x1+(s>0?28+L:-28-L),cy,css('--r'),5);}
+ if(I1!==0){const s=I1>0?-1:1;arrow(g,x2,cy-40,x2,cy-40+s*70,css('--b'),3);text(g,'B₁',x2+12,cy-80,css('--b'),'left',20,true);}
+ text(g,'Wires seen end-on: ⊙ current out of the page, ⊗ into the page',600,585,css('--muted'),'center',18);}
+
+/* ---------- 4. Ampère's law ---------- */
+let m4='wire';document.querySelectorAll('[data-m4]').forEach(b=>b.onclick=()=>{m4=b.dataset.m4;setPressed('[data-m4]',b);const t=m4==='toroid';
+ $('lab4n').classList.toggle('hide',!t);$('i4n').classList.toggle('hide',!t);$('l4R').textContent=t?'Inner radius a (cm) (outer b = a + 10 cm)':'Wire radius R (cm)';
+ $('q4').textContent=t?'Why is B zero inside the hole and outside the toroid, and why is it not uniform across the core?':'Inside the wire B grows with r, outside it falls as 1/r. Explain both from the current enclosed by the Amperian loop.';});
+function lab4(){const g=ctx('c4');const I=sl('i4i','o4i'),R=sl('i4R','o4R',x=>x.toFixed(1))/100,N=sl('i4n','o4n'),r=sl('i4r','o4r',x=>x.toFixed(1))/100;let f,Ienc;
+ if(m4==='wire'){f=t=>t<R?MU0*I*t/(2*PI*R*R):MU0*I/(2*PI*t);Ienc=r<R?I*r*r/(R*R):I;}else{const b=R+0.1;f=t=>(t>R&&t<b)?MU0*N*I/(2*PI*t):0;Ienc=(r>R&&r<b)?N*I:0;}
+ const B=f(r);$('r4a').textContent='I_enc = '+sci(Ienc,3)+' A';$('r4b').textContent='∮B·ds = B(2πr) = μ₀I_enc  →  B = '+sci(B,3)+' T';
+ $('r4c').textContent=m4==='wire'?(r<R?'Inside: I_enc = I r²/R², so B = μ₀Ir/2πR².':'Outside: all of I is enclosed, B = μ₀I/2πr.'):(Ienc?'Inside the core: N turns pierce the loop, B = μ₀NI/2πr.':'No net current through the loop: B = 0.');
+ const cx=280,cy=300,S=245/Math.max(m4==='wire'?R*1.3:(R+0.1)*1.1,r*1.12),rp=r*S;
+ if(m4==='wire'){g.fillStyle='rgba(194,94,0,0.25)';g.beginPath();g.arc(cx,cy,R*S,0,7);g.fill();osym(g,cx,cy,14,css('--o'),3);text(g,'I out of the page',cx,cy+R*S+24,css('--o'),'center',17);}
+ else{const b=R+0.1;g.fillStyle='rgba(194,94,0,0.18)';g.beginPath();g.arc(cx,cy,b*S,0,2*PI);g.moveTo(cx+R*S,cy);g.arc(cx,cy,R*S,0,2*PI);g.fill('evenodd');for(let k=0;k<16;k++){const t=2*PI*k/16;osym(g,cx+R*S*Math.cos(t),cy+R*S*Math.sin(t),6,css('--o'),1.5);xsym(g,cx+b*S*Math.cos(t),cy+b*S*Math.sin(t),6,css('--o'),1.5);}}
+ g.strokeStyle=css('--g');g.lineWidth=3;g.setLineDash([10,7]);g.beginPath();g.arc(cx,cy,rp,0,7);g.stroke();g.setLineDash([]);
+ if(B>0)for(let k=0;k<6;k++){const t=2*PI*k/6+0.4,x=cx+rp*Math.cos(t),y=cy+rp*Math.sin(t);arrow(g,x,y,x+34*Math.sin(t),y-34*Math.cos(t),css('--r'),2.5);}
+ const G=plotXY(g,640,60,1170,520,[f],0.0005,0.3,0,Math.max(f(m4==='wire'?R:R+0.0001),1e-12)*1.2,[css('--b')]);dot(g,G.px(r),G.py(B),8,css('--o'));
+ text(g,'B (T)',650,46,css('--ink'),'left',18);text(g,'r (up to 30 cm)',1170,545,css('--ink'),'right',17);text(g,'Amperian loop (dashed green)',cx,585,css('--g'),'center',17);}
+
+/* ---------- 5. Solenoid ---------- */
+function lab5(){const g=ctx('c5');const N=sl('i5n','o5n'),l=sl('i5l','o5l')/100,R=sl('i5r','o5r',x=>x.toFixed(1))/100,I=sl('i5i','o5i',x=>x.toFixed(1));
+ const n=N/l,Bi=MU0*n*I,f=x=>MU0*n*I/2*((x+l/2)/Math.sqrt((x+l/2)**2+R*R)-(x-l/2)/Math.sqrt((x-l/2)**2+R*R));
+ $('r5a').textContent='n = N/ℓ = '+sci(n,3)+' turns/m;  ideal B = μ₀nI = '+sci(Bi,3)+' T';$('r5b').textContent='Finite solenoid: B(centre) = '+sci(f(0),3)+' T,  B(end) = '+sci(f(l/2),3)+' T';
+ $('r5c').textContent=l>10*R?'Long and thin: B ≈ μ₀nI inside, about half of that at the ends.':'Short and fat: the field inside is weaker and not uniform.';
+ const W=480,sx=W/Math.max(l,4*R),Lp=l*sx,Rp=Math.min(R*sx,150),cx=290,cy=300,k=Math.min(28,Math.max(6,Math.round(N/20)));
+ for(let i=0;i<k;i++){const x=cx-Lp/2+(i+.5)*Lp/k;osym(g,x,cy-Rp,Math.min(9,Lp/k/2.4),css('--o'),2);xsym(g,x,cy+Rp,Math.min(9,Lp/k/2.4),css('--o'),2);}
+ for(let j=-2;j<=2;j++){const y=cy+j*Rp*0.35;arrow(g,cx-Lp/2-40,y,cx+Lp/2+40,y,css('--b'),2);}text(g,'B',cx+Lp/2+50,cy+6,css('--b'),'left',24,true);
+ const xm=Math.max(l,4*R)*0.9,G=plotXY(g,640,60,1170,520,[f,x=>Bi],-xm,xm,0,Bi*1.2,[css('--b'),css('--g')],2.5);
+ seg(g,G.px(-l/2),60,G.px(-l/2),520,css('--muted'),1.2,[5,5]);seg(g,G.px(l/2),60,G.px(l/2),520,css('--muted'),1.2,[5,5]);
+ text(g,'B along the axis',650,46,css('--ink'),'left',18);text(g,'μ₀nI',1170,G.py(Bi)-8,css('--g'),'right',17,true);text(g,'ends',G.px(l/2),540,css('--muted'),'center',16);}
+
+/* ---------- 6. Magnetic flux ---------- */
+let m6='u';document.querySelectorAll('[data-m6]').forEach(b=>b.onclick=()=>{m6=b.dataset.m6;setPressed('[data-m6]',b);$('m6u').classList.toggle('hide',m6!=='u');$('m6w').classList.toggle('hide',m6!=='w');
+ $('q6').textContent=m6==='u'?'At what angle is the flux largest? Zero? Negative? What does a negative flux mean?':'Why must we integrate here instead of using Φ = BA? Double the distance c: does the flux halve?';});
+function lab6(){const g=ctx('c6');
+ if(m6==='u'){const B=sl('i6b','o6b',x=>x.toFixed(2)),A=sl('i6a','o6a')*1e-4,th=sl('i6t','o6t',x=>x.toFixed(0)+'°'),c=Math.cos(th*PI/180),s=Math.sin(th*PI/180),Phi=B*A*c;
+  $('r6a').textContent='Φ_B = BA cos θ = '+sci(Phi,3)+' Wb';$('r6b').textContent='1 Wb = 1 T·m²';$('r6c').textContent=Math.abs(c)<1e-3?'The loop is parallel to B: no field line goes through it.':(c>0?'B goes through the loop along n̂.':'B goes through the loop against n̂: negative flux.');
+  for(let y=70;y<=540;y+=50)arrow(g,40,y,1160,y,css('--grid'),2);text(g,'B',1150,50,css('--muted'),'right',26,true);
+  const cx=600,cy=300,ry=200,rx=Math.max(4,ry*Math.abs(c)*0.9);g.fillStyle='rgba(194,94,0,0.18)';g.strokeStyle=css('--o');g.lineWidth=5;g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,7);g.fill();g.stroke();
+  arrow(g,cx,cy,cx+170*c,cy-170*s*0.5,css('--b'),5);text(g,'n̂',cx+190*c,cy-190*s*0.5,css('--b'),'center',26,true);
+  text(g,'Edge view: the loop turns about a vertical axis',1170,585,css('--muted'),'right',18);
+ } else {const I=sl('i6i','o6i'),c=sl('i6c','o6c',x=>x.toFixed(1))/100,a=sl('i6w','o6w',x=>x.toFixed(1))/100,b=sl('i6l','o6l',x=>x.toFixed(1))/100,Phi=MU0*I*b/(2*PI)*Math.log(1+a/c);
+  $('r6a').textContent='Φ_B = ∫B dA = (μ₀Ib/2π) ln(1 + a/c) = '+sci(Phi,3)+' Wb';$('r6b').textContent='B = μ₀I/2πr changes across the loop, so dA = b dr and we integrate.';$('r6c').textContent='Field into the page on the right of a wire carrying current upward.';
+  const wx=180,S=600/Math.max(c+a,0.1),x0=wx+c*S,x1=wx+(c+a)*S,hb=Math.min(b*S,460)/2,cy=300;
+  seg(g,wx,30,wx,570,css('--o'),8);arrow(g,wx-30,cy+60,wx-30,cy-60,css('--ink'),3);text(g,'I',wx-46,cy,css('--ink'),'right',22,true);
+  for(let x=wx+40;x<1160;x+=60)for(let y=60;y<=540;y+=60){const r=(x-wx)/S,sz=Math.max(3,Math.min(14,0.6/ (r*100+0.5)*60));xsym(g,x,y,sz,css('--grid'),1.3);}
+  g.strokeStyle=css('--b');g.lineWidth=4;g.strokeRect(x0,cy-hb,x1-x0,2*hb);g.fillStyle='rgba(31,91,214,0.08)';g.fillRect(x0,cy-hb,x1-x0,2*hb);
+  text(g,'c',(wx+x0)/2,cy+hb+30,css('--muted'),'center',20,true);text(g,'a',(x0+x1)/2,cy+hb+30,css('--muted'),'center',20,true);text(g,'b',x1+16,cy,css('--muted'),'left',20,true);
+  text(g,'⊗ smaller farther from the wire: B ∝ 1/r',1170,585,css('--muted'),'right',18);}}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4,t5:lab5,t6:lab6};
+function loop(t){T=reduce?0:t/1000;const f=LABS[active];if(f)f(t);requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

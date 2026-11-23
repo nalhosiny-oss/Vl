@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Energy of a System – Virtual Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=STIX+Two+Text&amp;display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:68ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',Georgia,serif;font-size:1.1rem;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.readout span{display:block}
+.eq{font-family:'STIX Two Text',Georgia,serif;font-size:1.12rem}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Energy of a System Lab</h1><p>Physics 1 (Engineering &amp; Computing) – Chapter 4. Change the values and watch the result, then use the example buttons to check your solutions and answer the question under each experiment.</p></header>
+<nav class="tabs" role="tablist" aria-label="Experiments"><button role="tab" aria-selected="true" data-t="t1">Work and force angle</button><button role="tab" aria-selected="false" data-t="t2">Spring (variable force)</button><button role="tab" aria-selected="false" data-t="t3">Work–kinetic energy</button><button role="tab" aria-selected="false" data-t="t4">Power</button><button role="tab" aria-selected="false" data-t="t5">Potential energy</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="A box pulled by a force at an angle"></canvas><div class="ctrl">
+<label><span>Force F (N)</span> <b id="o1F">50</b></label><input id="i1F" type="range" min="0" max="100" step="1" value="50">
+<label><span>Angle θ</span> <b id="o1t">30°</b></label><input id="i1t" type="range" min="0" max="180" step="1" value="30">
+<label><span>Displacement d (m)</span> <b id="o1d">3.0</b></label><input id="i1d" type="range" min="0" max="5" step="0.1" value="3">
+<div class="row"><button class="btn" type="button" id="p1">Example: vacuum cleaner, 50 N at 30°</button></div>
+<div class="readout"><span class="eq" id="r1">W = F d cosθ = 129.9 J</span><span id="r1s">Positive work</span></div>
+<div class="task"><h3>Question</h3>At what angle is the work zero no matter how large the force? At what angle is the work most negative?</div></div></section>
+
+<section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="A spring and its force–extension graph"></canvas><div class="ctrl">
+<label><span>Spring constant k (N/m)</span> <b id="o2k">200</b></label><input id="i2k" type="range" min="50" max="500" step="5" value="200">
+<label><span>Extension x (m)</span> <b id="o2x">0.20</b></label><input id="i2x" type="range" min="0" max="0.5" step="0.01" value="0.2">
+<div class="row"><button class="btn" type="button" id="p2">Example: measuring k of a spring</button></div>
+<div class="readout"><span class="eq" id="r2a">F = kx = 40.0 N</span><span class="eq" id="r2b">W = ½kx² = 4.00 J</span></div>
+<div class="task"><h3>Question</h3>Double the extension x. By what factor does the work increase, and why is it not just doubled?</div></div></section>
+
+<section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="A box speeding up and energy bars"></canvas><div class="ctrl">
+<label><span>Mass m (kg)</span> <b id="o3m">6.0</b></label><input id="i3m" type="range" min="1" max="20" step="0.5" value="6">
+<label><span>Force F (N)</span> <b id="o3F">12</b></label><input id="i3F" type="range" min="0" max="60" step="1" value="12">
+<label><span>Kinetic friction μ<sub>k</sub></span> <b id="o3u">0.00</b></label><input id="i3u" type="range" min="0" max="0.5" step="0.01" value="0">
+<label><span>Distance d (m)</span> <b id="o3d">3.0</b></label><input id="i3d" type="range" min="0.5" max="5" step="0.1" value="3">
+<div class="row"><button class="btn" type="button" id="g3">Run</button><button class="btn" type="button" id="p3">Example: 6 kg block pulled by 12 N</button></div>
+<div class="readout"><span class="eq" id="r3a">W = 36.0 J, Q = 0.0 J</span><span class="eq" id="r3b">ΔK = 36.0 J, v = 3.46 m/s</span></div>
+<div class="task"><h3>Question</h3>Set μ<sub>k</sub> = 0.2. What is the smallest force that moves the box? Where does the energy go that does not become kinetic energy?</div></div></section>
+
+<section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="An elevator rising at constant speed"></canvas><div class="ctrl">
+<label><span>Total mass M (kg)</span> <b id="o4m">1800</b></label><input id="i4m" type="range" min="100" max="2500" step="50" value="1800">
+<label><span>Constant speed v (m/s)</span> <b id="o4v">3.0</b></label><input id="i4v" type="range" min="0.5" max="5" step="0.1" value="3">
+<label><span>Friction f (N)</span> <b id="o4f">4000</b></label><input id="i4f" type="range" min="0" max="6000" step="100" value="4000">
+<div class="row"><button class="btn" type="button" id="p4">Example: elevator, 1500 kg car + 300 kg passengers</button></div>
+<div class="readout"><span class="eq" id="r4a">T = Mg + f = 21640 N</span><span class="eq" id="r4b">P = Tv = 64.9 kW = 87.0 hp</span></div>
+<div class="task"><h3>Question</h3>If you double the speed while keeping mass and friction fixed, what happens to the force T? What happens to the power?</div></div></section>
+
+<section class="lab" id="t5" role="tabpanel"><canvas id="c5" width="1200" height="600" aria-label="A ball between two heights and a reference level"></canvas><div class="ctrl">
+<label><span>Mass m (kg)</span> <b id="o5m">2.0</b></label><input id="i5m" type="range" min="0.5" max="10" step="0.5" value="2">
+<label><span>Initial height yᵢ (m)</span> <b id="o5a">1.0</b></label><input id="i5a" type="range" min="0" max="8" step="0.1" value="1">
+<label><span>Final height y<sub>f</sub> (m)</span> <b id="o5b">5.0</b></label><input id="i5b" type="range" min="0" max="8" step="0.1" value="5">
+<label><span>Reference level position (m)</span> <b id="o5r">0.0</b></label><input id="i5r" type="range" min="0" max="6" step="0.5" value="0">
+<div class="readout"><span class="eq" id="r5a">Uᵢ = 19.6 J, U_f = 98.0 J</span><span class="eq" id="r5b">ΔU = 78.4 J, W_g = −78.4 J</span></div>
+<div class="task"><h3>Question</h3>Move only the reference level. Which values change and which stay the same? What do you conclude?</div></div></section>
+<footer>Prof. Najm Al-Hosiny – Physics 1 (Engineering &amp; Computing), Chapter 4. Works on any phone or computer; nothing to install.</footer>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+const g=9.8,set=(id,v)=>{$(id).value=v};
+function arrow(c,x0,y0,x1,y1,col,w){c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();
+ const a=Math.atan2(y1-y0,x1-x0),h=Math.max(14,w*3);if(Math.hypot(x1-x0,y1-y0)<4)return;c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));c.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));c.closePath();c.fill();}
+function floor(c,y,x0,x1){c.strokeStyle=css('--muted');c.lineWidth=3;c.beginPath();c.moveTo(x0,y);c.lineTo(x1,y);c.stroke();c.lineWidth=1.5;for(let q=x0+20;q<=x1;q+=30){c.beginPath();c.moveTo(q,y);c.lineTo(q-16,y+18);c.stroke();}}
+function box(c,x0,y0,w,h){c.fillStyle=css('--fill');c.fillRect(x0,y0,w,h);c.strokeStyle=css('--ink');c.lineWidth=3;c.strokeRect(x0,y0,w,h);}
+function text(c,s,x,y,col,al,sz){c.font=(sz||28)+'px Inter, Arial, sans-serif';c.fillStyle=col;c.textAlign=al||'left';c.direction='ltr';c.fillText(s,x,y);}
+function spring(c,x0,y,x1,n,a){const L=x1-x0,e=20;c.beginPath();c.moveTo(x0,y);c.lineTo(x0+e,y);for(let i=1;i<2*n;i++)c.lineTo(x0+e+(L-2*e)*i/(2*n),y+(i%2?a:-a));c.lineTo(x1-e,y);c.lineTo(x1,y);c.strokeStyle=css('--ink');c.lineWidth=3;c.stroke();}
+function bar(c,xc,yb,h,col,w){c.fillStyle=col;c.fillRect(xc-w/2,h>0?yb-h:yb,w,Math.abs(h));}
+
+/* 1: work and angle */
+$('p1').onclick=()=>{set('i1F',50);set('i1t',30);set('i1d',3)};
+function lab1(t){const c=$('c1').getContext('2d'),W=1200,H=600;c.clearRect(0,0,W,H);
+ const F=+$('i1F').value,th=+$('i1t').value,d=+$('i1d').value,r=th*Math.PI/180,Wk=F*d*Math.cos(r);
+ $('o1F').textContent=F;$('o1t').textContent=th+'°';$('o1d').textContent=d.toFixed(1);
+ $('r1').textContent='W = F d cosθ = '+Wk.toFixed(1)+' J';
+ const sg=Math.abs(Math.cos(r))<1e-6||F===0||d===0?0:Math.sign(Wk);
+ $('r1s').textContent=sg>0?'Positive work':(sg<0?'Negative work':'Work = zero');
+ const fy=430,u=reduce?0.5:(t*0.00025)%1,xb=80+u*(d/5)*620,cx=xb+70,cy=fy-55;floor(c,fy,30,900);box(c,xb,fy-110,140,110);
+ const L=40+F*2.4;arrow(c,cx,cy,cx+L*Math.cos(r),cy-L*Math.sin(r),css('--o'),6);text(c,'F',cx+L*Math.cos(r)+10,cy-L*Math.sin(r)-8,css('--o'));
+ const col=sg>0?css('--o'):(sg<0?css('--r'):css('--muted'));arrow(c,cx,fy+50,cx+L*Math.cos(r),fy+50,col,6);text(c,'F cosθ',cx,fy+95,col);
+ arrow(c,80,fy+140,80+Math.max(d/5*620,6),fy+140,css('--b'),5);text(c,'d',90+d/5*620,fy+150,css('--b'));
+ const yb=300;c.strokeStyle=css('--muted');c.lineWidth=2;c.beginPath();c.moveTo(980,yb);c.lineTo(1160,yb);c.stroke();bar(c,1070,yb,Wk*0.45,col,90);text(c,'W',1070,40,css('--ink'),'center');text(c,Wk.toFixed(0)+' J',1070,Wk>=0?yb+40:yb-12,col,'center');}
+
+/* 2: spring */
+$('p2').onclick=()=>{set('i2k',270);set('i2x',0.02)};
+function lab2(){const c=$('c2').getContext('2d'),W=1200,H=600;c.clearRect(0,0,W,H);
+ const k=+$('i2k').value,xx=+$('i2x').value;$('o2k').textContent=k;$('o2x').textContent=xx.toFixed(2);
+ $('r2a').textContent='F = kx = '+(k*xx).toFixed(1)+' N';$('r2b').textContent='W = ½kx² = '+(0.5*k*xx*xx).toFixed(2)+' J';
+ const fy=200,wx=60,eq=420,xb=eq+xx*800;floor(c,fy,wx,1150);c.strokeStyle=css('--muted');c.lineWidth=3;c.beginPath();c.moveTo(wx,40);c.lineTo(wx,fy);c.stroke();
+ spring(c,wx,fy-45,xb,11,18);box(c,xb,fy-90,100,90);c.setLineDash([8,6]);c.strokeStyle=css('--muted');c.lineWidth=2;c.beginPath();c.moveTo(eq,fy-120);c.lineTo(eq,fy+20);c.stroke();c.setLineDash([]);
+ if(xx>0){arrow(c,xb,fy-45,xb-Math.min(30+k*xx*0.6,300),fy-45,css('--o'),6);text(c,'Fs = −kx',xb-20,fy-110,css('--o'),'right');}
+ const X0=120,Y0=560,gx=700,gy=280,Fmax=250;arrow(c,X0,Y0,X0+gx+40,Y0,css('--muted'),2);arrow(c,X0,Y0,X0,Y0-gy-30,css('--muted'),2);text(c,'x',X0+gx+50,Y0+8,css('--muted'));text(c,'F',X0-12,Y0-gy-30,css('--muted'),'right');
+ const px=X0+xx/0.5*gx,py=Y0-k*xx/Fmax*gy;c.fillStyle=css('--o');c.globalAlpha=.35;c.beginPath();c.moveTo(X0,Y0);c.lineTo(px,Y0);c.lineTo(px,py);c.closePath();c.fill();c.globalAlpha=1;
+ c.strokeStyle=css('--ink');c.lineWidth=3;c.beginPath();c.moveTo(X0,Y0);c.lineTo(X0+gx,Y0-k*0.5/Fmax*gy);c.stroke();text(c,'W = area = ½kx²',870,420,css('--ink'));}
+
+/* 3: work - kinetic energy */
+let run3=false,t3=0,last3=0;
+$('g3').onclick=()=>{run3=true;t3=0};$('p3').onclick=()=>{set('i3m',6);set('i3F',12);set('i3u',0);set('i3d',3);run3=true;t3=0};
+function lab3(t){const c=$('c3').getContext('2d'),W=1200,H=600;c.clearRect(0,0,W,H);
+ const m=+$('i3m').value,F=+$('i3F').value,mu=+$('i3u').value,d=+$('i3d').value,f=mu*m*g,net=F-f,moves=net>0,a=moves?net/m:0;
+ $('o3m').textContent=m.toFixed(1);$('o3F').textContent=F;$('o3u').textContent=mu.toFixed(2);$('o3d').textContent=d.toFixed(1);
+ const dt=t-last3;last3=t;if(run3)t3+=dt/1000*0.8;let s=moves?Math.min(0.5*a*t3*t3,d):0;if(!run3)s=moves?d:0;
+ const WF=F*s,Q=moves?f*s:0,K=WF-Q,v=Math.sqrt(Math.max(0,2*K/m)),vf=moves?Math.sqrt(2*net*d/m):0;
+ $('r3a').textContent='W = '+(F*(moves?d:0)).toFixed(1)+' J,  Q = '+(moves?f*d:0).toFixed(1)+' J';
+ $('r3b').textContent=moves?('ΔK = '+(net*d).toFixed(1)+' J,  v = '+vf.toFixed(2)+' m/s'):'F ≤ f: the box does not move';
+ const fy=330,sc=600/5,xb=60+s*sc;floor(c,fy,30,820);if(mu>0){c.strokeStyle=css('--muted');c.lineWidth=1.5;for(let q=40;q<820;q+=14){c.beginPath();c.moveTo(q,fy-1);c.lineTo(q+7,fy-9);c.stroke();}}
+ for(let q=0;q<=5;q++){text(c,q+' m',60+50+q*sc,fy+50,css('--muted'),'center',22);}
+ box(c,xb,fy-100,100,100);arrow(c,xb+100,fy-50,xb+100+Math.min(30+F*3,240),fy-50,css('--o'),6);if(f>0&&s<d||f>0&&!moves)arrow(c,xb,fy-15,xb-Math.min(20+f*3,200),fy-15,css('--r'),5);
+ if(v>0.01)arrow(c,xb+50,fy-140,xb+50+v*35,fy-140,css('--b'),5);text(c,'v = '+v.toFixed(2)+' m/s',40,50,css('--b'));
+ const yb=300,h=x=>Math.max(-260,Math.min(260,x*2.2));c.strokeStyle=css('--muted');c.lineWidth=2;c.beginPath();c.moveTo(880,yb);c.lineTo(1180,yb);c.stroke();
+ bar(c,930,yb,h(WF),css('--o'),70);bar(c,1030,yb,h(Q),css('--r'),70);bar(c,1130,yb,h(K),css('--b'),70);
+ text(c,'W',930,yb+40,css('--o'),'center');text(c,'Q',1030,yb+40,css('--r'),'center');text(c,'K',1130,yb+40,css('--b'),'center');
+ text(c,'W − Q = ΔK',1030,560,css('--ink'),'center');}
+
+/* 4: power and elevator */
+$('p4').onclick=()=>{set('i4m',1800);set('i4v',3);set('i4f',4000)};
+function lab4(t){const c=$('c4').getContext('2d'),W=1200,H=600;c.clearRect(0,0,W,H);
+ const M=+$('i4m').value,v=+$('i4v').value,f=+$('i4f').value,T=M*g+f,P=T*v;
+ $('o4m').textContent=M;$('o4v').textContent=v.toFixed(1);$('o4f').textContent=f;
+ $('r4a').textContent='T = Mg + f = '+T.toFixed(0)+' N';$('r4b').textContent='P = Tv = '+(P/1000).toFixed(1)+' kW = '+(P/746).toFixed(1)+' hp';
+ const s0=20,s1=580,cx=300,cy=420-((reduce?0:t*0.001*v*45)%220);c.strokeStyle=css('--muted');c.lineWidth=3;c.beginPath();c.moveTo(170,s0);c.lineTo(170,s1);c.moveTo(430,s0);c.lineTo(430,s1);c.stroke();
+ c.strokeStyle=css('--ink');c.lineWidth=2;c.beginPath();c.moveTo(cx,s0);c.lineTo(cx,cy-90);c.stroke();box(c,cx-90,cy-90,180,180);
+ const sc=0.004;arrow(c,cx,cy-90,cx,cy-90-T*sc,css('--o'),6);arrow(c,cx-40,cy+90,cx-40,cy+90+M*g*sc,css('--b'),6);if(f>0)arrow(c,cx+40,cy+90,cx+40,cy+90+f*sc,css('--r'),6);
+ text(c,'T',cx+14,cy-110,css('--o'));text(c,'Mg',cx-60,cy+130,css('--b'),'right');text(c,'f',cx+56,cy+120,css('--r'));
+ text(c,'a = 0',560,120,css('--ink'),'left',30);text(c,'P = T v',560,190,css('--ink'),'left',30);
+ c.strokeStyle=css('--muted');c.lineWidth=2;c.strokeRect(560,260,580,40);c.fillStyle=css('--o');c.fillRect(560,260,Math.min(580,P/150000*580),40);text(c,'0',560,330,css('--muted'),'center',22);text(c,'150 kW',1140,330,css('--muted'),'center',22);}
+
+/* 5: potential energy */
+function lab5(){const c=$('c5').getContext('2d'),W=1200,H=600;c.clearRect(0,0,W,H);
+ const m=+$('i5m').value,yi=+$('i5a').value,yf=+$('i5b').value,y0=+$('i5r').value,Ui=m*g*(yi-y0),Uf=m*g*(yf-y0),dU=Uf-Ui;
+ $('o5m').textContent=m.toFixed(1);$('o5a').textContent=yi.toFixed(1);$('o5b').textContent=yf.toFixed(1);$('o5r').textContent=y0.toFixed(1);
+ $('r5a').textContent='Uᵢ = '+Ui.toFixed(1)+' J,  U_f = '+Uf.toFixed(1)+' J';$('r5b').textContent='ΔU = '+dU.toFixed(1)+' J,  W_g = '+(-dU).toFixed(1)+' J';
+ const base=560,sc=60,X=y=>base-y*sc;floor(c,base,40,700);c.strokeStyle=css('--muted');c.lineWidth=2;c.beginPath();c.moveTo(90,base);c.lineTo(90,X(8.3));c.stroke();
+ for(let y=0;y<=8;y++){c.beginPath();c.moveTo(80,X(y));c.lineTo(100,X(y));c.stroke();text(c,y+' m',70,X(y)+8,css('--muted'),'right',20);}
+ c.setLineDash([10,8]);c.strokeStyle=css('--o');c.lineWidth=3;c.beginPath();c.moveTo(100,X(y0));c.lineTo(700,X(y0));c.stroke();c.setLineDash([]);text(c,'y = 0 (reference)',700,X(y0)-10,css('--o'),'right',22);
+ c.globalAlpha=.4;c.fillStyle=css('--b');c.beginPath();c.arc(300,X(yi),26,0,7);c.fill();c.globalAlpha=1;c.fillStyle=css('--ink');c.beginPath();c.arc(500,X(yf),26,0,7);c.fill();
+ text(c,'i',300,X(yi)+9,css('--panel'),'center',24);text(c,'f',500,X(yf)+9,css('--panel'),'center',24);
+ const yb=330,h=v=>Math.max(-250,Math.min(250,v*1.2));c.strokeStyle=css('--muted');c.beginPath();c.moveTo(800,yb);c.lineTo(1180,yb);c.stroke();
+ bar(c,860,yb,h(Ui),css('--b'),70);bar(c,980,yb,h(Uf),css('--ink'),70);bar(c,1110,yb,h(dU),css('--o'),70);
+ text(c,'Uᵢ',860,40,css('--b'),'center');text(c,'U_f',980,40,css('--ink'),'center');text(c,'ΔU',1110,40,css('--o'),'center');}
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4,t5:lab5};
+function loop(t){T=reduce?0:t/1000;const f=LABS[active];if(f)f(t);requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

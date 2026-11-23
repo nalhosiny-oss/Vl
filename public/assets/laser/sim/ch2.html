@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل خواص شعاع الليزر</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.4rem,4vw,2.1rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>معمل خواص شعاع الليزر</h1>
+  <p>فيزياء الليزر وتطبيقاته – الفصل الثاني. غيّر القيم وراقب النتيجة، واستخدم أزرار المسائل للتحقق من حلولك.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="المعامل">
+  <button role="tab" aria-selected="true" data-t="t1">فكرة الليزر والعتبة</button>
+  <button role="tab" aria-selected="false" data-t="t2">الأحادية والترابط</button>
+  <button role="tab" aria-selected="false" data-t="t3">الاتجاهية</button>
+  <button role="tab" aria-selected="false" data-t="t4">القابلية للتجميع</button>
+  <button role="tab" aria-selected="false" data-t="t5">السطوع</button>
+</nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="600" aria-label="مرنان ليزري ومنحنى القدرة الخارجة مع الضخ"></canvas>
+  <div class="ctrl">
+    <label>معدل الضخ <b id="o1p">2.20</b></label><input id="i1p" type="range" min="0" max="3" step="0.01" value="2.2">
+    <label>انعكاسية مرآة الخرج R <b id="o1r">0.95</b></label><input id="i1r" type="range" min="0.5" max="0.99" step="0.01" value="0.95">
+    <div class="readout"><span class="eq" id="r1a"></span><span id="r1b"></span></div>
+    <div class="task"><h3>سؤال</h3>ابدأ بضخ صغير وارفعه تدريجياً. عند أي قيمة يبدأ الليزر؟ وكيف تتغير هذه القيمة عند خفض انعكاسية المرآة؟</div>
+  </div>
+</section>
+
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="600" aria-label="عرض الخط الطيفي وطول الترابط"></canvas>
+  <div class="ctrl">
+    <label>الطول الموجي المركزي λ (nm) <b id="o2l">633</b></label><input id="i2l" type="range" min="400" max="1600" step="1" value="633">
+    <label>عرض النطاق Δf (Hz) <b id="o2f">1.0×10^9</b></label><input id="i2f" type="range" min="3" max="15" step="0.01" value="9">
+    <div class="row"><button class="btn" type="button" data-df="3">ليزر مستقر</button><button class="btn" type="button" data-df="9">ليزر هيليوم-نيون</button><button class="btn" type="button" data-df="13">LED</button><button class="btn" type="button" data-df="14.5">ضوء أبيض</button></div>
+    <div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span></div>
+    <div class="task"><h3>سؤال (المسائل 4 و5)</h3>اختر "ضوء أبيض" ثم "ليزر هيليوم-نيون". كم مرة يزيد طول الترابط؟ ولماذا زمن ترابط الضوء الحراري أقصر؟</div>
+  </div>
+</section>
+
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="600" aria-label="شعاع يتسع مع المسافة"></canvas>
+  <div class="ctrl">
+    <label>الطول الموجي λ (nm) <b id="o3l">700</b></label><input id="i3l" type="range" min="200" max="11000" step="10" value="700">
+    <label>قطر الحزمة D (cm) <b id="o3d">1.0</b></label><input id="i3d" type="range" min="0.1" max="100" step="0.1" value="1">
+    <label>المسافة z (m) <b id="o3z">3.84×10^8</b></label><input id="i3z" type="range" min="0" max="9" step="0.01" value="8.584">
+    <label>المعامل β <b id="o3b">1.22</b></label><input id="i3b" type="range" min="1" max="2.44" step="0.01" value="1.22">
+    <div class="row"><button class="btn" type="button" id="p3">المسألة 6 (القمر)</button></div>
+    <div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span></div>
+    <div class="task"><h3>سؤال</h3>ما الذي يقلل قطر البقعة على القمر أكثر: مضاعفة قطر الحزمة أم استخدام طول موجي أقصر بنسبة النصف؟</div>
+  </div>
+</section>
+
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="600" aria-label="عدسة تجمع شعاع الليزر في بقعة"></canvas>
+  <div class="ctrl">
+    <label>البعد البؤري F (cm) <b id="o4f">20.0</b></label><input id="i4f" type="range" min="0.5" max="50" step="0.1" value="20">
+    <label>قطر العدسة D (cm) <b id="o4d">2.0</b></label><input id="i4d" type="range" min="0.5" max="20" step="0.1" value="2">
+    <label>الطول الموجي λ (nm) <b id="o4l">450</b></label><input id="i4l" type="range" min="200" max="11000" step="10" value="450">
+    <label>قدرة الشعاع P (W) <b id="o4p">1</b></label><input id="i4p" type="range" min="0.01" max="100" step="0.01" value="1">
+    <div class="row"><button class="btn" type="button" id="p4">المسألة 9</button></div>
+    <div class="readout"><span class="eq" id="r4a"></span><span class="eq" id="r4b"></span></div>
+    <div class="task"><h3>سؤال</h3>لماذا يستطيع ليزر قدرته واط واحد أن يثقب ورقة، بينما لا يفعل ذلك مصباح قدرته 100 واط؟</div>
+  </div>
+</section>
+
+<section class="lab" id="t5" role="tabpanel">
+  <canvas id="c5" width="1200" height="600" aria-label="مقارنة سطوع مصدرين"></canvas>
+  <div class="ctrl">
+    <label>القدرة P (W) <b id="o5p">40</b></label><input id="i5p" type="range" min="0.001" max="100" step="0.001" value="40">
+    <label>مساحة السطح المشع S (cm²) <b id="o5s">700</b></label><input id="i5s" type="range" min="-4" max="3.5" step="0.01" value="2.845">
+    <label>الزاوية المجسمة Ω (sr) <b id="o5o">3.14</b></label><input id="i5o" type="range" min="-7" max="1.1" step="0.01" value="0.497">
+    <label>عرض النطاق Δλ (nm) <b id="o5w">0.1</b></label><input id="i5w" type="range" min="-6" max="2" step="0.01" value="-1">
+    <div class="row"><button class="btn" type="button" id="p5a">المسألة 7 (مصباح صوديوم)</button><button class="btn" type="button" id="p5b">ليزر 1 mW</button></div>
+    <div class="readout"><span class="eq" id="r5a"></span><span class="eq" id="r5b"></span></div>
+    <div class="task"><h3>سؤال</h3>قارن سطوع المصباح وسطوع ليزر قدرته 1 mW. من أين يأتي الفرق الهائل رغم صغر قدرة الليزر؟</div>
+  </div>
+</section>
+
+<footer>أ.د. نجم الحصيني – فيزياء الليزر وتطبيقاته، الفصل الثاني. يعمل على الجوال دون تثبيت.</footer>
+</div>
+
+<script>
+(function(){
+const c=3e8;const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;}));
+const sci=(v,d=2)=>{if(!isFinite(v))return '—';const e=Math.floor(Math.log10(Math.abs(v)));if(e>=-2&&e<4)return v.toFixed(Math.max(0,d-e));return (v/Math.pow(10,e)).toFixed(d)+'×10^'+e;};
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||26)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function curve(g,f,x0,x1,col,w){g.beginPath();for(let q=x0;q<=x1;q+=2){const y=f(q);q===x0?g.moveTo(q,y):g.lineTo(q,y);}g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function wl(l){if(l<380||l>750)return css('--r');const t=[[380,[130,0,200]],[440,[30,30,255]],[490,[0,190,255]],[510,[0,210,60]],[580,[240,220,0]],[645,[255,40,0]],[750,[170,0,0]]];for(let i=0;i<t.length-1;i++)if(l<=t[i+1][0]){const f=(l-t[i][0])/(t[i+1][0]-t[i][0]),a=t[i][1],b=t[i+1][1];return 'rgb('+a.map((v,j)=>Math.round(v+(b[j]-v)*f)).join(',')+')';}}
+
+/* 1 laser idea and threshold (steady-state of simple rate equations) */
+function lab1(){const g=$('c1').getContext('2d');g.clearRect(0,0,1200,600);const P=+$('i1p').value,R=+$('i1r').value,loss=0.05+(1-R)*2,Pth=loss/0.1,out=Math.max(0,P-Pth)*(1-R)/loss*3;
+ $('o1p').textContent=P.toFixed(2);$('o1r').textContent=R.toFixed(2);$('r1a').textContent='P_th ≈ '+Pth.toFixed(2)+',  P_out = '+out.toFixed(2)+' (a.u.)';$('r1b').textContent=P>Pth?'فوق العتبة: الانبعاث المستحث يغلب ويخرج شعاع الليزر':'تحت العتبة: الفقد أكبر من التكبير، انبعاث تلقائي فقط';
+ const L=60,Rx=560,y0=180;g.fillStyle=css('--o');g.globalAlpha=.12+.25*Math.min(1,P/3);g.fillRect(L+20,y0-70,Rx-L-40,140);g.globalAlpha=1;g.strokeStyle=css('--ink');g.lineWidth=2;g.strokeRect(L+20,y0-70,Rx-L-40,140);
+ seg(g,L,y0-110,L,y0+110,css('--ink'),10);seg(g,Rx,y0-110,Rx,y0+110,css('--muted'),3+5*R);const n=P>Pth?Math.min(10,2+out*3):1;
+ for(let i=0;i<n;i++){const s=((T*0.5+i/n)%1)*2,xp=s<1?L+20+s*(Rx-L-40):Rx-20-(s-1)*(Rx-L-40),yy=y0-50+i*10;seg(g,xp-30,yy,xp,yy,css('--o'),2);}
+ if(out>0)seg(g,Rx+6,y0,Rx+6+Math.min(500,80+out*100),y0,css('--o'),2+Math.min(14,out*4));
+ const X0=680,Y0=540,gx=460,gy=380;seg(g,X0,Y0,X0+gx,Y0,css('--muted'),2);seg(g,X0,Y0,X0,Y0-gy,css('--muted'),2);curve(g,q=>{const p=(q-X0)/gx*3;return Y0-Math.min(gy,Math.max(0,p-Pth)*(1-R)/loss*3*40);},X0,X0+gx,css('--o'),3);
+ seg(g,X0+Pth/3*gx,Y0,X0+Pth/3*gx,Y0-gy,css('--ink'),1.5,[5,5]);g.fillStyle=css('--b');g.beginPath();g.arc(X0+P/3*gx,Y0-Math.min(gy,out*40),8,0,7);g.fill();
+ text(g,'الضخ',X0+gx,Y0+30,css('--muted'),'center',20,1);text(g,'القدرة الخارجة',X0,Y0-gy-12,css('--muted'),'center',20,1);text(g,'العتبة',X0+Pth/3*gx,Y0+30,css('--ink'),'center',20,1);}
+
+/* 2 monochromaticity and coherence */
+document.querySelectorAll('[data-df]').forEach(b=>b.onclick=()=>{$('i2f').value=b.dataset.df;});
+function lab2(){const g=$('c2').getContext('2d');g.clearRect(0,0,1200,600);const l=+$('i2l').value*1e-9,df=Math.pow(10,+$('i2f').value),f0=c/l,M=df/f0,Lc=c/df,dt=1/df;
+ $('o2l').textContent=Math.round(l*1e9);$('o2f').textContent=sci(df,1);$('r2a').textContent='M = Δf/f₀ = '+sci(M);$('r2b').textContent='Δt = 1/Δf = '+sci(dt)+' s';$('r2c').textContent='Lc = c/Δf = '+sci(Lc)+' m';
+ const X0=60,X1=1140,w=Math.max(2,Math.min(1000,(Math.log10(df)-2)/13*900));curve(g,q=>{const d=q-600;return 280-220*Math.exp(-((d/(w/2))**2));},X0,X1,wl(l*1e9),4);text(g,'f₀',600,310,css('--muted'),'center',22);
+ const Lp=Math.max(30,Math.min(1080,(Math.log10(Lc)+7)/12*1000)),sp=60+((T*120)%(1140-60));curve(g,q=>{const d=q-sp;return Math.abs(d)<Lp/2?480-60*Math.sin(2*Math.PI*d/26):480;},60,1140,css('--o'),3);
+ seg(g,sp-Lp/2,560,sp+Lp/2,560,css('--b'),3);text(g,'Lc',sp,590,css('--b'),'center',20);text(g,'الرسم بمقياس لوغاريتمي',1140,30,css('--muted'),'right',18,1);}
+
+/* 3 directionality */
+$('p3').onclick=()=>{$('i3l').value=700;$('i3d').value=1;$('i3z').value=Math.log10(3.84e8);$('i3b').value=1.22;};
+function lab3(){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,600);const l=+$('i3l').value*1e-9,D=+$('i3d').value*1e-2,z=Math.pow(10,+$('i3z').value),b=+$('i3b').value,th=b*l/D,spot=D+2*th*z;
+ $('o3l').textContent=Math.round(l*1e9);$('o3d').textContent=(D*100).toFixed(1);$('o3z').textContent=sci(z,2);$('o3b').textContent=b.toFixed(2);
+ $('r3a').textContent='θd = βλ/D = '+sci(th)+' rad';$('r3b').textContent='قطر البقعة ≈ D + 2θd z = '+sci(spot)+' m';
+ const y0=300,sc=Math.min(240,Math.max(4,(Math.log10(spot)+3)*30));g.fillStyle=wl(l*1e9);g.globalAlpha=.5;g.beginPath();g.moveTo(60,y0-8);g.lineTo(1000,y0-sc);g.lineTo(1000,y0+sc);g.lineTo(60,y0+8);g.closePath();g.fill();g.globalAlpha=1;
+ g.strokeStyle=css('--ink');g.lineWidth=2;g.beginPath();g.ellipse(1050,y0,30,Math.max(sc,10),0,0,7);g.stroke();text(g,'مقياس لوغاريتمي للقطر',1140,560,css('--muted'),'right',18,1);}
+
+/* 4 focusability */
+$('p4').onclick=()=>{$('i4d').value=2;$('i4f').value=20;$('i4l').value=450;};
+function lab4(){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,600);const F=+$('i4f').value*1e-2,D=+$('i4d').value*1e-2,l=+$('i4l').value*1e-9,P=+$('i4p').value,d=F/D*l,I=P/(Math.PI*(d/2)**2);
+ $('o4f').textContent=(F*100).toFixed(1);$('o4d').textContent=(D*100).toFixed(1);$('o4l').textContent=Math.round(l*1e9);$('o4p').textContent=P.toFixed(2);
+ $('r4a').textContent='d = (F/D) λ = '+sci(d)+' m';$('r4b').textContent='I = P/(πd²/4) = '+sci(I)+' W/m²';
+ const lx=420,y0=300,Dp=Math.min(240,D*1000),fx=lx+Math.min(600,F*1200+40),dp=Math.max(2,Math.min(60,d*1e6*4));g.fillStyle=wl(l*1e9);g.globalAlpha=.5;g.fillRect(40,y0-Dp/2,lx-40,Dp);
+ g.beginPath();g.moveTo(lx,y0-Dp/2);g.lineTo(fx,y0-dp/2);g.lineTo(fx,y0+dp/2);g.lineTo(lx,y0+Dp/2);g.closePath();g.fill();g.globalAlpha=1;g.strokeStyle=css('--ink');g.lineWidth=3;g.beginPath();g.ellipse(lx,y0,18,Math.max(Dp/2+20,40),0,0,7);g.stroke();
+ seg(g,lx,y0+Dp/2+50,fx,y0+Dp/2+50,css('--muted'),2);text(g,'F',(lx+fx)/2,y0+Dp/2+80,css('--muted'),'center',22);}
+
+/* 5 brightness, B = P/(S Ω) and spectral brightness B/Δλ */
+$('p5a').onclick=()=>{$('i5p').value=40;$('i5s').value=Math.log10(700);$('i5o').value=Math.log10(Math.PI);$('i5w').value=Math.log10(0.1);};
+$('p5b').onclick=()=>{$('i5p').value=0.001;$('i5s').value=Math.log10(Math.PI*0.05*0.05);$('i5o').value=Math.log10(Math.PI*(1e-3)**2);$('i5w').value=Math.log10(1e-3);};
+function lab5(){const g=$('c5').getContext('2d');g.clearRect(0,0,1200,600);const P=+$('i5p').value,S=Math.pow(10,+$('i5s').value)*1e-4,O=Math.pow(10,+$('i5o').value),dl=Math.pow(10,+$('i5w').value),B=P/(S*O);
+ $('o5p').textContent=P<1?P.toFixed(3):P.toFixed(1);$('o5s').textContent=sci(S*1e4,2);$('o5o').textContent=sci(O,2);$('o5w').textContent=sci(dl,1);
+ $('r5a').textContent='B = P/(S Ω) = '+sci(B)+' W/(m²·sr)';$('r5b').textContent='Bλ = B/Δλ = '+sci(B/dl)+' W/(m²·sr·nm)';
+ const X0=80,X1=1120,mx=v=>X0+(v+2)/16*(X1-X0);seg(g,X0,400,X1,400,css('--muted'),2);for(let e=-2;e<=14;e+=2){seg(g,mx(e),390,mx(e),410,css('--muted'),2);text(g,'10^'+e,mx(e),440,css('--muted'),'center',18);}
+ const lb=Math.log10(B);g.fillStyle=css('--o');g.fillRect(X0,330,Math.max(4,Math.min(X1-X0,mx(lb)-X0)),50);text(g,'log B',X0,310,css('--muted'),'left',20);
+ const sunB=2e7;seg(g,mx(Math.log10(sunB)),300,mx(Math.log10(sunB)),420,css('--b'),3);text(g,'الشمس',mx(Math.log10(sunB)),290,css('--b'),'center',20,1);
+ text(g,'Ω = 4π تقريباً لمصدر يشع في كل الاتجاهات، و Ω = π لسطح يشع بانتظام في نصف فضاء',1120,540,css('--muted'),'right',18,1);}
+
+function loop(t){T=reduce?0:t/1000;({t1:lab1,t2:lab2,t3:lab3,t4:lab4,t5:lab5})[active]();requestAnimationFrame(loop);}requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

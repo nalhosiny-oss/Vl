@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المعمل الافتراضي — التجربة 9: طيف النفاذية UV-Vis</title>
+<style>
+  :root{
+    --bg:#f3f7fc; --panel:#ffffff; --panel2:#eef4fb; --line:#c9d6e8;
+    --navy:#14284b; --navy2:#1f4e8c; --sun:#e8742a; --sun2:#f59e4c;
+    --text:#14284b; --muted:#4a5d7e; --ok:#1d8a4e; --bad:#c0392b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#e6effa 0%,var(--bg) 260px);color:var(--text);
+       font-family:"Segoe UI",Tahoma,"Geeza Pro","Arial",sans-serif;line-height:1.7}
+  header{padding:22px 18px 12px;text-align:center;border-bottom:3px solid var(--sun);background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff}
+  header .tag{display:inline-block;color:#ffd7b5;border:1px solid var(--sun2);border-radius:20px;padding:2px 14px;font-size:13px}
+  h1{margin:8px 0 2px;font-size:26px;color:#fff}
+  h1 span{color:var(--sun2)}
+  header p{margin:0;color:#d3e0f2;font-size:14px}
+  .wrap{max-width:1100px;margin:0 auto;padding:14px}
+  .safety{background:#fff3e6;border:1px solid var(--sun);border-right:6px solid var(--sun);border-radius:12px;padding:10px 14px;margin:12px 0;font-size:14px}
+  .safety b{color:#b4511a}
+  nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  nav button{flex:1 1 150px;background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:10px;
+             font:inherit;font-size:15px;cursor:pointer}
+  nav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(20,40,75,.06)}
+  section.on{display:block}
+  h2{margin:0 0 10px;font-size:20px;color:var(--navy)}
+  h3{margin:14px 0 6px;font-size:16px;color:var(--sun)}
+  .eq{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:"Cambria Math","Times New Roman",serif;font-style:italic;
+      background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:2px 10px;margin:2px 0;font-size:18px;color:var(--navy)}
+  .eq.big{display:block;text-align:center;font-size:22px;margin:8px auto;max-width:460px}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  label{display:block;font-size:14px;color:var(--muted);margin-top:8px}
+  input[type=range]{width:100%;accent-color:var(--sun);direction:ltr}
+  select,input[type=number],input[type=text]{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+  .val{color:var(--sun);font-weight:bold}
+  .btn{background:var(--navy2);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px}
+  .btn.gold{background:var(--sun);color:#fff}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px;background:#fff;border:1px solid var(--line)}
+  canvas.dark{background:#05070d}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+  th,td{border:1px solid var(--line);padding:6px;text-align:center}
+  th{background:var(--navy);color:#fff}
+  td input{text-align:center}
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+  .q p{margin:0 0 6px;font-weight:bold}
+  .opt{display:block;width:100%;text-align:right;background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;
+       padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+  .opt.right{border-color:var(--ok);background:#e3f5ea}
+  .opt.wrong{border-color:var(--bad);background:#fbe7e4}
+  .fb{font-size:14px;color:var(--muted);min-height:1.2em}
+  .note{font-size:14px;color:var(--muted)}
+  .reading{font-size:20px;color:var(--sun);font-weight:bold}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:16px}
+  .pill{display:inline-block;background:#fff3e6;border:1px solid var(--sun);border-radius:20px;padding:1px 10px;font-size:13px;margin:2px}
+  div.reading.ltr{display:block;text-align:center}
+
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header>
+  <span class="tag">البصريات الفيزيائية <span class="ltr">2035004-4</span> — المعمل الافتراضي للعملي</span>
+  <h1>التجربة 9: <span>طيف النفاذية بجهاز المطياف الضوئي UV-Vis</span></h1>
+  <p>Transmittance Spectrum using a UV-Visible Spectrophotometer</p>
+</header>
+<div class="wrap">
+  <div class="safety">⚠️ <b>تنبيه سلامة:</b> لا تفتح غطاء حجرة العيّنة أثناء تشغيل مصباح الأشعة فوق البنفسجية (الديوتيريوم)، ولا تنظر إليه. أمسك الخلية (الكيوفيت) من وجهيها المصنفرين فقط، وجفّف أي محلول خارجها قبل إدخالها.</div>
+  <nav>
+    <button class="on" data-s="s1">1) أسئلة التحضير</button>
+    <button data-s="s2">2) فكرة التجربة</button>
+    <button data-s="s3">3) المحاكاة والقياس</button>
+    <button data-s="s4">4) الجدول والحسابات</button>
+    <button data-s="s5">5) ماذا لو…؟</button>
+  </nav>
+
+  <section id="s1" class="on">
+    <h2>أسئلة التحضير قبل المعمل</h2>
+    <p class="note">أجب عنها قبل حضور التجربة؛ يظهر التصحيح مباشرة بعد اختيارك.</p>
+    <div id="quiz"></div><p class="reading" id="qscore"></p>
+  </section>
+
+  <section id="s2">
+    <h2>فكرة التجربة</h2>
+    <p>جهاز المطياف الضوئي يرسل ضوءًا أحادي الطول الموجي <span class="eq">λ</span> (يختاره <b>محزوز</b> داخل الجهاز) خلال العيّنة، ويقيس كاشف ضوئي شدة الضوء النافذ <span class="eq">I</span> مقارنة بالشدة الساقطة <span class="eq">I₀</span>.</p>
+    <span class="eq big">T = I / I₀ × 100 %</span>
+    <p>ويُعرَّف <b>الامتصاص</b> (الكثافة الضوئية):</p>
+    <span class="eq big">A = − log₁₀ (T / 100)</span>
+    <h3>لماذا نستخدم عيّنة مرجعية؟</h3>
+    <p>جدران الخلية والمذيب يمتصان ويعكسان جزءًا من الضوء. لذلك نضع أولًا خلية فيها المذيب فقط (الماء المقطر) ونضبط الجهاز على <span class="eq">T = 100 %</span>، فتصبح القراءات بعد ذلك للمادة المذابة وحدها.</p>
+    <h3>ماذا نتعلم من الطيف؟</h3>
+    <p>برسم <span class="eq">T</span> على المحور الصادي مقابل <span class="eq">λ</span> على المحور السيني نحصل على طيف النفاذية. الطول الموجي الذي تكون عنده النفاذية أقل ما يمكن هو <span class="eq">λ_max</span> (أقصى امتصاص)، وهو بصمة للمادة.
+       ولون المحلول الذي نراه هو اللون المتمم للون الممتص: محلول برمنجنات البوتاسيوم يمتص الأخضر فيبدو بنفسجيًا.</p>
+    <div class="card"><b>الأجهزة:</b> مطياف ضوئي UV-Vis — خليتان (كيوفيت) من الكوارتز — ماء مقطر — محلول برمنجنات البوتاسيوم المخفف — محلول كبريتات النحاس — مرشح زجاجي أحمر.</div>
+  </section>
+
+  <section id="s3">
+    <h2>المحاكاة والقياس</h2>
+    <div class="grid">
+      <div class="card">
+        <canvas id="dev" dir="ltr" width="460" height="250" style="max-width:460px;margin:auto"></canvas>
+        <p class="note" style="text-align:center">شاشة الجهاز</p>
+      </div>
+      <div class="card">
+        <label>الطول الموجي λ (nm)</label>
+        <input type="range" id="lam" min="300" max="800" step="10" value="500">
+        <div class="reading ltr" id="lamOut">500 nm</div>
+        <label>العيّنة في الخلية</label>
+        <select id="smp"><option value="blank">ماء مقطر (المرجع)</option><option value="kmn">محلول برمنجنات البوتاسيوم</option><option value="cu">محلول كبريتات النحاس</option><option value="red">مرشح زجاجي أحمر</option></select>
+        <button class="btn" id="zero">اضبط 100% بالمرجع</button>
+        <button class="btn gold" id="rec">سجّل القراءة</button>
+        <button class="btn ghost" id="reset">ابدأ من جديد</button>
+        <p class="note" id="msg">ضع الماء المقطر واضغط «اضبط 100%» عند كل طول موجي قبل قياس العيّنة.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="s4">
+    <h2>جدول القراءات والحسابات</h2>
+    <p class="note">احسب الامتصاص <span class="eq">A = −log₁₀(T/100)</span> لكل صف، وارسم <span class="eq">T</span> مقابل <span class="eq">λ</span> بيدك، وحدد <span class="eq">λ_max</span> (أقل نفاذية).</p>
+    <label>العيّنة المعروضة في الجدول</label>
+    <select id="tSel"><option value="kmn">محلول برمنجنات البوتاسيوم</option><option value="cu">محلول كبريتات النحاس</option><option value="red">مرشح زجاجي أحمر</option></select>
+    <table><thead><tr><th>λ (nm)</th><th>T (%)</th><th>A التي حسبتها</th><th>النتيجة</th></tr></thead><tbody id="tb"></tbody></table>
+    <label>الطول الموجي لأقصى امتصاص λ_max الذي حددته من رسمك (nm)</label>
+    <input type="number" id="myL" step="10" style="max-width:240px"><br>
+    <button class="btn gold" id="chkBtn">تحقّق من حساباتي</button>
+    <div class="grid" style="margin-top:10px">
+      <div class="card"><canvas dir="ltr" id="plotCv" width="520" height="300"></canvas></div>
+      <div class="card" id="resBox"><p class="note">تظهر هنا النتائج بعد التحقق.</p></div>
+    </div>
+  </section>
+
+  <section id="s5">
+    <h2>ماذا لو…؟</h2>
+    <p class="note">توقّع الإجابة أولًا، ثم اضغط «أظهر التفسير».</p>
+    <div id="whatif"></div>
+  </section>
+</div>
+<footer>إعداد: أ.د. نجم الحصيني — قسم الفيزياء، جامعة الطائف</footer>
+<script>
+function onTab(){ if(typeof refresh==='function') refresh(); }
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');document.getElementById(b.dataset.s).classList.add('on');onTab();});
+function wrapLtr(o){return /^[\sλθαμω0-9.,\/=+\-−×·°%()a-zA-Z²³⁻¹]+$/.test(o)?'<span class="ltr">'+o+'</span>':o;}
+const Q=[
+ {q:'إذا كانت النفاذية T = 10% فإن الامتصاص A يساوي:',o:['0.1','1','2','10'],a:1,e:'A = −log₁₀(0.10) = 1.'},
+ {q:'لماذا نضبط الجهاز على 100% بخلية فيها الماء المقطر؟',o:['لتنظيف الخلية','لإلغاء أثر امتصاص الخلية والمذيب فتبقى القراءة للمادة المذابة وحدها','لتسخين المصباح','لا ضرورة لذلك'],a:1,e:'هذا ما يسمى قياس الخط المرجعي.'},
+ {q:'محلول يبدو لونه بنفسجيًا لأنه يمتص بقوة اللون:',o:['البنفسجي','الأحمر','الأخضر','الأزرق'],a:2,e:'اللون المرئي هو المتمم للون الممتص.'},
+ {q:'لماذا نستعمل خلايا كوارتز لا زجاجًا عاديًا في منطقة الأشعة فوق البنفسجية؟',o:['لأنها أرخص','لأن الزجاج العادي يمتص الأشعة فوق البنفسجية تحت نحو 340 nm','لأنها أكبر','لا فرق'],a:1,e:'الكوارتز شفاف حتى نحو 200 nm.'},
+ {q:'ما العنصر الذي يختار الطول الموجي داخل الجهاز؟',o:['العدسة','محزوز الحيود (أو منشور) مع شق خروج','الكاشف','الخلية'],a:1,e:'يحلل المحزوز الضوء ويمرر الشق نطاقًا ضيقًا من الأطوال الموجية.'}
+];
+const WI=[
+ {q:'ماذا يحدث لطيف برمنجنات البوتاسيوم لو ضاعفنا تركيزه؟',a:'يتضاعف الامتصاص A عند كل λ (قانون بير-لامبرت A = εcl)، فتنخفض النفاذية أكثر، ويبقى λ_max في موضعه.'},
+ {q:'ماذا لو نسينا ضبط 100% عند تغيير الطول الموجي؟',a:'تتداخل استجابة المصباح والكاشف وامتصاص الماء مع القراءة فيتشوه شكل الطيف.'},
+ {q:'لماذا يبدو محلول كبريتات النحاس أزرق؟',a:'لأنه يمتص الأحمر والأشعة تحت الحمراء القريبة ويمرر الأزرق.'},
+ {q:'ماذا لو وضعنا الخلية وعليها بصمات أصابع؟',a:'تشتت البصمات الضوء فتقل النفاذية الظاهرية عند كل الأطوال الموجية تقريبًا.'},
+ {q:'كيف يستفاد من طيف النفاذية للمرشح الأحمر؟',a:'نعرف منه حافة القطع (حيث T = 50%) ومدى الأطوال الموجية التي يمررها، وهذا مهم في تصميم المرشحات وأنظمة الليزر.'}
+];
+const g=(x,c,w)=>Math.exp(-((x-c)**2)/(2*w*w));
+const SPEC={blank:l=>0,
+ kmn:l=>0.55*g(l,507,11)+0.95*g(l,526,12)+0.9*g(l,546,11)+0.35*g(l,566,10)+0.35*g(l,311,25)+0.03,
+ cu:l=>0.9*g(l,800,130)*(l>500?1:Math.exp(-(((500-l)/60)**2)))+0.6/(1+Math.exp((l-330)/10))+0.02,
+ red:l=>2.4/(1+Math.exp((l-605)/11))+0.05};
+let zeroAt={}; let data={kmn:{},cu:{},red:{}};
+function L(){return +document.getElementById('lam').value;} function S(){return document.getElementById('smp').value;}
+const nz={};function Tval(){const k=S()+L();if(nz[k]==null)nz[k]=(Math.random()-0.5)*0.6;return Math.max(0.1,Math.min(100,100*Math.pow(10,-SPEC[S()](L()))+nz[k]));}
+const dc=document.getElementById('dev'),dx=dc.getContext('2d');
+function draw(){document.getElementById('lamOut').textContent=L()+' nm';const W=dc.width,H=dc.height;dx.fillStyle='#14284b';dx.fillRect(0,0,W,H);dx.fillStyle='#0c1a33';dx.fillRect(20,20,W-40,H-40);
+  dx.fillStyle='#7fe3ff';dx.font='bold 20px Tahoma';dx.textAlign='left';dx.fillText('λ = '+L()+' nm',40,62);
+  const z=zeroAt[L()];dx.font='bold 46px Tahoma';dx.fillStyle='#ffd27a';dx.fillText(z?('T = '+Tval().toFixed(1)+' %'):'T = ---.- %',40,140);
+  dx.font='15px Tahoma';dx.fillStyle='#9fb6d9';dx.fillText(z?'Baseline OK':'Baseline required at this λ',40,190);
+  dx.fillText('Sample: '+({blank:'Reference (water)',kmn:'KMnO₄ solution',cu:'CuSO₄ solution',red:'Red glass filter'})[S()],40,215);}
+document.getElementById('lam').oninput=draw;document.getElementById('smp').onchange=draw;
+document.getElementById('zero').onclick=()=>{const el=document.getElementById('msg');if(S()!=='blank'){el.innerHTML='<span class="bad">ضع خلية الماء المقطر (المرجع) أولًا ثم اضبط 100%.</span>';return;}zeroAt[L()]=1;draw();el.innerHTML='<span class="ok">ضُبط 100% عند '+L()+' nm. ضع العيّنة الآن.</span>';};
+document.getElementById('reset').onclick=()=>{data={kmn:{},cu:{},red:{}};render();};
+document.getElementById('rec').onclick=()=>{const el=document.getElementById('msg');if(S()==='blank'){el.innerHTML='<span class="bad">هذه خلية المرجع؛ ضع عيّنة.</span>';return;}
+  if(!zeroAt[L()]){el.innerHTML='<span class="bad">لم يُضبط 100% عند هذا الطول الموجي بعد.</span>';return;}
+  data[S()][L()]=+Tval().toFixed(1);document.getElementById('tSel').value=S();render();el.innerHTML='<span class="ok">سُجّلت: λ = '+L()+' nm، T = '+data[S()][L()]+' %. غيّر λ واضبط المرجع ثم قِس.</span>';};
+document.getElementById('tSel').onchange=render;
+function rowsOf(s){return Object.keys(data[s]).map(Number).sort((a,b)=>a-b).map(l=>({l,T:data[s][l]}));}
+function render(){const s=document.getElementById('tSel').value;document.getElementById('tb').innerHTML=rowsOf(s).map(r=>'<tr><td>'+r.l+'</td><td class="ltr">'+r.T.toFixed(1)+'</td><td><input type="number" step="0.001" id="u'+r.l+'"></td><td id="q'+r.l+'"></td></tr>').join('');drawPlot();}
+const pc=document.getElementById('plotCv'),px=pc.getContext('2d');
+function drawPlot(){const s=document.getElementById('tSel').value,rows=rowsOf(s),W=pc.width,H=pc.height,m=44;px.fillStyle='#fff';px.fillRect(0,0,W,H);
+  for(let l=380;l<=780;l+=4){const x=m+(l-300)/500*(W-m-15);const hue=l<440?270-(l-380)*1:l<490?210-(l-440)*0.6:l<580?180-(l-490)*1.6:l<645?36-(l-580)*0.5:0;px.fillStyle='hsla('+hue+',90%,55%,.15)';px.fillRect(x,10,(W-m-15)/125+1,H-50);}
+  px.strokeStyle='#4a5d7e';px.fillStyle='#4a5d7e';px.font='12px Tahoma';px.textAlign='center';px.beginPath();px.moveTo(m,10);px.lineTo(m,H-40);px.lineTo(W-10,H-40);px.stroke();px.fillText('λ (nm)',W-35,H-8);px.save();px.translate(12,H/2);px.rotate(-Math.PI/2);px.fillText('T (%)',0,0);px.restore();
+  const X=l=>m+(l-300)/500*(W-m-15),Y=t=>H-40-t/100*(H-55);for(let l=300;l<=800;l+=100)px.fillText(l,X(l),H-24);px.textAlign='right';for(let t=0;t<=100;t+=20)px.fillText(t,m-4,Y(t)+4);
+  if(rows.length>1){px.strokeStyle='#e8742a';px.lineWidth=2;px.beginPath();rows.forEach((r,i)=>i?px.lineTo(X(r.l),Y(r.T)):px.moveTo(X(r.l),Y(r.T)));px.stroke();px.lineWidth=1;}
+  px.fillStyle='#1f4e8c';rows.forEach(r=>{px.beginPath();px.arc(X(r.l),Y(r.T),4,0,7);px.fill();});}
+document.getElementById('chkBtn').onclick=()=>{const s=document.getElementById('tSel').value,rows=rowsOf(s),box=document.getElementById('resBox');if(rows.length<8){box.innerHTML='<span class="bad">سجّل ثماني قراءات على الأقل لهذه العيّنة (مثلًا كل 20 nm من 380 إلى 780 nm).</span>';return;}
+  let ok=0;rows.forEach(r=>{const A=-Math.log10(r.T/100),u=document.getElementById('u'+r.l).value,el=document.getElementById('q'+r.l);if(u==='')el.innerHTML='<span class="bad">لم تحسب</span>';else if(Math.abs(+u-A)<=0.006){el.innerHTML='<span class="ok">✔</span>';ok++;}else el.innerHTML='<span class="bad">✘ '+A.toFixed(3)+'</span>';});
+  const mn=rows.reduce((a,b)=>b.T<a.T?b:a),ul=+document.getElementById('myL').value;
+  box.innerHTML='حساباتك الصحيحة لـ A: '+ok+' من '+rows.length+'<br>λ_max: '+(ul?(Math.abs(ul-mn.l)<=10?'<span class="ok">✔</span>':'<span class="bad">✘ من جدولك أقل نفاذية عند <span class="ltr">'+mn.l+' nm</span></span>'):'<span class="bad">لم تُدخله</span>')+
+   '<hr style="border-color:#c9d6e8">أقل نفاذية في قراءاتك: <span class="ltr val">T = '+mn.T.toFixed(1)+' % at '+mn.l+' nm</span>'+(s==='kmn'?'<br>المرجع: لبرمنجنات البوتاسيوم أقصى امتصاص قرب <span class="ltr">525–545 nm</span> (الأخضر)':s==='cu'?'<br>المرجع: كبريتات النحاس تمتص الأحمر وتحت الأحمر القريب (أقصاه قرب <span class="ltr">800 nm</span>)':'<br>المرشح الأحمر: لا يوجد قمة امتصاص بل حافة قطع؛ حدد λ عندما <span class="ltr">T = 50 %</span> من رسمك.');drawPlot();};
+function refresh(){draw();drawPlot();}
+draw();render();
+(function(){let score=0,answered=0;const qz=document.getElementById('quiz');
+Q.forEach((it,i)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+wrapLtr(o)+'</button>').join('')+'<div class="fb"></div>';
+  d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(d.dataset.done)return;d.dataset.done=1;answered++;const j=+b.dataset.j;
+    d.querySelectorAll('.opt')[it.a].classList.add('right');
+    if(j===it.a){score++;d.querySelector('.fb').innerHTML='<span class="ok">✔ صحيح.</span> '+it.e;}
+    else{b.classList.add('wrong');d.querySelector('.fb').innerHTML='<span class="bad">✘ ليس هذا.</span> '+it.e;}
+    if(answered===Q.length)document.getElementById('qscore').textContent='نتيجتك: '+score+' من '+Q.length;});
+  qz.appendChild(d);});
+const wi=document.getElementById('whatif');
+WI.forEach((w,i)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML='<p>'+(i+1)+') '+w.q+'</p><button class="btn ghost">أظهر التفسير</button><div class="fb" style="display:none;margin-top:6px">'+w.a+'</div>';
+  d.querySelector('button').onclick=()=>{d.querySelector('.fb').style.display='block';};wi.appendChild(d);});
+})();
+</script>
+<script>window.REAL_CFG={
+ id:'exp9', intro:'أدخل الطول الموجي والنفاذية التي قرأتها من الجهاز لكل نقطة، واحسب الامتصاص بيدك، ثم ارسم طيف النفاذية.', minRows:8,
+ consts:[],
+ tables:[{rows:21, cols:[{key:'l',label:'λ (nm)',fixed:i=>380+20*i},{key:'T',label:'T (%)'}],
+   user:{label:'A التي حسبتها',ref:o=>-Math.log10(o.T/100),tol:{abs:0.006},d:3}}],
+ extras:[{id:'lmax',label:'λ لأقل نفاذية من رسمك (nm)',ref:(R)=>R.lmax,tol:{abs:10},d:0}],
+ plots:[{table:0,x:o=>o.l,y:o=>o.T,xl:'λ (nm)',yl:'T (%)',join:true,noZero:true}],
+ result:(D)=>{const d=D[0];const mn=d.reduce((a,b)=>b.T<a.T?b:a);return {lmax:mn.l,lines:['<span class="ltr">minimum T = '+mn.T+' % at λ = '+mn.l+' nm</span>']};}
+};</script>
+<script>// ===== Real-lab readings mode (shared engine) =====
+(function(){
+const CFG = window.REAL_CFG;
+const KEY = 'optlab_real_' + CFG.id;
+let st = {consts:{}, tables:[], extras:{}};
+try { const s = localStorage.getItem(KEY); if (s) st = JSON.parse(s); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e) {} };
+const num = v => (v === '' || v == null || isNaN(+v)) ? null : +v;
+const close = (u, ref, t) => t.abs != null ? Math.abs(u - ref) <= t.abs : Math.abs(u - ref) / Math.abs(ref) <= (t.rel || 0.02);
+const fmt = (v, d) => (v == null || !isFinite(v)) ? '—' : v.toFixed(d);
+
+const s4 = document.getElementById('s4');
+const h2 = s4.querySelector('h2');
+const sim = document.createElement('div'); sim.id = 'simMode';
+while (h2.nextSibling) sim.appendChild(h2.nextSibling);
+// remove Excel note from simulation mode
+sim.querySelectorAll('p.note').forEach(p => { if (p.textContent.indexOf('Excel') >= 0) p.remove(); });
+const sw = document.createElement('div'); sw.className = 'modesw';
+sw.innerHTML = '<button class="btn gold" id="mReal">قراءات المعمل الحقيقي</button><button class="btn ghost" id="mSim">قراءات من المحاكاة</button>';
+const real = document.createElement('div'); real.id = 'realMode';
+h2.after(sw); sw.after(real); real.after(sim);
+
+const css = document.createElement('style');
+css.textContent = '.modesw{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}#realMode input.rin{background:#fff3e6;border:1px solid #e8742a;color:#14284b;border-radius:6px;padding:6px;width:100%;min-width:70px;text-align:center;font-size:15px}' +
+ '#realMode .cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}#realMode .cgrid label{display:block;font-size:14px;margin-bottom:3px}#realMode td.calc{color:#4a5d7e}#realMode .tblwrap{overflow-x:auto}#realMode .rtools{margin:6px 0}#realMode h3{margin:14px 0 6px}';
+document.head.appendChild(css);
+
+function setMode(r) {
+  real.style.display = r ? '' : 'none'; sim.style.display = r ? 'none' : '';
+  document.getElementById('mReal').className = 'btn ' + (r ? 'gold' : 'ghost');
+  document.getElementById('mSim').className = 'btn ' + (r ? 'ghost' : 'gold');
+  if (!r && typeof drawPlot === 'function') { try { drawPlot(); } catch(e) {} }
+}
+
+function build() {
+  let h = '<p class="note">' + CFG.intro + ' الخانات الذهبية لقراءاتك وحساباتك؛ تُحفظ تلقائيًا في هذا الجهاز. بعد «تحقّق» التقط صورة لهذه الصفحة وأرفقها في آخر تقريرك.</p>';
+  if (CFG.consts && CFG.consts.length) {
+    h += '<div class="cgrid">';
+    CFG.consts.forEach(c => { const v = st.consts[c.id] ?? c.def ?? ''; h += '<div><label>' + c.label + '</label><input class="rin ltr" type="number" step="any" data-c="' + c.id + '" value="' + v + '"></div>'; });
+    h += '</div>';
+  }
+  CFG.tables.forEach((T, ti) => {
+    if (!st.tables[ti]) st.tables[ti] = [];
+    const rows = st.tables[ti];
+    while (rows.length < (T.rows || 5)) rows.push({});
+    if (T.title) h += '<h3>' + T.title + '</h3>';
+    h += '<div class="tblwrap"><table><thead><tr>';
+    T.cols.forEach(c => h += '<th>' + c.label + '</th>');
+    (T.calc || []).forEach(c => h += '<th>' + c.label + '</th>');
+    if (T.user) h += '<th>' + T.user.label + '</th><th>النتيجة</th>';
+    h += '</tr></thead><tbody>';
+    rows.forEach((r, ri) => {
+      h += '<tr>';
+      T.cols.forEach(c => h += '<td><input class="rin ltr" type="number" step="any" data-t="' + ti + '" data-r="' + ri + '" data-k="' + c.key + '" value="' + (r[c.key] ?? (c.fixed ? c.fixed(ri) : '')) + '"></td>');
+      (T.calc || []).forEach((c, ci) => h += '<td class="calc" style="direction:ltr" id="rc' + ti + '_' + ri + '_' + ci + '"></td>');
+      if (T.user) h += '<td><input class="rin ltr" type="number" step="any" data-t="' + ti + '" data-r="' + ri + '" data-k="_u" value="' + (r._u ?? '') + '"></td><td class="st" id="rs' + ti + '_' + ri + '"></td>';
+      h += '</tr>';
+    });
+    h += '</tbody></table></div><div class="rtools"><button class="btn ghost" data-add="' + ti + '">+ صف</button></div>';
+  });
+  if (CFG.extras && CFG.extras.length) {
+    h += '<div class="cgrid">';
+    CFG.extras.forEach(e => h += '<div><label>' + e.label + '</label><input class="rin ltr" type="number" step="any" data-e="' + e.id + '" value="' + (st.extras[e.id] ?? '') + '"></div>');
+    h += '</div>';
+  }
+  h += '<button class="btn gold" id="rChk">تحقّق من نتائجي</button> <button class="btn ghost" id="rClr">مسح كل القراءات</button>';
+  h += '<div class="grid" style="margin-top:10px">';
+  (CFG.plots || []).forEach((p, i) => h += '<div class="card"><canvas dir="ltr" id="rPlot' + i + '" width="520" height="300"></canvas></div>');
+  h += '<div class="card" id="rRes"><p class="note">تظهر هنا النتائج بعد التحقق.</p></div></div>';
+  real.innerHTML = h;
+  real.querySelectorAll('input[data-c]').forEach(i => i.oninput = () => { st.consts[i.dataset.c] = i.value; save(); refreshCalc(); });
+  real.querySelectorAll('input[data-t]').forEach(i => i.oninput = () => { st.tables[+i.dataset.t][+i.dataset.r][i.dataset.k] = i.value; save(); refreshCalc(); });
+  real.querySelectorAll('input[data-e]').forEach(i => i.oninput = () => { st.extras[i.dataset.e] = i.value; save(); });
+  real.querySelectorAll('button[data-add]').forEach(b => b.onclick = () => { st.tables[+b.dataset.add].push({}); save(); build(); });
+  document.getElementById('rChk').onclick = check;
+  document.getElementById('rClr').onclick = () => { if (!confirmClear()) return; st = {consts:{}, tables:[], extras:{}}; save(); build(); };
+  refreshCalc(); drawPlots(false);
+}
+let clrArm = false;
+function confirmClear() { const b = document.getElementById('rClr'); if (clrArm) { clrArm = false; return true; } clrArm = true; b.textContent = 'اضغط مرة أخرى للتأكيد'; setTimeout(() => { clrArm = false; if (b) b.textContent = 'مسح كل القراءات'; }, 3000); return false; }
+
+function C() { const o = {}; (CFG.consts || []).forEach(c => o[c.id] = num(st.consts[c.id] ?? c.def)); return o; }
+function data(ti) {
+  const T = CFG.tables[ti];
+  return (st.tables[ti] || []).map((r, ri) => { const o = {_ri: ri}; T.cols.forEach(c => o[c.key] = num(r[c.key] ?? (c.fixed ? c.fixed(ri) : null))); o._u = num(r._u); return o; })
+    .filter(o => T.cols.every(c => o[c.key] != null));
+}
+function refreshCalc() {
+  const c = C();
+  CFG.tables.forEach((T, ti) => { (T.calc || []).forEach((cc, ci) => {
+    (st.tables[ti] || []).forEach((r, ri) => {
+      const o = {}; T.cols.forEach(k => o[k.key] = num(r[k.key] ?? (k.fixed ? k.fixed(ri) : null)));
+      const ok = T.cols.every(k => o[k.key] != null);
+      const el = document.getElementById('rc' + ti + '_' + ri + '_' + ci); if (el) el.textContent = ok ? fmt(cc.f(o, c), cc.d ?? 2) : '';
+    });
+  }); });
+}
+function fitLin(xs, ys) { const n = xs.length; if (n < 2) return null; const mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n; let sxy = 0, sxx = 0; xs.forEach((x, i) => { sxy += (x - mx) * (ys[i] - my); sxx += (x - mx) ** 2; }); const m = sxy / sxx; return {m, b: my - m * mx}; }
+function fitOrigin(xs, ys) { let a = 0, b = 0; xs.forEach((x, i) => { a += x * ys[i]; b += x * x; }); return b ? a / b : null; }
+function check() {
+  const c = C(); const miss = (CFG.consts || []).filter(k => c[k.id] == null);
+  const box = document.getElementById('rRes');
+  if (miss.length) { box.innerHTML = '<p class="bad">أدخل أولًا: ' + miss.map(k => k.label).join('، ') + '</p>'; return; }
+  const D = CFG.tables.map((T, ti) => data(ti));
+  if (D.every(d => d.length < (CFG.minRows || 2))) { box.innerHTML = '<p class="bad">أدخل ' + (CFG.minRows || 2) + ' قراءات على الأقل.</p>'; return; }
+  let ok = 0, tot = 0;
+  CFG.tables.forEach((T, ti) => {
+    (st.tables[ti] || []).forEach((r, ri) => { const el = document.getElementById('rs' + ti + '_' + ri); if (el) el.innerHTML = ''; });
+    if (!T.user) return;
+    D[ti].forEach(o => {
+      const ref = T.user.ref(o, c); const el = document.getElementById('rs' + ti + '_' + o._ri); tot++;
+      if (o._u == null) el.innerHTML = '<span class="bad">لم تحسب</span>';
+      else if (close(o._u, ref, T.user.tol || {})) { el.innerHTML = '<span class="ok">✔ صحيح</span>'; ok++; }
+      else el.innerHTML = '<span class="bad">✘ راجع: ' + fmt(ref, T.user.d ?? 1) + '</span>';
+    });
+  });
+  const R = CFG.result(D, c, fitOrigin, fitLin);
+  let h = '';
+  if (tot) h += '<b>حساباتك الصحيحة في الجدول:</b> ' + ok + ' من ' + tot + '<br>';
+  (CFG.extras || []).forEach(e => {
+    const u = num(st.extras[e.id]); const ref = e.ref(R, D, c);
+    if (ref == null || !isFinite(ref)) return;
+    h += e.label + ': ' + (u == null ? '<span class="bad">لم تُدخل</span>' : close(u, ref, e.tol || {}) ? '<span class="ok">✔ قريب من الصحيح</span>' : '<span class="bad">✘ راجع (الصحيح ≈ <span class="ltr">' + fmt(ref, e.d ?? 3) + '</span>)</span>') + '<br>';
+  });
+  h += '<hr style="border-color:#c9d6e8">' + R.lines.join('<br>');
+  box.innerHTML = h;
+  drawPlots(true, R);
+}
+function drawPlots(withFit, R) {
+  (CFG.plots || []).forEach((P, i) => {
+    const cv = document.getElementById('rPlot' + i); if (!cv) return; const x = cv.getContext('2d');
+    const W = cv.width, H = cv.height, m = 48;
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H);
+    const d = data(P.table); const c = C();
+    const pts = d.map(o => [P.x(o, c), P.y(o, c)]).filter(p => isFinite(p[0]) && isFinite(p[1]));
+    x.strokeStyle = '#4a5d7e'; x.fillStyle = '#4a5d7e'; x.font = '13px Tahoma, Arial'; x.textAlign = 'center';
+    let xmin = Math.min(0, ...pts.map(p => p[0])), xmax = Math.max(1, ...pts.map(p => p[0]));
+    let ymin = Math.min(0, ...pts.map(p => p[1])), ymax = Math.max(1, ...pts.map(p => p[1]));
+    if (P.noZero) { xmin = Math.min(...pts.map(p => p[0]), xmax - 1); ymin = Math.min(...pts.map(p => p[1]), ymax - 1); }
+    const px = (xmax - xmin) * 0.08 || 1, py = (ymax - ymin) * 0.1 || 1; xmax += px; ymax += py; if (xmin < 0) xmin -= px; if (ymin < 0) ymin -= py;
+    const X = v => m + (v - xmin) / (xmax - xmin) * (W - m - 15), Y = v => H - m + 10 - (v - ymin) / (ymax - ymin) * (H - m - 15);
+    x.beginPath(); x.moveTo(m, 8); x.lineTo(m, H - m + 10); x.lineTo(W - 8, H - m + 10); x.stroke();
+    if (xmin < 0) { x.beginPath(); x.moveTo(X(0), 8); x.lineTo(X(0), H - m + 10); x.setLineDash([3, 3]); x.stroke(); x.setLineDash([]); }
+    if (ymin < 0) { x.beginPath(); x.moveTo(m, Y(0)); x.lineTo(W - 8, Y(0)); x.setLineDash([3, 3]); x.stroke(); x.setLineDash([]); }
+    const nice = r => { const e = Math.pow(10, Math.floor(Math.log10(r / 4))); const f = r / 4 / e; return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * e; };
+    const sx = nice(xmax - xmin), sy = nice(ymax - ymin), lbl = v => +(+v.toFixed(6)).toPrecision(4) + '';
+    for (let v = Math.ceil(xmin / sx) * sx; v <= xmax + 1e-9; v += sx) x.fillText(lbl(v), X(v), H - m + 26);
+    x.textAlign = 'right'; for (let v = Math.ceil(ymin / sy) * sy; v <= ymax + 1e-9; v += sy) x.fillText(lbl(v), m - 5, Y(v) + 4); x.textAlign = 'center';
+    x.fillText(P.xl, W / 2, H - 6); x.save(); x.translate(13, H / 2); x.rotate(-Math.PI / 2); x.fillText(P.yl, 0, 0); x.restore();
+    if (withFit && P.fit && R && R[P.fit] != null) { const s = R[P.fit], b0 = P.fitB ? (R[P.fitB] || 0) : 0; x.strokeStyle = '#e8742a'; x.lineWidth = 2; x.beginPath(); x.moveTo(X(xmin), Y(s * xmin + b0)); x.lineTo(X(xmax), Y(s * xmax + b0)); x.stroke(); x.lineWidth = 1; }
+    if (withFit && P.join) { const q = pts.slice().sort((a, b) => a[0] - b[0]); x.strokeStyle = '#e8742a'; x.beginPath(); q.forEach((p, k) => k ? x.lineTo(X(p[0]), Y(p[1])) : x.moveTo(X(p[0]), Y(p[1]))); x.stroke(); }
+    x.fillStyle = '#1f4e8c'; pts.forEach(p => { x.beginPath(); x.arc(X(p[0]), Y(p[1]), 5, 0, 7); x.fill(); });
+    if (P.title) { x.fillStyle = '#e8742a'; x.textAlign = 'right'; x.fillText(P.title, W - 10, 20); }
+  });
+}
+document.getElementById('mReal').onclick = () => setMode(true);
+document.getElementById('mSim').onclick = () => setMode(false);
+build(); setMode(true);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المعامل الافتراضية — أ.د. نجم الحصيني</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14213d; --ink2:#46506a; --mute:#7a8197; --line:#e4e7ef; --bg:#f6f7fb; --card:#ffffff;
+  --hero:#0f1c3f; --hero2:#18295a; --beam:#ff3b3b; --gold:#f2b544;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"IBM Plex Sans Arabic",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;-webkit-text-size-adjust:100%}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+
+/* ---------- HERO ---------- */
+.hero{background:var(--hero);color:#fff;position:relative;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:center;padding-top:30px;padding-bottom:34px}
+.brand{display:flex;align-items:center;gap:10px;font-size:14px;color:#c9d3f0}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--beam);box-shadow:0 0 0 4px rgba(255,59,59,.18)}
+.hero h1{font-size:34px;line-height:1.3;margin:10px 0 4px;font-weight:600}
+.hero .by{font-size:15px;color:var(--gold);margin:0 0 6px;font-weight:500}
+.hero .tag{font-size:15px;color:#c9d3f0;margin:0 0 20px}
+.search{position:relative}
+.search input{width:100%;height:54px;border-radius:14px;border:0;padding:0 50px 0 16px;font:inherit;font-size:16px;color:var(--ink);background:#fff;outline:none}
+.search input:focus{box-shadow:0 0 0 3px rgba(242,181,68,.55)}
+.search svg{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:22px;height:22px;stroke:#7a8197}
+.hint{font-size:13px;color:#9fb0dc;margin-top:8px}
+.artbox{position:relative;width:100%;aspect-ratio:1/0.82;margin:-10px 0}
+#art{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stats{display:flex;gap:18px;margin-top:18px;flex-wrap:wrap}
+.stat{font-size:13px;color:#c9d3f0}.stat b{display:block;font-size:22px;color:#fff;font-weight:600;line-height:1.2}
+
+/* ---------- RESULTS ---------- */
+#results{display:none;margin-top:22px}
+.res-head{font-size:14px;color:var(--ink2);margin-bottom:8px}
+.res{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;transition:border-color .15s}
+.res:hover{border-color:#b9c2d9}
+.res .sw{width:6px;align-self:stretch;border-radius:3px;flex:none}
+.res .t{font-weight:500}.res .c{font-size:13px;color:var(--mute)}
+.res .x{font-size:13px;color:var(--ink2)}
+mark{background:#fff1c7;color:inherit;border-radius:3px;padding:0 2px}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--ink2)}
+
+/* ---------- FILTERS + CARDS ---------- */
+.sec{margin:30px 0 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.sec h2{font-size:20px;margin:0;font-weight:600}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font:inherit;font-size:14px;color:var(--ink2);cursor:pointer}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,border-color .15s;text-align:right;font:inherit;color:inherit;padding:0}
+.card:hover{transform:translateY(-2px);border-color:#b9c2d9}
+.card .band{height:8px}
+.card .body{padding:14px 16px 12px;flex:1;width:100%}
+.card .name{font-size:17px;font-weight:600;margin:0 0 2px}
+.card .code{font-size:13px;color:var(--mute);text-align:right}
+.card .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pill{font-size:12px;border-radius:999px;padding:2px 10px;background:#eef1f8;color:var(--ink2)}
+.card .foot{border-top:1px solid var(--line);padding:9px 16px;font-size:13px;color:var(--ink2);display:flex;justify-content:space-between;width:100%}
+.en{direction:ltr;unicode-bidi:isolate}
+
+/* ---------- COURSE PANEL ---------- */
+.panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:14px;overflow:hidden}
+.panel.open{display:block}
+.panel .ph{padding:16px 18px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.panel .ph h3{margin:0;font-size:19px;font-weight:600}
+.panel .ph button{background:rgba(255,255,255,.18);border:0;color:#fff;border-radius:8px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+.tabs{display:flex;gap:6px;padding:12px 18px 0}
+.ch{display:flex;gap:12px;align-items:center;padding:11px 18px;border-top:1px solid var(--line)}
+.ch:first-of-type{border-top:0}
+.ch .num{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;flex:none}
+.ch .tt{flex:1;min-width:0}
+.ch .go{font-size:13px;color:var(--mute);flex:none}
+.soon{padding:18px;color:var(--ink2);font-size:14px}
+
+/* ---------- NEW STRIP ---------- */
+.strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.strip a{flex:0 0 230px;scroll-snap-align:start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.strip .d{font-size:12px;color:var(--mute)}
+.strip .t{font-size:14px;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+footer{margin-top:44px;border-top:1px solid var(--line);background:#fff}
+footer .wrap{padding-top:18px;padding-bottom:24px;font-size:13px;color:var(--mute);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:760px){
+  .hero .wrap{grid-template-columns:1fr;padding-top:22px;padding-bottom:26px}
+  .hero .artbox{order:-1;max-width:460px;width:100%;margin:-6px auto -10px;aspect-ratio:1/0.85}
+  .hero h1{font-size:27px}
+  .stats{gap:14px}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="brand"><span class="dot"></span><span>vl.najmalhosiny.com</span></div>
+      <h1>المعامل الافتراضية</h1>
+      <p class="by">إعداد أ.د. نجم الحصيني · جامعة الطائف</p>
+      <p class="tag">جرّب الفيزياء بيدك، في أي وقت ومن أي جهاز.</p>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="ابحث باسم التجربة أو الفصل… مثل: حيود، Gaussian، قانون أوم" autocomplete="off" aria-label="ابحث في المعامل">
+      </div>
+      <div class="hint">البحث يشمل عناوين الفصول وأسماء المحاكيات في كل المقررات.</div>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="artbox" aria-hidden="true"><canvas id="art"></canvas></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="results" aria-live="polite"></section>
+
+  <div class="sec">
+    <h2>المقررات</h2>
+    <div class="chips" id="chips">
+      <button class="chip on" data-f="all">الكل</button>
+      <button class="chip" data-f="bsc">البكالوريوس</button>
+      <button class="chip" data-f="msc">الماجستير</button>
+      <button class="chip" data-f="lab">لها معمل</button>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="panel" id="panel"></div>
+
+  <div class="sec"><h2>أُضيف حديثاً</h2></div>
+  <div class="strip" id="strip"></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© أ.د. نجم الحصيني — قسم الفيزياء، جامعة الطائف</span>
+    <span>نسخة تجريبية · الليزر والبصريات وفيزياء عامة 1 وPhysics 1 وPhysics 2 على الموقع الجديد، وبقية المقررات تفتح مؤقتاً من الموقع القديم</span>
+  </div>
+</footer>
+
+<script>
+const LABS = [{"c": "Advanced Laser Physics (ماجستير)", "n": 1, "t": "Chapter 1: Introduction: Historical Overview (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch1", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Temporal coherence, Directionality, Brightness) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Advanced Laser Physics (ماجستير)", "n": 2, "t": "Chapter 2: Review of Electromagnetic Theory (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch2", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Lorentz dispersion, Fresnel equations, Pulse dispersion) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Advanced Laser Physics (ماجستير)", "n": 3, "t": "Chapter 3: Ray Tracing: ABCD Matrix Method (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch3", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Lens systems, Lens waveguide, Resonator stability) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Advanced Laser Physics (ماجستير)", "n": 4, "t": "Chapter 4: Gaussian Beams (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch4", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Gaussian beam propagation, Lens focusing, Higher-order modes) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Advanced Laser Physics (ماجستير)", "n": 5, "t": "Chapter 5: Optical Cavities (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch5", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Cavity eigenmode, Fox–Li iteration, Fabry–Perot) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Advanced Laser Physics (ماجستير)", "n": 6, "t": "Chapter 6: Atomic Radiation (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch6", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Blackbody modes, Line broadening, Absorption saturation) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Advanced Laser Physics (ماجستير)", "n": 7, "t": "Chapter 7: Laser Oscillation and Amplification (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch7", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Rate equations and threshold, Amplifiers, ASE) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Advanced Laser Physics (ماجستير)", "n": 8, "t": "Chapter 8: General Characteristics of Lasers (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch8", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Relaxation oscillations, Q-switching, Mode locking) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Advanced Laser Physics (ماجستير)", "n": 9, "t": "Chapter 9: Laser Systems (2 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch9", "d": "2026-11-15", "x": "محاكيان تفاعليان (Pumping schemes, Semiconductor laser L-I and turn-on delay) + ورقة PDF/Word + سكربتا MATLAB"}, {"c": "Advanced Laser Physics (ماجستير)", "n": 10, "t": "Chapter 10: Topics in Laser Applications (2 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/AdvancedLaser/Ch10", "d": "2026-11-15", "x": "محاكيان تفاعليان (Doppler cooling, Photon statistics) + ورقة PDF/Word + سكربتا MATLAB"}, {"c": "Digital Methods in Photonics (ماجستير)", "n": 1, "t": "Chapter 1: Introduction to Modelling and Simulation (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/DigitalMethods/Ch1", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Euler، Monte Carlo، DES) + ورقة PDF/Word + سكربتا MATLAB"}, {"c": "Digital Methods in Photonics (ماجستير)", "n": 2, "t": "Chapter 2: Mathematical Models (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/DigitalMethods/Ch2", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (عدّ الفوتونات، مختبر مولدات الأرقام العشوائية، مستكشف الطوابير) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Digital Methods in Photonics (ماجستير)", "n": 3, "t": "Chapter 3: Analysis of Simulation Data (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/DigitalMethods/Ch3", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (ملاءمة التوزيعات، فترات الثقة والتغطية، الإحماء ومتوسطات الدفعات) + ورقة PDF/Word + سكربتا MATLAB"}, {"c": "Digital Methods in Photonics (ماجستير)", "n": 4, "t": "Chapter 4: Verification, Calibration and Validation of Simulation Models (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/DigitalMethods/Ch4", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (التحقق من الحلّال ورتبة التقارب، المعايرة والبيانات المحجوزة، اختبار المصادقة) + ورقة PDF/Word + سكربتا MATLAB"}, {"c": "Digital Methods in Photonics (ماجستير)", "n": 5, "t": "Chapter 5: Simulation of Computer Systems and Case Studies (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/DigitalMethods/Ch5", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (محاكي الذاكرة المخبئية، مستكشف المعالج والذاكرة، مقارنة تصميمين بالأرقام العشوائية المشتركة) + ورقة PDF/Word + سكربتا MATLAB"}, {"c": "Digital Methods in Photonics (ماجستير)", "n": 6, "t": "Chapter 6: Modeling of Modern Photonics Components (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/DigitalMethods/Ch6", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (حلّال أنماط الشريحة بالفروق المحدودة، FDTD أحادي البعد مع PML، الاضمحلال واستخراج Q) + ورقة PDF/Word + سكربتا MATLAB"}, {"c": "Interferometric Systems (ماجستير)", "n": 1, "t": "Chapter 1: Interference (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Interferometric/Ch1", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Two-beam fringes and visibility, Temporal coherence, Point and extended sources) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Interferometric Systems (ماجستير)", "n": 2, "t": "Chapter 2: Two-Beam Interferometers (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Interferometric/Ch2", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Michelson, Mach–Zehnder, Fourier-transform spectrometer) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Interferometric Systems (ماجستير)", "n": 3, "t": "Chapter 3: Multiple-Beam Interference (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Interferometric/Ch3", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Airy function, Fabry–Perot spectrometer, Equal thickness and FECO) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Interferometric Systems (ماجستير)", "n": 4, "t": "Chapter 4: Photodetectors and CCD Arrays (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Interferometric/Ch4", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Photon statistics and PMT, Pixel noise and photon transfer, Sampling and pixel MTF) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Interferometric Systems (ماجستير)", "n": 5, "t": "Chapter 5: Interferogram Analysis and Image Processing (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Interferometric/Ch5", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Fourier series/FFT/convolution, Image processing, Takeda and phase shifting) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Interferometric Systems (ماجستير)", "n": 6, "t": "Chapter 6: Fundamental Principles of Holography (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Interferometric/Ch6", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Diffraction and propagation, Coherence, Hologram and holographic interferometry) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Interferometric Systems (ماجستير)", "n": 7, "t": "Chapter 7: Digital Holography (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Interferometric/Ch7", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Fresnel reconstruction, Convolution and phase, Phase shifting and Fourier holography) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Interferometric Systems (ماجستير)", "n": 8, "t": "Chapter 8: Recording of Digital Holograms (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Interferometric/Ch8", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Maximum angle and aliasing, Minimum distance, Stability) + ورقة PDF/Word + سكربتا MATLAB"}, {"c": "Interferometric Systems (ماجستير)", "n": 9, "t": "Chapter 9: Digital Holographic Interferometry and Applications (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Interferometric/Ch9", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Deformation by DHI, Sensitivity vector and shape, Temperature by phase-shifting DHI) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Optoelectronics (ماجستير)", "n": 1, "t": "Chapter 1: Coupled-Mode Theory and Waveguide Couplers (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Optoelectronics/Ch1", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Supermodes vs CMT, Power exchange in a coupler, Input and output couplers) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Optoelectronics (ماجستير)", "n": 2, "t": "Chapter 2: Optical Modulation (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Optoelectronics/Ch2", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Index ellipsoid and Pockels effect, Mach–Zehnder modulator, IQ modulation formats) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Optoelectronics (ماجستير)", "n": 3, "t": "Chapter 3: Electro-, Acousto- and Magneto-optic Modulators; Liquid Crystal Devices (4 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Optoelectronics/Ch3", "d": "2026-11-15", "x": "4 محاكيات تفاعلية (Pockels cell, Liquid-crystal cells, Acousto-optic diffraction, Faraday isolator) + ورقة PDF/Word + 4 سكربتات MATLAB"}, {"c": "Optoelectronics (ماجستير)", "n": 4, "t": "Chapter 4: Optical Detection (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Optoelectronics/Ch4", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Absorption and p-i-n bandwidth, Noise, SNR and APD gain, BER and sensitivity) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Optoelectronics (ماجستير)", "n": 5, "t": "Chapter 5: Integrated Sources and Detectors; Injection Lasers and LEDs (4 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Optoelectronics/Ch5", "d": "2026-11-15", "x": "4 محاكيات تفاعلية (LED spectrum and efficiency, Rate equations and L–I curve, Laser dynamics and modulation, Vacuum deposition) + ورقة PDF/Word + 4 سكربتات MATLAB"}, {"c": "Optoelectronics (ماجستير)", "n": 6, "t": "Chapter 6: Optical Amplification (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Optoelectronics/Ch6", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Gain saturation and noise, EDFA rate equations, Distributed Raman amplifier) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Optoelectronics (ماجستير)", "n": 7, "t": "Chapter 7: Applications of Integrated Optics (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Optoelectronics/Ch7", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (Microring filter and sensor, Directional-coupler switch, MZI-mesh optical processor) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Optoelectronics (ماجستير)", "n": 8, "t": "Chapter 8: Photonic Crystals and Recent Advances (3 interactive simulators + MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/Optoelectronics/Ch8", "d": "2026-11-15", "x": "3 محاكيات تفاعلية (1D photonic crystal (TMM), 2D photonic crystal bands, Thin-film LiNbO3 modulator) + ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Quantum Optics (ماجستير)", "n": 1, "t": "Chapter 1: Semiclassical Theory of Atom–Light Interactions (MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/QuantumOptics/Ch1", "d": "2026-11-14", "x": "معمل حاسوبي: ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Quantum Optics (ماجستير)", "n": 2, "t": "Chapter 2: Field Quantization and Quantum States of Light (MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/QuantumOptics/Ch2", "d": "2026-11-14", "x": "معمل حاسوبي: ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Quantum Optics (ماجستير)", "n": 3, "t": "Chapter 3: Quantum Theory of Atom–Field Interaction (MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/QuantumOptics/Ch3", "d": "2026-11-14", "x": "معمل حاسوبي: ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Quantum Optics (ماجستير)", "n": 4, "t": "Chapter 4: Quantum Theory of the Laser (MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/QuantumOptics/Ch4", "d": "2026-11-14", "x": "معمل حاسوبي: ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "Quantum Optics (ماجستير)", "n": 5, "t": "Chapter 5: Applications to Quantum Information and Quantum Measurement (MATLAB computational lab)", "u": "https://sites.google.com/view/lasers-cha1/MSc/QuantumOptics/Ch5", "d": "2026-11-14", "x": "معمل حاسوبي: ورقة PDF/Word + 3 سكربتات MATLAB"}, {"c": "الأطياف الذرية والجزيئية", "n": 1, "t": "الفصل الأول: أساسيات الأطياف وجهاز المطياف", "u": "https://sites.google.com/view/lasers-cha1/Spectroscopy/Ch1", "d": "2026-11-17", "x": "5 تجارب: الطيف الكهرومغناطيسي، أشكال الطيف، الانبعاث والامتصاص، بناء المطياف، بير-لامبرت + قبل المعمل وبعده"}, {"c": "الأطياف الذرية والجزيئية", "n": 2, "t": "الفصل الثاني: النماذج الذرية وطيف الهيدروجين", "u": "https://sites.google.com/view/lasers-cha1/Spectroscopy/Ch2", "d": "2026-11-17", "x": "5 تجارب: رذرفورد، نموذج بور، متسلسلات الهيدروجين، الامتصاص والتأين، حدود نموذج بور + قبل المعمل وبعده"}, {"c": "الأطياف الذرية والجزيئية", "n": 3, "t": "الفصل الثالث: الأعداد الكمية والذرات متعددة الإلكترونات", "u": "https://sites.google.com/view/lasers-cha1/Spectroscopy/Ch3", "d": "2026-11-17", "x": "4 تجارب: المدارات، التوزيع الإلكتروني، قواعد هوند، ازدواج الزخم الزاوي + قبل المعمل وبعده"}, {"c": "الأطياف الذرية والجزيئية", "n": 4, "t": "الفصل الرابع: التركيب الدقيق وفائق الدقة وقواعد الاختيار", "u": "https://sites.google.com/view/lasers-cha1/Spectroscopy/Ch4", "d": "2026-11-17", "x": "4 تجارب: الازدواج المغزلي المداري، قواعد الاختيار، فائق الدقة، الهيليوم + قبل المعمل وبعده"}, {"c": "الأطياف الذرية والجزيئية", "n": 5, "t": "الفصل الخامس: الذرة في المجالات الخارجية (زيمان وشتارك)", "u": "https://sites.google.com/view/lasers-cha1/Spectroscopy/Ch5", "d": "2026-11-17", "x": "4 تجارب: المبادرة، زيمان العادي، زيمان الشاذ، شتارك + قبل المعمل وبعده"}, {"c": "الأطياف الذرية والجزيئية", "n": 6, "t": "الفصل السادس: الروابط الجزيئية والدوران والاهتزاز", "u": "https://sites.google.com/view/lasers-cha1/Spectroscopy/Ch6", "d": "2026-11-17", "x": "4 تجارب: منحنى الطاقة، الطيف الدوراني، المستويات الاهتزازية، P وR + قبل المعمل وبعده"}, {"c": "الأطياف الذرية والجزيئية", "n": 7, "t": "الفصل السابع: الأطياف الإلكترونية الجزيئية وتقنيات القياس", "u": "https://sites.google.com/view/lasers-cha1/Spectroscopy/Ch7", "d": "2026-11-17", "x": "4 تجارب: فرانك-كوندون، طيف I₂، أنماط IR ورامان، مطياف رامان + قبل المعمل وبعده"}, {"c": "البصريات الفيزيائية", "n": 1, "t": "الفصل الأول: طبيعة الضوء", "u": "optics/1.html", "d": "", "x": ""}, {"c": "البصريات الفيزيائية", "n": 2, "t": "الفصل الثاني: النظرية الموجية", "u": "optics/2.html", "d": "", "x": ""}, {"c": "البصريات الفيزيائية", "n": 3, "t": "الفصل الثالث: تراكب الموجات", "u": "optics/3.html", "d": "", "x": ""}, {"c": "البصريات الفيزيائية", "n": 4, "t": "الفصل الرابع: تداخل الموجات الضوئية", "u": "optics/4.html", "d": "", "x": ""}, {"c": "البصريات الفيزيائية", "n": 5, "t": "الفصل الخامس: حيود الموجات الضوئية", "u": "optics/5.html", "d": "", "x": ""}, {"c": "البصريات الفيزيائية", "n": 6, "t": "الفصل السادس: استقطاب الضوء", "u": "optics/6.html", "d": "", "x": ""}, {"c": "فيزياء 1 (هندسة وحاسب)", "n": 1, "t": "Chapter 1: Vectors", "u": "p1/1.html", "d": "2026-11-06", "x": ""}, {"c": "فيزياء 1 (هندسة وحاسب)", "n": 2, "t": "Chapter 2: Motion in One Dimension", "u": "p1/2.html", "d": "2026-11-06", "x": ""}, {"c": "فيزياء 1 (هندسة وحاسب)", "n": 3, "t": "Chapter 3: The Laws of Motion", "u": "p1/3.html", "d": "2026-11-06", "x": ""}, {"c": "فيزياء 1 (هندسة وحاسب)", "n": 4, "t": "Chapter 4: Energy of a System", "u": "p1/4.html", "d": "2026-11-06", "x": ""}, {"c": "فيزياء 1 (هندسة وحاسب)", "n": 5, "t": "Chapter 5: Temperature and Heat", "u": "p1/5.html", "d": "2026-11-06", "x": ""}, {"c": "فيزياء 1 (هندسة وحاسب)", "n": 6, "t": "Chapter 6: Electric Fields", "u": "p1/6.html", "d": "2026-11-06", "x": ""}, {"c": "فيزياء 1 (هندسة وحاسب)", "n": 7, "t": "Chapter 7: Electric Potential", "u": "p1/7.html", "d": "2026-11-06", "x": ""}, {"c": "فيزياء 1 (هندسة وحاسب)", "n": 8, "t": "Chapter 8: Current and Resistance", "u": "p1/8.html", "d": "2026-11-06", "x": ""}, {"c": "فيزياء 1 (هندسة وحاسب)", "n": 9, "t": "Chapter 9: Light and Optics", "u": "p1/9.html", "d": "2026-11-06", "x": ""}, {"c": "فيزياء 2 (هندسة وحاسب)", "n": 1, "t": "Chapter 1: Electric Fields", "u": "p2/1.html", "d": "2026-11-11", "x": ""}, {"c": "فيزياء 2 (هندسة وحاسب)", "n": 2, "t": "Chapter 2: Electric Flux and Gauss's Law", "u": "p2/2.html", "d": "2026-11-11", "x": ""}, {"c": "فيزياء 2 (هندسة وحاسب)", "n": 3, "t": "Chapter 3: Magnetic Fields", "u": "p2/3.html", "d": "2026-11-11", "x": ""}, {"c": "فيزياء 2 (هندسة وحاسب)", "n": 4, "t": "Chapter 4: Sources of the Magnetic Field", "u": "p2/4.html", "d": "2026-11-11", "x": ""}, {"c": "فيزياء 2 (هندسة وحاسب)", "n": 5, "t": "Chapter 5: Induced EMF – Faraday's and Lenz's Laws", "u": "p2/5.html", "d": "2026-11-11", "x": ""}, {"c": "فيزياء 2 (هندسة وحاسب)", "n": 6, "t": "Chapter 6: Alternating Current Circuits", "u": "p2/6.html", "d": "2026-11-11", "x": ""}, {"c": "فيزياء الليزر وتطبيقاتها", "n": 1, "t": "الفصل الأول: المقدمة والتمهيد", "u": "laser/1.html", "d": "", "x": ""}, {"c": "فيزياء الليزر وتطبيقاتها", "n": 2, "t": "الفصل الثاني: المدخل إلى الليزر", "u": "laser/2.html", "d": "", "x": ""}, {"c": "فيزياء الليزر وتطبيقاتها", "n": 3, "t": "الفصل الثالث: مستويات الطاقة", "u": "laser/3.html", "d": "", "x": ""}, {"c": "فيزياء الليزر وتطبيقاتها", "n": 4, "t": "الفصل الرابع : مكونات الليزر", "u": "laser/4.html", "d": "", "x": ""}, {"c": "فيزياء الليزر وتطبيقاتها", "n": 5, "t": "الفصل الخامس: توليد الليزر", "u": "laser/5.html", "d": "", "x": ""}, {"c": "فيزياء الليزر وتطبيقاتها", "n": 6, "t": "الفصل السادس: سلوكيات الليزر اللحظية", "u": "laser/6.html", "d": "", "x": ""}, {"c": "فيزياء الليزر وتطبيقاتها", "n": 7, "t": "الفصل السابع: أنظمة الليزر الشائعة", "u": "laser/7.html", "d": "", "x": ""}, {"c": "فيزياء الليزر وتطبيقاتها", "n": 8, "t": "الفصل الثامن: تطبيقات الليزر", "u": "laser/8.html", "d": "", "x": ""}, {"c": "فيزياء الليزر وتطبيقاتها", "n": 9, "t": "الفصل التاسع: تأثيرات الليزر والسلامة", "u": "laser/9.html", "d": "", "x": ""}, {"c": "فيزياء عامة 1", "n": 1, "t": "الفصل الأول: المتجهات", "u": "gp1/1.html", "d": "", "x": ""}, {"c": "فيزياء عامة 1", "n": 2, "t": "الفصل الثاني :الحركة في بعد واحد", "u": "gp1/2.html", "d": "", "x": ""}, {"c": "فيزياء عامة 1", "n": 3, "t": "الفصل الثالث: قوانين الحركة", "u": "gp1/3.html", "d": "", "x": ""}, {"c": "فيزياء عامة 1", "n": 4, "t": "الفصل الرابع: الشغل والطاقة", "u": "gp1/4.html", "d": "", "x": ""}, {"c": "فيزياء عامة 1", "n": 5, "t": "الفصل الخامس: الديناميكا الحرارية", "u": "gp1/5.html", "d": "", "x": ""}, {"c": "فيزياء عامة 1", "n": 6, "t": "الفصل السادس:المجالات الكهربية", "u": "gp1/6.html", "d": "", "x": ""}, {"c": "فيزياء عامة 1", "n": 7, "t": "الفصل السابع: الجهد الكهربي", "u": "gp1/7.html", "d": "", "x": ""}, {"c": "فيزياء عامة 1", "n": 8, "t": "الفصل الثامن: التيار والمقاومة", "u": "gp1/8.html", "d": "", "x": ""}, {"c": "فيزياء عامة 1", "n": 9, "t": "الفصل التاسع: الضوء والبصريات", "u": "gp1/9.html", "d": "", "x": ""}, {"c": "الاهتزازات والموجات", "n": 1, "t": "الفصل الأول: الحركة التوافقية البسيطة", "u": "https://sites.google.com/view/lasers-cha1/Vibrations/Ch1", "d": "2026-11-17", "x": ""}, {"c": "الاهتزازات والموجات", "n": 2, "t": "الفصل الثاني: الاهتزازات الحرة", "u": "https://sites.google.com/view/lasers-cha1/Vibrations/Ch2", "d": "2026-11-17", "x": ""}, {"c": "الاهتزازات والموجات", "n": 3, "t": "الفصل الثالث: المذبذب المخمد", "u": "https://sites.google.com/view/lasers-cha1/Vibrations/Ch3", "d": "2026-11-17", "x": ""}, {"c": "الاهتزازات والموجات", "n": 4, "t": "الفصل الرابع: الاهتزازات القسرية والرنين", "u": "https://sites.google.com/view/lasers-cha1/Vibrations/Ch4", "d": "2026-11-17", "x": ""}, {"c": "الاهتزازات والموجات", "n": 5, "t": "الفصل الخامس: تراكب اهتزازين على خط واحد", "u": "https://sites.google.com/view/lasers-cha1/Vibrations/Ch5", "d": "2026-11-17", "x": ""}, {"c": "الاهتزازات والموجات", "n": 6, "t": "الفصل السادس: تراكب اهتزازين متعامدين", "u": "https://sites.google.com/view/lasers-cha1/Vibrations/Ch6", "d": "2026-11-17", "x": ""}, {"c": "الاهتزازات والموجات", "n": 7, "t": "الفصل السابع: الموجات المتنقلة", "u": "https://sites.google.com/view/lasers-cha1/Vibrations/Ch7", "d": "2026-11-17", "x": ""}, {"c": "الاهتزازات والموجات", "n": 8, "t": "الفصل الثامن: الموجات الموقوفة", "u": "https://sites.google.com/view/lasers-cha1/Vibrations/Ch8", "d": "2026-11-17", "x": ""}, {"c": "الاهتزازات والموجات", "n": 9, "t": "الفصل التاسع: الأنظمة ذات درجتي حرية", "u": "https://sites.google.com/view/lasers-cha1/Vibrations/Ch9", "d": "2026-11-17", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 1, "t": "الفصل الأول: مدخل إلى MATLAB", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch1", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 2, "t": "الفصل الثاني: المتجهات والمصفوفات", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch2", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 3, "t": "الفصل الثالث: ملفات الأوامر والدوال", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch3", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 4, "t": "الفصل الرابع: الرسم البياني", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch4", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 5, "t": "الفصل الخامس: الأخطاء والتنقيح", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch5", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 6, "t": "الفصل السادس: بناء الدوال", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch6", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 7, "t": "الفصل السابع: الحلقات التكرارية", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch7", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 8, "t": "الفصل الثامن: الجمل الشرطية", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch8", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 9, "t": "الفصل التاسع: الاستيفاء والمطابقة", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch9", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (1)", "n": 10, "t": "الفصل العاشر: تطبيقات فيزيائية", "u": "https://sites.google.com/view/lasers-cha1/CompApp1/Ch10", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 1, "t": "الفصل الأول: مدخل إلى الفيزياء الحاسوبية", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch1", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 2, "t": "الفصل الثاني: الاستيفاء", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch2", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 3, "t": "الفصل الثالث: الاشتقاق العددي", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch3", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 4, "t": "الفصل الرابع: التكامل العددي", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch4", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 5, "t": "الفصل الخامس: المعادلات غير الخطية والتصغير", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch5", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 6, "t": "الفصل السادس: المعادلات التفاضلية العادية", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch6", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 7, "t": "الفصل السابع: الجبر الخطي", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch7", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 8, "t": "الفصل الثامن: المعادلات التفاضلية الجزئية", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch8", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 9, "t": "الفصل التاسع: تحويل فورييه", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch9", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 10, "t": "الفصل العاشر: الميكانيكا الكلاسيكية", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch10", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 11, "t": "الفصل الحادي عشر: طرائق مونت كارلو", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch11", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 12, "t": "الفصل الثاني عشر: الفوضى", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch12", "d": "2026-11-18", "x": ""}, {"c": "تطبيقات الحاسب في الفيزياء (2)", "n": 13, "t": "الفصل الثالث عشر: مطابقة البيانات", "u": "https://sites.google.com/view/lasers-cha1/CompApp2/Ch13", "d": "2026-11-18", "x": ""}];
+
+const COURSES = [
+  {k:"فيزياء الليزر وتطبيقاتها", name:"فيزياء الليزر وتطبيقاتها", code:"2034203-4", lvl:"bsc", lab:7, col:"#9b1b30", acc:"#d9a441", href:"laser/index.html"},
+  {k:"البصريات الفيزيائية",      name:"البصريات الفيزيائية",      code:"2035004-4", lvl:"bsc", lab:12, col:"#1d3a78", acc:"#f08a3c", href:"optics/index.html"},
+  {k:"فيزياء عامة 1",            name:"فيزياء عامة 1",            code:"2031204-4", href:"gp1/index.html", lvl:"bsc", lab:10, col:"#b5603a", acc:"#7d8a3a"},
+  {k:"فيزياء 1 (هندسة وحاسب)",  name:"Physics 1",                code:"203205-4", href:"p1/index.html",  lvl:"bsc", lab:9,  col:"#0f6e6e", acc:"#e2a63b", en:true, sub:"Engineering & Computing"},
+  {k:"فيزياء 2 (هندسة وحاسب)",  name:"Physics 2",                code:"203207-4", href:"p2/index.html",  lvl:"bsc", lab:10, col:"#0e1f4a", acc:"#22c3e6", en:true, sub:"Engineering & Computing"},
+  {k:"الأطياف الذرية والجزيئية", name:"الأطياف الذرية والجزيئية", code:"2037003-4", lvl:"bsc", lab:0, col:"#8a6a1f", acc:"#2b2b2b"},
+  {k:"الاهتزازات والموجات",      name:"الاهتزازات والموجات",      code:"2034002-4", lvl:"bsc", lab:0, col:"#5b3a8c", acc:"#4fb3a9"},
+  {k:"تطبيقات الحاسب في الفيزياء (1)", name:"تطبيقات الحاسب في الفيزياء (1)", code:"2034001-3", lvl:"bsc", lab:0, col:"#2f5d50", acc:"#e07b39"},
+  {k:"تطبيقات الحاسب في الفيزياء (2)", name:"تطبيقات الحاسب في الفيزياء (2)", code:"2035001-3", lvl:"bsc", lab:0, col:"#3b4a6b", acc:"#d6b24c"},
+  {k:"Advanced Laser Physics (ماجستير)",       name:"Advanced Laser Physics",       code:"203670-3", lvl:"msc", lab:0, col:"#4b2e83", acc:"#c9a227", en:true},
+  {k:"Digital Methods in Photonics (ماجستير)", name:"Digital Methods in Photonics", code:"203671-3", lvl:"msc", lab:0, col:"#5a2a5e", acc:"#f0a35e", en:true},
+  {k:"Interferometric Systems (ماجستير)",      name:"Interferometric Systems",      code:"203673-3", lvl:"msc", lab:0, col:"#24527a", acc:"#e0b04a", en:true},
+  {k:"Quantum Optics (ماجستير)",               name:"Quantum Optics",               code:"203674-3", lvl:"msc", lab:0, col:"#3d3a8c", acc:"#7fd1c7", en:true},
+  {k:"Optoelectronics (ماجستير)",              name:"Optoelectronics",              code:"203675-3", lvl:"msc", lab:0, col:"#1f5e4a", acc:"#9ad16b", en:true}
+];
+COURSES.forEach(c => c.labs = LABS.filter(l => l.c === c.k).sort((a,b)=>a.n-b.n));
+const byKey = Object.fromEntries(COURSES.map(c=>[c.k,c]));
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const norm = s => String(s).toLowerCase()
+  .replace(/[ً-ْـ]/g,'')
+  .replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه');
+
+/* stats */
+$('#stats').innerHTML =
+  `<div class="stat"><b>${COURSES.length}</b>مقرراً</div>
+   <div class="stat"><b>${LABS.length}</b>معملاً نظرياً</div>
+   <div class="stat"><b>${COURSES.reduce((s,c)=>s+c.lab,0)}</b>تجربة عملية</div>`;
+
+/* cards */
+let filter = 'all';
+function chTitle(l){ return l.t.replace(/\s*\((?:\d+ interactive simulators?|2 interactive simulators)[^)]*\)\s*$/i,'').replace(/\s*\(MATLAB computational lab\)\s*$/i,''); }
+function drawCards(){
+  const list = COURSES.filter(c => filter==='all' || (filter==='lab' ? c.lab : c.lvl===filter));
+  $('#grid').innerHTML = list.map(c => `
+    <button class="card" data-k="${esc(c.k)}" aria-label="${esc(c.name)}">
+      <div class="band" style="background:linear-gradient(90deg,${c.acc} 0 22%,${c.col} 22%)"></div>
+      <div class="body">
+        <p class="name ${c.en?'en':''}" style="${c.en?'text-align:right':''}">${esc(c.name)}</p>
+        <div class="code"><bdi dir="ltr">${c.code?esc(c.code):'&nbsp;'}${c.sub?' · '+esc(c.sub):''}</bdi></div>
+        <div class="meta">
+          <span class="pill">${c.lvl==='msc'?'ماجستير':'بكالوريوس'}</span>
+          <span class="pill">نظري</span>
+          ${c.lab?'<span class="pill" style="background:#fff1e0;color:#8a4b0f">عملي · '+c.lab+' تجارب</span>':''}
+        </div>
+      </div>
+      <div class="foot"><span>${c.labs.length} ${c.labs.length>10?'فصلاً':'فصول'}</span><span style="color:${c.col}">افتح ←</span></div>
+    </button>`).join('');
+  document.querySelectorAll('.card').forEach(b => b.onclick = () => { const c = byKey[b.dataset.k]; if (c.href) location.href = c.href; else openCourse(b.dataset.k); });
+}
+document.querySelectorAll('.chip').forEach(ch => ch.onclick = () => {
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+  ch.classList.add('on'); filter = ch.dataset.f; drawCards(); $('#panel').classList.remove('open');
+});
+
+/* course panel */
+function openCourse(k, tab){
+  const c = byKey[k]; tab = tab || 'theory';
+  const p = $('#panel');
+  const rows = tab==='theory'
+    ? c.labs.map(l => `
+      <a class="ch" href="${esc(l.u)}"${/^https?:/.test(l.u)?' target="_blank" rel="noopener"':''}>
+        <span class="num" style="background:${c.col}14;color:${c.col}">${l.n}</span>
+        <span class="tt ${c.en?'en':''}" style="${c.en?'text-align:right':''}">${esc(chTitle(l))}</span>
+        <span class="go">فتح ↗</span>
+      </a>`).join('')
+    : `<div class="soon">صفحات التجارب العملية تُنقل في مرحلة نقل هذا المقرر، وتأخذ نفس هيدر المقرر النظري.</div>`;
+  p.innerHTML = `
+    <div class="ph" style="background:${c.col}">
+      <h3 class="${c.en?'en':''}">${esc(c.name)} ${c.code?`<span style="font-size:14px;opacity:.8;font-weight:400" class="en">${esc(c.code)}</span>`:''}</h3>
+      <button id="closeP">إغلاق ✕</button>
+    </div>
+    ${c.lab?`<div class="tabs">
+      <button class="chip ${tab==='theory'?'on':''}" data-t="theory">النظري</button>
+      <button class="chip ${tab==='lab'?'on':''}" data-t="lab">العملي</button></div>`:''}
+    <div>${rows}</div>`;
+  p.classList.add('open');
+  $('#closeP').onclick = () => p.classList.remove('open');
+  p.querySelectorAll('[data-t]').forEach(b => b.onclick = () => openCourse(k, b.dataset.t));
+  p.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* search */
+function hi(text, terms){
+  let s = esc(text);
+  terms.forEach(t => { if(t.length<2) return;
+    const re = new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+    s = s.replace(re, m => `<mark>${m}</mark>`); });
+  return s;
+}
+$('#q').addEventListener('input', e => {
+  const raw = e.target.value.trim(), box = $('#results');
+  if (raw.length < 2){ box.style.display='none'; return; }
+  const terms = norm(raw).split(/\s+/).filter(Boolean);
+  const hits = LABS.filter(l => { const h = norm(l.c+' '+l.t+' '+l.x); return terms.every(t => h.includes(t)); }).slice(0,30);
+  const rawTerms = raw.split(/\s+/);
+  box.style.display = 'block';
+  box.innerHTML = hits.length
+    ? `<div class="res-head">${hits.length} نتيجة</div>` + hits.map(l => { const c = byKey[l.c];
+        return `<a class="res" href="${esc(l.u)}"${/^https?:/.test(l.u)?' target="_blank" rel="noopener"':''}>
+          <span class="sw" style="background:${c.col}"></span>
+          <span><span class="t">${hi(chTitle(l), rawTerms)}</span><br>
+          <span class="c">${esc(c.name)} · الفصل ${l.n}</span>
+          ${l.x?`<br><span class="x">${hi(l.x, rawTerms)}</span>`:''}</span></a>`; }).join('')
+    : `<div class="empty">لا توجد نتائج لـ «${esc(raw)}». جرّب كلمة أقصر أو اسم الفصل.</div>`;
+});
+
+/* newest strip */
+const newest = LABS.filter(l=>l.d).sort((a,b)=> b.d.localeCompare(a.d) || a.n-b.n);
+const seen = new Set(), picks = [];
+newest.forEach(l => { if(!seen.has(l.c)){ seen.add(l.c); picks.push(l); } });
+$('#strip').innerHTML = picks.map(l => { const c = byKey[l.c];
+  return `<a href="${esc(l.u)}"${/^https?:/.test(l.u)?' target="_blank" rel="noopener"':''} style="border-top:4px solid ${c.col}">
+    <div class="d">${esc(c.name)} · <bdi dir="ltr">${l.d}</bdi></div><div class="t">${esc(chTitle(l))}</div></a>`; }).join('');
+
+drawCards();
+
+/* hero art: rotating Lorenz–Haken laser attractor with a travelling light point */
+(function(){
+  const cv = document.getElementById('art'); if(!cv) return;
+  const ctx = cv.getContext('2d');
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // integrate once (sigma=10, r=28, b=8/3)
+  const P = []; let X=1,Y=1,Z=20; const s=10,r=28,b=8/3,dt=0.004;
+  for(let n=0;n<16000;n++){ const dx=s*(Y-X), dy=X*(r-Z)-Y, dz=X*Y-b*Z; X+=dx*dt; Y+=dy*dt; Z+=dz*dt; if(n>400) P.push([X,Y,Z-25]); }
+  const N = P.length, BINS = 10;
+  const bin = P.map(p => Math.max(0, Math.min(BINS-1, Math.floor((p[2]+22)/44*BINS))));
+  const cols = [];
+  for(let k=0;k<BINS;k++){ const t=k/(BINS-1); cols.push(`rgba(${Math.round(255-t*125)},${Math.round(95+t*105)},${Math.round(85+t*170)},0.38)`); }
+  let W=0,H=0,dpr=1,scale=1,cx=0,cy=0,ang=-0.785,clock=0,head=0,raf=0,visible=true,last=0;
+  function size(){
+    dpr = Math.min(window.devicePixelRatio||1, 2);
+    W = Math.round(cv.clientWidth*dpr); H = Math.round(cv.clientHeight*dpr);
+    cv.width=W; cv.height=H; scale = Math.min(W/54, H/50); cx=W/2; cy=H*0.47;
+  }
+  const tilt = 0.22, ct=Math.cos(tilt), st=Math.sin(tilt);
+  function proj(p, ca, sa){
+    const x = p[0]*ca - p[1]*sa, y = p[0]*sa + p[1]*ca, z = p[2];
+    const y2 = y*ct - z*st, z2 = y*st + z*ct;            // tilt toward viewer
+    const f = 1/(1 + y2/160);                              // gentle perspective
+    return [cx + x*scale*f, cy - z2*scale*f];
+  }
+  function frame(ts){
+    raf = requestAnimationFrame(frame);
+    if(!visible) return;
+    const dtm = last ? Math.min(50, ts-last) : 16; last = ts;
+    clock += dtm; ang = -0.785 + 0.42*Math.sin(clock*2*Math.PI/30000);   // slow 3D sway around the front view (36 s period)
+    head = (head + Math.round(dtm*1.6)) % N;
+    draw();
+  }
+  function draw(){
+    const ca=Math.cos(ang), sa=Math.sin(ang);
+    ctx.clearRect(0,0,W,H);
+    const Q = new Array(N); for(let i=0;i<N;i++) Q[i]=proj(P[i],ca,sa);
+    ctx.globalCompositeOperation='lighter'; ctx.lineWidth=Math.max(0.7,0.8*dpr); ctx.lineJoin='round';
+    for(let k=0;k<BINS;k++){
+      ctx.strokeStyle=cols[k]; ctx.beginPath();
+      for(let i=0;i<N-1;i++){ if(bin[i]!==k) continue; ctx.moveTo(Q[i][0],Q[i][1]); ctx.lineTo(Q[i+1][0],Q[i+1][1]); }
+      ctx.stroke();
+    }
+    // travelling light: bright tail along the trajectory
+    const L = 260;
+    for(let j=0;j<L;j++){
+      const i = (head - L + j + N) % N, i2 = (i+1)%N; if(i2===0) continue;
+      const a = j/L;
+      ctx.strokeStyle=`rgba(255,${Math.round(150+a*90)},${Math.round(120+a*100)},${(a*a*0.9).toFixed(3)})`;
+      ctx.lineWidth = (0.8 + a*2.2)*dpr;
+      ctx.beginPath(); ctx.moveTo(Q[i][0],Q[i][1]); ctx.lineTo(Q[i2][0],Q[i2][1]); ctx.stroke();
+    }
+    const h = Q[head], g = ctx.createRadialGradient(h[0],h[1],0,h[0],h[1],14*dpr);
+    g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.35,'rgba(255,170,140,.55)'); g.addColorStop(1,'rgba(255,90,90,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(h[0],h[1],14*dpr,0,7); ctx.fill();
+    ctx.globalCompositeOperation='source-over';
+  }
+  size();
+  if(reduce){ draw(); }
+  else {
+    if('IntersectionObserver' in window) new IntersectionObserver(es=>{ visible = es[0].isIntersecting; last=0; }).observe(cv);
+    raf = requestAnimationFrame(frame);
+  }
+  let to; window.addEventListener('resize', ()=>{ clearTimeout(to); to=setTimeout(()=>{ size(); if(reduce) draw(); },150); });
+})();
+</script>
+</body>
+</html>

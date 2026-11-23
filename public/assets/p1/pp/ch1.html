@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before and After the Lab: Chapter 1 – Vectors</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F2F8F7;--panel:#FFFFFF;--ink:#12302E;--muted:#4E6866;--line:#CFE3E0;--acc:#0F5C59;--onacc:#fff;--acc2:#C9762A;--chip:#E6F2F0;--ok:#1E8E5A;--okbg:#E3F5EC;--bad:#C63A3A;--badbg:#FBE6E6}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.65}
+.wrap{max-width:980px;margin:0 auto;padding:14px 14px 16px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;justify-content:space-between}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.1rem,3.2vw,1.45rem);margin:.3em 0 0}
+h1 span{color:var(--acc)}
+.tabs{display:flex;gap:8px;margin:12px 0 10px}
+.tabs button{flex:1;font:inherit;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 10px;border-radius:12px;cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.pane{display:none}.pane.on{display:block}
+.hint{color:var(--muted);font-size:.86rem;margin:0 0 8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:300px}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.tag{display:inline-block;font-size:.78rem;color:var(--acc2);border:1px solid var(--line);border-radius:999px;padding:0 10px;margin-inline-start:6px}
+.q{margin:4px 0 8px;font-size:1rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:8px 12px;border-radius:10px;margin:5px 0;cursor:pointer;min-height:42px}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.fb{margin-top:6px;font-size:.9rem;color:var(--muted)}
+.fb b{color:var(--ink)}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+textarea{width:100%;min-height:76px;font:inherit;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px;resize:vertical}
+.show{font:inherit;margin-top:6px;border:1px solid var(--acc2);background:transparent;color:var(--acc2);padding:6px 14px;border-radius:10px;cursor:pointer;min-height:40px}
+.ans{display:none;margin-top:8px;background:var(--chip);border-radius:10px;padding:8px 12px;font-size:.93rem}
+.ans.on{display:block}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.nav button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 16px;border-radius:10px;cursor:pointer;min-height:40px}
+.nav button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--acc)}
+.score{text-align:center;padding:30px 10px}
+.score .big{font-size:2rem;color:var(--acc2);font-weight:700}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+.step{font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+.do{margin-top:8px;background:var(--chip);border-inline-start:3px solid var(--acc2);border-radius:10px;padding:8px 12px;font-size:.93rem}
+.verdict{font-weight:700}
+.tabs button{font-size:clamp(.8rem,2.6vw,1rem);padding:8px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><span class="badge" id="badge"></span></div>
+<h1 id="h1"></h1>
+<nav class="tabs" role="tablist"><button role="tab" aria-selected="true" data-p="pre" id="t1"></button><button role="tab" aria-selected="false" data-p="poe" id="t3"></button><button role="tab" aria-selected="false" data-p="post" id="t2"></button></nav>
+<section class="pane on" id="pre"><p class="hint" id="h_pre"></p><div class="card" id="pc"></div><div class="nav"><button id="pp"></button><div class="dots" id="pd"></div><button id="pn"></button></div></section>
+<section class="pane" id="poe"><p class="hint" id="h_poe"></p><div class="card" id="ec"></div><div class="nav"><button id="ep"></button><div class="dots" id="ed"></div><button id="en"></button></div></section>
+<section class="pane" id="post"><p class="hint" id="h_post"></p><div class="card" id="dc"></div><div class="nav"><button id="dp"></button><div class="dots" id="dd"></div><button id="dn"></button></div></section>
+</div>
+<script>
+const D={"lang":"en","course":"Physics 1","code":"203205-4","title":"Before and After the Lab: <span>Chapter 1 – Vectors</span>","review":"Chapter 1 lecture: polar coordinates, adding vectors graphically and by components, multiplying a vector by a scalar.","pre":[{"q":"A point has coordinates (−3.50, −2.50) m. Its polar angle, measured from the positive x axis, is about:","o":["35.5°","144.5°","215.5°","324.5°"],"a":2,"e":"tan<sup>−1</sup>(2.5/3.5) = 35.5°, and the point is in the third quadrant, so we add 180°."},{"q":"The x component A<sub>x</sub> of a vector is negative when its angle θ (from the positive x axis) is:","o":["between 0° and 90°","between 90° and 270°","between 180° and 360°","greater than 270° only"],"a":1,"e":"A<sub>x</sub> = A cos θ, and the cosine is negative in the second and third quadrants."},{"q":"A = 2î + 2ĵ and B = 2î − 4ĵ. The magnitude of R = A + B is:","o":["2.0","4.0","4.47","6.0"],"a":2,"e":"R = 4î − 2ĵ, so its magnitude is √(16 + 4) = √20 ≈ 4.47."},{"q":"If we start with B and then add A instead of the reverse, the resultant:","o":["changes in magnitude only","changes in direction only","does not change","is reversed"],"a":2,"e":"Vector addition is commutative: A + B = B + A."},{"q":"Which value of m makes mA a vector opposite to A and half as long?","o":["0.5","−0.5","−2","2"],"a":1,"e":"The negative sign reverses the direction, and the magnitude 0.5 halves the length."}],"post":[{"t":"Experiment 1: Polar coordinates","q":"When must you add 180° to the angle your calculator gives for θ = tan⁻¹(y/x)? Apply this to the point (−3.50, −2.50).","a":"When x is negative (second and third quadrants), because the calculator returns tan<sup>−1</sup> only between −90° and 90°. For this point: r = √(3.5<sup>2</sup> + 2.5<sup>2</sup>) ≈ 4.30 m and θ = 35.5° + 180° = 215.5°."},{"t":"Experiment 2: Graphical addition","q":"A car travels 20 km north and then 35 km at 150° from east. Does the resultant change if you start with B? What is its magnitude?","a":"No, because addition is commutative. By components: R<sub>x</sub> = 35 cos150° = −30.3 km and R<sub>y</sub> = 20 + 35 sin150° = 37.5 km, so R ≈ 48.2 km, at about 38.9° west of north."},{"t":"Experiments 3 and 4: Components and adding by components","q":"A vector of magnitude 5.0 makes 30° with the x axis. Find its components, then explain why adding by components is preferred to the graphical method.","a":"A<sub>x</sub> = 5 cos30° = 4.33 and A<sub>y</sub> = 5 sin30° = 2.50. Adding by components turns vector addition into ordinary algebraic addition along each axis, so it gives an exact result for any number of vectors without drawing and measuring errors."},{"t":"Experiment 5: Multiplying by a scalar","q":"Set B = −A. What is the resultant? What does multiplying a vector by a negative number do?","a":"The resultant is zero (the zero vector). Multiplying by a negative number reverses the direction and multiplies the length by the absolute value of the number."}],"poe":[{"t":"Experiment 1: Polar coordinates","q":"The point is <span class=\"eq\" dir=\"ltr\">(x, y) = (−3, −4) m</span>. Its angle measured counter‑clockwise from <span class=\"eq\" dir=\"ltr\">+x</span> is:","o":["<span class=\"eq\" dir=\"ltr\">53.1°</span>","<span class=\"eq\" dir=\"ltr\">233.1°</span>","<span class=\"eq\" dir=\"ltr\">126.9°</span>","<span class=\"eq\" dir=\"ltr\">−53.1°</span>"],"a":1,"do":"In the «Polar coordinates» tab set <span class=\"eq\" dir=\"ltr\">x = −3</span> and <span class=\"eq\" dir=\"ltr\">y = −4</span>, then read <span class=\"eq\" dir=\"ltr\">r</span> and the angle.","e":"<span class=\"eq\" dir=\"ltr\">r = 5 m</span>. A calculator gives <span class=\"eq\" dir=\"ltr\">tan<sup>−1</sup>(4/3) = 53.1°</span>, but the point is in the third quadrant, so add <span class=\"eq\" dir=\"ltr\">180°</span> to get <span class=\"eq\" dir=\"ltr\">233.1°</span>."},{"t":"Experiment 2: Graphical addition","q":"<span class=\"eq\" dir=\"ltr\">A = 30</span> east (<span class=\"eq\" dir=\"ltr\">0°</span>) and <span class=\"eq\" dir=\"ltr\">B = 40</span> north (<span class=\"eq\" dir=\"ltr\">90°</span>). The magnitude of <span class=\"eq\" dir=\"ltr\">R</span> is:","o":["<span class=\"eq\" dir=\"ltr\">70</span>","<span class=\"eq\" dir=\"ltr\">50</span>","<span class=\"eq\" dir=\"ltr\">10</span>","<span class=\"eq\" dir=\"ltr\">35</span>"],"a":1,"do":"In the «Graphical addition» tab set <span class=\"eq\" dir=\"ltr\">A = 30</span> at <span class=\"eq\" dir=\"ltr\">0°</span> and <span class=\"eq\" dir=\"ltr\">B = 40</span> at <span class=\"eq\" dir=\"ltr\">90°</span>, then read <span class=\"eq\" dir=\"ltr\">R</span>.","e":"The vectors are perpendicular, so <span class=\"eq\" dir=\"ltr\">R = √(30<sup>2</sup> + 40<sup>2</sup>) = 50</span>. Magnitudes add directly only when the vectors point the same way, and the order of addition does not change <span class=\"eq\" dir=\"ltr\">R</span>."},{"t":"Experiment 3: Components","q":"A vector of magnitude <span class=\"eq\" dir=\"ltr\">10</span> at <span class=\"eq\" dir=\"ltr\">120°</span>. The signs of <span class=\"eq\" dir=\"ltr\">A<sub>x</sub></span> and <span class=\"eq\" dir=\"ltr\">A<sub>y</sub></span> are:","o":["Both positive","<span class=\"eq\" dir=\"ltr\">A<sub>x</sub></span> negative, <span class=\"eq\" dir=\"ltr\">A<sub>y</sub></span> positive","<span class=\"eq\" dir=\"ltr\">A<sub>x</sub></span> positive, <span class=\"eq\" dir=\"ltr\">A<sub>y</sub></span> negative","Both negative"],"a":1,"do":"In the «Components» tab set the magnitude to <span class=\"eq\" dir=\"ltr\">10</span> and the angle to <span class=\"eq\" dir=\"ltr\">120°</span>, then read both components.","e":"<span class=\"eq\" dir=\"ltr\">A<sub>x</sub> = 10 cos 120° = −5</span> and <span class=\"eq\" dir=\"ltr\">A<sub>y</sub> = 10 sin 120° ≈ 8.66</span>. <span class=\"eq\" dir=\"ltr\">A<sub>x</sub></span> is negative between <span class=\"eq\" dir=\"ltr\">90°</span> and <span class=\"eq\" dir=\"ltr\">270°</span>, and <span class=\"eq\" dir=\"ltr\">A<sub>y</sub></span> vanishes at <span class=\"eq\" dir=\"ltr\">0°</span> and <span class=\"eq\" dir=\"ltr\">180°</span>."},{"t":"Experiment 4: Adding by components","q":"If <span class=\"eq\" dir=\"ltr\">A = (3, −2)</span> and <span class=\"eq\" dir=\"ltr\">B = (−3, 2)</span>, the resultant <span class=\"eq\" dir=\"ltr\">R = A + B</span> is:","o":["<span class=\"eq\" dir=\"ltr\">(6, −4)</span>","The zero vector","<span class=\"eq\" dir=\"ltr\">(0, −4)</span>","<span class=\"eq\" dir=\"ltr\">(3, 2)</span>"],"a":1,"do":"In the «Adding components» tab set the four components and watch the resultant.","e":"<span class=\"eq\" dir=\"ltr\">B = −A</span>, so each component cancels: <span class=\"eq\" dir=\"ltr\">R<sub>x</sub> = 0</span> and <span class=\"eq\" dir=\"ltr\">R<sub>y</sub> = 0</span>. A vector and its negative have equal magnitude and opposite directions."},{"t":"Experiment 5: Multiplying by a scalar","q":"Which <span class=\"eq\" dir=\"ltr\">m</span> makes <span class=\"eq\" dir=\"ltr\">mA</span> opposite to <span class=\"eq\" dir=\"ltr\">A</span> with half its length?","o":["<span class=\"eq\" dir=\"ltr\">0.5</span>","<span class=\"eq\" dir=\"ltr\">−2</span>","<span class=\"eq\" dir=\"ltr\">−0.5</span>","<span class=\"eq\" dir=\"ltr\">2</span>"],"a":2,"do":"In the «Multiplying by a scalar» tab move <span class=\"eq\" dir=\"ltr\">m</span> to <span class=\"eq\" dir=\"ltr\">−0.5</span> and compare the two vectors.","e":"The minus sign reverses the direction and <span class=\"eq\" dir=\"ltr\">|m| = 0.5</span> halves the length. <span class=\"eq\" dir=\"ltr\">m = −2</span> would reverse it and double it."}]};
+const T=D.lang==='ar'?{t1:'١) اختبار قبلي',t3:'٢) توقّع ثم جرّب',t2:'٣) مناقشة بعد المعمل',hpoe:'أثناء المعمل: توقّع النتيجة أولًا، ثم جرّبها في المعمل، ثم اقرأ التفسير.',s1:'① توقّع',s2:'② جرّب في المعمل',s3:'③ فسّر',see:'جرّبت، أظهر التفسير',hit:'توقّعك صحيح.',miss:'توقّعك يخالف النتيجة، وهذا مفيد: لاحظ السبب.',hpre:'أجب قبل فتح المعمل؛ يظهر التصحيح فور اختيارك، ولا تُحفظ النتيجة ولا تُرسل لأحد.',hpost:'بعد إنهاء المعمل: اكتب إجابتك أولًا، ثم قارنها بالإجابة النموذجية.',prev:'السابق',next:'التالي',res:'النتيجة',again:'إعادة الاختبار',ok:'إجابة صحيحة.',no:'ليست هذه.',show:'أظهر الإجابة النموذجية',hide:'أخفِ الإجابة',ph:'اكتب إجابتك هنا…',q:'السؤال',of:'من',good:'أنت مستعد للمعمل، افتحه الآن.',mid:'جيد، راجع ما أخطأت فيه ثم ابدأ المعمل.',low:'راجع المحاضرة قبل أن تبدأ المعمل: '}:{t1:'1) Pre-lab quiz',t3:'2) Predict & try',t2:'3) Post-lab discussion',hpoe:'During the lab: predict first, try it in the lab, then read the explanation.',s1:'① Predict',s2:'② Try it in the lab',s3:'③ Explain',see:'I tried it, show explanation',hit:'Your prediction was right.',miss:'Your prediction differs from the result, which is useful: see why.',hpre:'Answer before opening the lab. Feedback appears instantly; nothing is saved or sent.',hpost:'After the lab: write your own answer first, then compare it with the model answer.',prev:'Previous',next:'Next',res:'Result',again:'Retake quiz',ok:'Correct.',no:'Not quite.',show:'Show model answer',hide:'Hide answer',ph:'Write your answer here…',q:'Question',of:'of',good:'You are ready, open the lab now.',mid:'Good. Review what you missed, then start the lab.',low:'Review the lecture before starting the lab: '};
+const $=id=>document.getElementById(id);
+$('badge').innerHTML=D.course+' · <bdi dir="ltr">'+D.code+'</bdi>';$('h1').innerHTML=D.title;
+$('t1').textContent=T.t1;$('t2').textContent=T.t2;$('t3').textContent=T.t3;$('h_poe').textContent=T.hpoe;$('h_pre').textContent=T.hpre;$('h_post').textContent=T.hpost;
+['pp','dp','ep'].forEach(i=>$(i).textContent=T.prev);['pn','dn','en'].forEach(i=>$(i).textContent=T.next);
+let pi=0,st=D.pre.map(()=>-1),di=0,shown=D.post.map(()=>false),txt=D.post.map(()=>'');
+function dots(el,n,k){el.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('i');if(i===k)d.className='on';el.appendChild(d);}}
+function rPre(){const c=$('pc');const N=D.pre.length;
+if(pi===N){const s=st.filter((v,i)=>v===D.pre[i].a).length;c.innerHTML='<div class="score"><div>'+T.res+'</div><div class="big">'+s+' / '+N+'</div><p>'+(s>=N-1?T.good:(s>=Math.ceil(N/2)?T.mid:T.low+D.review))+'</p><button class="show" id="rt">'+T.again+'</button></div>';$('rt').onclick=()=>{st=st.map(()=>-1);pi=0;rPre();};}
+else{const it=D.pre[pi];c.innerHTML='<div class="qn">'+T.q+' '+(pi+1)+' '+T.of+' '+N+'</div><div class="q">'+it.q+'</div>';
+it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=t;
+if(st[pi]>=0){b.disabled=true;if(j===it.a)b.classList.add('right');else if(j===st[pi])b.classList.add('wrong');}
+b.onclick=()=>{st[pi]=j;rPre();};c.appendChild(b);});
+if(st[pi]>=0){const f=document.createElement('div');f.className='fb';f.innerHTML='<b>'+(st[pi]===it.a?T.ok:T.no)+'</b> '+it.e;c.appendChild(f);}}
+dots($('pd'),N+1,pi);$('pp').disabled=pi===0;$('pn').disabled=pi===N||(pi<N&&st[pi]<0);}
+function rPost(){const c=$('dc');const N=D.post.length;const it=D.post[di];
+c.innerHTML='<div class="qn">'+T.q+' '+(di+1)+' '+T.of+' '+N+'<span class="tag">'+it.t+'</span></div><div class="q">'+it.q+'</div><textarea placeholder="'+T.ph+'"></textarea><button class="show">'+(shown[di]?T.hide:T.show)+'</button><div class="ans'+(shown[di]?' on':'')+'">'+it.a+'</div>';
+const ta=c.querySelector('textarea');ta.value=txt[di];ta.oninput=()=>txt[di]=ta.value;
+c.querySelector('.show').onclick=()=>{shown[di]=!shown[di];rPost();};
+dots($('dd'),N,di);$('dp').disabled=di===0;$('dn').disabled=di===N-1;}
+$('pp').onclick=()=>{pi--;rPre();};$('pn').onclick=()=>{pi++;rPre();};$('dp').onclick=()=>{di--;rPost();};$('dn').onclick=()=>{di++;rPost();};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===b.dataset.p));});
+let ei=0,ech=D.poe.map(()=>-1),eopen=D.poe.map(()=>false);
+function rPoe(){const c=$('ec');const N=D.poe.length;const it=D.poe[ei];
+ c.innerHTML='<div class="qn">'+T.q+' '+(ei+1)+' '+T.of+' '+N+'<span class="tag">'+it.t+'</span></div><div class="step">'+T.s1+'</div><div class="q">'+it.q+'</div>';
+ it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=t;
+  if(ech[ei]>=0){b.disabled=true;if(eopen[ei]&&j===it.a)b.classList.add('right');else if(j===ech[ei])b.classList.add(eopen[ei]&&j!==it.a?'wrong':'right');if(!eopen[ei]&&j===ech[ei]){b.classList.remove('right');b.style.borderColor='var(--acc2)';}}
+  b.onclick=()=>{ech[ei]=j;rPoe();};c.appendChild(b);});
+ if(ech[ei]>=0){const d=document.createElement('div');d.innerHTML='<div class="step">'+T.s2+'</div><div class="do">'+it.do+'</div>'+(eopen[ei]?'<div class="step">'+T.s3+'</div><div class="fb"><span class="verdict">'+(ech[ei]===it.a?T.hit:T.miss)+'</span> '+it.e+'</div>':'<button class="show" id="see">'+T.see+'</button>');c.appendChild(d);
+  const s=c.querySelector('#see');if(s)s.onclick=()=>{eopen[ei]=true;rPoe();};}
+ dots($('ed'),N,ei);$('ep').disabled=ei===0;$('en').disabled=ei===N-1;}
+$('ep').onclick=()=>{ei--;rPoe();};$('en').onclick=()=>{ei++;rPoe();};
+rPre();rPost();rPoe();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f1"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script><script>(function(){var p=(location.hash||"#pre").slice(1);
+var b=document.querySelector('.tabs button[data-p="'+p+'"]');if(b)b.click();
+["nav.tabs",".top","#h1"].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display="none";});
+document.documentElement.style.background=document.body.style.background="transparent";})();</script>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab — Experiment 2: The Simple Pendulum</title>
+<style>
+  :root{
+    --bg:#EEF2F7; --panel:#FFFFFF; --panel2:#F6F8FB; --line:#D5DCE6; --navy:#1B2A41; --ink:#1A1D2B;
+    --orange:#C25E00; --blue:#1F5BD6; --red:#C8322F; --green:#2E7D4F; --gray:#5B6072; --amber:#F2A541;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Calibri,"Segoe UI",Candara,Arial,sans-serif;line-height:1.55;font-size:16px}
+  header{background:var(--navy);color:#fff;padding:20px 18px 16px;text-align:center;border-bottom:4px solid var(--orange)}
+  header .tag{display:inline-block;color:var(--amber);border:1px solid var(--amber);border-radius:20px;padding:1px 14px;font-size:13px;letter-spacing:.3px}
+  h1{margin:8px 0 2px;font-family:Cambria,Georgia,serif;font-size:27px;font-weight:700}
+  h1 span{color:var(--amber)}
+  header p{margin:0;color:#C9D3E3;font-size:15px}
+  .wrap{max-width:1120px;margin:0 auto;padding:14px}
+  .safety{background:#FFF4E5;border:1px solid var(--orange);border-left:6px solid var(--orange);border-radius:10px;padding:9px 14px;margin:12px 0;font-size:15px}
+  .safety b{color:var(--orange)}
+  nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  nav button{flex:1 1 150px;background:var(--panel);color:var(--gray);border:1px solid var(--line);border-radius:10px;padding:10px;
+             font:inherit;font-size:15px;cursor:pointer;font-weight:600}
+  nav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(27,42,65,.06)}
+  section.on{display:block}
+  h2{margin:0 0 10px;font-size:21px;color:var(--navy);font-family:Cambria,Georgia,serif}
+  h3{margin:16px 0 6px;font-size:17px;color:var(--orange)}
+  .eq{display:inline-block;font-family:"Cambria Math",Cambria,"Times New Roman",serif;background:var(--panel2);border:1px solid var(--line);
+      border-radius:7px;padding:2px 10px;margin:2px 0;font-size:17px;color:var(--navy);white-space:nowrap}
+  .eq i{font-style:italic}
+  .eq.big{display:block;text-align:center;font-size:21px;margin:8px auto;max-width:460px;padding:6px 12px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:820px){.grid,.grid3{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  label{display:block;font-size:15px;color:var(--gray);margin-top:8px}
+  input[type=range]{width:100%;accent-color:var(--orange)}
+  select,input[type=number],input[type=text]{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+  .val{color:var(--orange);font-weight:bold}
+  .btn{background:var(--navy);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px;font-weight:600}
+  .btn.or{background:var(--orange)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--gray)}
+  .btn:disabled{opacity:.45;cursor:default}
+  canvas{width:100%;display:block;border-radius:10px;background:#fff;border:1px solid var(--line)}
+  canvas.click{cursor:crosshair}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+  th,td{border:1px solid var(--line);padding:5px;text-align:center}
+  th{background:var(--navy);color:#fff;font-weight:600}
+  td input{text-align:center;padding:4px}
+  .ok{color:var(--green);font-weight:600} .bad{color:var(--red);font-weight:600}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+  .q p{margin:0 0 6px;font-weight:bold;color:var(--navy)}
+  .opt{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;
+       padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+  .opt.right{border-color:var(--green);background:#E6F4EA}
+  .opt.wrong{border-color:var(--red);background:#FBE9E8}
+  .fb{font-size:15px;color:var(--gray);min-height:1.2em}
+  .note{font-size:15px;color:var(--gray)}
+  .reading{font-size:21px;color:var(--orange);font-weight:bold}
+  .res{background:#EEF4FF;border:1px solid #C9D8F5;border-radius:10px;padding:10px 14px;margin-top:10px}
+  .res b{color:var(--navy)}
+  .wi{background:var(--panel2);border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:10px;padding:10px 12px;margin:10px 0}
+  .wi p{margin:0 0 6px;font-weight:600}
+  .wi .ans{display:none;color:var(--ink);background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px;margin-top:6px}
+  .wi.show .ans{display:block}
+  .pill{display:inline-block;background:#E8EEF8;border:1px solid #C9D8F5;border-radius:20px;padding:1px 10px;font-size:14px;margin:2px;color:var(--navy)}
+  footer{text-align:center;color:var(--gray);font-size:13px;padding:16px}
+  sub,sup{font-size:70%}
+</style>
+
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header>
+  <span class="tag">Physics 1 (203205-4) — Practical Virtual Lab</span>
+  <h1>Experiment 2: <span>The Simple Pendulum</span></h1>
+  <p>Simple harmonic motion · measuring the free-fall acceleration g from a T² – L graph</p>
+</header>
+<div class="wrap">
+  <div class="safety">⚠️ <b>Safety:</b> clamp the stand firmly to the bench so it cannot tip, keep the swinging bob away from faces, and keep the amplitude small.</div>
+  <nav>
+    <button class="on" data-s="s1">1) Pre-lab questions</button>
+    <button data-s="s2">2) Theory</button>
+    <button data-s="s3">3) Simulation &amp; measurement</button>
+    <button data-s="s4">4) Data table &amp; analysis</button>
+    <button data-s="sR">5) My lab readings ✔</button>
+    <button data-s="s5">6) What if…?</button>
+  </nav>
+
+  <section id="s1" class="on"><h2>Pre-lab questions</h2><p class="note">Answer before you come to the lab. The correction appears as soon as you choose.</p><div id="quiz"></div><p class="reading" id="qscore"></p></section>
+
+  <section id="s2">
+    <h2>Theory</h2>
+    <p>A <b>simple pendulum</b> is a small heavy bob of mass <i>M</i> on a light string. The length <i>L</i> is measured from the point of suspension to the <b>centre</b> of the bob.
+       Linked to <b>Chapter 2</b> (free fall, <i>g</i>) and <b>Chapter 3</b> (weight <i>Mg</i>, Newton’s second law) of the lectures.</p>
+    <h3>1. Restoring force</h3>
+    <p>When the bob is pulled aside by an angle θ, the component of its weight along the arc pulls it back:</p>
+    <span class="eq big"><i>F</i> = −<i>Mg</i> sin θ ≈ −<i>Mg</i> θ = −(<i>Mg</i> / <i>L</i>) <i>x</i>     (θ small, θ in radians, <i>x</i> = <i>L</i>θ)</span>
+    <p>The force is proportional to the displacement and opposite to it, so the motion is <b>simple harmonic</b>. Newton’s second law gives <span class="eq"><i>a</i> = −(<i>g</i>/<i>L</i>) <i>x</i></span>, and the periodic time is</p>
+    <span class="eq big"><i>T</i> = 2π √(<i>L</i> / <i>g</i>)</span>
+    <p>Notice that <i>T</i> does <b>not</b> depend on the mass of the bob, and (for small angles) not on the amplitude.</p>
+    <h3>2. The straight-line graph</h3>
+    <p>Squaring both sides:</p>
+    <span class="eq big"><i>T</i>² = (4π² / <i>g</i>) <i>L</i>     →     slope = 4π² / <i>g</i>     →     <i>g</i> = 4π² / slope</span>
+    <p>Plot <i>T</i>² (s²) on the <i>y</i>-axis against <i>L</i> (m) on the <i>x</i>-axis. The points lie on a straight line through the origin.</p>
+    <h3>3. Good practice</h3>
+    <p>• Keep the amplitude small (less than about 10°). • Time <b>10 complete oscillations</b> (there and back = one oscillation) and divide by 10; this makes the reaction-time error 10 times smaller.
+       • Start and stop the watch when the bob passes the <b>lowest point</b> (it moves fastest there, so the instant is sharp). • Reject a run if the bob swings in an ellipse.</p>
+    <div class="card"><b>Apparatus:</b> pendulum bob (diameter 2.0 cm) on a cotton thread, clamp and stand with split cork, metre rule, stopwatch, fiducial mark (pointer) under the lowest point.</div>
+  </section>
+
+  <section id="s3">
+    <h2>Simulation &amp; measurement</h2>
+    <div class="grid">
+      <div class="card">
+        <label>Thread length ℓ from the cork to the top of the bob: <span class="val" id="lv"></span></label>
+        <input type="range" id="ell" min="19" max="119" step="1" value="59">
+        <p class="note">The bob diameter is <b>2.0 cm</b>, so <i>L</i> = ℓ + 1.0 cm (to the centre of the bob).</p>
+        <label>Starting angle (amplitude): <span class="val" id="av"></span></label>
+        <input type="range" id="amp" min="3" max="40" step="1" value="8">
+        <label>Bob</label>
+        <select id="bob"><option value="50">Brass bob, 50 g</option><option value="100">Steel bob, 100 g</option><option value="20">Wooden bob, 20 g</option></select>
+        <p><button class="btn" id="go">Release the bob</button> <button class="btn ghost" id="stopP">Stop the pendulum</button></p>
+        <div class="card" style="background:#fff">
+          <b>Stopwatch</b> <span class="reading" id="sw" style="font-family:Consolas,monospace;margin-left:10px">0.00 s</span><br>
+          <button class="btn or" id="swBtn">Start</button> <button class="btn ghost" id="swRst">Reset</button>
+          <label><input type="checkbox" id="cnt" style="width:auto"> Show an oscillation counter (to check your counting)</label>
+          <span class="note" id="cntOut"></span>
+        </div>
+        <button class="btn or" id="add">Add this run to the table</button>
+        <p class="note" id="warn"></p>
+      </div>
+      <div class="card"><canvas id="pc" width="520" height="620"></canvas>
+        <p class="note">Start and stop the stopwatch as the bob passes the pointer at the lowest point. Time 10 complete oscillations.</p></div>
+    </div>
+  </section>
+
+  <section id="s4">
+    <h2>Data table &amp; analysis</h2>
+    <p class="note">Fill in <i>L</i>, <i>T</i> and <i>T</i>² yourself, then press “Check”.</p>
+    <table><thead><tr><th>Run</th><th>ℓ (cm)</th><th>Your <i>L</i> (m)</th><th><i>t</i> for 10 osc. (s)</th><th>Your <i>T</i> (s)</th><th>Your <i>T</i>² (s²)</th><th>Result</th></tr></thead><tbody id="tb"></tbody></table>
+    <canvas id="plot" width="900" height="380" style="margin-top:10px"></canvas>
+    <div class="grid">
+      <label>Slope of YOUR hand-drawn T² – L line (s²/m)<input type="number" id="uS" step="0.01"></label>
+      <label>Your g = 4π²/slope (m/s²)<input type="number" id="uG" step="0.01"></label>
+    </div>
+    <button class="btn or" id="chk">Check</button> <button class="btn ghost" id="clr">Clear</button>
+    <div class="res" id="res"><p class="note">Record at least 5 different lengths (e.g. 20 cm to 120 cm), then check.</p></div>
+  </section>
+
+  <section id="sR"><h2>My real lab readings — self-check</h2><div id="real"></div></section>
+
+  <section id="s5"><h2>What if…?</h2><p class="note">Predict first, write your reason, then reveal the explanation.</p><div id="whatif"></div></section>
+</div>
+<footer>Physics 1 (203205-4) · Practical part · Prof. Najm Al-Hosiny</footer>
+<script>
+// ===== shared helpers for Physics 1 practical virtual labs =====
+const $=id=>document.getElementById(id);
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); $(b.dataset.s).classList.add('on');
+  if(window.onTab) window.onTab(b.dataset.s);
+});
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function roundTo(x,step){return Math.round(x/step)*step;}
+function fmt(x,d){return (x===null||x===undefined||isNaN(x))?'—':(+x).toFixed(d);}
+function pct(a,b){return Math.abs(a-b)/Math.abs(b)*100;}
+function close(u,t,tol){return u!==null&&u!==''&&!isNaN(u)&&Math.abs(u-t)<=Math.abs(t)*tol+1e-12;}
+
+// ----- pre-lab quiz -----
+function buildQuiz(Q){
+  let score=0,answered=0; const qz=$('quiz');
+  Q.forEach((it,i)=>{
+    const d=document.createElement('div'); d.className='q';
+    d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+String.fromCharCode(97+j)+') '+o+'</button>').join('')+'<div class="fb"></div>';
+    d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(d.dataset.done) return; d.dataset.done=1; answered++;
+      const j=+b.dataset.j; d.querySelectorAll('.opt')[it.a].classList.add('right');
+      if(j===it.a){score++; d.querySelector('.fb').innerHTML='<span class="ok">✔ Correct.</span> '+it.e;}
+      else{b.classList.add('wrong'); d.querySelector('.fb').innerHTML='<span class="bad">✘ Not quite.</span> '+it.e;}
+      if(answered===Q.length) $('qscore').textContent='Your score: '+score+' / '+Q.length;
+    });
+    qz.appendChild(d);
+  });
+}
+// ----- what if...? -----
+function buildWhatIf(W){
+  const box=$('whatif');
+  W.forEach((it,i)=>{
+    const d=document.createElement('div'); d.className='wi';
+    d.innerHTML='<p>'+(i+1)+') '+it.q+'</p><textarea rows="2" style="width:100%;font:inherit;border:1px solid #D5DCE6;border-radius:8px;padding:6px" placeholder="Write your prediction and reason first…"></textarea>'+
+      '<button class="btn ghost">Show the explanation</button><div class="ans">'+it.a+'</div>';
+    d.querySelector('button').onclick=()=>d.classList.toggle('show');
+    box.appendChild(d);
+  });
+}
+// ----- least squares -----
+function fitLine(xs,ys){ // y = m x + b
+  const n=xs.length; if(n<2) return null;
+  const sx=xs.reduce((a,b)=>a+b,0), sy=ys.reduce((a,b)=>a+b,0);
+  const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0);
+  const den=n*sxx-sx*sx; if(Math.abs(den)<1e-15) return null;
+  const m=(n*sxy-sx*sy)/den, b=(sy-m*sx)/n;
+  const res=ys.map((y,i)=>y-(m*xs[i]+b)); const s2=n>2?res.reduce((a,r)=>a+r*r,0)/(n-2):0;
+  const dm=Math.sqrt(n*s2/den), db=Math.sqrt(s2*sxx/den);
+  return {m,b,dm,db};
+}
+function fitOrigin(xs,ys){ // y = m x
+  const n=xs.length; if(n<1) return null;
+  const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0); if(sxx===0) return null;
+  const m=sxy/sxx; const s2=n>1?ys.reduce((a,y,i)=>a+(y-m*xs[i])**2,0)/(n-1):0;
+  return {m,b:0,dm:Math.sqrt(s2/sxx),db:0};
+}
+// ----- plot -----
+function niceStep(range){const r=range/6,p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p;return (f<1.5?1:f<3?2:f<7?5:10)*p;}
+function drawPlot(cv,pts,o){
+  o=o||{}; const g=cv.getContext('2d'), W=cv.width,H=cv.height; g.clearRect(0,0,W,H); g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+  const L=74,R=22,T=22,B=58;
+  let xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  let x0=o.xmin!==undefined?o.xmin:Math.min(0,...xs), x1=o.xmax!==undefined?o.xmax:Math.max(...xs,1e-9);
+  let y0=o.ymin!==undefined?o.ymin:Math.min(0,...ys), y1=o.ymax!==undefined?o.ymax:Math.max(...ys,1e-9);
+  if(!pts.length){x0=0;x1=1;y0=0;y1=1;}
+  x1+= (x1-x0)*0.08; y1+=(y1-y0)*0.10; if(x0<0)x0-=(x1-x0)*0.05; if(y0<0)y0-=(y1-y0)*0.05;
+  const X=x=>L+(x-x0)/(x1-x0)*(W-L-R), Y=y=>H-B-(y-y0)/(y1-y0)*(H-T-B);
+  const sxs=niceStep(x1-x0), sys=niceStep(y1-y0);
+  g.font='13px Calibri, Arial'; g.textAlign='center'; g.strokeStyle='#E3E8F0'; g.fillStyle='#5B6072';
+  const dec=s=>s>=1?0:Math.min(4,Math.ceil(-Math.log10(s)));
+  for(let x=Math.ceil(x0/sxs)*sxs;x<=x1+1e-12;x+=sxs){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),H-B);g.stroke();g.fillText(x.toFixed(dec(sxs)),X(x),H-B+17);}
+  g.textAlign='right';
+  for(let y=Math.ceil(y0/sys)*sys;y<=y1+1e-12;y+=sys){g.beginPath();g.moveTo(L,Y(y));g.lineTo(W-R,Y(y));g.stroke();g.fillText(y.toFixed(dec(sys)),L-6,Y(y)+4);}
+  g.strokeStyle='#1B2A41'; g.lineWidth=1.5; g.beginPath(); g.moveTo(L,T); g.lineTo(L,H-B); g.lineTo(W-R,H-B); g.stroke();
+  if(x0<0&&x1>0){g.beginPath();g.moveTo(X(0),T);g.lineTo(X(0),H-B);g.stroke();}
+  if(y0<0&&y1>0){g.beginPath();g.moveTo(L,Y(0));g.lineTo(W-R,Y(0));g.stroke();}
+  g.lineWidth=1; g.fillStyle='#1B2A41'; g.textAlign='center'; g.font='bold 14px Calibri, Arial';
+  g.fillText(o.xlabel||'x',(L+W-R)/2,H-14);
+  g.save(); g.translate(18,(T+H-B)/2); g.rotate(-Math.PI/2); g.fillText(o.ylabel||'y',0,0); g.restore();
+  const line=(f,col,dash)=>{ if(!f) return; g.strokeStyle=col; g.lineWidth=2; g.setLineDash(dash||[]);
+    const xa=o.extend?x0:Math.min(0,x0), xb=x1; g.beginPath(); g.moveTo(X(xa),Y(f.m*xa+f.b)); g.lineTo(X(xb),Y(f.m*xb+f.b)); g.stroke(); g.setLineDash([]); g.lineWidth=1;};
+  g.save(); g.beginPath(); g.rect(L,T,W-L-R,H-T-B); g.clip();
+  line(o.fit,'#C25E00'); line(o.student,'#1F5BD6',[6,5]);
+  g.restore();
+  pts.forEach(p=>{g.fillStyle='#1B2A41'; g.beginPath(); g.arc(X(p[0]),Y(p[1]),4.5,0,2*Math.PI); g.fill();});
+  if(o.fit||o.student){g.font='13px Calibri, Arial'; g.textAlign='left';
+    if(o.fit){g.fillStyle='#C25E00'; g.fillText('— best-fit line (least squares)',L+10,T+14);}
+    if(o.student){g.fillStyle='#1F5BD6'; g.fillText('- - line with YOUR slope',L+10,T+30);}}
+}
+
+// ===== "My real lab readings" self-check (replaces the Excel file) =====
+function buildReal(cfg){
+  const box=$('real'), KEY='p1lab_real_'+cfg.key;
+  let store={}; try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){store={};}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}};
+  const num=v=>{if(v===undefined||v===null) return null; v=String(v).trim().replace(',', '.'); if(v==='') return null; const x=parseFloat(v); return isNaN(x)?null:x;};
+  let h='<p class="note">'+(cfg.intro||'')+' Type the readings you recorded in the laboratory (in your manual), do your own calculations, then press <b>Check my results</b>. '+
+        'Your entries are kept in this browser, so you can come back later. Take a screenshot of the result and attach it at the end of your report.</p>';
+  if(cfg.consts&&cfg.consts.length){h+='<div class="grid3">'+cfg.consts.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+  cfg.tables.forEach(t=>{
+    h+='<h3>'+t.title+'</h3><div style="overflow-x:auto"><table id="rt_'+t.id+'"><thead><tr><th>#</th>'+t.cols.map(c=>'<th'+(c.calc?' style="background:#7A5200"':'')+'>'+c.label+'</th>').join('')+'</tr></thead><tbody></tbody></table></div>';
+    if(t.add!==false) h+='<button class="btn ghost" data-add="'+t.id+'">+ Add a row</button>';
+  });
+  if(cfg.mine&&cfg.mine.length){h+='<h3>Your results from your hand-drawn graph / calculation</h3><div class="grid3">'+cfg.mine.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+  h+='<p><button class="btn or" id="rcheck">Check my results</button> <button class="btn ghost" id="rclear">Clear all my entries</button></p>'+
+     '<p class="note">Yellow-headed columns are your own calculations: they turn <span class="ok">green</span> when correct and <span class="bad">red</span> when not.</p>'+
+     (cfg.plot?'<canvas id="rplot" width="760" height="430"></canvas>':'')+'<div class="res" id="rres"><p class="note">Results appear here after you press Check.</p></div>';
+  box.innerHTML=h;
+  const rowsOf=t=>{ if(!store[t.id]) store[t.id]=[]; const n=Math.max(t.rows||5, store[t.id].length); while(store[t.id].length<n) store[t.id].push({}); return store[t.id]; };
+  function renderTables(){
+    cfg.tables.forEach(t=>{
+      const tb=$('rt_'+t.id).querySelector('tbody'); const R=rowsOf(t);
+      if(t.preset) R.forEach((r,i)=>{ if(t.preset[i]) Object.keys(t.preset[i]).forEach(k=>{ if(r[k]===undefined) r[k]=String(t.preset[i][k]); }); });
+      tb.innerHTML=R.map((r,i)=>'<tr><td>'+(t.rowLabels?t.rowLabels[i]||(i+1):(i+1))+'</td>'+t.cols.map(c=>'<td'+(c.calc?' style="background:#FFF8D6"':'')+'><input type="text" inputmode="decimal" data-t="'+t.id+'" data-r="'+i+'" data-c="'+c.id+'" value="'+(r[c.id]===undefined?'':String(r[c.id]).replace(/"/g,''))+'"></td>').join('')+'</tr>').join('');
+    });
+    box.querySelectorAll('input[data-t]').forEach(inp=>inp.oninput=()=>{store[inp.dataset.t][+inp.dataset.r][inp.dataset.c]=inp.value; inp.style.borderColor=''; save();});
+  }
+  box.querySelectorAll('input[data-k]').forEach(inp=>{ if(store['k_'+inp.dataset.k]!==undefined) inp.value=store['k_'+inp.dataset.k]; inp.oninput=()=>{store['k_'+inp.dataset.k]=inp.value; save();}; });
+  box.querySelectorAll('button[data-add]').forEach(b=>b.onclick=()=>{ store[b.dataset.add].push({}); save(); renderTables(); });
+  let armed=false;
+  $('rclear').onclick=()=>{ if(!armed){armed=true; $('rclear').textContent='Click again to clear everything'; setTimeout(()=>{armed=false; $('rclear').textContent='Clear all my entries';},4000); return;}
+    store={}; save(); box.querySelectorAll('input[data-k]').forEach(i=>i.value=''); renderTables(); $('rres').innerHTML='<p class="note">Cleared.</p>'; if(cfg.plot) drawPlot($('rplot'),[],cfg.plot); armed=false; $('rclear').textContent='Clear all my entries'; };
+  $('rcheck').onclick=()=>{
+    const K={}; box.querySelectorAll('input[data-k]').forEach(i=>K[i.dataset.k]=num(i.value));
+    const T={}; let marks=0, good=0;
+    cfg.tables.forEach(t=>{
+      T[t.id]=[];
+      store[t.id].forEach((r,i)=>{
+        const o={_i:i}; t.cols.forEach(c=>{ if(!c.calc) o[c.id]=num(r[c.id]); });
+        const complete=t.cols.filter(c=>!c.calc&&!c.optional).every(c=>o[c.id]!==null);
+        t.cols.filter(c=>c.calc).forEach(c=>{
+          const inp=box.querySelector('input[data-t="'+t.id+'"][data-r="'+i+'"][data-c="'+c.id+'"]'); const u=num(r[c.id]);
+          if(!complete){ inp.style.borderColor=''; return; }
+          let e=null; try{ e=c.f(o,K); }catch(err){ e=null; } o[c.id]=e; o['your_'+c.id]=u;
+          if(u===null||e===null||!isFinite(e)){ inp.style.borderColor=''; return; }
+          const ok=c.abs!==undefined?Math.abs(u-e)<=c.abs:close(u,e,c.tol||0.02); marks++; if(ok) good++;
+          inp.style.borderColor=ok?'#2E7D4F':'#C8322F'; inp.style.borderWidth='2px'; inp.title=ok?'correct':'expected about '+(+e.toPrecision(4));
+        });
+        if(complete) T[t.id].push(o);
+      });
+    });
+    let out;
+    try{ out=cfg.analyze(T,K)||{}; }catch(err){ out={html:'<span class="bad">Please check your entries: '+err.message+'</span>'}; }
+    let s=marks?'<b>Your calculated columns:</b> '+good+' / '+marks+' correct'+(good<marks?' — hover over (or tap) a red cell to see the expected value.':' ✔')+'<br>':'';
+    $('rres').innerHTML=s+(out.html||'');
+    if(cfg.plot){ const p=out.plot||{pts:[]}; drawPlot($('rplot'),p.pts,Object.assign({},cfg.plot,p)); }
+  };
+  renderTables(); if(cfg.plot) drawPlot($('rplot'),[],cfg.plot);
+}
+function ok5(u,t,lim,txt){ lim=lim||5; if(u===null||u===undefined) return ''; const d=pct(u,t); return d<=lim?'<span class="ok">✔ '+txt+' is within '+lim+' % of the best-fit value</span>':'<span class="bad">✘ '+txt+' differs by '+d.toFixed(1)+' % from the best-fit value — check the two points you read on your line</span>'; }
+</script>
+
+<script>
+buildQuiz([
+ {q:'The periodic time of a simple pendulum depends on:',o:['the mass of the bob','the length L and g','the amplitude only','the colour of the thread'],a:1,e:'T = 2π√(L/g): only L and g (for small amplitudes).'},
+ {q:'If the length of a pendulum is made 4 times larger, its period becomes:',o:['4 times larger','2 times larger','the same','half'],a:1,e:'T ∝ √L, and √4 = 2.'},
+ {q:'On a graph of T² (y-axis) against L (x-axis), the slope equals:',o:['g','4π²/g','g/4π²','√g'],a:1,e:'T² = (4π²/g) L, so the slope is 4π²/g and g = 4π²/slope.'},
+ {q:'Why do we time 10 oscillations instead of 1?',o:['To make the pendulum swing faster','To reduce the effect of reaction time on T','Because the first swing is wrong','To increase the amplitude'],a:1,e:'The reaction-time error (≈0.2 s) is shared by 10 periods, so the error in T becomes ≈0.02 s.'},
+ {q:'The length L of the pendulum is measured from the point of suspension to:',o:['the top of the bob','the bottom of the bob','the centre of the bob','the floor'],a:2,e:'The bob behaves like a point mass at its centre, so L goes to the centre of the bob.'}
+]);
+buildWhatIf([
+ {q:'What if you use a heavier bob of the same size?',a:'Nothing changes: T does not depend on the mass, because both the restoring force (Mg sin θ) and the inertia (M) are proportional to M. Try it with the bob menu.'},
+ {q:'What if the amplitude is 40° instead of 8°?',a:'sin θ ≈ θ is no longer accurate, and the period becomes about 3 % longer (T ≈ T₀(1 + θ₀²/16)). Your g would come out too small. Try it in the simulation.'},
+ {q:'What if you measure L to the top of the bob (forgetting the 1.0 cm radius)?',a:'Every L is 1 cm too short. The graph keeps the same slope but no longer passes through the origin (it crosses the L-axis at −1 cm). Using the slope, not a single point, protects your g.'},
+ {q:'What if the experiment were done on the Moon (g = 1.62 m/s²)?',a:'T = 2π√(L/g) becomes √(9.79/1.62) ≈ 2.5 times longer. The slope of the T² – L graph becomes about 6 times larger.'},
+ {q:'What if you started and stopped the watch at the end of a swing instead of the lowest point?',a:'At the turning points the bob moves slowly, so it is hard to see the exact moment; the timing error increases. At the lowest point it moves fastest and the instant is sharp.'}
+]);
+const G=9.79, D2R=Math.PI/180;
+const pc=$('pc'), g=pc.getContext('2d');
+let th0=8*D2R, th=0, omega=0, running=false, last=null, tSim=0, crossings=0, prevSide=0, rows=[], ext=null;
+function Lm(){return (+ell.value+1.0)/100;}
+function trueT(){const a=+amp.value*D2R; return 2*Math.PI*Math.sqrt(Lm()/G)*(1+a*a/16+11*a**4/3072);}
+function upd(){ lv.textContent='ℓ = '+ell.value+' cm'; av.textContent=amp.value+'°';
+  warn.innerHTML=+amp.value>12?'<span class="bad">The amplitude is large: sin θ ≈ θ is no longer accurate.</span>':''; }
+function drawP(){
+  const W=pc.width,H=pc.height,top=40,sx=W/2; g.clearRect(0,0,W,H); g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+  g.fillStyle='#5B6072'; g.fillRect(sx-70,10,140,14); g.fillStyle='#C9A66B'; g.fillRect(sx-9,18,18,22);
+  const Lpx=40+ (+ell.value)/120*480; const scale=Lpx/((+ell.value+1)/100);
+  const bx=sx+Lpx*Math.sin(th), by=top+Lpx*Math.cos(th);
+  g.strokeStyle='#E3E8F0'; g.setLineDash([5,5]); g.beginPath(); g.moveTo(sx,top); g.lineTo(sx,top+Lpx+30); g.stroke(); g.setLineDash([]);
+  g.strokeStyle='#1A1D2B'; g.lineWidth=1.5; g.beginPath(); g.moveTo(sx,top); g.lineTo(bx,by); g.stroke(); g.lineWidth=1;
+  const r=Math.max(7,0.01*scale); const col=bob.value==='100'?'#8C96A8':bob.value==='20'?'#C9A66B':'#D4A13A';
+  g.fillStyle=col; g.beginPath(); g.arc(bx,by,r,0,2*Math.PI); g.fill(); g.strokeStyle='#1A1D2B'; g.stroke();
+  g.fillStyle='#C25E00'; g.beginPath(); g.moveTo(sx,top+Lpx+r+6); g.lineTo(sx-8,top+Lpx+r+22); g.lineTo(sx+8,top+Lpx+r+22); g.fill();
+  g.fillStyle='#5B6072'; g.font='13px Calibri'; g.fillText('pointer (lowest point)',sx+12,top+Lpx+r+20);
+  // metre rule
+  g.fillStyle='#F7E8C8'; g.fillRect(24,top,34,Lpx+20); g.strokeStyle='#8A6D3B'; g.strokeRect(24,top,34,Lpx+20);
+  g.fillStyle='#3A2A10'; g.font='11px Calibri';
+  const pxcm=Lpx/(+ell.value+1); for(let c=0;c<=+ell.value+1;c++){ const y=top+c*pxcm; const L=c%10===0?14:(c%5===0?9:4); g.beginPath(); g.moveTo(58,y); g.lineTo(58-L,y); g.stroke(); if(c%10===0) g.fillText(String(c),27,y+4); }
+}
+function step(ts){
+  if(!running){last=null;return;}
+  if(last===null) last=ts; let dt=Math.min(0.05,(ts-last)/1000); last=ts;
+  // exact period including the finite-amplitude correction, with very light damping
+  tSim+=dt; const ph=2*Math.PI*tSim/trueT(); th=th0*Math.exp(-tSim/400)*Math.cos(ph);
+  const side=Math.sign(Math.sin(ph)); if(prevSide!==0&&side!==prevSide) crossings++; prevSide=side;
+  if(cnt.checked) cntOut.textContent='Oscillations since release: '+(Math.floor(crossings/2));
+  drawP(); requestAnimationFrame(step);
+}
+go.onclick=()=>{th0=+amp.value*D2R; tSim=0; crossings=0; prevSide=0; running=true; requestAnimationFrame(step);};
+stopP.onclick=()=>{running=false; th=0; drawP();};
+['ell','amp','bob'].forEach(id=>$(id).addEventListener('input',()=>{running=false; th=0; upd(); drawP();}));
+// stopwatch
+let swOn=false, swT0=0, swVal=0, swRaf=null;
+function swTick(){ if(!swOn) return; swVal=(performance.now()-swT0)/1000; sw.textContent=swVal.toFixed(2)+' s'; swRaf=requestAnimationFrame(swTick); }
+swBtn.onclick=()=>{ if(!swOn){swOn=true; swT0=performance.now()-swVal*1000; swBtn.textContent='Stop'; swTick();} else {swOn=false; swBtn.textContent='Start'; swVal=(performance.now()-swT0)/1000; sw.textContent=swVal.toFixed(2)+' s';} };
+swRst.onclick=()=>{swOn=false; swVal=0; sw.textContent='0.00 s'; swBtn.textContent='Start';};
+add.onclick=()=>{ if(swOn||swVal<1){alert('Time 10 oscillations with the stopwatch first (start, then stop).');return;}
+  const tt=trueT()*10; if(Math.abs(swVal-tt)/tt>0.15) if(!confirm('Your time is far from 10 oscillations of this pendulum. Add it anyway?')) return;
+  rows=rows.filter(r=>r.ell!==+ell.value); rows.push({ell:+ell.value,t10:+swVal.toFixed(2),amp:+amp.value,u:{}}); rows.sort((a,b)=>a.ell-b.ell); ext=null; render(); swRst.onclick(); };
+function render(){ const tb=$('tb'); tb.innerHTML='';
+  rows.forEach((r,i)=>{ const tr=document.createElement('tr'); const inp=k=>'<input type="number" step="0.001" data-k="'+k+'" value="'+(r.u[k]??'')+'">';
+    tr.innerHTML='<td>'+(i+1)+'</td><td>'+r.ell+'</td><td>'+inp('L')+'</td><td>'+r.t10.toFixed(2)+'</td><td>'+inp('T')+'</td><td>'+inp('T2')+'</td><td>'+(r.res||'')+'</td>';
+    tr.querySelectorAll('input').forEach(x=>x.oninput=()=>{r.u[x.dataset.k]=x.value===''?null:+x.value;}); tb.appendChild(tr); });
+  drawPlot(plot,rows.map(r=>[(r.ell+1)/100,(r.t10/10)**2]),Object.assign({xlabel:'length L (m)',ylabel:'T² (s²)'},ext||{})); }
+chk.onclick=()=>{ if(rows.length<5){alert('Record at least 5 lengths.');return;}
+  rows.forEach(r=>{ const L=(r.ell+1)/100, T=r.t10/10, T2=T*T; const ok=close(r.u.L,L,0.005)&&close(r.u.T,T,0.005)&&close(r.u.T2,T2,0.01);
+    r.res=ok?'<span class="ok">✔</span>':'<span class="bad">✘ L='+L.toFixed(3)+', T='+T.toFixed(3)+', T²='+T2.toFixed(3)+'</span>'; });
+  const xs=rows.map(r=>(r.ell+1)/100), ys=rows.map(r=>(r.t10/10)**2); const f=fitLine(xs,ys); const gF=4*Math.PI**2/f.m, dg=gF*f.dm/f.m;
+  const us=uS.value===''?null:+uS.value, ug=uG.value===''?null:+uG.value;
+  ext={fit:f,student:us!==null?{m:us,b:0}:null}; render();
+  let s='<b>Best-fit slope</b> = '+f.m.toFixed(3)+' ± '+f.dm.toFixed(3)+' s²/m, intercept = '+f.b.toFixed(3)+' s² → <b>g = 4π²/slope = '+gF.toFixed(2)+' ± '+dg.toFixed(2)+' m/s²</b>'+
+    '<br>Accepted value in Taif: <b>g = 9.79 m/s²</b> → % error = '+pct(gF,9.79).toFixed(1)+' %';
+  if(us!==null) s+='<br>Your slope '+us+' s²/m: '+(pct(us,f.m)<=5?'<span class="ok">✔ within 5 % of the best fit</span>':'<span class="bad">✘ differs by '+pct(us,f.m).toFixed(1)+' %; check the two points you read on your line</span>');
+  if(ug!==null&&us!==null) s+='<br>Your g: '+(close(ug,4*Math.PI**2/us,0.01)?'<span class="ok">✔ correctly calculated from your slope</span>':'<span class="bad">✘ 4π²/'+us+' = '+(4*Math.PI**2/us).toFixed(2)+' m/s²</span>');
+  if(rows.some(r=>r.amp>12)) s+='<br><span class="bad">Some runs used a large amplitude (&gt; 12°): they make T too long and g too small.</span>';
+  res.innerHTML=s; };
+clr.onclick=()=>{rows=[];ext=null;render();res.innerHTML='<p class="note">Record at least 5 different lengths, then check.</p>';};
+upd(); drawP(); render();
+window.onTab=()=>{drawP(); render();};
+</script>
+<script>
+
+buildReal({key:'exp2', intro:'One row for each length L (to the centre of the bob).',
+ tables:[{id:'P', title:'Your pendulum readings', rows:6, cols:[
+   {id:'L',label:'L (m)'},{id:'t1',label:'t₁ for 10 osc. (s)'},{id:'t2',label:'t₂ for 10 osc. (s)',optional:1},
+   {id:'T',label:'Your T (s)',calc:1,tol:0.01,f:o=>(o.t2===null?o.t1:(o.t1+o.t2)/2)/10},
+   {id:'T2',label:'Your T² (s²)',calc:1,tol:0.02,f:o=>((o.t2===null?o.t1:(o.t1+o.t2)/2)/10)**2}]}],
+ mine:[{id:'slope',label:'Your slope of the T² – L line (s²/m)'},{id:'g',label:'Your g = 4π²/slope (m/s²)'}],
+ plot:{xlabel:'L (m)', ylabel:'T² (s²)'},
+ analyze:(T,K)=>{
+  const P=T.P.map(o=>[o.L,o.T2]); const f=fitOrigin(P.map(p=>p[0]),P.map(p=>p[1]));
+  if(!f||P.length<3) return {html:'Enter at least three lengths.', plot:{pts:P}};
+  const g=4*Math.PI**2/f.m, dg=g*f.dm/f.m;
+  let s='<b>Best-fit line through the origin:</b> slope = '+fmt(f.m,3)+' s²/m → <b>g = '+fmt(g,2)+' ± '+fmt(dg,2)+' m/s²</b>; % error from 9.79 m/s² (Taif) = '+fmt(pct(g,9.79),1)+' %<br>'+ok5(K.slope,f.m,5,'Your slope');
+  if(K.g!==null&&K.slope) s+='<br>Your g: '+(close(K.g,4*Math.PI**2/K.slope,0.01)?'<span class="ok">✔ correctly calculated from your slope</span>':'<span class="bad">✘ 4π²/'+K.slope+' = '+fmt(4*Math.PI**2/K.slope,2)+' m/s²</span>');
+  return {html:s, plot:{pts:P, fit:f, student:K.slope?{m:K.slope,b:0}:null}};
+ }});
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

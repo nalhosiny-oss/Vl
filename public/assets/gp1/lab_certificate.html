@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>شهادة إنجاز – فيزياء عامة 1 (عملي)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&family=Tajawal:wght@400;700&family=Amiri:wght@700&display=swap">
+<style>
+:root{--bg:#F6EEDF;--panel:#FFFBF4;--ink:#3B2A1F;--muted:#7A6552;--line:#E3D3B6;--acc:#B4532A;--acc2:#5E6B2B;--chip:#FBF4E6;--ok:#2E7D4F;--okbg:#EAF2DD;--bad:#C8322F;--badbg:#F8E1DD}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.65}
+.wrap{max-width:820px;margin:0 auto;padding:14px}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.15rem,3.4vw,1.5rem);margin:.35em 0 .2em}
+h1 span{color:var(--acc)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px}
+.muted{color:var(--muted);font-size:.92rem}
+ul.rules{margin:.4em 0;padding-inline-start:1.2em}
+ul.rules li{margin:.2em 0}
+.btn{font:inherit;font-weight:700;border:0;background:var(--acc);color:#fff;padding:10px 22px;border-radius:12px;cursor:pointer;min-height:46px}
+.btn.ghost{background:transparent;border:1px solid var(--acc2);color:var(--acc2);font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--acc2);width:0}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.q{margin:4px 0 8px;font-size:1.02rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:9px 12px;border-radius:10px;margin:6px 0;cursor:pointer;min-height:44px}
+.opt.sel{border-color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc2)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.big{font-size:2.2rem;font-weight:700;color:var(--acc2);text-align:center}
+.rev{border-top:1px solid var(--line);padding:8px 0;font-size:.92rem}
+.rev b{color:var(--bad)}
+.rev .ok{color:var(--ok)}
+input[type=text]{width:100%;font:inherit;font-size:1.05rem;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+#certImg{width:100%;height:auto;border-radius:8px;display:block;margin-top:10px;-webkit-touch-callout:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hide{display:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+code{font-family:Consolas,"Courier New",monospace;direction:ltr;unicode-bidi:isolate;background:var(--chip);border:1px solid var(--line);padding:0 5px;border-radius:5px;font-size:.92em}
+</style>
+</head>
+<body>
+<div class="wrap">
+<span class="badge">فيزياء عامة 1 (عملي) · <bdi dir="ltr">2031204-4</bdi></span>
+<h1>شهادة إنجاز <span>المعامل الافتراضية</span></h1>
+
+<section id="sIntro" class="card">
+<p>بعد أن تُنهي معامل التجارب التسع، أجب عن الاختبار الختامي لتحصل على شهادة إنجاز باسمك.</p>
+<ul class="rules">
+<li><b>20 سؤالًا</b> اختيار من متعدد من التجارب التسع، تُسحب عشوائيًا في كل محاولة.</li>
+<li>درجة النجاح <b>80%</b> (16 سؤالًا صحيحًا على الأقل).</li>
+<li>إن لم تنجح، راجع إجاباتك ثم أعد المحاولة بأسئلة جديدة.</li>
+<li class="muted">لا تُحفظ إجاباتك ولا تُرسل لأحد. هذه شهادة إنجاز ذاتية وليست شهادة رسمية من الجامعة.</li>
+</ul>
+<button class="btn" id="go">ابدأ الاختبار</button>
+</section>
+
+<section id="sQuiz" class="card hide">
+<div class="qn" id="qn"></div>
+<div class="bar"><i id="barI"></i></div>
+<div class="q" id="qt"></div>
+<div id="qo"></div>
+<div class="nav"><button class="btn ghost" id="prev">السابق</button><button class="btn" id="next">التالي</button></div>
+</section>
+
+<section id="sRes" class="card hide">
+<div class="muted" style="text-align:center">نتيجتك</div>
+<div class="big" id="pct"></div>
+<p id="msg" style="text-align:center"></p>
+<div id="passBox" class="hide">
+<label for="nm">اكتب اسمك كما تريده أن يظهر في الشهادة:</label>
+<input type="text" id="nm" maxlength="40" autocomplete="name">
+<button class="btn" id="mk">أنشئ الشهادة</button>
+</div>
+<div id="failBox" class="hide"><button class="btn" id="again">أعد المحاولة بأسئلة جديدة</button></div>
+<div id="review"></div>
+</section>
+
+<section id="sCert" class="card hide">
+<p class="muted" id="saveHint">على الجوال: اضغط مطوّلًا على الشهادة ثم اختر «حفظ الصورة». على الحاسب: استخدم زر التنزيل.</p>
+<img id="certImg" alt="شهادة الإنجاز">
+<div class="row"><a class="btn" id="dl" download="شهادة_إنجاز_فيزياء_عامة_1_عملي.png" href="#" style="text-decoration:none;display:inline-flex;align-items:center">تنزيل الشهادة</a><button class="btn ghost" id="back">رجوع</button></div>
+<canvas id="cv" class="hide"></canvas>
+</section>
+</div>
+<script>
+const BANK=[{"c": 1, "q": "في طاولة القوى، تكون الحلقة المركزية في حالة اتزان عندما:", "o": ["تكون القوى متساوية المقدار دائمًا", "تكون محصلة القوى صفرًا", "تكون جميع الخيوط في اتجاه واحد", "يكون أحد الأثقال صفرًا"], "a": 1, "e": "شرط الاتزان الانتقالي <span class=\"eq\" dir=\"ltr\">ΣF = 0</span>."}, {"c": 1, "q": "قوتان <span class=\"eq\" dir=\"ltr\">3 N</span> و<span class=\"eq\" dir=\"ltr\">4 N</span> متعامدتان. مقدار القوة الموازنة:", "o": ["<span class=\"eq\" dir=\"ltr\">1 N</span>", "<span class=\"eq\" dir=\"ltr\">5 N</span>", "<span class=\"eq\" dir=\"ltr\">7 N</span>", "<span class=\"eq\" dir=\"ltr\">12 N</span>"], "a": 1, "e": "المحصلة <span class=\"eq\" dir=\"ltr\">√(3² + 4²) = 5 N</span>، والموازنة تساويها مقدارًا وتعاكسها اتجاهًا."}, {"c": 1, "q": "القوة الموازنة لمحصلة اتجاهها <span class=\"eq\" dir=\"ltr\">40°</span> يكون اتجاهها:", "o": ["<span class=\"eq\" dir=\"ltr\">40°</span>", "<span class=\"eq\" dir=\"ltr\">140°</span>", "<span class=\"eq\" dir=\"ltr\">220°</span>", "<span class=\"eq\" dir=\"ltr\">320°</span>"], "a": 2, "e": "الموازنة تعاكس المحصلة: <span class=\"eq\" dir=\"ltr\">40° + 180° = 220°</span>."}, {"c": 1, "q": "المركبة السينية لقوة <span class=\"eq\" dir=\"ltr\">10 N</span> اتجاهها <span class=\"eq\" dir=\"ltr\">60°</span> مع المحور السيني:", "o": ["<span class=\"eq\" dir=\"ltr\">5 N</span>", "<span class=\"eq\" dir=\"ltr\">8.66 N</span>", "<span class=\"eq\" dir=\"ltr\">10 N</span>", "<span class=\"eq\" dir=\"ltr\">0 N</span>"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">F<sub>x</sub> = 10 cos60° = 5 N</span>"}, {"c": 1, "q": "لماذا نتأكد أن الحلقة في مركز الطاولة تمامًا عند الاتزان؟", "o": ["لتمر خطوط عمل القوى في نقطة واحدة", "لتقليل الكتلة", "لزيادة الاحتكاك", "لا أهمية لذلك"], "a": 0, "e": "القوى المتلاقية في نقطة واحدة تجعل الحسابات المتجهية صحيحة."}, {"c": 2, "q": "زمن الدورة للبندول البسيط (زوايا صغيرة) يعتمد على:", "o": ["الكتلة فقط", "الطول وتسارع الجاذبية", "السعة فقط", "الكتلة والسعة"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">T = 2π√(L/g)</span>"}, {"c": 2, "q": "إذا ضوعف طول البندول أربع مرات، فإن زمن الدورة:", "o": ["يتضاعف", "يتضاعف أربع مرات", "يقل إلى النصف", "لا يتغير"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">T ∝ √L</span>، و<span class=\"eq\" dir=\"ltr\">√4 = 2</span>."}, {"c": 2, "q": "رُسم <span class=\"eq\" dir=\"ltr\">T²</span> مقابل <span class=\"eq\" dir=\"ltr\">L</span> فكان الميل <span class=\"eq\" dir=\"ltr\">4.0 s²/m</span>. قيمة <span class=\"eq\" dir=\"ltr\">g</span>:", "o": ["<span class=\"eq\" dir=\"ltr\">9.6 m/s²</span>", "<span class=\"eq\" dir=\"ltr\">9.9 m/s²</span>", "<span class=\"eq\" dir=\"ltr\">4.0 m/s²</span>", "<span class=\"eq\" dir=\"ltr\">39.5 m/s²</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">g = 4π²/ميل = 39.48/4.0 ≈ 9.87 m/s²</span>"}, {"c": 2, "q": "لماذا نقيس زمن 20 اهتزازة ثم نقسم؟", "o": ["لتقليل خطأ زمن رد فعل المؤقت", "لزيادة السعة", "لتغيير الطول", "لأن الاهتزازة الأولى أطول"], "a": 0, "e": "خطأ التشغيل والإيقاف ثابت تقريبًا فيقل أثره النسبي."}, {"c": 2, "q": "يجب أن تكون زاوية الإزاحة صغيرة (أقل من نحو <span class=\"eq\" dir=\"ltr\">10°</span>) لأن:", "o": ["الخيط قد ينقطع", "تقريب sinθ ≈ θ يصبح صحيحًا فتكون الحركة توافقية بسيطة", "الكتلة تتغير", "الجاذبية تزداد"], "a": 1, "e": "عند الزوايا الكبيرة يعتمد الزمن على السعة."}, {"c": 3, "q": "ينص قانون هوك على أن قوة النابض:", "o": ["تتناسب مع مربع الاستطالة", "تتناسب طرديًا مع الاستطالة ضمن حد المرونة", "ثابتة دائمًا", "تتناسب عكسيًا مع الاستطالة"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">F = kx</span>"}, {"c": 3, "q": "نابض استطال <span class=\"eq\" dir=\"ltr\">4 cm</span> عند تعليق كتلة <span class=\"eq\" dir=\"ltr\">200 g</span> (<span class=\"eq\" dir=\"ltr\">g = 9.8 m/s²</span>). ثابت النابض:", "o": ["<span class=\"eq\" dir=\"ltr\">4.9 N/m</span>", "<span class=\"eq\" dir=\"ltr\">49 N/m</span>", "<span class=\"eq\" dir=\"ltr\">490 N/m</span>", "<span class=\"eq\" dir=\"ltr\">0.49 N/m</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">k = mg/x = (0.2)(9.8)/0.04 = 49 N/m</span>"}, {"c": 3, "q": "في منحنى القوة مقابل الاستطالة، يمثل الميل:", "o": ["الكتلة", "ثابت النابض", "الطاقة", "الجاذبية"], "a": 1, "e": "الميل <span class=\"eq\" dir=\"ltr\">ΔF/Δx = k</span>."}, {"c": 3, "q": "الطاقة المخزنة في نابض <span class=\"eq\" dir=\"ltr\">k = 100 N/m</span> مستطيل <span class=\"eq\" dir=\"ltr\">0.1 m</span>:", "o": ["<span class=\"eq\" dir=\"ltr\">0.5 J</span>", "<span class=\"eq\" dir=\"ltr\">1 J</span>", "<span class=\"eq\" dir=\"ltr\">5 J</span>", "<span class=\"eq\" dir=\"ltr\">10 J</span>"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">U = ½kx² = ½(100)(0.01) = 0.5 J</span>"}, {"c": 3, "q": "إذا تجاوزت القوة حد المرونة للنابض فإنه:", "o": ["يعود لطوله الأصلي دائمًا", "يتشوه تشوهًا دائمًا", "يصبح ثابته صفرًا", "يزداد ثابته"], "a": 1, "e": "بعد حد المرونة لا يعود النابض لطوله الأصلي."}, {"c": 4, "q": "في تجربة قانون أوم، يوصل الأميتر مع المقاومة على:", "o": ["التوازي", "التوالي", "لا يوصل", "طرفي البطارية فقط"], "a": 1, "e": "الأميتر يقيس التيار المار فيوصل على التوالي."}, {"c": 4, "q": "رُسم الجهد مقابل التيار لموصل أومي فكان خطًا مستقيمًا ميله <span class=\"eq\" dir=\"ltr\">47 Ω</span>. هذا الميل يمثل:", "o": ["القدرة", "المقاومة", "الموصلية", "الشحنة"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">V = IR</span> فالميل هو <span class=\"eq\" dir=\"ltr\">R</span>."}, {"c": 4, "q": "مقاومة <span class=\"eq\" dir=\"ltr\">220 Ω</span> يمر بها تيار <span class=\"eq\" dir=\"ltr\">50 mA</span>. فرق الجهد عليها:", "o": ["<span class=\"eq\" dir=\"ltr\">1.1 V</span>", "<span class=\"eq\" dir=\"ltr\">11 V</span>", "<span class=\"eq\" dir=\"ltr\">4.4 V</span>", "<span class=\"eq\" dir=\"ltr\">110 V</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">V = (0.05)(220) = 11 V</span>"}, {"c": 4, "q": "الفولتميتر المثالي مقاومته:", "o": ["صفر", "صغيرة جدًا", "كبيرة جدًا (لانهائية)", "تساوي مقاومة الدائرة"], "a": 2, "e": "حتى لا يسحب تيارًا يؤثر على الدائرة."}, {"c": 4, "q": "مصباح متوهج يعطي منحنى <span class=\"eq\" dir=\"ltr\">V–I</span> غير خطي لأن:", "o": ["مقاومته تتغير بتغير درجة حرارة الفتيلة", "قانون أوم خاطئ", "الأميتر معطل", "البطارية ضعيفة"], "a": 0, "e": "المقاومة تزداد مع ارتفاع حرارة الفتيلة فهو موصل غير أومي."}, {"c": 5, "q": "مقاومتان <span class=\"eq\" dir=\"ltr\">100 Ω</span> و<span class=\"eq\" dir=\"ltr\">300 Ω</span> على التوالي. المقاومة المكافئة:", "o": ["<span class=\"eq\" dir=\"ltr\">75 Ω</span>", "<span class=\"eq\" dir=\"ltr\">200 Ω</span>", "<span class=\"eq\" dir=\"ltr\">400 Ω</span>", "<span class=\"eq\" dir=\"ltr\">30000 Ω</span>"], "a": 2, "e": "<span class=\"eq\" dir=\"ltr\">R = R<sub>1</sub> + R<sub>2</sub></span>"}, {"c": 5, "q": "المقاومتان نفسهما على التوازي. المقاومة المكافئة:", "o": ["<span class=\"eq\" dir=\"ltr\">75 Ω</span>", "<span class=\"eq\" dir=\"ltr\">150 Ω</span>", "<span class=\"eq\" dir=\"ltr\">400 Ω</span>", "<span class=\"eq\" dir=\"ltr\">200 Ω</span>"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">R = (100×300)/(100+300) = 75 Ω</span>"}, {"c": 5, "q": "في توصيل التوازي، الكمية المتساوية في جميع الفروع هي:", "o": ["التيار", "فرق الجهد", "القدرة", "المقاومة"], "a": 1, "e": "جميع الفروع متصلة بالنقطتين نفسيهما."}, {"c": 5, "q": "المقاومة المكافئة لعدة مقاومات على التوازي تكون:", "o": ["أكبر من أكبرها", "أصغر من أصغرها", "بين أصغرها وأكبرها", "مساوية لمجموعها"], "a": 1, "e": "إضافة فروع تزيد مسارات التيار فتقل المقاومة."}, {"c": 6, "q": "سقط جسم من السكون مسافة <span class=\"eq\" dir=\"ltr\">1.0 m</span> في زمن <span class=\"eq\" dir=\"ltr\">0.452 s</span>. قيمة <span class=\"eq\" dir=\"ltr\">g</span>:", "o": ["<span class=\"eq\" dir=\"ltr\">4.4 m/s²</span>", "<span class=\"eq\" dir=\"ltr\">9.8 m/s²</span>", "<span class=\"eq\" dir=\"ltr\">2.2 m/s²</span>", "<span class=\"eq\" dir=\"ltr\">19.6 m/s²</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">g = 2h/t² = 2/(0.452)² ≈ 9.8 m/s²</span>"}, {"c": 6, "q": "عند رسم <span class=\"eq\" dir=\"ltr\">h</span> مقابل <span class=\"eq\" dir=\"ltr\">t²</span> يكون الميل مساويًا:", "o": ["<span class=\"eq\" dir=\"ltr\">g</span>", "<span class=\"eq\" dir=\"ltr\">g/2</span>", "<span class=\"eq\" dir=\"ltr\">2g</span>", "<span class=\"eq\" dir=\"ltr\">√g</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">h = ½gt²</span>"}, {"c": 6, "q": "بإهمال مقاومة الهواء، كرتان مختلفتا الكتلة تسقطان من الارتفاع نفسه:", "o": ["الأثقل تصل أولًا", "تصلان معًا", "الأخف تصل أولًا", "يعتمد على اللون"], "a": 1, "e": "تسارع السقوط الحر لا يعتمد على الكتلة."}, {"c": 6, "q": "سرعة جسم بعد سقوطه الحر من السكون لمدة <span class=\"eq\" dir=\"ltr\">2 s</span>:", "o": ["<span class=\"eq\" dir=\"ltr\">9.8 m/s</span>", "<span class=\"eq\" dir=\"ltr\">19.6 m/s</span>", "<span class=\"eq\" dir=\"ltr\">4.9 m/s</span>", "<span class=\"eq\" dir=\"ltr\">39.2 m/s</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">v = gt = 9.8 × 2</span>"}, {"c": 7, "q": "جسم على بعد <span class=\"eq\" dir=\"ltr\">30 cm</span> من عدسة محدبة بعدها البؤري <span class=\"eq\" dir=\"ltr\">10 cm</span>. بعد الصورة:", "o": ["<span class=\"eq\" dir=\"ltr\">7.5 cm</span>", "<span class=\"eq\" dir=\"ltr\">15 cm</span>", "<span class=\"eq\" dir=\"ltr\">20 cm</span>", "<span class=\"eq\" dir=\"ltr\">30 cm</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">1/v = 1/10 − 1/30 = 2/30 ⇒ v = 15 cm</span>"}, {"c": 7, "q": "تكبير الصورة في السؤال السابق:", "o": ["<span class=\"eq\" dir=\"ltr\">0.5</span>", "<span class=\"eq\" dir=\"ltr\">2</span>", "<span class=\"eq\" dir=\"ltr\">1</span>", "<span class=\"eq\" dir=\"ltr\">3</span>"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">m = v/u = 15/30 = 0.5</span> (صورة مصغرة مقلوبة)."}, {"c": 7, "q": "عندما يوضع الجسم على بعد يساوي ضعف البعد البؤري لعدسة محدبة، تكون الصورة:", "o": ["مكبرة", "مساوية للجسم ومقلوبة", "تقديرية", "في اللانهاية"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">u = 2f ⇒ v = 2f</span> والتكبير 1."}, {"c": 7, "q": "طريقة لإيجاد البعد البؤري تقريبيًا بسرعة في المعمل:", "o": ["تكوين صورة جسم بعيد جدًا (نافذة) على الشاشة", "قياس كتلة العدسة", "غمر العدسة في الماء", "إضاءة العدسة من الجانب"], "a": 0, "e": "صورة الجسم البعيد تتكون عند البؤرة تقريبًا."}, {"c": 8, "q": "مرآة مقعرة نصف قطر تكورها <span class=\"eq\" dir=\"ltr\">40 cm</span>. بعدها البؤري:", "o": ["<span class=\"eq\" dir=\"ltr\">10 cm</span>", "<span class=\"eq\" dir=\"ltr\">20 cm</span>", "<span class=\"eq\" dir=\"ltr\">40 cm</span>", "<span class=\"eq\" dir=\"ltr\">80 cm</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">f = R/2</span>"}, {"c": 8, "q": "جسم على بعد <span class=\"eq\" dir=\"ltr\">15 cm</span> من مرآة مقعرة بعدها البؤري <span class=\"eq\" dir=\"ltr\">10 cm</span>. بعد الصورة:", "o": ["<span class=\"eq\" dir=\"ltr\">6 cm</span>", "<span class=\"eq\" dir=\"ltr\">30 cm</span>", "<span class=\"eq\" dir=\"ltr\">25 cm</span>", "<span class=\"eq\" dir=\"ltr\">15 cm</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">1/v = 1/10 − 1/15 = 1/30</span>"}, {"c": 8, "q": "إذا وُضع الجسم بين البؤرة والمرآة المقعرة تكون الصورة:", "o": ["حقيقية مقلوبة", "تقديرية معتدلة مكبرة", "حقيقية مصغرة", "لا تتكون"], "a": 1, "e": "مثل مرآة الحلاقة؛ تتكون الصورة خلف المرآة."}, {"c": 8, "q": "عندما يكون الجسم في مركز التكور تتكون الصورة:", "o": ["في البؤرة", "في مركز التكور بالحجم نفسه مقلوبة", "في اللانهاية", "خلف المرآة"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">u = R = 2f ⇒ v = 2f</span>"}, {"c": 9, "q": "ضوء ينتقل من الهواء إلى زجاج بزاوية سقوط <span class=\"eq\" dir=\"ltr\">45°</span> وزاوية انكسار <span class=\"eq\" dir=\"ltr\">28°</span>. معامل انكسار الزجاج تقريبًا:", "o": ["<span class=\"eq\" dir=\"ltr\">1.33</span>", "<span class=\"eq\" dir=\"ltr\">1.51</span>", "<span class=\"eq\" dir=\"ltr\">1.61</span>", "<span class=\"eq\" dir=\"ltr\">1.25</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">n = sin45°/sin28° = 0.707/0.469 ≈ 1.51</span>"}, {"c": 9, "q": "عند انتقال الضوء من الهواء إلى الزجاج فإن الشعاع:", "o": ["ينكسر مبتعدًا عن العمود", "ينكسر مقتربًا من العمود", "لا ينكسر", "ينعكس كليًا دائمًا"], "a": 1, "e": "الوسط الأكبر معامل انكسار يقرّب الشعاع من العمود."}, {"c": 9, "q": "في متوازي المستطيلات الزجاجي، الشعاع الخارج يكون:", "o": ["موازيًا للشعاع الساقط مع إزاحة جانبية", "عموديًا على الساقط", "منطبقًا عليه دون إزاحة دائمًا", "منعكسًا للخلف"], "a": 0, "e": "الوجهان متوازيان فتعود زاوية الخروج مساوية لزاوية السقوط."}, {"c": 9, "q": "عند رسم <span class=\"eq\" dir=\"ltr\">sin i</span> مقابل <span class=\"eq\" dir=\"ltr\">sin r</span> لقطعة زجاج، الميل يساوي:", "o": ["زاوية الانكسار", "معامل الانكسار", "سرعة الضوء", "الطول الموجي"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">sin i = n sin r</span>"}];
+const N=20,PASS=16;
+const $=id=>document.getElementById(id);
+const show=id=>['sIntro','sQuiz','sRes','sCert'].forEach(s=>$(s).classList.toggle('hide',s!==id));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let Q=[],ans=[],k=0,score=0;
+function draw(){ // two per chapter + the rest random
+  const by={};BANK.forEach((x,i)=>{(by[x.c]=by[x.c]||[]).push(i);});
+  const per=Math.max(1,Math.min(2,Math.floor(N/Object.keys(by).length)));let pick=[];Object.values(by).forEach(l=>pick.push(...shuffle(l).slice(0,per)));pick=shuffle(pick).slice(0,N);
+  const rest=shuffle(BANK.map((_,i)=>i).filter(i=>!pick.includes(i)));
+  pick=pick.concat(rest.slice(0,N-pick.length));
+  Q=shuffle(pick).map(i=>{const x=BANK[i],ord=shuffle(x.o.map((_,j)=>j));return {q:x.q,o:ord.map(j=>x.o[j]),a:ord.indexOf(x.a),e:x.e,c:x.c};});
+  ans=Q.map(()=>-1);k=0;
+}
+function rQ(){
+  const it=Q[k];$('qn').textContent='السؤال '+(k+1)+' من '+N+' · التجربة '+it.c;$('barI').style.width=((k+1)/N*100)+'%';
+  $('qt').innerHTML=it.q;const box=$('qo');box.innerHTML='';
+  it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt'+(ans[k]===j?' sel':'');b.innerHTML=t;b.onclick=()=>{ans[k]=j;rQ();};box.appendChild(b);});
+  $('prev').disabled=k===0;$('next').disabled=ans[k]<0;$('next').textContent=k===N-1?'أنهِ الاختبار':'التالي';
+}
+function finish(){
+  score=Q.filter((x,i)=>ans[i]===x.a).length;const p=Math.round(score/N*100);
+  $('pct').innerHTML='<span class="eq">'+score+' / '+N+'</span> · <span class="eq">'+p+'%</span>';
+  const ok=score>=PASS;$('msg').textContent=ok?'مبارك! اجتزت الاختبار الختامي.':'لم تبلغ 80% بعد. راجع الأسئلة التي أخطأت فيها ثم أعد المحاولة.';
+  $('passBox').classList.toggle('hide',!ok);$('failBox').classList.toggle('hide',ok);
+  const wr=Q.map((x,i)=>({x,i})).filter(o=>ans[o.i]!==o.x.a);
+  $('review').innerHTML=wr.length?'<p class="muted" style="margin-top:14px">الأسئلة التي أخطأت فيها:</p>'+wr.map(o=>'<div class="rev"><div>'+o.x.q+'</div><div><b>إجابتك:</b> '+o.x.o[ans[o.i]]+'</div><div><span class="ok">الصحيح:</span> '+o.x.o[o.x.a]+'</div><div class="muted">'+o.x.e+'</div></div>').join(''):'';
+  show('sRes');window.scrollTo(0,0);
+}
+$('go').onclick=()=>{draw();rQ();show('sQuiz');};
+$('prev').onclick=()=>{k--;rQ();};
+$('next').onclick=()=>{if(k<N-1){k++;rQ();}else finish();};
+$('again').onclick=()=>{draw();rQ();show('sQuiz');window.scrollTo(0,0);};
+$('back').onclick=()=>show('sRes');
+
+/* ---------- certificate (dark ruby theme) ---------- */
+const TH={"bg": "#3B2A1F", "frame": "#D98A5F", "accent": "#D98A5F", "title": "#F3DFB6", "text": "#F6EEDF", "muted": "#C9B8A3", "name": "#FFFFFF", "beam": "#A8B85A"};
+function mixLine(c,segs,cx,y){const ws=segs.map(s=>{c.direction=s.ltr?'ltr':'rtl';return c.measureText(s.t).width;});const tot=ws.reduce((a,b)=>a+b,0);let x=cx+tot/2;
+  segs.forEach((s,i)=>{x-=ws[i];c.direction=s.ltr?'ltr':'rtl';c.textAlign=s.ltr?'left':'right';c.fillText(s.t,s.ltr?x:x+ws[i],y);});c.direction='rtl';c.textAlign='center';}
+function fitFont(c,txt,weight,size,family,maxW){let s=size;do{c.font=weight+' '+s+'px '+family;s-=2;}while(c.measureText(txt).width>maxW&&s>30);}
+function drawCert(cv,d){const t=TH,W=1600,H=1131;cv.width=W;cv.height=H;const c=cv.getContext('2d');c.direction='rtl';c.textAlign='center';c.textBaseline='middle';
+  const AR="Tajawal, 'IBM Plex Sans Arabic', Tahoma, sans-serif",TT="Amiri, Tajawal, serif";
+  c.fillStyle=t.bg;c.fillRect(0,0,W,H);c.strokeStyle=t.frame;c.lineWidth=6;c.strokeRect(40,40,W-80,H-80);c.strokeStyle=t.accent;c.lineWidth=2;c.strokeRect(58,58,W-116,H-116);
+  c.fillStyle=t.accent;[[58,58],[W-58,58],[58,H-58],[W-58,H-58]].forEach(([x,y])=>{c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();});
+  const cx=W/2;c.fillStyle=t.muted;c.font='400 30px '+AR;c.fillText('المعامل الافتراضية · أ.د. نجم الحصيني',cx,150);
+  c.fillStyle=t.title;c.font='700 104px '+TT;c.fillText('شهادة إنجاز',cx,280);
+  const g=c.createLinearGradient(cx-260,0,cx+260,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,t.beam);g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(cx-260,360,520,5);
+  c.fillStyle=t.text;c.font='400 38px '+AR;c.fillText('تشهد المعامل الافتراضية بأن',cx,450);
+  c.fillStyle=t.name;fitFont(c,d.name,'700',76,AR,1250);c.fillText(d.name,cx,550);c.fillStyle=t.accent;c.fillRect(cx-300,610,600,2);
+  c.fillStyle=t.text;c.font='400 38px '+AR;
+  mixLine(c,[{t:'أتمّ معامل مقرر «فيزياء عامة 1 (عملي)» (\u20662031204-4\u2069)'}],cx,690);
+  mixLine(c,[{t:'واجتاز الاختبار الختامي بنسبة '},{t:d.score+'%',ltr:true}],cx,750);
+  c.font='400 28px '+AR;c.fillStyle=t.muted;const fy=920;c.fillText('التاريخ',W-300,fy);c.fillText('أستاذ المقرر',300,fy);
+  c.fillStyle=t.text;c.font='700 34px '+AR;c.direction='ltr';c.fillText(d.date,W-300,fy+50);c.direction='rtl';c.fillText('أ.د. نجم الحصيني',300,fy+50);
+  c.save();c.translate(cx,955);c.fillStyle=t.accent;c.beginPath();c.arc(0,0,62,0,Math.PI*2);c.fill();c.strokeStyle=t.bg;c.lineWidth=3;c.beginPath();c.arc(0,0,50,0,Math.PI*2);c.stroke();
+  c.lineWidth=9;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-22,2);c.lineTo(-6,18);c.lineTo(24,-16);c.stroke();c.restore();}
+$('mk').onclick=async()=>{
+  const name=$('nm').value.replace(/\s+/g,' ').trim();if(name.length<3){$('nm').focus();return;}
+  $('mk').disabled=true;
+  try{await Promise.race([Promise.all([document.fonts.load("700 76px Tajawal",name),document.fonts.load("400 38px Tajawal","أتم"),document.fonts.load("700 104px Amiri","شهادة")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  const d=new Date(),date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+  drawCert($('cv'),{name,score:Math.round(score/N*100),date});
+  const url=$('cv').toDataURL('image/png');$('certImg').src=url;$('dl').href=url;$('mk').disabled=false;show('sCert');window.scrollTo(0,0);
+};
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

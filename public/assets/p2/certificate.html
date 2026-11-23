@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificate of Achievement – Physics (2)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=STIX+Two+Text&family=Playfair+Display:wght@700&display=swap">
+<style>
+:root{--bg:#0B1430;--panel:#111D40;--ink:#E8EEFA;--muted:#9FB0D0;--line:#24335E;--acc:#1597B5;--acc2:#E0A12A;--chip:#18264F;--ok:#3FB37F;--okbg:rgba(63,179,127,.16);--bad:#F06B6B;--badbg:rgba(240,107,107,.16)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,'Segoe UI',Arial,sans-serif;line-height:1.65}
+.wrap{max-width:820px;margin:0 auto;padding:14px}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.15rem,3.4vw,1.5rem);margin:.35em 0 .2em}
+h1 span{color:var(--acc)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px}
+.muted{color:var(--muted);font-size:.92rem}
+ul.rules{margin:.4em 0;padding-inline-start:1.2em}
+ul.rules li{margin:.2em 0}
+.btn{font:inherit;font-weight:700;border:0;background:var(--acc);color:#fff;padding:10px 22px;border-radius:12px;cursor:pointer;min-height:46px}
+.btn.ghost{background:transparent;border:1px solid var(--acc2);color:var(--acc2);font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--acc2);width:0}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.q{margin:4px 0 8px;font-size:1.02rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:9px 12px;border-radius:10px;margin:6px 0;cursor:pointer;min-height:44px}
+.opt.sel{border-color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc2)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.big{font-size:2.2rem;font-weight:700;color:var(--acc2);text-align:center}
+.rev{border-top:1px solid var(--line);padding:8px 0;font-size:.92rem}
+.rev b{color:var(--bad)}
+.rev .ok{color:var(--ok)}
+input[type=text]{width:100%;font:inherit;font-size:1.05rem;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+#certImg{width:100%;height:auto;border-radius:8px;display:block;margin-top:10px;-webkit-touch-callout:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hide{display:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<span class="badge">Physics (2) · 203207-4</span>
+<h1>Certificate of Achievement · <span>Virtual Labs</span></h1>
+
+<section id="sIntro" class="card">
+<p>After you finish the labs of the six chapters, take the final quiz to earn a certificate in your name.</p>
+<ul class="rules">
+<li><b>20 multiple-choice questions</b> drawn at random from the six chapters on every attempt.</li>
+<li>The pass mark is <b>80%</b> (at least 16 correct answers).</li>
+<li>If you do not pass, review your answers and try again with new questions.</li>
+<li class="muted">Your answers are not saved or sent anywhere. This is a self-issued certificate of achievement, not an official university certificate.</li>
+</ul>
+<button class="btn" id="go">Start the quiz</button>
+</section>
+
+<section id="sQuiz" class="card hide">
+<div class="qn" id="qn"></div>
+<div class="bar"><i id="barI"></i></div>
+<div class="q" id="qt"></div>
+<div id="qo"></div>
+<div class="nav"><button class="btn ghost" id="prev">Previous</button><button class="btn" id="next">Next</button></div>
+</section>
+
+<section id="sRes" class="card hide">
+<div class="muted" style="text-align:center">Your score</div>
+<div class="big" id="pct"></div>
+<p id="msg" style="text-align:center"></p>
+<div id="passBox" class="hide">
+<label for="nm">Type your name as you want it to appear on the certificate:</label>
+<input type="text" id="nm" maxlength="40" autocomplete="name">
+<button class="btn" id="mk">Create my certificate</button>
+</div>
+<div id="failBox" class="hide"><button class="btn" id="again">Try again with new questions</button></div>
+<div id="review"></div>
+</section>
+
+<section id="sCert" class="card hide">
+<p class="muted" id="saveHint">On a phone: long-press the certificate and choose “Save image”. On a computer: use the download button.</p>
+<img id="certImg" alt="Certificate of achievement">
+<div class="row"><a class="btn" id="dl" download="Certificate_Physics2.png" href="#" style="text-decoration:none;display:inline-flex;align-items:center">Download certificate</a><button class="btn ghost" id="back">Back</button></div>
+<canvas id="cv" class="hide"></canvas>
+</section>
+</div>
+<script>
+const BANK=[{"c": 1, "q": "The force between charges of <span class=\"eq\">+2 μC</span> and <span class=\"eq\">−3 μC</span> that are <span class=\"eq\">0.3 m</span> apart is (<span class=\"eq\">k = 9×10<sup>9</sup> N·m<sup>2</sup>/C<sup>2</sup></span>):", "o": ["0.6 N, attractive", "0.6 N, repulsive", "0.2 N, attractive", "6 N, attractive"], "a": 0, "e": "<span class=\"eq\">F = k|q<sub>1</sub>q<sub>2</sub>|/r<sup>2</sup> = 9×10<sup>9</sup> × 6×10<sup>−12</sup>/0.09 = 0.6 N</span>; opposite charges attract."}, {"c": 1, "q": "An electron is placed in a uniform field of <span class=\"eq\">1000 N/C</span>. The force on it is:", "o": ["<span class=\"eq\">1.6×10<sup>−16</sup> N</span> along the field", "<span class=\"eq\">1.6×10<sup>−16</sup> N</span> opposite to the field", "<span class=\"eq\">1.6×10<sup>−22</sup> N</span> along the field", "zero"], "a": 1, "e": "<span class=\"eq\">F = eE = 1.6×10<sup>−19</sup> × 1000</span>; the charge is negative, so the force is opposite to E."}, {"c": 1, "q": "The electric field at the midpoint between two equal positive point charges is:", "o": ["zero", "maximum", "directed toward one of the charges", "twice the field of one charge"], "a": 0, "e": "The two fields are equal in magnitude and opposite in direction at the midpoint, so they cancel."}, {"c": 1, "q": "The acceleration of an electron in a uniform field of <span class=\"eq\">1000 N/C</span> (<span class=\"eq\">m<sub>e</sub> = 9.11×10<sup>−31</sup> kg</span>) is about:", "o": ["<span class=\"eq\">1.8×10<sup>11</sup> m/s<sup>2</sup></span>", "<span class=\"eq\">1.8×10<sup>14</sup> m/s<sup>2</sup></span>", "<span class=\"eq\">9.6×10<sup>10</sup> m/s<sup>2</sup></span>", "<span class=\"eq\">1.6×10<sup>−16</sup> m/s<sup>2</sup></span>"], "a": 1, "e": "<span class=\"eq\">a = eE/m = 1.6×10<sup>−16</sup>/9.11×10<sup>−31</sup> ≈ 1.76×10<sup>14</sup> m/s<sup>2</sup></span>"}, {"c": 1, "q": "Which of the following CANNOT be the charge of an object?", "o": ["<span class=\"eq\">3.2×10<sup>−19</sup> C</span>", "<span class=\"eq\">2.4×10<sup>−19</sup> C</span>", "<span class=\"eq\">4.8×10<sup>−19</sup> C</span>", "<span class=\"eq\">1.6×10<sup>−18</sup> C</span>"], "a": 1, "e": "Charge is quantized in integer multiples of <span class=\"eq\">e = 1.6×10<sup>−19</sup> C</span>; <span class=\"eq\">2.4×10<sup>−19</sup> C = 1.5e</span>."}, {"c": 1, "q": "Inside a conductor in electrostatic equilibrium, the electric field is:", "o": ["maximum", "zero", "equal to the field just outside", "directed toward the surface"], "a": 1, "e": "Free charges move until the field inside vanishes; any excess charge resides on the surface."}, {"c": 1, "q": "A proton released from rest in a uniform electric field:", "o": ["stays at rest", "accelerates along the field direction", "accelerates opposite to the field", "moves in a circle"], "a": 1, "e": "The force <span class=\"eq\">F = eE</span> on a positive charge is along E, so it accelerates in that direction."}, {"c": 2, "q": "The net flux through a closed surface enclosing a charge of <span class=\"eq\">8.85 nC</span> (<span class=\"eq\">ε<sub>0</sub> = 8.85×10<sup>−12</sup> C<sup>2</sup>/N·m<sup>2</sup></span>) is:", "o": ["<span class=\"eq\">100 N·m<sup>2</sup>/C</span>", "<span class=\"eq\">1000 N·m<sup>2</sup>/C</span>", "<span class=\"eq\">8.85 N·m<sup>2</sup>/C</span>", "<span class=\"eq\">10<sup>4</sup> N·m<sup>2</sup>/C</span>"], "a": 1, "e": "Gauss's law: <span class=\"eq\">Φ = q/ε<sub>0</sub> = 8.85×10<sup>−9</sup>/8.85×10<sup>−12</sup> = 1000 N·m<sup>2</sup>/C</span>"}, {"c": 2, "q": "The net electric flux through a closed surface that encloses no charge is:", "o": ["positive", "negative", "zero", "depends on the shape of the surface"], "a": 2, "e": "By Gauss's law the net flux depends only on the enclosed charge; every field line that enters also leaves."}, {"c": 2, "q": "A uniform field of <span class=\"eq\">200 N/C</span> is perpendicular to a flat surface of area <span class=\"eq\">0.5 m<sup>2</sup></span>. The flux through it is:", "o": ["<span class=\"eq\">50 N·m<sup>2</sup>/C</span>", "<span class=\"eq\">100 N·m<sup>2</sup>/C</span>", "<span class=\"eq\">400 N·m<sup>2</sup>/C</span>", "<span class=\"eq\">0</span>"], "a": 1, "e": "<span class=\"eq\">Φ = EA = 200 × 0.5 = 100 N·m<sup>2</sup>/C</span>"}, {"c": 2, "q": "For the same surface, if the angle between the field and the normal to the surface is <span class=\"eq\">60°</span>, the flux becomes:", "o": ["<span class=\"eq\">50 N·m<sup>2</sup>/C</span>", "<span class=\"eq\">87 N·m<sup>2</sup>/C</span>", "<span class=\"eq\">100 N·m<sup>2</sup>/C</span>", "<span class=\"eq\">0</span>"], "a": 0, "e": "<span class=\"eq\">Φ = EA cos 60° = 100 × 0.5 = 50 N·m<sup>2</sup>/C</span>"}, {"c": 2, "q": "Outside a uniformly charged solid sphere, the electric field is:", "o": ["zero", "as if all the charge were at the center", "uniform", "proportional to the distance r"], "a": 1, "e": "A spherical Gaussian surface gives <span class=\"eq\">E = kQ/r<sup>2</sup></span>, the same as a point charge at the center."}, {"c": 2, "q": "The field of an infinite plane sheet with uniform charge density <span class=\"eq\">σ</span> is:", "o": ["<span class=\"eq\">σ/ε<sub>0</sub></span>, decreasing with distance", "<span class=\"eq\">σ/2ε<sub>0</sub></span>, independent of distance", "<span class=\"eq\">σ/2ε<sub>0</sub></span>, proportional to distance", "zero"], "a": 1, "e": "A cylindrical Gaussian surface (pillbox) gives <span class=\"eq\">E = σ/2ε<sub>0</sub></span> on each side, at any distance."}, {"c": 2, "q": "The electric field inside a uniformly charged thin spherical shell is:", "o": ["zero", "<span class=\"eq\">kQ/r<sup>2</sup></span>", "<span class=\"eq\">kQ/R<sup>2</sup></span>", "infinite"], "a": 0, "e": "A Gaussian sphere inside the shell encloses no charge, so <span class=\"eq\">E = 0</span>."}, {"c": 3, "q": "The magnetic force on a charge moving parallel to a magnetic field is:", "o": ["maximum", "zero", "<span class=\"eq\">qvB</span>", "along the velocity"], "a": 1, "e": "<span class=\"eq\">F = qvB sin θ</span> with <span class=\"eq\">θ = 0</span>."}, {"c": 3, "q": "A proton moves at <span class=\"eq\">2×10<sup>6</sup> m/s</span> perpendicular to a <span class=\"eq\">0.5 T</span> field. The magnetic force on it is:", "o": ["<span class=\"eq\">1.6×10<sup>−13</sup> N</span>", "<span class=\"eq\">3.2×10<sup>−13</sup> N</span>", "<span class=\"eq\">1.6×10<sup>−19</sup> N</span>", "<span class=\"eq\">8×10<sup>−14</sup> N</span>"], "a": 0, "e": "<span class=\"eq\">F = qvB = 1.6×10<sup>−19</sup> × 2×10<sup>6</sup> × 0.5 = 1.6×10<sup>−13</sup> N</span>"}, {"c": 3, "q": "The radius of the circular path of that proton (<span class=\"eq\">m<sub>p</sub> = 1.67×10<sup>−27</sup> kg</span>) is about:", "o": ["<span class=\"eq\">0.4 cm</span>", "<span class=\"eq\">4.2 cm</span>", "<span class=\"eq\">42 cm</span>", "<span class=\"eq\">4.2 m</span>"], "a": 1, "e": "<span class=\"eq\">r = mv/qB = (1.67×10<sup>−27</sup> × 2×10<sup>6</sup>)/(1.6×10<sup>−19</sup> × 0.5) ≈ 0.042 m</span>"}, {"c": 3, "q": "A static magnetic field does no work on a moving charge because the magnetic force is:", "o": ["very small", "always perpendicular to the velocity", "parallel to the velocity", "zero for all charges"], "a": 1, "e": "A force perpendicular to the displacement does no work; the speed stays constant and only the direction changes."}, {"c": 3, "q": "A straight wire <span class=\"eq\">0.2 m</span> long carries <span class=\"eq\">5 A</span> perpendicular to a <span class=\"eq\">0.4 T</span> field. The force on it is:", "o": ["<span class=\"eq\">0.04 N</span>", "<span class=\"eq\">0.4 N</span>", "<span class=\"eq\">4 N</span>", "<span class=\"eq\">10 N</span>"], "a": 1, "e": "<span class=\"eq\">F = ILB = 5 × 0.2 × 0.4 = 0.4 N</span>"}, {"c": 3, "q": "A coil of 10 turns and area <span class=\"eq\">0.01 m<sup>2</sup></span> carries <span class=\"eq\">2 A</span> in a <span class=\"eq\">0.5 T</span> field, with its plane parallel to the field. The torque on it is:", "o": ["<span class=\"eq\">0.01 N·m</span>", "<span class=\"eq\">0.1 N·m</span>", "<span class=\"eq\">1 N·m</span>", "<span class=\"eq\">0</span>"], "a": 1, "e": "<span class=\"eq\">τ = NIAB sin 90° = 10 × 2 × 0.01 × 0.5 = 0.1 N·m</span>"}, {"c": 3, "q": "The SI unit of magnetic field, the tesla, equals:", "o": ["<span class=\"eq\">N/(A·m)</span>", "<span class=\"eq\">N·A/m</span>", "<span class=\"eq\">A/m</span>", "<span class=\"eq\">N/C</span>"], "a": 0, "e": "From <span class=\"eq\">F = ILB</span>: <span class=\"eq\">B = F/IL</span>, so <span class=\"eq\">1 T = 1 N/(A·m)</span>."}, {"c": 4, "q": "The magnetic field <span class=\"eq\">5 cm</span> from a long straight wire carrying <span class=\"eq\">10 A</span> is:", "o": ["<span class=\"eq\">4×10<sup>−5</sup> T</span>", "<span class=\"eq\">4×10<sup>−4</sup> T</span>", "<span class=\"eq\">2×10<sup>−5</sup> T</span>", "<span class=\"eq\">1.3×10<sup>−4</sup> T</span>"], "a": 0, "e": "<span class=\"eq\">B = μ<sub>0</sub>I/2πr = (4π×10<sup>−7</sup> × 10)/(2π × 0.05) = 4×10<sup>−5</sup> T</span>"}, {"c": 4, "q": "Two long parallel wires carry currents in the same direction. The wires:", "o": ["attract each other", "repel each other", "exert no force on each other", "twist about each other"], "a": 0, "e": "Each wire sits in the field of the other; the force <span class=\"eq\">IL × B</span> points toward the other wire for parallel currents."}, {"c": 4, "q": "The field at the center of a circular loop of radius <span class=\"eq\">10 cm</span> carrying <span class=\"eq\">5 A</span> is about:", "o": ["<span class=\"eq\">3.1×10<sup>−5</sup> T</span>", "<span class=\"eq\">1.0×10<sup>−5</sup> T</span>", "<span class=\"eq\">6.3×10<sup>−5</sup> T</span>", "<span class=\"eq\">3.1×10<sup>−6</sup> T</span>"], "a": 0, "e": "<span class=\"eq\">B = μ<sub>0</sub>I/2R = (4π×10<sup>−7</sup> × 5)/0.2 ≈ 3.1×10<sup>−5</sup> T</span>"}, {"c": 4, "q": "A long solenoid has <span class=\"eq\">1000</span> turns per metre and carries <span class=\"eq\">2 A</span>. The field inside is about:", "o": ["<span class=\"eq\">2.5×10<sup>−3</sup> T</span>", "<span class=\"eq\">2.5×10<sup>−5</sup> T</span>", "<span class=\"eq\">1.3×10<sup>−3</sup> T</span>", "<span class=\"eq\">2.5 T</span>"], "a": 0, "e": "<span class=\"eq\">B = μ<sub>0</sub>nI = 4π×10<sup>−7</sup> × 1000 × 2 ≈ 2.5×10<sup>−3</sup> T</span>"}, {"c": 4, "q": "Ampère's law states that:", "o": ["<span class=\"eq\">∮B·ds = μ<sub>0</sub>I<sub>enc</sub></span>", "<span class=\"eq\">∮E·dA = q/ε<sub>0</sub></span>", "<span class=\"eq\">∮B·dA = μ<sub>0</sub>I</span>", "<span class=\"eq\">ε = −dΦ<sub>B</sub>/dt</span>"], "a": 0, "e": "The line integral of B around a closed path equals μ₀ times the current enclosed by the path."}, {"c": 4, "q": "If the distance from a long straight current-carrying wire is doubled, the magnetic field:", "o": ["doubles", "halves", "drops to one quarter", "does not change"], "a": 1, "e": "<span class=\"eq\">B = μ<sub>0</sub>I/2πr</span>, so B is inversely proportional to r."}, {"c": 4, "q": "The magnetic field inside a long ideal solenoid is:", "o": ["zero", "nearly uniform and along the axis", "circular around the axis", "strongest near the windings only"], "a": 1, "e": "Inside a long solenoid the field is uniform, parallel to the axis, with <span class=\"eq\">B = μ<sub>0</sub>nI</span>."}, {"c": 5, "q": "The magnetic flux through a loop of area <span class=\"eq\">0.02 m<sup>2</sup></span> in a perpendicular field of <span class=\"eq\">0.5 T</span> is:", "o": ["<span class=\"eq\">0.01 Wb</span>", "<span class=\"eq\">0.1 Wb</span>", "<span class=\"eq\">0.04 Wb</span>", "<span class=\"eq\">25 Wb</span>"], "a": 0, "e": "<span class=\"eq\">Φ<sub>B</sub> = BA = 0.5 × 0.02 = 0.01 Wb</span>"}, {"c": 5, "q": "The flux through each turn of a 100-turn coil drops from <span class=\"eq\">0.01 Wb</span> to zero in <span class=\"eq\">0.1 s</span>. The average induced emf is:", "o": ["<span class=\"eq\">0.1 V</span>", "<span class=\"eq\">1 V</span>", "<span class=\"eq\">10 V</span>", "<span class=\"eq\">100 V</span>"], "a": 2, "e": "<span class=\"eq\">|ε| = NΔΦ/Δt = 100 × 0.01/0.1 = 10 V</span>"}, {"c": 5, "q": "A rod <span class=\"eq\">0.5 m</span> long moves at <span class=\"eq\">4 m/s</span> perpendicular to a <span class=\"eq\">0.2 T</span> field. The motional emf is:", "o": ["<span class=\"eq\">0.1 V</span>", "<span class=\"eq\">0.4 V</span>", "<span class=\"eq\">1.6 V</span>", "<span class=\"eq\">10 V</span>"], "a": 1, "e": "<span class=\"eq\">ε = BLv = 0.2 × 0.5 × 4 = 0.4 V</span>"}, {"c": 5, "q": "Lenz's law states that the induced current:", "o": ["always flows clockwise", "opposes the change in magnetic flux that produces it", "adds to the change in flux", "is independent of the flux"], "a": 1, "e": "The induced current sets up a field that opposes the change in flux; this is a consequence of energy conservation."}, {"c": 5, "q": "A magnet is pushed into a coil, first slowly and then quickly. The induced emf is:", "o": ["larger when pushed slowly", "larger when pushed quickly", "the same in both cases", "zero in both cases"], "a": 1, "e": "Faraday's law: emf is proportional to the rate of change of flux, <span class=\"eq\">ε = −N dΦ<sub>B</sub>/dt</span>."}, {"c": 5, "q": "A generator coil has 50 turns of area <span class=\"eq\">0.01 m<sup>2</sup></span> and rotates at <span class=\"eq\">100 rad/s</span> in a <span class=\"eq\">0.4 T</span> field. The maximum emf is:", "o": ["<span class=\"eq\">2 V</span>", "<span class=\"eq\">20 V</span>", "<span class=\"eq\">200 V</span>", "<span class=\"eq\">0.2 V</span>"], "a": 1, "e": "<span class=\"eq\">ε<sub>max</sub> = NABω = 50 × 0.01 × 0.4 × 100 = 20 V</span>"}, {"c": 6, "q": "An AC voltage has a peak value of <span class=\"eq\">170 V</span>. Its rms value is about:", "o": ["<span class=\"eq\">85 V</span>", "<span class=\"eq\">120 V</span>", "<span class=\"eq\">170 V</span>", "<span class=\"eq\">240 V</span>"], "a": 1, "e": "<span class=\"eq\">V<sub>rms</sub> = V<sub>max</sub>/√2 = 170/1.414 ≈ 120 V</span>"}, {"c": 6, "q": "The inductive reactance of a <span class=\"eq\">0.1 H</span> inductor at <span class=\"eq\">50 Hz</span> is about:", "o": ["<span class=\"eq\">5 Ω</span>", "<span class=\"eq\">31.4 Ω</span>", "<span class=\"eq\">314 Ω</span>", "<span class=\"eq\">0.03 Ω</span>"], "a": 1, "e": "<span class=\"eq\">X<sub>L</sub> = 2πfL = 2π × 50 × 0.1 ≈ 31.4 Ω</span>"}, {"c": 6, "q": "The capacitive reactance of a <span class=\"eq\">100 μF</span> capacitor at <span class=\"eq\">50 Hz</span> is about:", "o": ["<span class=\"eq\">3.2 Ω</span>", "<span class=\"eq\">31.8 Ω</span>", "<span class=\"eq\">318 Ω</span>", "<span class=\"eq\">0.03 Ω</span>"], "a": 1, "e": "<span class=\"eq\">X<sub>C</sub> = 1/(2πfC) = 1/(2π × 50 × 10<sup>−4</sup>) ≈ 31.8 Ω</span>"}, {"c": 6, "q": "The resonance frequency of a series RLC circuit with <span class=\"eq\">L = 0.1 H</span> and <span class=\"eq\">C = 10 μF</span> is about:", "o": ["<span class=\"eq\">50 Hz</span>", "<span class=\"eq\">159 Hz</span>", "<span class=\"eq\">1000 Hz</span>", "<span class=\"eq\">16 Hz</span>"], "a": 1, "e": "<span class=\"eq\">f<sub>0</sub> = 1/(2π√(LC)) = 1/(2π × 10<sup>−3</sup>) ≈ 159 Hz</span>"}, {"c": 6, "q": "In a purely inductive AC circuit, the current:", "o": ["is in phase with the voltage", "lags the voltage by 90°", "leads the voltage by 90°", "lags the voltage by 180°"], "a": 1, "e": "Across an inductor the voltage leads the current by a quarter cycle, i.e. the current lags by 90°."}, {"c": 6, "q": "A transformer has 500 primary turns and 50 secondary turns. With <span class=\"eq\">220 V</span> on the primary, the secondary voltage is:", "o": ["<span class=\"eq\">22 V</span>", "<span class=\"eq\">2200 V</span>", "<span class=\"eq\">110 V</span>", "<span class=\"eq\">44 V</span>"], "a": 0, "e": "<span class=\"eq\">V<sub>s</sub> = V<sub>p</sub>N<sub>s</sub>/N<sub>p</sub> = 220 × 50/500 = 22 V</span>"}];
+const N=20,PASS=16;
+const $=id=>document.getElementById(id);
+const show=id=>['sIntro','sQuiz','sRes','sCert'].forEach(s=>$(s).classList.toggle('hide',s!==id));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let Q=[],ans=[],k=0,score=0;
+function draw(){ // two per chapter + the rest random
+  const by={};BANK.forEach((x,i)=>{(by[x.c]=by[x.c]||[]).push(i);});
+  let pick=[];Object.values(by).forEach(l=>pick.push(...shuffle(l).slice(0,2)));
+  const rest=shuffle(BANK.map((_,i)=>i).filter(i=>!pick.includes(i)));
+  pick=pick.concat(rest.slice(0,N-pick.length));
+  Q=shuffle(pick).map(i=>{const x=BANK[i],ord=shuffle(x.o.map((_,j)=>j));return {q:x.q,o:ord.map(j=>x.o[j]),a:ord.indexOf(x.a),e:x.e,c:x.c};});
+  ans=Q.map(()=>-1);k=0;
+}
+function rQ(){
+  const it=Q[k];$('qn').textContent='Question '+(k+1)+' of '+N+' · Chapter '+it.c;$('barI').style.width=((k+1)/N*100)+'%';
+  $('qt').innerHTML=it.q;const box=$('qo');box.innerHTML='';
+  it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt'+(ans[k]===j?' sel':'');b.innerHTML=t;b.onclick=()=>{ans[k]=j;rQ();};box.appendChild(b);});
+  $('prev').disabled=k===0;$('next').disabled=ans[k]<0;$('next').textContent=k===N-1?'Finish':'Next';
+}
+function finish(){
+  score=Q.filter((x,i)=>ans[i]===x.a).length;const p=Math.round(score/N*100);
+  $('pct').innerHTML='<span class="eq">'+score+' / '+N+'</span> · <span class="eq">'+p+'%</span>';
+  const ok=score>=PASS;$('msg').textContent=ok?'Congratulations! You passed the final quiz.':'You have not reached 80% yet. Review the questions you missed, then try again.';
+  $('passBox').classList.toggle('hide',!ok);$('failBox').classList.toggle('hide',ok);
+  const wr=Q.map((x,i)=>({x,i})).filter(o=>ans[o.i]!==o.x.a);
+  $('review').innerHTML=wr.length?'<p class="muted" style="margin-top:14px">Questions you missed:</p>'+wr.map(o=>'<div class="rev"><div>'+o.x.q+'</div><div><b>Your answer:</b> '+o.x.o[ans[o.i]]+'</div><div><span class="ok">Correct:</span> '+o.x.o[o.x.a]+'</div><div class="muted">'+o.x.e+'</div></div>').join(''):'';
+  show('sRes');window.scrollTo(0,0);
+}
+$('go').onclick=()=>{draw();rQ();show('sQuiz');};
+$('prev').onclick=()=>{k--;rQ();};
+$('next').onclick=()=>{if(k<N-1){k++;rQ();}else finish();};
+$('again').onclick=()=>{draw();rQ();show('sQuiz');window.scrollTo(0,0);};
+$('back').onclick=()=>show('sRes');
+
+/* ---------- certificate (dark ruby theme) ---------- */
+const TH={"bg": "#0B1430", "frame": "#E0A12A", "accent": "#E0A12A", "title": "#F2C15A", "text": "#E8EEFA", "muted": "#9FB0D0", "name": "#FFFFFF", "beam": "#1597B5"};
+function mixLine(c,segs,cx,y){const ws=segs.map(s=>{c.direction=s.ltr?'ltr':'rtl';return c.measureText(s.t).width;});const tot=ws.reduce((a,b)=>a+b,0);let x=cx+tot/2;
+  segs.forEach((s,i)=>{x-=ws[i];c.direction=s.ltr?'ltr':'rtl';c.textAlign=s.ltr?'left':'right';c.fillText(s.t,s.ltr?x:x+ws[i],y);});c.direction='rtl';c.textAlign='center';}
+function fitFont(c,txt,weight,size,family,maxW){let s=size;do{c.font=weight+' '+s+'px '+family;s-=2;}while(c.measureText(txt).width>maxW&&s>30);}
+function drawCert(cv,d){const t=TH,W=1600,H=1131;cv.width=W;cv.height=H;const c=cv.getContext('2d');c.direction='ltr';c.textAlign='center';c.textBaseline='middle';
+  const SF="Inter, 'Segoe UI', Arial, sans-serif",TT="'Playfair Display', Georgia, serif";
+  c.fillStyle=t.bg;c.fillRect(0,0,W,H);c.strokeStyle=t.frame;c.lineWidth=6;c.strokeRect(40,40,W-80,H-80);c.strokeStyle=t.accent;c.lineWidth=2;c.strokeRect(58,58,W-116,H-116);
+  c.fillStyle=t.accent;[[58,58],[W-58,58],[58,H-58],[W-58,H-58]].forEach(([x,y])=>{c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();});
+  const cx=W/2;c.fillStyle=t.muted;c.font='400 30px '+SF;c.fillText('Virtual Labs · Prof. Najm Al-Hosiny',cx,150);
+  c.fillStyle=t.title;c.font='700 92px '+TT;c.fillText('Certificate of Achievement',cx,280);
+  const g=c.createLinearGradient(cx-260,0,cx+260,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,t.beam);g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(cx-260,360,520,5);
+  c.fillStyle=t.text;c.font='400 36px '+SF;c.fillText('This certifies that',cx,450);
+  c.fillStyle=t.name;fitFont(c,d.name,'700',76,SF,1250);c.fillText(d.name,cx,550);c.fillStyle=t.accent;c.fillRect(cx-300,610,600,2);
+  const L1='has completed the labs of “Physics (2)” (203207-4)';c.fillStyle=t.text;fitFont(c,L1,'400',36,SF,1300);c.fillText(L1,cx,690);
+  c.font='400 36px '+SF;c.fillText('and passed the final quiz with a score of '+d.score+'%',cx,750);
+  c.font='400 28px '+SF;c.fillStyle=t.muted;const fy=920;c.fillText('Date',300,fy);c.fillText('Course instructor',W-300,fy);
+  c.fillStyle=t.text;c.font='700 34px '+SF;c.fillText(d.date,300,fy+50);c.fillText('Prof. Najm Al-Hosiny',W-300,fy+50);
+  c.save();c.translate(cx,955);c.fillStyle=t.accent;c.beginPath();c.arc(0,0,62,0,Math.PI*2);c.fill();c.strokeStyle=t.bg;c.lineWidth=3;c.beginPath();c.arc(0,0,50,0,Math.PI*2);c.stroke();
+  c.lineWidth=9;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-22,2);c.lineTo(-6,18);c.lineTo(24,-16);c.stroke();c.restore();}
+$('mk').onclick=async()=>{
+  const name=$('nm').value.replace(/\s+/g,' ').trim();if(name.length<3){$('nm').focus();return;}
+  $('mk').disabled=true;
+  try{await Promise.race([Promise.all([document.fonts.load("700 76px Inter",name),document.fonts.load("400 36px Inter","has"),document.fonts.load("700 92px 'Playfair Display'","Certificate")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  const d=new Date(),date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+  drawCert($('cv'),{name,score:Math.round(score/N*100),date});
+  const url=$('cv').toDataURL('image/png');$('certImg').src=url;$('dl').href=url;$('mk').disabled=false;show('sCert');window.scrollTo(0,0);
+};
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

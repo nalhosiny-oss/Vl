@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab — Experiment 6: The Convex Lens</title>
+<style>
+  :root{
+    --bg:#EEF2F7; --panel:#FFFFFF; --panel2:#F6F8FB; --line:#D5DCE6; --navy:#1B2A41; --ink:#1A1D2B;
+    --orange:#C25E00; --blue:#1F5BD6; --red:#C8322F; --green:#2E7D4F; --gray:#5B6072; --amber:#F2A541;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Calibri,"Segoe UI",Candara,Arial,sans-serif;line-height:1.55;font-size:16px}
+  header{background:var(--navy);color:#fff;padding:20px 18px 16px;text-align:center;border-bottom:4px solid var(--orange)}
+  header .tag{display:inline-block;color:var(--amber);border:1px solid var(--amber);border-radius:20px;padding:1px 14px;font-size:13px;letter-spacing:.3px}
+  h1{margin:8px 0 2px;font-family:Cambria,Georgia,serif;font-size:27px;font-weight:700}
+  h1 span{color:var(--amber)}
+  header p{margin:0;color:#C9D3E3;font-size:15px}
+  .wrap{max-width:1120px;margin:0 auto;padding:14px}
+  .safety{background:#FFF4E5;border:1px solid var(--orange);border-left:6px solid var(--orange);border-radius:10px;padding:9px 14px;margin:12px 0;font-size:15px}
+  .safety b{color:var(--orange)}
+  nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  nav button{flex:1 1 150px;background:var(--panel);color:var(--gray);border:1px solid var(--line);border-radius:10px;padding:10px;
+             font:inherit;font-size:15px;cursor:pointer;font-weight:600}
+  nav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(27,42,65,.06)}
+  section.on{display:block}
+  h2{margin:0 0 10px;font-size:21px;color:var(--navy);font-family:Cambria,Georgia,serif}
+  h3{margin:16px 0 6px;font-size:17px;color:var(--orange)}
+  .eq{display:inline-block;font-family:"Cambria Math",Cambria,"Times New Roman",serif;background:var(--panel2);border:1px solid var(--line);
+      border-radius:7px;padding:2px 10px;margin:2px 0;font-size:17px;color:var(--navy);white-space:nowrap}
+  .eq i{font-style:italic}
+  .eq.big{display:block;text-align:center;font-size:21px;margin:8px auto;max-width:460px;padding:6px 12px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:820px){.grid,.grid3{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  label{display:block;font-size:15px;color:var(--gray);margin-top:8px}
+  input[type=range]{width:100%;accent-color:var(--orange)}
+  select,input[type=number],input[type=text]{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;width:100%}
+  .val{color:var(--orange);font-weight:bold}
+  .btn{background:var(--navy);color:#fff;border:0;border-radius:9px;padding:8px 14px;font:inherit;cursor:pointer;margin:4px 2px;font-weight:600}
+  .btn.or{background:var(--orange)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--gray)}
+  .btn:disabled{opacity:.45;cursor:default}
+  canvas{width:100%;display:block;border-radius:10px;background:#fff;border:1px solid var(--line)}
+  canvas.click{cursor:crosshair}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+  th,td{border:1px solid var(--line);padding:5px;text-align:center}
+  th{background:var(--navy);color:#fff;font-weight:600}
+  td input{text-align:center;padding:4px}
+  .ok{color:var(--green);font-weight:600} .bad{color:var(--red);font-weight:600}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+  .q p{margin:0 0 6px;font-weight:bold;color:var(--navy)}
+  .opt{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;
+       padding:7px 10px;margin:4px 0;font:inherit;cursor:pointer}
+  .opt.right{border-color:var(--green);background:#E6F4EA}
+  .opt.wrong{border-color:var(--red);background:#FBE9E8}
+  .fb{font-size:15px;color:var(--gray);min-height:1.2em}
+  .note{font-size:15px;color:var(--gray)}
+  .reading{font-size:21px;color:var(--orange);font-weight:bold}
+  .res{background:#EEF4FF;border:1px solid #C9D8F5;border-radius:10px;padding:10px 14px;margin-top:10px}
+  .res b{color:var(--navy)}
+  .wi{background:var(--panel2);border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:10px;padding:10px 12px;margin:10px 0}
+  .wi p{margin:0 0 6px;font-weight:600}
+  .wi .ans{display:none;color:var(--ink);background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px;margin-top:6px}
+  .wi.show .ans{display:block}
+  .pill{display:inline-block;background:#E8EEF8;border:1px solid #C9D8F5;border-radius:20px;padding:1px 10px;font-size:14px;margin:2px;color:var(--navy)}
+  footer{text-align:center;color:var(--gray);font-size:13px;padding:16px}
+  sub,sup{font-size:70%}
+</style>
+
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header>
+  <span class="tag">Physics 1 (203205-4) — Practical Virtual Lab</span>
+  <h1>Experiment 6: <span>The Convex Lens</span></h1>
+  <p>Focal length and power of a converging lens · the u – v method and the 1/u – 1/v graph</p>
+</header>
+<div class="wrap">
+  <div class="safety">⚠️ <b>Safety:</b> the illuminated object box gets hot — do not touch the lamp housing. Never look at the Sun through a lens or use a lens to focus sunlight. Hold lenses by their edges and put them back in their holders.</div>
+  <nav>
+    <button class="on" data-s="s1">1) Pre-lab questions</button>
+    <button data-s="s2">2) Theory</button>
+    <button data-s="s3">3) Simulation &amp; measurement</button>
+    <button data-s="s4">4) Data table &amp; analysis</button>
+    <button data-s="sR">5) My lab readings ✔</button>
+    <button data-s="s5">6) What if…?</button>
+  </nav>
+
+  <section id="s1" class="on"><h2>Pre-lab questions</h2><p class="note">Answer before you come to the lab. The correction appears as soon as you choose.</p><div id="quiz"></div><p class="reading" id="qscore"></p></section>
+
+  <section id="s2">
+    <h2>Theory</h2>
+    <p>Linked to <b>Chapter 9 — Light and Optics</b> (images formed by thin lenses) of the lectures.</p>
+    <h3>1. The converging lens</h3>
+    <p>A convex lens is thicker at the centre. Rays parallel to the principal axis are refracted so that they all pass through one point, the <b>principal focus</b> <i>F</i>. The distance from the centre of the lens to <i>F</i> is the <b>focal length</b> <i>f</i>. A ray through the centre of a thin lens passes straight through.</p>
+    <h3>2. Real images and the lens equation</h3>
+    <p>When the object is farther from the lens than <i>f</i>, the rays from each point of the object meet again on the other side and form a <b>real, inverted</b> image that can be caught on a screen. With the object distance <i>u</i> and the image distance <i>v</i> (both measured from the centre of the lens, positive for a real object and a real image):</p>
+    <span class="eq big">1/<i>f</i> = 1/<i>u</i> + 1/<i>v</i>     →     <i>f</i> = <i>u v</i> / (<i>u</i> + <i>v</i>)     magnification <i>m</i> = <i>v</i>/<i>u</i></span>
+    <p>For a very distant object (<i>u</i> → ∞) we get <i>v</i> ≈ <i>f</i>: this gives a quick first estimate of <i>f</i>.</p>
+    <h3>3. The 1/u – 1/v graph</h3>
+    <p>Plot 1/<i>v</i> (cm⁻¹) on the <i>y</i>-axis against 1/<i>u</i> (cm⁻¹) on the <i>x</i>-axis, using the <b>same scale</b> on both axes. The equation <span class="eq">1/<i>v</i> = −1/<i>u</i> + 1/<i>f</i></span> is a straight line of slope −1. <b>Both intercepts equal 1/f</b>; take their average:</p>
+    <span class="eq big"><i>f</i> = 1 / (average of the two intercepts)</span>
+    <h3>4. Power of a lens</h3>
+    <span class="eq big"><i>P</i> = 1 / <i>f</i>     (<i>f</i> in metres, <i>P</i> in dioptres, D)</span>
+    <div class="card"><b>Apparatus:</b> convex lens in a holder, illuminated object (cross-wires and arrow), white screen, optical bench with metre scale.</div>
+  </section>
+
+  <section id="s3">
+    <h2>Simulation &amp; measurement</h2>
+    <div class="grid">
+      <div class="card">
+        <label>Lens: <select id="lens" style="width:auto"><option value="A">Lens A</option><option value="B">Lens B</option><option value="C">Lens C</option></select> (changing the lens clears the table)</label>
+        <label>Lens position on the bench: <span class="val" id="lpv"></span></label>
+        <input type="range" id="lp" min="5" max="95" step="0.1" value="30">
+        <label>Screen position on the bench: <span class="val" id="spv"></span></label>
+        <input type="range" id="sp" min="10" max="150" step="0.1" value="80">
+        <p class="note">The illuminated object is fixed at the <b>0 cm</b> mark. Move the screen until the image is as <b>sharp</b> as possible, then read the scale:</p>
+        <p><span class="pill" id="uOut"></span> <span class="pill" id="vOut"></span></p>
+        <button class="btn or" id="rec">Record u and v</button>
+        <button class="btn ghost" id="far">Quick estimate: image of a distant window</button>
+        <p class="note" id="farOut"></p>
+      </div>
+      <div class="card"><b>What you see on the screen</b><canvas id="scr" width="420" height="300" style="background:#F2F2EE"></canvas></div>
+    </div>
+    <canvas id="bench" width="1080" height="250" style="margin-top:10px"></canvas>
+  </section>
+
+  <section id="s4">
+    <h2>Data table &amp; analysis</h2>
+    <p class="note">Calculate the yellow columns yourself, then press “Check”. Keep 4 decimal places for the reciprocals.</p>
+    <table><thead><tr><th>#</th><th><i>u</i> (cm)</th><th><i>v</i> (cm)</th><th>Your 1/<i>u</i> (cm⁻¹)</th><th>Your 1/<i>v</i> (cm⁻¹)</th><th>Your <i>f</i> = <i>uv</i>/(<i>u</i>+<i>v</i>) (cm)</th><th>Result</th></tr></thead><tbody id="tb"></tbody></table>
+    <canvas id="plot" width="900" height="420" style="margin-top:10px"></canvas>
+    <div class="grid3">
+      <label>Your x-intercept (cm⁻¹)<input type="number" id="uX" step="0.0001"></label>
+      <label>Your y-intercept (cm⁻¹)<input type="number" id="uY" step="0.0001"></label>
+      <label>Your power P (dioptres)<input type="number" id="uP" step="0.01"></label>
+    </div>
+    <button class="btn or" id="chk">Check</button> <button class="btn ghost" id="clr">Clear</button>
+    <div class="res" id="res"><p class="note">Record at least 5 pairs (some with a magnified image, some with a diminished one), then check.</p></div>
+  </section>
+
+  <section id="sR"><h2>My real lab readings — self-check</h2><div id="real"></div></section>
+
+  <section id="s5"><h2>What if…?</h2><p class="note">Predict first, write your reason, then reveal the explanation.</p><div id="whatif"></div></section>
+</div>
+<footer>Physics 1 (203205-4) · Practical part · Prof. Najm Al-Hosiny</footer>
+<script>
+// ===== shared helpers for Physics 1 practical virtual labs =====
+const $=id=>document.getElementById(id);
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); $(b.dataset.s).classList.add('on');
+  if(window.onTab) window.onTab(b.dataset.s);
+});
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function roundTo(x,step){return Math.round(x/step)*step;}
+function fmt(x,d){return (x===null||x===undefined||isNaN(x))?'—':(+x).toFixed(d);}
+function pct(a,b){return Math.abs(a-b)/Math.abs(b)*100;}
+function close(u,t,tol){return u!==null&&u!==''&&!isNaN(u)&&Math.abs(u-t)<=Math.abs(t)*tol+1e-12;}
+
+// ----- pre-lab quiz -----
+function buildQuiz(Q){
+  let score=0,answered=0; const qz=$('quiz');
+  Q.forEach((it,i)=>{
+    const d=document.createElement('div'); d.className='q';
+    d.innerHTML='<p>'+(i+1)+') '+it.q+'</p>'+it.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+String.fromCharCode(97+j)+') '+o+'</button>').join('')+'<div class="fb"></div>';
+    d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(d.dataset.done) return; d.dataset.done=1; answered++;
+      const j=+b.dataset.j; d.querySelectorAll('.opt')[it.a].classList.add('right');
+      if(j===it.a){score++; d.querySelector('.fb').innerHTML='<span class="ok">✔ Correct.</span> '+it.e;}
+      else{b.classList.add('wrong'); d.querySelector('.fb').innerHTML='<span class="bad">✘ Not quite.</span> '+it.e;}
+      if(answered===Q.length) $('qscore').textContent='Your score: '+score+' / '+Q.length;
+    });
+    qz.appendChild(d);
+  });
+}
+// ----- what if...? -----
+function buildWhatIf(W){
+  const box=$('whatif');
+  W.forEach((it,i)=>{
+    const d=document.createElement('div'); d.className='wi';
+    d.innerHTML='<p>'+(i+1)+') '+it.q+'</p><textarea rows="2" style="width:100%;font:inherit;border:1px solid #D5DCE6;border-radius:8px;padding:6px" placeholder="Write your prediction and reason first…"></textarea>'+
+      '<button class="btn ghost">Show the explanation</button><div class="ans">'+it.a+'</div>';
+    d.querySelector('button').onclick=()=>d.classList.toggle('show');
+    box.appendChild(d);
+  });
+}
+// ----- least squares -----
+function fitLine(xs,ys){ // y = m x + b
+  const n=xs.length; if(n<2) return null;
+  const sx=xs.reduce((a,b)=>a+b,0), sy=ys.reduce((a,b)=>a+b,0);
+  const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0);
+  const den=n*sxx-sx*sx; if(Math.abs(den)<1e-15) return null;
+  const m=(n*sxy-sx*sy)/den, b=(sy-m*sx)/n;
+  const res=ys.map((y,i)=>y-(m*xs[i]+b)); const s2=n>2?res.reduce((a,r)=>a+r*r,0)/(n-2):0;
+  const dm=Math.sqrt(n*s2/den), db=Math.sqrt(s2*sxx/den);
+  return {m,b,dm,db};
+}
+function fitOrigin(xs,ys){ // y = m x
+  const n=xs.length; if(n<1) return null;
+  const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,x,i)=>a+x*ys[i],0); if(sxx===0) return null;
+  const m=sxy/sxx; const s2=n>1?ys.reduce((a,y,i)=>a+(y-m*xs[i])**2,0)/(n-1):0;
+  return {m,b:0,dm:Math.sqrt(s2/sxx),db:0};
+}
+// ----- plot -----
+function niceStep(range){const r=range/6,p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p;return (f<1.5?1:f<3?2:f<7?5:10)*p;}
+function drawPlot(cv,pts,o){
+  o=o||{}; const g=cv.getContext('2d'), W=cv.width,H=cv.height; g.clearRect(0,0,W,H); g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+  const L=74,R=22,T=22,B=58;
+  let xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  let x0=o.xmin!==undefined?o.xmin:Math.min(0,...xs), x1=o.xmax!==undefined?o.xmax:Math.max(...xs,1e-9);
+  let y0=o.ymin!==undefined?o.ymin:Math.min(0,...ys), y1=o.ymax!==undefined?o.ymax:Math.max(...ys,1e-9);
+  if(!pts.length){x0=0;x1=1;y0=0;y1=1;}
+  x1+= (x1-x0)*0.08; y1+=(y1-y0)*0.10; if(x0<0)x0-=(x1-x0)*0.05; if(y0<0)y0-=(y1-y0)*0.05;
+  const X=x=>L+(x-x0)/(x1-x0)*(W-L-R), Y=y=>H-B-(y-y0)/(y1-y0)*(H-T-B);
+  const sxs=niceStep(x1-x0), sys=niceStep(y1-y0);
+  g.font='13px Calibri, Arial'; g.textAlign='center'; g.strokeStyle='#E3E8F0'; g.fillStyle='#5B6072';
+  const dec=s=>s>=1?0:Math.min(4,Math.ceil(-Math.log10(s)));
+  for(let x=Math.ceil(x0/sxs)*sxs;x<=x1+1e-12;x+=sxs){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),H-B);g.stroke();g.fillText(x.toFixed(dec(sxs)),X(x),H-B+17);}
+  g.textAlign='right';
+  for(let y=Math.ceil(y0/sys)*sys;y<=y1+1e-12;y+=sys){g.beginPath();g.moveTo(L,Y(y));g.lineTo(W-R,Y(y));g.stroke();g.fillText(y.toFixed(dec(sys)),L-6,Y(y)+4);}
+  g.strokeStyle='#1B2A41'; g.lineWidth=1.5; g.beginPath(); g.moveTo(L,T); g.lineTo(L,H-B); g.lineTo(W-R,H-B); g.stroke();
+  if(x0<0&&x1>0){g.beginPath();g.moveTo(X(0),T);g.lineTo(X(0),H-B);g.stroke();}
+  if(y0<0&&y1>0){g.beginPath();g.moveTo(L,Y(0));g.lineTo(W-R,Y(0));g.stroke();}
+  g.lineWidth=1; g.fillStyle='#1B2A41'; g.textAlign='center'; g.font='bold 14px Calibri, Arial';
+  g.fillText(o.xlabel||'x',(L+W-R)/2,H-14);
+  g.save(); g.translate(18,(T+H-B)/2); g.rotate(-Math.PI/2); g.fillText(o.ylabel||'y',0,0); g.restore();
+  const line=(f,col,dash)=>{ if(!f) return; g.strokeStyle=col; g.lineWidth=2; g.setLineDash(dash||[]);
+    const xa=o.extend?x0:Math.min(0,x0), xb=x1; g.beginPath(); g.moveTo(X(xa),Y(f.m*xa+f.b)); g.lineTo(X(xb),Y(f.m*xb+f.b)); g.stroke(); g.setLineDash([]); g.lineWidth=1;};
+  g.save(); g.beginPath(); g.rect(L,T,W-L-R,H-T-B); g.clip();
+  line(o.fit,'#C25E00'); line(o.student,'#1F5BD6',[6,5]);
+  g.restore();
+  pts.forEach(p=>{g.fillStyle='#1B2A41'; g.beginPath(); g.arc(X(p[0]),Y(p[1]),4.5,0,2*Math.PI); g.fill();});
+  if(o.fit||o.student){g.font='13px Calibri, Arial'; g.textAlign='left';
+    if(o.fit){g.fillStyle='#C25E00'; g.fillText('— best-fit line (least squares)',L+10,T+14);}
+    if(o.student){g.fillStyle='#1F5BD6'; g.fillText('- - line with YOUR slope',L+10,T+30);}}
+}
+
+// ===== "My real lab readings" self-check (replaces the Excel file) =====
+function buildReal(cfg){
+  const box=$('real'), KEY='p1lab_real_'+cfg.key;
+  let store={}; try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){store={};}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}};
+  const num=v=>{if(v===undefined||v===null) return null; v=String(v).trim().replace(',', '.'); if(v==='') return null; const x=parseFloat(v); return isNaN(x)?null:x;};
+  let h='<p class="note">'+(cfg.intro||'')+' Type the readings you recorded in the laboratory (in your manual), do your own calculations, then press <b>Check my results</b>. '+
+        'Your entries are kept in this browser, so you can come back later. Take a screenshot of the result and attach it at the end of your report.</p>';
+  if(cfg.consts&&cfg.consts.length){h+='<div class="grid3">'+cfg.consts.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+  cfg.tables.forEach(t=>{
+    h+='<h3>'+t.title+'</h3><div style="overflow-x:auto"><table id="rt_'+t.id+'"><thead><tr><th>#</th>'+t.cols.map(c=>'<th'+(c.calc?' style="background:#7A5200"':'')+'>'+c.label+'</th>').join('')+'</tr></thead><tbody></tbody></table></div>';
+    if(t.add!==false) h+='<button class="btn ghost" data-add="'+t.id+'">+ Add a row</button>';
+  });
+  if(cfg.mine&&cfg.mine.length){h+='<h3>Your results from your hand-drawn graph / calculation</h3><div class="grid3">'+cfg.mine.map(c=>'<label>'+c.label+'<input type="text" inputmode="decimal" data-k="'+c.id+'"></label>').join('')+'</div>';}
+  h+='<p><button class="btn or" id="rcheck">Check my results</button> <button class="btn ghost" id="rclear">Clear all my entries</button></p>'+
+     '<p class="note">Yellow-headed columns are your own calculations: they turn <span class="ok">green</span> when correct and <span class="bad">red</span> when not.</p>'+
+     (cfg.plot?'<canvas id="rplot" width="760" height="430"></canvas>':'')+'<div class="res" id="rres"><p class="note">Results appear here after you press Check.</p></div>';
+  box.innerHTML=h;
+  const rowsOf=t=>{ if(!store[t.id]) store[t.id]=[]; const n=Math.max(t.rows||5, store[t.id].length); while(store[t.id].length<n) store[t.id].push({}); return store[t.id]; };
+  function renderTables(){
+    cfg.tables.forEach(t=>{
+      const tb=$('rt_'+t.id).querySelector('tbody'); const R=rowsOf(t);
+      if(t.preset) R.forEach((r,i)=>{ if(t.preset[i]) Object.keys(t.preset[i]).forEach(k=>{ if(r[k]===undefined) r[k]=String(t.preset[i][k]); }); });
+      tb.innerHTML=R.map((r,i)=>'<tr><td>'+(t.rowLabels?t.rowLabels[i]||(i+1):(i+1))+'</td>'+t.cols.map(c=>'<td'+(c.calc?' style="background:#FFF8D6"':'')+'><input type="text" inputmode="decimal" data-t="'+t.id+'" data-r="'+i+'" data-c="'+c.id+'" value="'+(r[c.id]===undefined?'':String(r[c.id]).replace(/"/g,''))+'"></td>').join('')+'</tr>').join('');
+    });
+    box.querySelectorAll('input[data-t]').forEach(inp=>inp.oninput=()=>{store[inp.dataset.t][+inp.dataset.r][inp.dataset.c]=inp.value; inp.style.borderColor=''; save();});
+  }
+  box.querySelectorAll('input[data-k]').forEach(inp=>{ if(store['k_'+inp.dataset.k]!==undefined) inp.value=store['k_'+inp.dataset.k]; inp.oninput=()=>{store['k_'+inp.dataset.k]=inp.value; save();}; });
+  box.querySelectorAll('button[data-add]').forEach(b=>b.onclick=()=>{ store[b.dataset.add].push({}); save(); renderTables(); });
+  let armed=false;
+  $('rclear').onclick=()=>{ if(!armed){armed=true; $('rclear').textContent='Click again to clear everything'; setTimeout(()=>{armed=false; $('rclear').textContent='Clear all my entries';},4000); return;}
+    store={}; save(); box.querySelectorAll('input[data-k]').forEach(i=>i.value=''); renderTables(); $('rres').innerHTML='<p class="note">Cleared.</p>'; if(cfg.plot) drawPlot($('rplot'),[],cfg.plot); armed=false; $('rclear').textContent='Clear all my entries'; };
+  $('rcheck').onclick=()=>{
+    const K={}; box.querySelectorAll('input[data-k]').forEach(i=>K[i.dataset.k]=num(i.value));
+    const T={}; let marks=0, good=0;
+    cfg.tables.forEach(t=>{
+      T[t.id]=[];
+      store[t.id].forEach((r,i)=>{
+        const o={_i:i}; t.cols.forEach(c=>{ if(!c.calc) o[c.id]=num(r[c.id]); });
+        const complete=t.cols.filter(c=>!c.calc&&!c.optional).every(c=>o[c.id]!==null);
+        t.cols.filter(c=>c.calc).forEach(c=>{
+          const inp=box.querySelector('input[data-t="'+t.id+'"][data-r="'+i+'"][data-c="'+c.id+'"]'); const u=num(r[c.id]);
+          if(!complete){ inp.style.borderColor=''; return; }
+          let e=null; try{ e=c.f(o,K); }catch(err){ e=null; } o[c.id]=e; o['your_'+c.id]=u;
+          if(u===null||e===null||!isFinite(e)){ inp.style.borderColor=''; return; }
+          const ok=c.abs!==undefined?Math.abs(u-e)<=c.abs:close(u,e,c.tol||0.02); marks++; if(ok) good++;
+          inp.style.borderColor=ok?'#2E7D4F':'#C8322F'; inp.style.borderWidth='2px'; inp.title=ok?'correct':'expected about '+(+e.toPrecision(4));
+        });
+        if(complete) T[t.id].push(o);
+      });
+    });
+    let out;
+    try{ out=cfg.analyze(T,K)||{}; }catch(err){ out={html:'<span class="bad">Please check your entries: '+err.message+'</span>'}; }
+    let s=marks?'<b>Your calculated columns:</b> '+good+' / '+marks+' correct'+(good<marks?' — hover over (or tap) a red cell to see the expected value.':' ✔')+'<br>':'';
+    $('rres').innerHTML=s+(out.html||'');
+    if(cfg.plot){ const p=out.plot||{pts:[]}; drawPlot($('rplot'),p.pts,Object.assign({},cfg.plot,p)); }
+  };
+  renderTables(); if(cfg.plot) drawPlot($('rplot'),[],cfg.plot);
+}
+function ok5(u,t,lim,txt){ lim=lim||5; if(u===null||u===undefined) return ''; const d=pct(u,t); return d<=lim?'<span class="ok">✔ '+txt+' is within '+lim+' % of the best-fit value</span>':'<span class="bad">✘ '+txt+' differs by '+d.toFixed(1)+' % from the best-fit value — check the two points you read on your line</span>'; }
+</script>
+
+<script>
+buildQuiz([
+ {q:'A convex lens is also called:',o:['a diverging lens','a converging lens','a plane lens','a mirror'],a:1,e:'It brings parallel rays together at the principal focus.'},
+ {q:'u = 30 cm and v = 15 cm. The focal length is:',o:['45 cm','15 cm','10 cm','2 cm'],a:2,e:'f = uv/(u+v) = 450/45 = 10 cm.'},
+ {q:'A lens has f = 25 cm. Its power is:',o:['25 D','4 D','0.04 D','2.5 D'],a:1,e:'P = 1/f with f in metres: 1/0.25 m = 4 D.'},
+ {q:'On the graph of 1/v against 1/u, each intercept equals:',o:['f','1/f','2f','the magnification'],a:1,e:'1/v = −1/u + 1/f: at 1/u = 0, 1/v = 1/f, and at 1/v = 0, 1/u = 1/f.'},
+ {q:'The real image formed by a convex lens on a screen is always:',o:['upright','inverted','virtual','the same size as the object'],a:1,e:'A real image formed by a single lens is inverted. Its size depends on where the object is.'}
+]);
+buildWhatIf([
+ {q:'What if the object is placed exactly at the focus (u = f)?',a:'The rays leave the lens parallel, so no image forms on the screen at any distance (v → ∞). Try it: move the lens to the focal length of the object and look for a sharp image.'},
+ {q:'What if u is smaller than f?',a:'The rays still diverge after the lens: no real image. Looking through the lens you see an upright, magnified, virtual image — the lens is a magnifying glass.'},
+ {q:'What if you cover the upper half of the lens with card?',a:'The whole image is still formed, because every part of the lens receives light from every point of the object; it is only dimmer.'},
+ {q:'What if you swap u and v (put the object where the image was)?',a:'A sharp image forms where the object was (light paths are reversible). This is why u and v are “interchangeable” and you get two lens positions for one object–screen distance.'},
+ {q:'What if the object–screen distance is less than 4f?',a:'No lens position gives a sharp image. A real image needs u + v ≥ 4f; the minimum (u = v = 2f) gives an image the same size as the object.'}
+]);
+const LENS={A:10.2, B:14.8, C:20.3}; // true focal lengths (cm)
+let rows=[], ext=null;
+const F=()=>LENS[lens.value];
+function geo(){ const L=+lp.value, S=+sp.value, u=L, f=F(); const vT=u>f? u*f/(u-f): Infinity; const vS=S-L; return {L,S,u,f,vT,vS}; }
+function upd(){ const g=geo(); if(g.S<=g.L+1){ sp.value=(g.L+2).toFixed(1); }
+  const G=geo(); lpv.textContent=G.L.toFixed(1)+' cm'; spv.textContent=G.S.toFixed(1)+' cm';
+  uOut.textContent='u = lens − object = '+G.u.toFixed(1)+' cm'; vOut.textContent='v = screen − lens = '+G.vS.toFixed(1)+' cm'; drawScreen(); drawBench(); }
+function drawScreen(){ const c=scr.getContext('2d'),W=scr.width,H=scr.height; c.clearRect(0,0,W,H); c.fillStyle='#F2F2EE'; c.fillRect(0,0,W,H);
+  const g=geo(), D=4.0; let blur, m, bright;
+  if(!isFinite(g.vT)||g.vT<=0){ blur=60; m=1; bright=0.25; } else { blur=Math.abs(g.vS-g.vT)*D/g.vT*12; m=g.vT/g.u; bright=Math.min(1,0.25+1/(m*m+0.3)); }
+  const sz=60*Math.min(m,4.5);
+  c.save(); c.filter='blur('+Math.min(40,blur).toFixed(1)+'px)'; c.translate(W/2,H/2); c.rotate(Math.PI); // real image: inverted
+  c.globalAlpha=Math.max(0.15,bright*(blur>25?0.4:1)); c.strokeStyle='#C25E00'; c.fillStyle='#C25E00'; c.lineWidth=Math.max(2,4*Math.min(m,2));
+  c.beginPath(); c.moveTo(-sz,0); c.lineTo(sz,0); c.moveTo(0,-sz); c.lineTo(0,sz); c.stroke(); // cross-wires
+  c.beginPath(); c.moveTo(0,-sz); c.lineTo(-sz*0.25,-sz*0.7); c.lineTo(sz*0.25,-sz*0.7); c.closePath(); c.fill(); // arrow head (object's "up")
+  c.beginPath(); c.moveTo(sz*0.35,-sz*0.35); c.lineTo(sz*0.65,-sz*0.35); c.stroke(); // asymmetric mark (object's "right")
+  c.restore(); c.filter='none'; c.globalAlpha=1;
+  c.fillStyle='#5B6072'; c.font='13px Calibri'; c.fillText(blur<1.2&&isFinite(g.vT)?'sharp image':'blurred — move the screen',10,H-10);
+}
+function drawBench(){ const c=bench.getContext('2d'),W=bench.width,H=bench.height; c.clearRect(0,0,W,H); c.fillStyle='#fff'; c.fillRect(0,0,W,H);
+  const x0=40, sc=(W-70)/150, X=cm=>x0+cm*sc, ay=110, g=geo();
+  c.fillStyle='#F7E8C8'; c.fillRect(x0-10,190,W-50,34); c.strokeStyle='#8A6D3B'; c.strokeRect(x0-10,190,W-50,34);
+  c.strokeStyle='#3A2A10'; c.fillStyle='#3A2A10'; c.font='11px Calibri'; c.textAlign='center';
+  for(let mm=0;mm<=1500;mm+=5){ const x=X(mm/10), L=mm%100===0?16:(mm%50===0?10:5); c.beginPath(); c.moveTo(x,190); c.lineTo(x,190+L); c.stroke(); if(mm%100===0) c.fillText(String(mm/10),x,218); }
+  c.strokeStyle='#C9D3E3'; c.setLineDash([6,4]); c.beginPath(); c.moveTo(x0-10,ay); c.lineTo(W-20,ay); c.stroke(); c.setLineDash([]);
+  // object (arrow on lamp box)
+  c.fillStyle='#5B6072'; c.fillRect(X(0)-30,ay-35,26,70); c.fillStyle='#F2A541'; c.beginPath(); c.arc(X(0)-17,ay,8,0,7); c.fill();
+  c.strokeStyle='#C25E00'; c.lineWidth=3; c.beginPath(); c.moveTo(X(0),ay); c.lineTo(X(0),ay-40); c.stroke(); c.fillStyle='#C25E00'; c.beginPath(); c.moveTo(X(0),ay-48); c.lineTo(X(0)-6,ay-36); c.lineTo(X(0)+6,ay-36); c.fill(); c.lineWidth=1;
+  // lens
+  const lx=X(g.L); c.fillStyle='rgba(31,91,214,.18)'; c.strokeStyle='#1F5BD6'; c.beginPath(); c.ellipse(lx,ay,9,62,0,0,7); c.fill(); c.stroke();
+  c.fillStyle='#1F5BD6'; c.font='bold 13px Calibri'; c.fillText('lens',lx,ay-70);
+  [g.f,-g.f].forEach(d=>{ c.fillStyle='#1F5BD6'; c.beginPath(); c.arc(lx+d*sc,ay,3,0,7); c.fill(); c.fillText('F',lx+d*sc,ay+16); });
+  // screen
+  const sx=X(g.S); c.fillStyle='#E8ECF2'; c.fillRect(sx,ay-75,8,150); c.strokeStyle='#5B6072'; c.strokeRect(sx,ay-75,8,150); c.fillStyle='#1A1D2B'; c.fillText('screen',sx+4,ay-80);
+  // rays from the arrow tip
+  const h=40, tip=[X(0),ay-h];
+  if(isFinite(g.vT)){ const ix=lx+g.vT*sc, iy=ay+h*g.vT/g.u; c.strokeStyle='rgba(194,94,0,.75)'; c.lineWidth=1.3;
+    const Fx=lx-g.f*sc, tF=(lx-tip[0])/(Fx-tip[0]); const rays=[[lx,ay-h],[lx,ay]]; if(g.u>g.f*1.05) rays.push([lx,tip[1]+tF*(ay-tip[1])]);
+    rays.forEach(p=>{ if(Math.abs(p[1]-ay)>62) return; c.beginPath(); c.moveTo(...tip); c.lineTo(...p); const dx=ix-p[0], dy=iy-p[1]; const t=(Math.min(sx,W-20)-p[0])/dx; c.lineTo(p[0]+dx*t,p[1]+dy*t); c.stroke(); });
+    c.lineWidth=1; c.setLineDash([3,3]); c.strokeStyle='#2E7D4F'; c.beginPath(); c.moveTo(ix,ay); c.lineTo(ix,iy); c.stroke(); c.setLineDash([]);
+  }
+  c.fillStyle='#5B6072'; c.font='12px Calibri'; c.textAlign='left'; c.fillText('side view (rays from the tip of the arrow; the green dashed line shows where the sharp image forms)',x0,20);
+}
+['lp','sp'].forEach(id=>$(id).addEventListener('input',upd));
+lens.onchange=()=>{rows=[];ext=null;render();farOut.textContent='';upd();};
+far.onclick=()=>{ const v=F()*(1+0.01*gauss()); farOut.innerHTML='Image of a window 20 m away is sharp at about <b>'+v.toFixed(1)+' cm</b> from the lens → first estimate f ≈ '+v.toFixed(1)+' cm. Start with u larger than this.'; };
+rec.onclick=()=>{ const g=geo(); if(!isFinite(g.vT)){alert('No real image: the object is inside the focal length.');return;}
+  if(Math.abs(g.vS-g.vT)*4/g.vT*12>2.5){ if(!confirm('The image is still blurred. Record anyway?')) return; }
+  rows.push({u:+g.u.toFixed(1),v:+g.vS.toFixed(1),uin:{}}); ext=null; render(); };
+function render(){ const tb=$('tb'); tb.innerHTML='';
+  rows.forEach((r,i)=>{ const tr=document.createElement('tr'); const inp=k=>'<input type="number" step="0.0001" data-k="'+k+'" style="background:#FFF8D6" value="'+(r.uin[k]??'')+'">';
+    tr.innerHTML='<td>'+(i+1)+'</td><td>'+r.u.toFixed(1)+'</td><td>'+r.v.toFixed(1)+'</td><td>'+inp('iu')+'</td><td>'+inp('iv')+'</td><td>'+inp('f')+'</td><td>'+(r.res||'')+'</td>';
+    tr.querySelectorAll('input').forEach(x=>x.oninput=()=>{r.uin[x.dataset.k]=x.value===''?null:+x.value;}); tb.appendChild(tr); });
+  const pts=rows.map(r=>[1/r.u,1/r.v]); const mx=Math.max(0.01,...pts.map(p=>Math.max(p[0],p[1])))*1.15;
+  drawPlot(plot,pts,Object.assign({xlabel:'1/u (cm⁻¹)',ylabel:'1/v (cm⁻¹)',xmin:0,ymin:0,xmax:mx,ymax:mx},ext||{})); }
+chk.onclick=()=>{ if(rows.length<5){alert('Record at least 5 pairs.');return;}
+  rows.forEach(r=>{ const iu=1/r.u, iv=1/r.v, f=r.u*r.v/(r.u+r.v); const ok=close(r.uin.iu,iu,0.01)&&close(r.uin.iv,iv,0.01)&&close(r.uin.f,f,0.01);
+    r.res=ok?'<span class="ok">✔</span>':'<span class="bad">✘ '+iu.toFixed(4)+', '+iv.toFixed(4)+', '+f.toFixed(1)+'</span>'; });
+  const fs=rows.map(r=>r.u*r.v/(r.u+r.v)), fav=fs.reduce((a,b)=>a+b,0)/fs.length, sd=Math.sqrt(fs.reduce((a,x)=>a+(x-fav)**2,0)/(fs.length-1));
+  const fit=fitLine(rows.map(r=>1/r.u),rows.map(r=>1/r.v)); const yi=fit.b, xi=-fit.b/fit.m, fg=2/(xi+yi);
+  ext={fit,extend:true}; render();
+  const ux=uX.value===''?null:+uX.value, uy=uY.value===''?null:+uY.value, up=uP.value===''?null:+uP.value;
+  let s='<b>u – v method:</b> f<sub>avg</sub> = '+fav.toFixed(2)+' ± '+sd.toFixed(2)+' cm'+
+    '<br><b>Graph:</b> slope = '+fit.m.toFixed(3)+' (expected −1) · y-intercept = '+yi.toFixed(4)+' cm⁻¹ · x-intercept = '+xi.toFixed(4)+' cm⁻¹ → <b>f = 2/(sum of intercepts) = '+fg.toFixed(2)+' cm</b>'+
+    '<br><b>Power</b> P = 1/f = 1/'+(fg/100).toFixed(4)+' m = <b>'+(100/fg).toFixed(2)+' D</b>';
+  if(ux!==null&&uy!==null) s+='<br>Your intercepts: '+((Math.abs(ux-xi)/xi<=0.05&&Math.abs(uy-yi)/yi<=0.05)?'<span class="ok">✔ within 5 %</span>':'<span class="bad">✘ read them again where your line crosses the axes</span>');
+  if(up!==null) s+='<br>Your power: '+(Math.abs(up-100/fg)/(100/fg)<=0.05?'<span class="ok">✔</span>':'<span class="bad">✘ remember f must be in metres</span>');
+  s+='<br><b>Accepted value</b> for lens '+lens.value+': f = '+F().toFixed(1)+' cm → % error: u – v method '+pct(fav,F()).toFixed(1)+' %, graph '+pct(fg,F()).toFixed(1)+' %';
+  res.innerHTML=s; };
+clr.onclick=()=>{rows=[];ext=null;render();res.innerHTML='<p class="note">Record at least 5 pairs, then check.</p>';};
+upd(); render();
+window.onTab=()=>{upd(); render();};
+</script>
+<script>
+
+buildReal({key:'exp6', intro:'One row for each sharp image: u and v measured from the centre of the lens.',
+ tables:[{id:'U', title:'Your u – v readings', rows:6, cols:[
+   {id:'u',label:'u (cm)'},{id:'v',label:'v (cm)'},
+   {id:'iu',label:'Your 1/u (cm⁻¹)',calc:1,abs:0.00015,f:o=>1/o.u},{id:'iv',label:'Your 1/v (cm⁻¹)',calc:1,abs:0.00015,f:o=>1/o.v},
+   {id:'f',label:'Your f = uv/(u+v) (cm)',calc:1,tol:0.01,f:o=>o.u*o.v/(o.u+o.v)}]}],
+ mine:[{id:'A',label:'Your A — intercept on the 1/v axis (cm⁻¹)'},{id:'B',label:'Your B — intercept on the 1/u axis (cm⁻¹)'},{id:'P',label:'Your power P (dioptres)'}],
+ plot:{xlabel:'1/u (cm⁻¹)', ylabel:'1/v (cm⁻¹)', xmin:0, ymin:0},
+ analyze:(T,K)=>{
+  const P=T.U.map(o=>[1/o.u,1/o.v]); if(P.length<3) return {html:'Enter at least three pairs.', plot:{pts:P}};
+  const fs=T.U.map(o=>o.u*o.v/(o.u+o.v)), fm=fs.reduce((a,b)=>a+b,0)/fs.length, sd=Math.sqrt(fs.reduce((a,x)=>a+(x-fm)**2,0)/Math.max(1,fs.length-1));
+  const f=fitLine(P.map(p=>p[0]),P.map(p=>p[1])); const A=f.b, B=-f.b/f.m, fg=2/(A+B);
+  let s='<b>u – v method:</b> f = '+fmt(fm,2)+' ± '+fmt(sd,2)+' cm<br><b>Graph (best fit):</b> slope = '+fmt(f.m,2)+' (should be close to −1), A = '+fmt(A,4)+' cm⁻¹, B = '+fmt(B,4)+' cm⁻¹ → <b>f = 2/(A+B) = '+fmt(fg,2)+' cm</b>; difference between the two methods = '+fmt(pct(fg,fm),1)+' %; power P = 100/f = '+fmt(100/fg,2)+' D<br>';
+  if(K.A!==null) s+='Your A: '+(close(K.A,A,0.05)?'<span class="ok">✔</span>':'<span class="bad">✘ best fit gives '+fmt(A,4)+'</span>')+'  ';
+  if(K.B!==null) s+='Your B: '+(close(K.B,B,0.05)?'<span class="ok">✔</span>':'<span class="bad">✘ best fit gives '+fmt(B,4)+'</span>');
+  if(K.P!==null) s+='<br>Your power: '+(close(K.P,100/fg,0.05)?'<span class="ok">✔</span>':'<span class="bad">✘ P = 1/f with f in metres = '+fmt(100/fg,2)+' D</span>');
+  const st=(K.A&&K.B)?{m:-K.A/K.B,b:K.A}:null;
+  return {html:s, plot:{pts:P, fit:f, student:st}};
+ }});
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>
