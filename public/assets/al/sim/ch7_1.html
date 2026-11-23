@@ -54,7 +54,7 @@ html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
 </head><body>
 <header><small>ADVANCED LASER PHYSICS 203670-3 · CHAPTER 7 · SIMULATOR 1</small><h1>Laser oscillation: rate equations, threshold and gain clamping</h1></header>
 <div class="wrap"><div class="grid"><div class="card">
- <div class="eq">dn/ds = x − n − nm ,  dm/ds = r[(n − 1)m + βn] ,  s = t/τ<br>n = N/N<sub>th</sub> ,  m = photon density in units of 1/(cστ) ,  x = R<sub>p</sub>/R<sub>th</sub> ,  r = τ/τ<sub>c</sub><br>steady state above threshold: n = 1 (gain clamped), m = x − 1</div>
+ <div class="eq">dn/ds = x − n − nm ,  dm/ds = r[(n − 1)m + βn] ,  s = t/τ<br>n = N/N<sub>th</sub> ,  m = photon density in units of 1/(cστ) ,  x = R<sub>p</sub>/R<sub>th</sub> ,  r = τ/τ<sub>c</sub><br>steady state above threshold for β → 0: n ≈ 1 (gain clamped), m ≈ x − 1<br>exact steady state for β ≠ 0: n = x/(1 + m) ,  m² + (1 − x)m − βx = 0 (non-negative root; used for the &quot;theory&quot; values)</div>
  <label>Pump x = R<sub>p</sub>/R<sub>th</sub>: <span class="val" id="v1"></span></label><input type="range" id="x" min="0.2" max="6" step="0.05" value="2">
  <label>Lifetime ratio r = τ/τ<sub>c</sub>: <span class="val" id="v2"></span></label><input type="range" id="r" min="1" max="4" step="0.05" value="3">
  <label>Spontaneous-emission factor β: <span class="val" id="v3"></span></label><input type="range" id="b" min="-9" max="-3" step="0.1" value="-6">

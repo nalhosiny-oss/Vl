@@ -126,7 +126,7 @@ html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
     <span class="eq big">L<sub>c</sub> = 2 (L<sub>2</sub> − L<sub>1</sub>)</span>
     <h3>زمن الترابط وعرض الخط الطيفي</h3>
     <span class="eq big">Δτ = L<sub>c</sub> / c</span>
-    <span class="eq big">L<sub>c</sub> = λ² / (2π Δλ)   ⟹   Δλ = λ² / (2π L<sub>c</sub>)</span>
+    <span class="eq big">L<sub>c</sub> = c / Δν = λ² / Δλ   ⟹   Δλ = λ² / L<sub>c</sub></span>
     <div class="card"><b>الأجهزة:</b> ليزر هيليوم-نيون — مقياس مايكلسون بقاعدة مدرجة بالمليمتر تسمح بإزاحة المرآة عدة سنتيمترات — مجزئ حزمة — عدسة <span class="ltr">f = 18 mm</span> — شاشة.</div>
   </section>
 
@@ -179,7 +179,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
 const Q=[
  {q:'طول الترابط هو:',o:['طول تجويف الليزر','أقصى فرق مسير يبقى عنده التداخل واضحًا','الطول الموجي لليزر','قطر الشعاع'],a:1,e:'بعده يضيع الارتباط الطوري بين الموجتين فتختفي الأهداب.'},
  {q:'إذا تحركت المرآة مسافة 5 cm من موضع تساوي الذراعين فإن فرق المسير يساوي:',o:['2.5 cm','5 cm','10 cm','20 cm'],a:2,e:'الضوء يقطع الذراع ذهابًا وإيابًا، ففرق المسير ضعف إزاحة المرآة.'},
- {q:'كلما ضاق الخط الطيفي للمصدر (Δλ أصغر) فإن طول الترابط:',o:['يقل','يزداد','لا يتغير','يصبح صفرًا'],a:1,e:'L_c = λ²/(2πΔλ)، فهو يتناسب عكسيًا مع Δλ.'},
+ {q:'كلما ضاق الخط الطيفي للمصدر (Δλ أصغر) فإن طول الترابط:',o:['يقل','يزداد','لا يتغير','يصبح صفرًا'],a:1,e:'L_c = λ²/Δλ، فهو يتناسب عكسيًا مع Δλ.'},
  {q:'عند أي موضع تكون أهداب التداخل أوضح ما يمكن؟',o:['عند تساوي طولي الذراعين تقريبًا','عند أبعد موضع للمرآة','عند إزالة مجزئ الحزمة','لا يتغير الوضوح'],a:0,e:'فرق المسير صفر فيكون الارتباط الطوري أكبر ما يمكن.'},
  {q:'زمن الترابط لليزر طول ترابطه 30 cm تقريبًا:',o:['1 ns','1 μs','1 ms','1 s'],a:0,e:'Δτ = L_c / c = 0.30 / (3×10⁸) = 1×10⁻⁹ s.'}
 ];
@@ -222,7 +222,7 @@ document.getElementById('chkBtn').onclick=()=>{if(trials.length<2){alert('سجّ
   trials.forEach((t,i)=>{const lt=lcs[i];t.res=t.u==null?'<span class="bad">لم تحسب</span>':(Math.abs(t.u-lt)<=0.05+0.01*lt?'<span class="ok">✔</span>':'<span class="bad">✘ راجع: '+lt.toFixed(1)+'</span>');
     const e=Math.abs(t.L1-t.eq); if(e>0.8) t.res+=' <span class="bad">(L₁ بعيد عن موضع تساوي الذراعين)</span>';});
   renderTable();
-  const avg=lcs.reduce((a,b)=>a+b,0)/lcs.length, tau=avg/100/3e8*1e9, dl=(632.8e-9)**2/(2*Math.PI*avg/100)*1e12;
+  const avg=lcs.reduce((a,b)=>a+b,0)/lcs.length, tau=avg/100/3e8*1e9, dl=(632.8e-9)**2/(avg/100)*1e12;
   const g=(v,ref,tol)=>v?(Math.abs(v-ref)/ref<=tol?'<span class="ok">✔ صحيح</span>':'<span class="bad">✘ راجع</span>'):'<span class="bad">لم تُدخله</span>';
   document.getElementById('resBox').innerHTML=
    'متوسط طول الترابط من قراءاتك: <span class="ltr val">L<sub>c</sub> = '+avg.toFixed(1)+' cm</span> — حسابك: '+g(+document.getElementById('myLc').value,avg,0.02)+'<br>'+
@@ -234,7 +234,7 @@ const WI=[
  {q:'كيف يكون طول الترابط لمصباح صوديوم مقارنة بالليزر؟',a:'أقصر بكثير (أجزاء من المليمتر) لأن خطه الطيفي أعرض بكثير؛ ولضوء الشمس الأبيض نحو ميكرومتر واحد فقط.'},
  {q:'ماذا لو حرّكنا المرآة في الاتجاه المعاكس من موضع التساوي؟',a:'تبهت الأهداب بالطريقة نفسها، لأن الذي يهم هو القيمة المطلقة لفرق المسير.'},
  {q:'لماذا تُستخدم ليزرات ذات طول ترابط كبير في التصوير المجسم (الهولوغرام)؟',a:'لأن الهولوغرام يسجّل تداخل ضوء انعكس من أجزاء مختلفة العمق؛ إذا كان فرق المسير أكبر من طول الترابط لن يُسجَّل تداخل.'},
- {q:'إذا كان طول الترابط 20 cm فكم عرض الخط الطيفي بالتردد تقريبًا؟',a:'Δν ≈ c / (2π L_c) ≈ 3×10⁸ / (2π × 0.2) ≈ 240 MHz.'}
+ {q:'إذا كان طول الترابط 20 cm فكم عرض الخط الطيفي بالتردد تقريبًا؟',a:'Δν ≈ c / L_c ≈ 3×10⁸ / 0.2 ≈ 1.5×10⁹ Hz = 1.5 GHz.'}
 ];
 const wi=document.getElementById('whatif');
 WI.forEach((w,i)=>{const d=document.createElement('div');d.className='q';
@@ -252,10 +252,10 @@ drawR();
          {id:'tau',label:'زمن الترابط الذي حسبته (ns)', ref:R=>R.tau, tol:{rel:0.03}, d:3},
          {id:'dl',label:'عرض الخط الطيفي الذي حسبته Δλ (pm)', ref:R=>R.dl, tol:{rel:0.03}, d:3}],
  result:(D,c)=>{const L=D[0].map(o=>2*Math.abs(o.b-o.a)); const N=L.length; const lc=L.reduce((a,b)=>a+b,0)/N;
-  const sd=N>1?Math.sqrt(L.reduce((a,b)=>a+(b-lc)**2,0)/(N-1)):0; const tau=lc/100/3e8*1e9; const dl=(c.lam*1e-9)**2/(2*Math.PI*lc/100)*1e12;
+  const sd=N>1?Math.sqrt(L.reduce((a,b)=>a+(b-lc)**2,0)/(N-1)):0; const tau=lc/100/3e8*1e9; const dl=(c.lam*1e-9)**2/(lc/100)*1e12;
   return {lc, tau, dl, lines:['<span class="ltr">L<sub>c</sub> = '+lc.toFixed(2)+(N>1?' ± '+(sd/Math.sqrt(N)).toFixed(2):'')+' cm</span>',
    '<span class="ltr">ΔT = L<sub>c</sub>/c = '+tau.toFixed(3)+' ns</span>',
-   '<span class="ltr">Δλ = λ²/(2πL<sub>c</sub>) = '+dl.toFixed(3)+' pm</span>']};}
+   '<span class="ltr">Δλ = λ²/L<sub>c</sub> = '+dl.toFixed(3)+' pm</span>']};}
 };</script>
 <script>// ===== Real-lab readings mode (shared engine) =====
 (function(){
