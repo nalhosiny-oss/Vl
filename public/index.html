@@ -79,6 +79,18 @@ mark{background:#fff1c7;color:inherit;border-radius:3px;padding:0 2px}
 .ch .go{font-size:13px;color:var(--mute);flex:none}
 .soon{padding:18px;color:var(--ink2);font-size:14px}
 
+
+/* ---------- SECTION TABS ---------- */
+.seg{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;margin-top:26px;position:sticky;top:8px;z-index:5}
+.sg{flex:1;border:0;background:transparent;border-radius:10px;padding:10px 8px;font:inherit;font-size:16px;font-weight:600;color:var(--ink2);cursor:pointer}
+.sg.on{background:var(--hero);color:#fff}
+.plan-intro{color:var(--ink2);font-size:15px;margin:22px 0 4px}
+.lvl{font-size:17px;font-weight:600;margin:24px 0 10px;display:flex;align-items:center;gap:10px}
+.lvl:after{content:"";flex:1;height:1px;background:var(--line)}
+.card.soon-c{cursor:default;border-style:dashed}
+.card.soon-c .body{padding:10px 16px 6px}.card.soon-c .name{font-size:16px}.card.soon-c .foot{padding:6px 16px;color:var(--mute)}
+#plan .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.card.soon-c:hover{transform:none;border-color:var(--line)}
 /* ---------- NEW STRIP ---------- */
 .strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
 .strip a{flex:0 0 230px;scroll-snap-align:start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
@@ -120,8 +132,13 @@ footer .wrap{padding-top:18px;padding-bottom:24px;font-size:13px;color:var(--mut
 <main class="wrap">
   <section id="results" aria-live="polite"></section>
 
+  <div class="seg" role="tablist" aria-label="أقسام المقررات">
+    <button class="sg on" role="tab" aria-selected="true" data-s="mine">مقرراتي</button>
+    <button class="sg" role="tab" aria-selected="false" data-s="plan">مقررات الخطة</button>
+  </div>
+  <div id="sec-mine">
   <div class="sec">
-    <h2>المقررات</h2>
+    <h2>مقرراتي</h2>
     <div class="chips" id="chips">
       <button class="chip on" data-f="all">الكل</button>
       <button class="chip" data-f="bsc">البكالوريوس</button>
@@ -131,6 +148,11 @@ footer .wrap{padding-top:18px;padding-bottom:24px;font-size:13px;color:var(--mut
   </div>
   <div class="grid" id="grid"></div>
   <div class="panel" id="panel"></div>
+  </div>
+  <div id="sec-plan" hidden>
+    <p class="plan-intro">بقية مقررات خطة بكالوريوس الفيزياء، مرتبة حسب المستوى الدراسي. تُضاف معامل كل مقرر تباعاً.</p>
+    <div id="plan"></div>
+  </div>
 
   <div class="sec"><h2>أُضيف حديثاً</h2></div>
   <div class="strip" id="strip"></div>
@@ -264,6 +286,49 @@ $('#strip').innerHTML = picks.map(l => { const c = byKey[l.c];
     <div class="d">${esc(c.name)} · <bdi dir="ltr">${l.d}</bdi></div><div class="t">${esc(chTitle(l))}</div></a>`; }).join('');
 
 drawCards();
+
+/* plan courses (rest of the BSc plan) */
+const PLAN = [
+  {lv:3, name:"الفيزياء العامة (2)", code:"2033002-4"},
+  {lv:3, name:"الحرارة والديناميكا الحرارية", code:"2033001-4"},
+  {lv:3, name:"الكهربية والمغناطيسية", code:"2033003-4"},
+  {lv:4, name:"الفيزياء الحديثة"},
+  {lv:4, name:"الميكانيكا الكلاسيكية (1)"},
+  {lv:4, name:"المعادلات التفاضلية التطبيقية للفيزياء"},
+  {lv:5, name:"الميكانيكا الكلاسيكية (2)"},
+  {lv:5, name:"فيزياء الجوامد (1)"},
+  {lv:5, name:"الفيزياء الرياضية (1)"},
+  {lv:6, name:"فيزياء الكم (1)"},
+  {lv:6, name:"الإلكترونيات"},
+  {lv:6, name:"الفيزياء الإحصائية"},
+  {lv:6, name:"النظرية الكهرومغناطيسية"},
+  {lv:6, name:"الفيزياء الرياضية (2)"},
+  {lv:7, name:"فيزياء الجوامد (2)"},
+  {lv:7, name:"الفيزياء النووية"},
+  {lv:8, name:"الفيزياء الإشعاعية"},
+  {lv:8, name:"فيزياء الكم (2)"}
+];
+const LVN = {3:"المستوى الثالث",4:"المستوى الرابع",5:"المستوى الخامس",6:"المستوى السادس",7:"المستوى السابع",8:"المستوى الثامن"};
+function drawPlan(){
+  const lv = [...new Set(PLAN.map(p=>p.lv))];
+  $('#plan').innerHTML = lv.map(v => `<h3 class="lvl">${LVN[v]}</h3><div class="grid">` +
+    PLAN.filter(p=>p.lv===v).map(p => {
+      const ready = !!p.href;
+      return `<${ready?'a href="'+esc(p.href)+'"':'div'} class="card${ready?'':' soon-c'}">
+        <div class="band" style="background:${p.col||'#c9cfdd'}"></div>
+        <div class="body"><p class="name">${esc(p.name)}</p>
+          <div class="code"><bdi dir="ltr">${p.code?esc(p.code):'&nbsp;'}</bdi></div>
+          ${ready?'<div class="meta"><span class="pill">بكالوريوس</span><span class="pill">نظري</span></div>':''}</div>
+        <div class="foot"><span>${ready?'افتح المعامل':'قيد الإعداد'}</span><span>${ready?'←':''}</span></div>
+      </${ready?'a':'div'}>`; }).join('') + `</div>`).join('');
+}
+drawPlan();
+function showSec(k){
+  document.querySelectorAll('.sg').forEach(b=>{ const on=b.dataset.s===k; b.classList.toggle('on',on); b.setAttribute('aria-selected',on); });
+  $('#sec-mine').hidden = k!=='mine'; $('#sec-plan').hidden = k!=='plan';
+}
+document.querySelectorAll('.sg').forEach(b => b.onclick = () => { showSec(b.dataset.s); history.replaceState(null,'',b.dataset.s==='plan'?'#plan':location.pathname); });
+if (location.hash==='#plan') showSec('plan');
 
 /* hero art: rotating Lorenz–Haken laser attractor with a travelling light point */
 (function(){
