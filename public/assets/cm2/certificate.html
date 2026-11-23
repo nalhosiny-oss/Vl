@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>شهادة إنجاز – الميكانيكا الكلاسيكية (2)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&family=Tajawal:wght@400;700&family=Amiri:wght@700&display=swap">
+<style>
+:root{--bg:#F5F6F8;--panel:#FFFFFF;--ink:#1A2230;--muted:#5A6474;--line:#DEE2E8;--acc:#0F4C5C;--acc2:#8A6D0F;--chip:#ECEFF3;--ok:#2E7D4F;--okbg:#E3F1E8;--bad:#B03A2E;--badbg:#F8E1DD}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.65}
+.wrap{max-width:820px;margin:0 auto;padding:14px}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.15rem,3.4vw,1.5rem);margin:.35em 0 .2em}
+h1 span{color:var(--acc)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px}
+.muted{color:var(--muted);font-size:.92rem}
+ul.rules{margin:.4em 0;padding-inline-start:1.2em}
+ul.rules li{margin:.2em 0}
+.btn{font:inherit;font-weight:700;border:0;background:var(--acc);color:#fff;padding:10px 22px;border-radius:12px;cursor:pointer;min-height:46px}
+.btn.ghost{background:transparent;border:1px solid var(--acc2);color:var(--acc2);font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--acc2);width:0}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.q{margin:4px 0 8px;font-size:1.02rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:9px 12px;border-radius:10px;margin:6px 0;cursor:pointer;min-height:44px}
+.opt.sel{border-color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc2)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.big{font-size:2.2rem;font-weight:700;color:var(--acc2);text-align:center}
+.rev{border-top:1px solid var(--line);padding:8px 0;font-size:.92rem}
+.rev b{color:var(--bad)}
+.rev .ok{color:var(--ok)}
+input[type=text]{width:100%;font:inherit;font-size:1.05rem;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+#certImg{width:100%;height:auto;border-radius:8px;display:block;margin-top:10px;-webkit-touch-callout:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hide{display:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<span class="badge">الميكانيكا الكلاسيكية (2) · <bdi dir="ltr">2035003-2</bdi></span>
+<h1>شهادة إنجاز <span>المعامل الافتراضية</span></h1>
+
+<section id="sIntro" class="card">
+<p>بعد أن تُنهي معامل الوحدات الثلاث، أجب عن الاختبار الختامي لتحصل على شهادة إنجاز باسمك.</p>
+<ul class="rules">
+<li><b>20 سؤالًا</b> اختيار من متعدد من الوحدات الثلاث، تُسحب عشوائيًا في كل محاولة.</li>
+<li>درجة النجاح <b>80%</b> (16 سؤالًا صحيحًا على الأقل).</li>
+<li>إن لم تنجح، راجع إجاباتك ثم أعد المحاولة بأسئلة جديدة.</li>
+<li class="muted">لا تُحفظ إجاباتك ولا تُرسل لأحد. هذه شهادة إنجاز ذاتية وليست شهادة رسمية من الجامعة.</li>
+</ul>
+<button class="btn" id="go">ابدأ الاختبار</button>
+</section>
+
+<section id="sQuiz" class="card hide">
+<div class="qn" id="qn"></div>
+<div class="bar"><i id="barI"></i></div>
+<div class="q" id="qt"></div>
+<div id="qo"></div>
+<div class="nav"><button class="btn ghost" id="prev">السابق</button><button class="btn" id="next">التالي</button></div>
+</section>
+
+<section id="sRes" class="card hide">
+<div class="muted" style="text-align:center">نتيجتك</div>
+<div class="big" id="pct"></div>
+<p id="msg" style="text-align:center"></p>
+<div id="passBox" class="hide">
+<label for="nm">اكتب اسمك كما تريده أن يظهر في الشهادة:</label>
+<input type="text" id="nm" maxlength="40" autocomplete="name">
+<button class="btn" id="mk">أنشئ الشهادة</button>
+</div>
+<div id="failBox" class="hide"><button class="btn" id="again">أعد المحاولة بأسئلة جديدة</button></div>
+<div id="review"></div>
+</section>
+
+<section id="sCert" class="card hide">
+<p class="muted" id="saveHint">على الجوال: اضغط مطوّلًا على الشهادة ثم اختر «حفظ الصورة». على الحاسب: استخدم زر التنزيل.</p>
+<img id="certImg" alt="شهادة الإنجاز">
+<div class="row"><a class="btn" id="dl" download="شهادة_إنجاز_الميكانيكا_الكلاسيكية_2.png" href="#" style="text-decoration:none;display:inline-flex;align-items:center">تنزيل الشهادة</a><button class="btn ghost" id="back">رجوع</button></div>
+<canvas id="cv" class="hide"></canvas>
+</section>
+</div>
+<script>
+const BANK=[{"c": 1, "q": "الكتلة المختزلة لجسمين m₁ وm₂:", "o": ["<span class=\"eq\" dir=\"ltr\">m₁ + m₂</span>", "<span class=\"eq\" dir=\"ltr\">m₁m₂/(m₁ + m₂)</span>", "<span class=\"eq\" dir=\"ltr\">(m₁ + m₂)/2</span>", "<span class=\"eq\" dir=\"ltr\">√(m₁m₂)</span>"], "a": 1, "e": "وتكون أصغر من أصغر الكتلتين."}, {"c": 1, "q": "في غياب القوى الخارجية، مركز كتلة نظام جسيمات:", "o": ["يتسارع دائمًا", "يتحرك بسرعة ثابتة", "يدور حول الأصل", "يبقى عند الأصل دائمًا"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">M R̈ = F<sub>ext</sub> = 0</span>"}, {"c": 1, "q": "الطاقة الحركية لنظام جسيمات تساوي:", "o": ["<span class=\"eq\" dir=\"ltr\">½MV²</span>", "<span class=\"eq\" dir=\"ltr\">½MV² + T′</span>", "<span class=\"eq\" dir=\"ltr\">T′</span>", "<span class=\"eq\" dir=\"ltr\">½MV² − T′</span>"], "a": 1, "e": "حركة مركز الكتلة + الحركة النسبية حول مركز الكتلة."}, {"c": 1, "q": "كمية الحركة الكلية في إطار مركز الكتلة:", "o": ["تساوي MV", "تساوي صفرًا", "تساوي ضعف MV", "غير معرّفة"], "a": 1, "e": "تعريف إطار مركز الكتلة."}, {"c": 1, "q": "الزخم الزاوي لنظام جسيمات حول الأصل يساوي:", "o": ["زخم مركز الكتلة فقط", "زخم مركز الكتلة + الزخم حول مركز الكتلة", "الزخم حول مركز الكتلة فقط", "صفرًا دائمًا"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">L = R × MV + Σ rᵢ′ × mᵢvᵢ′</span>"}, {"c": 1, "q": "في التصادم المرن في إطار مركز الكتلة:", "o": ["تتغير مقادير السرعات", "تبقى مقادير السرعات ويتغير اتجاهها", "يتوقف الجسيمان", "تتضاعف الطاقة"], "a": 1, "e": "حفظ الطاقة وكمية الحركة الصفرية."}, {"c": 1, "q": "جسيم يصطدم مرنًا بجسيم ساكن أثقل منه بكثير. يرتد:", "o": ["بسرعة تقارب سرعته", "بسرعة صفر", "بضعف سرعته", "لا يرتد"], "a": 0, "e": "الجسم الثقيل يكاد لا يتحرك، كارتداد كرة عن جدار."}, {"c": 2, "q": "اللاغرانجيان لنظام محافظ:", "o": ["<span class=\"eq\" dir=\"ltr\">L = T + V</span>", "<span class=\"eq\" dir=\"ltr\">L = T − V</span>", "<span class=\"eq\" dir=\"ltr\">L = V − T</span>", "<span class=\"eq\" dir=\"ltr\">L = TV</span>"], "a": 1, "e": "الطاقة الحركية ناقص طاقة الجهد."}, {"c": 2, "q": "معادلة لاغرانج للإحداثي المعمم q:", "o": ["<span class=\"eq\" dir=\"ltr\">d/dt(∂L/∂q̇) − ∂L/∂q = 0</span>", "<span class=\"eq\" dir=\"ltr\">∂L/∂q = 0</span>", "<span class=\"eq\" dir=\"ltr\">d/dt(∂L/∂q) = ∂L/∂q̇</span>", "<span class=\"eq\" dir=\"ltr\">∂L/∂t = 0</span>"], "a": 0, "e": "معادلة أويلر-لاغرانج."}, {"c": 2, "q": "عدد درجات الحرية لـ N جسيمًا في الفراغ تربطها k معادلة قيد:", "o": ["<span class=\"eq\" dir=\"ltr\">3N</span>", "<span class=\"eq\" dir=\"ltr\">3N − k</span>", "<span class=\"eq\" dir=\"ltr\">N − k</span>", "<span class=\"eq\" dir=\"ltr\">3N + k</span>"], "a": 1, "e": "كل قيد هولونومي يحذف درجة حرية."}, {"c": 2, "q": "خرزة على حلقة دوّارة: موضع الاتزان خارج القاع يظهر عندما:", "o": ["<span class=\"eq\" dir=\"ltr\">ω² < g/R</span>", "<span class=\"eq\" dir=\"ltr\">ω² > g/R</span>", "<span class=\"eq\" dir=\"ltr\">ω = 0</span>", "<span class=\"eq\" dir=\"ltr\">دائمًا</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">cosθ₀ = g/(ω²R)</span> يجب أن يكون أقل من 1."}, {"c": 2, "q": "القيد الهولونومي هو قيد:", "o": ["يعتمد على السرعات فقط", "يمكن كتابته معادلة بين الإحداثيات (والزمن)", "لا يمكن كتابته رياضيًا", "يخص الأنظمة الحرة"], "a": 1, "e": "مثل <span class=\"eq\" dir=\"ltr\">x² + y² − l² = 0</span> للبندول."}, {"c": 2, "q": "اللاغرانجيان للبندول البسيط بالإحداثي θ:", "o": ["<span class=\"eq\" dir=\"ltr\">½ml²θ̇² + mgl cosθ</span>", "<span class=\"eq\" dir=\"ltr\">½ml²θ̇² − mgl cosθ</span>", "<span class=\"eq\" dir=\"ltr\">½mθ̇²</span>", "<span class=\"eq\" dir=\"ltr\">mgl sinθ</span>"], "a": 0, "e": "V = −mgl cosθ."}, {"c": 2, "q": "البندول الزنبركي له عدد إحداثيات معممة:", "o": ["1", "2", "3", "4"], "a": 1, "e": "r وθ في مستوى الحركة."}, {"c": 3, "q": "كمية الحركة المعممة المرافقة للإحداثي q:", "o": ["<span class=\"eq\" dir=\"ltr\">p = ∂L/∂q</span>", "<span class=\"eq\" dir=\"ltr\">p = ∂L/∂q̇</span>", "<span class=\"eq\" dir=\"ltr\">p = mq</span>", "<span class=\"eq\" dir=\"ltr\">p = ∂H/∂q</span>"], "a": 1, "e": "تعريف كمية الحركة القانونية."}, {"c": 3, "q": "معادلتا هاملتون:", "o": ["<span class=\"eq\" dir=\"ltr\">q̇ = ∂H/∂p ، ṗ = −∂H/∂q</span>", "<span class=\"eq\" dir=\"ltr\">q̇ = −∂H/∂p ، ṗ = ∂H/∂q</span>", "<span class=\"eq\" dir=\"ltr\">q̇ = ∂H/∂q ، ṗ = ∂H/∂p</span>", "<span class=\"eq\" dir=\"ltr\">q̇ = p ، ṗ = q</span>"], "a": 0, "e": "معادلتان من الرتبة الأولى لكل درجة حرية."}, {"c": 3, "q": "إذا لم يظهر الإحداثي q في اللاغرانجيان (إحداثي دوري) فإن:", "o": ["q ثابت", "p_q محفوظة", "الطاقة صفر", "الحركة مستحيلة"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">ṗ = ∂L/∂q = 0</span>"}, {"c": 3, "q": "للجسيم المشحون في مجال مغناطيسي، كمية الحركة القانونية:", "o": ["<span class=\"eq\" dir=\"ltr\">mv</span>", "<span class=\"eq\" dir=\"ltr\">mv + qA</span>", "<span class=\"eq\" dir=\"ltr\">mv − qA</span>", "<span class=\"eq\" dir=\"ltr\">qA</span>"], "a": 1, "e": "لأن اللاغرانجيان يحتوي الحد q v·A."}, {"c": 3, "q": "المسارات في فضاء الطور لنظام محافظ ذي درجة حرية واحدة:", "o": ["تتقاطع كثيرًا", "لا تتقاطع أبدًا", "تكون مستقيمة دائمًا", "تمر بالأصل"], "a": 1, "e": "لكل نقطة (q, p) مستقبل وحيد بحسب معادلات هاملتون."}, {"c": 3, "q": "سرعة انجراف جسيم مشحون في مجالين E وB متعامدين:", "o": ["<span class=\"eq\" dir=\"ltr\">E/B</span>", "<span class=\"eq\" dir=\"ltr\">B/E</span>", "<span class=\"eq\" dir=\"ltr\">EB</span>", "<span class=\"eq\" dir=\"ltr\">qE/m</span>"], "a": 0, "e": "لا تعتمد على الشحنة ولا الكتلة."}, {"c": 3, "q": "الهاملتونيان للبندول البسيط:", "o": ["<span class=\"eq\" dir=\"ltr\">p²/(2ml²) − mgl cosθ</span>", "<span class=\"eq\" dir=\"ltr\">p²/(2m) + mgl</span>", "<span class=\"eq\" dir=\"ltr\">½ml²θ̇² − mgl cosθ</span>", "<span class=\"eq\" dir=\"ltr\">p²/(2ml²) + mgl cosθ</span>"], "a": 0, "e": "p = ml²θ̇."}];
+const N=20,PASS=16;
+const $=id=>document.getElementById(id);
+const show=id=>['sIntro','sQuiz','sRes','sCert'].forEach(s=>$(s).classList.toggle('hide',s!==id));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let Q=[],ans=[],k=0,score=0;
+function draw(){ // two per chapter + the rest random
+  const by={};BANK.forEach((x,i)=>{(by[x.c]=by[x.c]||[]).push(i);});
+  let pick=[];Object.values(by).forEach(l=>pick.push(...shuffle(l).slice(0,2)));
+  const rest=shuffle(BANK.map((_,i)=>i).filter(i=>!pick.includes(i)));
+  pick=pick.concat(rest.slice(0,N-pick.length));
+  Q=shuffle(pick).map(i=>{const x=BANK[i],ord=shuffle(x.o.map((_,j)=>j));return {q:x.q,o:ord.map(j=>x.o[j]),a:ord.indexOf(x.a),e:x.e,c:x.c};});
+  ans=Q.map(()=>-1);k=0;
+}
+function rQ(){
+  const it=Q[k];$('qn').textContent='السؤال '+(k+1)+' من '+N+' · الوحدة '+it.c;$('barI').style.width=((k+1)/N*100)+'%';
+  $('qt').innerHTML=it.q;const box=$('qo');box.innerHTML='';
+  it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt'+(ans[k]===j?' sel':'');b.innerHTML=t;b.onclick=()=>{ans[k]=j;rQ();};box.appendChild(b);});
+  $('prev').disabled=k===0;$('next').disabled=ans[k]<0;$('next').textContent=k===N-1?'أنهِ الاختبار':'التالي';
+}
+function finish(){
+  score=Q.filter((x,i)=>ans[i]===x.a).length;const p=Math.round(score/N*100);
+  $('pct').innerHTML='<span class="eq">'+score+' / '+N+'</span> · <span class="eq">'+p+'%</span>';
+  const ok=score>=PASS;$('msg').textContent=ok?'مبارك! اجتزت الاختبار الختامي.':'لم تبلغ 80% بعد. راجع الأسئلة التي أخطأت فيها ثم أعد المحاولة.';
+  $('passBox').classList.toggle('hide',!ok);$('failBox').classList.toggle('hide',ok);
+  const wr=Q.map((x,i)=>({x,i})).filter(o=>ans[o.i]!==o.x.a);
+  $('review').innerHTML=wr.length?'<p class="muted" style="margin-top:14px">الأسئلة التي أخطأت فيها:</p>'+wr.map(o=>'<div class="rev"><div>'+o.x.q+'</div><div><b>إجابتك:</b> '+o.x.o[ans[o.i]]+'</div><div><span class="ok">الصحيح:</span> '+o.x.o[o.x.a]+'</div><div class="muted">'+o.x.e+'</div></div>').join(''):'';
+  show('sRes');window.scrollTo(0,0);
+}
+$('go').onclick=()=>{draw();rQ();show('sQuiz');};
+$('prev').onclick=()=>{k--;rQ();};
+$('next').onclick=()=>{if(k<N-1){k++;rQ();}else finish();};
+$('again').onclick=()=>{draw();rQ();show('sQuiz');window.scrollTo(0,0);};
+$('back').onclick=()=>show('sRes');
+
+/* ---------- certificate (dark ruby theme) ---------- */
+const TH={"bg": "#0F4C5C", "frame": "#F0D98A", "accent": "#C9A227", "title": "#F2F2F2", "text": "#F5F6F8", "muted": "#B8C0CC", "name": "#FFFFFF", "beam": "#C9A227"};
+function mixLine(c,segs,cx,y){const ws=segs.map(s=>{c.direction=s.ltr?'ltr':'rtl';return c.measureText(s.t).width;});const tot=ws.reduce((a,b)=>a+b,0);let x=cx+tot/2;
+  segs.forEach((s,i)=>{x-=ws[i];c.direction=s.ltr?'ltr':'rtl';c.textAlign=s.ltr?'left':'right';c.fillText(s.t,s.ltr?x:x+ws[i],y);});c.direction='rtl';c.textAlign='center';}
+function fitFont(c,txt,weight,size,family,maxW){let s=size;do{c.font=weight+' '+s+'px '+family;s-=2;}while(c.measureText(txt).width>maxW&&s>30);}
+function drawCert(cv,d){const t=TH,W=1600,H=1131;cv.width=W;cv.height=H;const c=cv.getContext('2d');c.direction='rtl';c.textAlign='center';c.textBaseline='middle';
+  const AR="Tajawal, 'IBM Plex Sans Arabic', Tahoma, sans-serif",TT="Amiri, Tajawal, serif";
+  c.fillStyle=t.bg;c.fillRect(0,0,W,H);c.strokeStyle=t.frame;c.lineWidth=6;c.strokeRect(40,40,W-80,H-80);c.strokeStyle=t.accent;c.lineWidth=2;c.strokeRect(58,58,W-116,H-116);
+  c.fillStyle=t.accent;[[58,58],[W-58,58],[58,H-58],[W-58,H-58]].forEach(([x,y])=>{c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();});
+  const cx=W/2;c.fillStyle=t.muted;c.font='400 30px '+AR;c.fillText('المعامل الافتراضية · أ.د. نجم الحصيني',cx,150);
+  c.fillStyle=t.title;c.font='700 104px '+TT;c.fillText('شهادة إنجاز',cx,280);
+  const g=c.createLinearGradient(cx-260,0,cx+260,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,t.beam);g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(cx-260,360,520,5);
+  c.fillStyle=t.text;c.font='400 38px '+AR;c.fillText('تشهد المعامل الافتراضية بأن',cx,450);
+  c.fillStyle=t.name;fitFont(c,d.name,'700',76,AR,1250);c.fillText(d.name,cx,550);c.fillStyle=t.accent;c.fillRect(cx-300,610,600,2);
+  c.fillStyle=t.text;c.font='400 38px '+AR;
+  mixLine(c,[{t:'أتمّ معامل مقرر «الميكانيكا الكلاسيكية (2)» (\u20662035003-2\u2069)'}],cx,690);
+  mixLine(c,[{t:'واجتاز الاختبار الختامي بنسبة '},{t:d.score+'%',ltr:true}],cx,750);
+  c.font='400 28px '+AR;c.fillStyle=t.muted;const fy=920;c.fillText('التاريخ',W-300,fy);c.fillText('أستاذ المقرر',300,fy);
+  c.fillStyle=t.text;c.font='700 34px '+AR;c.direction='ltr';c.fillText(d.date,W-300,fy+50);c.direction='rtl';c.fillText('أ.د. نجم الحصيني',300,fy+50);
+  c.save();c.translate(cx,955);c.fillStyle=t.accent;c.beginPath();c.arc(0,0,62,0,Math.PI*2);c.fill();c.strokeStyle=t.bg;c.lineWidth=3;c.beginPath();c.arc(0,0,50,0,Math.PI*2);c.stroke();
+  c.lineWidth=9;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-22,2);c.lineTo(-6,18);c.lineTo(24,-16);c.stroke();c.restore();}
+$('mk').onclick=async()=>{
+  const name=$('nm').value.replace(/\s+/g,' ').trim();if(name.length<3){$('nm').focus();return;}
+  $('mk').disabled=true;
+  try{await Promise.race([Promise.all([document.fonts.load("700 76px Tajawal",name),document.fonts.load("400 38px Tajawal","أتم"),document.fonts.load("700 104px Amiri","شهادة")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  const d=new Date(),date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+  drawCert($('cv'),{name,score:Math.round(score/N*100),date});
+  const url=$('cv').toDataURL('image/png');$('certImg').src=url;$('dl').href=url;$('mk').disabled=false;show('sCert');window.scrollTo(0,0);
+};
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>
