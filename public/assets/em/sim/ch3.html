@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل دوائر التيار المستمر</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style>.readout .eq[dir=rtl]{text-align:right;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;font-size:1rem}.readout .eq{margin:2px 0}.readout .ltr{display:inline-block;direction:ltr;font-family:'STIX Two Text',serif}</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل دوائر التيار المستمر</h1><p>الكهربية والمغناطيسية – الوحدة الثالثة. القوة الدافعة الكهربية، وقاعدتا كيرشوف وتطبيقاتهما، وشحن المكثف وتفريغه عبر مقاومة.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">القوة الدافعة والمقاومة الداخلية</button><button role="tab" aria-selected="false" data-t="t2">قاعدتا كيرشوف</button><button role="tab" aria-selected="false" data-t="t3">شحن المكثف وتفريغه</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="بطارية لها مقاومة داخلية موصولة بمقاومة خارجية"></canvas><div class="ctrl"><label>القوة الدافعة ε (V) <b id="o1e"></b></label><input id="i1e" type="range" min="1" max="24" step="0.5" value="12"><label>المقاومة الداخلية r (Ω) <b id="o1r"></b></label><input id="i1r" type="range" min="0.1" max="5" step="0.1" value="1"><label>المقاومة الخارجية R (Ω) <b id="o1R"></b></label><input id="i1R" type="range" min="0.1" max="20" step="0.1" value="5"><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span><span class="eq" id="r1d"></span></div><div class="task"><h3>سؤال</h3>عند أي قيمة لـ R تكون القدرة المنقولة إلى المقاومة الخارجية أكبر ما يمكن؟ ولماذا يقل فرق الجهد بين طرفي البطارية عندما يزداد التيار؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="دائرة بعروتين وبطاريتين وثلاث مقاومات"></canvas><div class="ctrl"><label>ε₁ (V) <b id="o2a"></b></label><input id="i2a" type="range" min="0" max="20" step="0.5" value="12"><label>ε₂ (V) <b id="o2b"></b></label><input id="i2b" type="range" min="0" max="20" step="0.5" value="6"><label>R₁ (Ω) <b id="o2x"></b></label><input id="i2x" type="range" min="1" max="20" step="0.5" value="4"><label>R₂ (Ω) <b id="o2y"></b></label><input id="i2y" type="range" min="1" max="20" step="0.5" value="6"><label>R₃ (Ω) <b id="o2z"></b></label><input id="i2z" type="range" min="1" max="20" step="0.5" value="3"><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span><span class="eq" id="r2d"></span></div><div class="task"><h3>سؤال</h3>تحقق من قاعدة الوصلة عند العقدة: هل I₁ + I₂ = I₃؟ وماذا تعني الإشارة السالبة لتيار ما؟</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="دائرة RC أثناء الشحن والتفريغ مع منحنيي الشحنة والتيار"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="m1">شحن</button><button class="btn" type="button" id="m2">تفريغ</button></div><label>ε (V) <b id="o3e"></b></label><input id="i3e" type="range" min="1" max="20" step="0.5" value="10"><label>R (kΩ) <b id="o3R"></b></label><input id="i3R" type="range" min="1" max="100" step="1" value="20"><label>C (μF) <b id="o3C"></b></label><input id="i3C" type="range" min="10" max="500" step="10" value="100"><div class="row"><button class="btn" type="button" id="p3">ابدأ من جديد</button></div><div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span class="eq" id="r3c"></span><span class="eq" id="r3d"></span></div><div class="task"><h3>سؤال</h3>كم ثابتًا زمنيًا τ يلزم ليبلغ المكثف 99% من شحنته القصوى تقريبًا؟</div></div></section>
+<footer>المعامل الافتراضية · إعداد أ.د. نجم الحصيني · قسم الفيزياء، جامعة الطائف</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;const T0={};
+const el=k=>T-(T0[k]||0),rs=k=>{T0[k]=T;};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;rs(active);}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.textBaseline='alphabetic';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function ring(g,x,y,r,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){if(Math.hypot(x1-x0,y1-y0)<4)return;seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function poly(g,pts,col,w,d){if(pts.length<2)return;g.setLineDash(d||[]);g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts)g.lineTo(p[0],p[1]);g.strokeStyle=col;g.lineWidth=w||2;g.stroke();g.setLineDash([]);}
+function box(g,x0,y0,w,h,fc){g.fillStyle=fc||css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+function axes(g,x0,y0,w,h,xl,yl){g.fillStyle=css('--plot');seg(g,x0,y0,x0+w,y0,css('--muted'),2);seg(g,x0,y0,x0,y0-h,css('--muted'),2);for(let i=1;i<=4;i++){seg(g,x0+i*w/4,y0,x0+i*w/4,y0-h,css('--grid'),1);seg(g,x0,y0-i*h/4,x0+w,y0-i*h/4,css('--grid'),1);}text(g,xl,x0+w,y0+30,css('--muted'),'right',20);text(g,yl,x0+6,y0-h-10,css('--muted'),'left',20);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const set=(o)=>{for(const k in o)$(k).value=o[k];};
+const deg=Math.PI/180,G=9.8;
+const R=(id,s)=>{const e=$(id);if(!/[؀-ۿ]/.test(s)){e.dir='ltr';e.textContent=s;return;}e.dir='rtl';const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ e.innerHTML=s.split(/([؀-ۿ][؀-ۿ\s()⚠]*)/).map((p,i)=>{if(i%2)return esc(p);const t=p.trim();if(!t)return p;return (/^\s/.test(p)?' ':'')+'<span class="ltr">'+esc(t)+'</span>'+(/\s$/.test(p)?' ':'');}).join('');};
+const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=1e5||a<1e-3))return v.toExponential(d===undefined?2:d).replace('e','×10^').replace('+','');return v.toFixed(d===undefined?2:d);};
+
+
+function lab1(){const g=ctx('c1'),e=sl('i1e','o1e',v=>v.toFixed(1)),r=sl('i1r','o1r',v=>v.toFixed(1)),Rr=sl('i1R','o1R',v=>v.toFixed(1));const I=e/(Rr+r),Vt=e-I*r,P=I*I*Rr,Pm=e*e/(4*r);
+ R('r1a','I = ε/(R + r) = '+I.toFixed(2)+' A');R('r1b','فرق الجهد الطرفي ΔV = ε − Ir = '+Vt.toFixed(2)+' V');R('r1c','القدرة في R: P = I²R = '+P.toFixed(2)+' W');R('r1d','أقصى قدرة عند R = r: Pmax = ε²/4r = '+Pm.toFixed(2)+' W');
+ const x0=80,y0=120,w=380,h=300;g.strokeStyle=css('--ink');g.lineWidth=3;g.strokeRect(x0,y0,w,h);g.fillStyle=css('--plot');g.fillRect(x0-30,y0+40,60,220);seg(g,x0-22,y0+80,x0+22,y0+80,css('--ink'),4);seg(g,x0-12,y0+100,x0+12,y0+100,css('--ink'),8);seg(g,x0,y0+40,x0,y0+80,css('--ink'),3);seg(g,x0,y0+100,x0,y0+150,css('--ink'),3);text(g,'ε',x0-36,y0+98,css('--ink'),'right',24);
+ const zig=(xa,ya,xb,col)=>{const p=[[xa,ya]];for(let i=1;i<10;i++)p.push([xa+(xb-xa)*i/10,ya+(i%2?-12:12)]);p.push([xb,ya]);g.fillStyle=css('--plot');g.fillRect(xa,ya-16,xb-xa,32);poly(g,p,col,3);};
+ const zp=[[x0,y0+150]];for(let i=1;i<10;i++)zp.push([x0+(i%2?-12:12),y0+150+i*8]);zp.push([x0,y0+230]);poly(g,zp,css('--o'),3);seg(g,x0,y0+230,x0,y0+260,css('--ink'),3);text(g,'r',x0+22,y0+198,css('--o'),'left',24);
+ seg(g,x0-40,y0+40,x0-40,y0+260,css('--muted'),1.5,[4,5]);text(g,'البطارية',x0-46,y0+290,css('--muted'),'center',16,true);
+ zig(x0+140,y0,x0+240,css('--r'));text(g,'R',x0+190,y0-24,css('--r'),'center',24);const ph=(el('t1')*I*0.4)%1;for(let i=0;i<10;i++){const s=(i/10+ph)%1,L=2*(w+h),d=s*L;let px,py;if(d<w){px=x0+d;py=y0;}else if(d<w+h){px=x0+w;py=y0+d-w;}else if(d<2*w+h){px=x0+w-(d-w-h);py=y0+h;}else{px=x0;py=y0+h-(d-2*w-h);}dot(g,px,py,5,css('--b'));}
+ const X0=600,Y0=520,W=540,H=420;axes(g,X0,Y0,W,H,'R (Ω)','P (W)');const p=[];for(let i=1;i<=200;i++){const RR=20*i/200;p.push([X0+i/200*W,Y0-e*e*RR/Math.pow(RR+r,2)/Pm*H*0.9]);}poly(g,p,css('--b'),3);dot(g,X0+Rr/20*W,Y0-P/Pm*H*0.9,9,css('--o'));seg(g,X0+r/20*W,Y0,X0+r/20*W,Y0-H*0.9,css('--muted'),1,[4,5]);text(g,'R = r',X0+r/20*W,Y0+30,css('--muted'),'center',18);}
+function lab2(){const g=ctx('c2'),e1=sl('i2a','o2a',v=>v.toFixed(1)),e2=sl('i2b','o2b',v=>v.toFixed(1)),R1=sl('i2x','o2x',v=>v.toFixed(1)),R2=sl('i2y','o2y',v=>v.toFixed(1)),R3=sl('i2z','o2z',v=>v.toFixed(1));
+ // loop1: e1 - I1R1 - I3R3 =0 ; loop2: e2 - I2R2 - I3R3 = 0 ; I3=I1+I2
+ const D=R1*R2+R1*R3+R2*R3,I1=(e1*(R2+R3)-e2*R3)/D,I2=(e2*(R1+R3)-e1*R3)/D,I3=I1+I2;
+ R('r2a','I₁ = '+I1.toFixed(3)+' A،  I₂ = '+I2.toFixed(3)+' A،  I₃ = '+I3.toFixed(3)+' A');R('r2b','قاعدة الوصلة: I₁ + I₂ = I₃ = '+I3.toFixed(3)+' A');R('r2c','العروة اليسرى: ε₁ − I₁R₁ − I₃R₃ = '+(e1-I1*R1-I3*R3).toFixed(3)+' V');R('r2d','العروة اليمنى: ε₂ − I₂R₂ − I₃R₃ = '+(e2-I2*R2-I3*R3).toFixed(3)+' V');
+ const xl=180,xm=600,xr=1020,yt=120,yb=480;g.strokeStyle=css('--ink');g.lineWidth=3;g.beginPath();g.moveTo(xl,yt);g.lineTo(xr,yt);g.lineTo(xr,yb);g.lineTo(xl,yb);g.closePath();g.stroke();seg(g,xm,yt,xm,yb,css('--ink'),3);
+ const res=(x,y,vert,lab)=>{g.fillStyle=css('--plot');if(vert)g.fillRect(x-20,y-50,40,100);else g.fillRect(x-50,y-20,100,40);const p=[];for(let i=0;i<=10;i++)p.push(vert?[x+(i%2?14:-14)*(i>0&&i<10),y-50+i*10]:[x-50+i*10,y+(i%2?14:-14)*(i>0&&i<10)]);poly(g,p,css('--r'),3);text(g,lab,vert?x+28:x,vert?y+8:y-28,css('--r'),vert?'left':'center',22);};
+ res((xl+xm)/2,yt,false,'R₁');res((xm+xr)/2,yt,false,'R₂');res(xm,(yt+yb)/2,true,'R₃');
+ const bat=(x,lab)=>{g.fillStyle=css('--plot');g.fillRect(x-30,(yt+yb)/2-30,60,60);seg(g,x-26,(yt+yb)/2-6,x+26,(yt+yb)/2-6,css('--ink'),4);seg(g,x-14,(yt+yb)/2+10,x+14,(yt+yb)/2+10,css('--ink'),8);text(g,lab,x+(x<xm?-40:40),(yt+yb)/2+8,css('--ink'),x<xm?'right':'left',24);};bat(xl,'ε₁');bat(xr,'ε₂');
+ const ia=(x,y,dx,dy,I,l)=>{const s=Math.sign(I)||1;arrow(g,x-dx*20*s,y-dy*20*s,x+dx*20*s,y+dy*20*s,css('--b'),4);text(g,l+' = '+Math.abs(I).toFixed(2)+' A',x,y+(dy?0:42),css('--b'),'center',20);};ia(xl+80,yt,1,0,I1,'I₁');ia(xr-80,yt,-1,0,I2,'I₂');ia(xm+60,yb-80,0,1,I3,'I₃');text(g,'الأسهم بالاتجاه الحقيقي للتيار',600,570,css('--muted'),'center',18,true);}
+let CH=true;$('m1').onclick=()=>{CH=true;rs('t3');};$('m2').onclick=()=>{CH=false;rs('t3');};$('p3').onclick=()=>rs('t3');
+function lab3(){const g=ctx('c3'),e=sl('i3e','o3e',v=>v.toFixed(1)),Rr=sl('i3R','o3R')*1e3,C=sl('i3C','o3C')*1e-6,tau=Rr*C,t=Math.min(el('t3')*tau/1.5,5*tau);const Q=C*e,q=CH?Q*(1-Math.exp(-t/tau)):Q*Math.exp(-t/tau),I=(CH?1:-1)*e/Rr*Math.exp(-t/tau);
+ R('r3a','τ = RC = '+tau.toFixed(2)+' s');R('r3b',(CH?'شحن: q = Q(1 − e^(−t/τ))':'تفريغ: q = Q e^(−t/τ)')+'،  Q = Cε = '+(Q*1e6).toFixed(0)+' μC');R('r3c','t = '+t.toFixed(2)+' s:  q = '+(q*1e6).toFixed(1)+' μC،  I = '+(I*1e3).toFixed(3)+' mA');R('r3d','q/Q = '+(q/Q*100).toFixed(1)+' %');
+ const X0=110,W=1020,xs=tt=>X0+tt/(5*tau)*W;const Y1=270,H1=210,Y2=540,H2=210;axes(g,X0,Y1,W,H1,'t','q');axes(g,X0,Y2,W,H2,'t','|I|');const p1=[],p2=[];for(let i=0;i<=200;i++){const tt=5*tau*i/200,qq=CH?1-Math.exp(-tt/tau):Math.exp(-tt/tau);p1.push([xs(tt),Y1-qq*H1*0.9]);p2.push([xs(tt),Y2-Math.exp(-tt/tau)*H2*0.9]);}
+ poly(g,p1,css('--b'),3);poly(g,p2,css('--r'),3);dot(g,xs(t),Y1-q/Q*H1*0.9,8,css('--o'));dot(g,xs(t),Y2-Math.abs(I)*Rr/e*H2*0.9,8,css('--o'));for(let k=1;k<=5;k++){seg(g,xs(k*tau),Y1,xs(k*tau),Y1+8,css('--muted'),2);text(g,k+'τ',xs(k*tau),Y1+28,css('--muted'),'center',16);}}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3};
+function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

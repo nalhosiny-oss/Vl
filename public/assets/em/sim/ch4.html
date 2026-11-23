@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل المجال المغناطيسي</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style>.readout .eq[dir=rtl]{text-align:right;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;font-size:1rem}.readout .eq{margin:2px 0}.readout .ltr{display:inline-block;direction:ltr;font-family:'STIX Two Text',serif}</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل المجال المغناطيسي</h1><p>الكهربية والمغناطيسية – الوحدة الرابعة. القوة على الشحنات المتحركة، ومنتقي السرعات ومطياف الكتلة، والعزم على ملف يمر فيه تيار.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">القوة على شحنة متحركة</button><button role="tab" aria-selected="false" data-t="t2">منتقي السرعات ومطياف الكتلة</button><button role="tab" aria-selected="false" data-t="t3">العزم على ملف</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="جسيم مشحون يتحرك في مسار دائري داخل مجال مغناطيسي منتظم"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="a1">بروتون</button><button class="btn" type="button" id="a2">إلكترون</button><button class="btn" type="button" id="a3">جسيم ألفا</button></div><label>السرعة v (×10⁶ m/s) <b id="o1v"></b></label><input id="i1v" type="range" min="0.5" max="10" step="0.1" value="2"><label>المجال B (T) <b id="o1B"></b></label><input id="i1B" type="range" min="0.05" max="1" step="0.01" value="0.35"><label>الزاوية بين v وB <b id="o1t"></b></label><input id="i1t" type="range" min="0" max="180" step="1" value="90"><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span><span class="eq" id="r1d"></span></div><div class="task"><h3>سؤال</h3>ضاعف السرعة. ماذا يحدث لنصف قطر المسار وللزمن الدوري؟ ولماذا لا يغيّر المجال المغناطيسي مقدار سرعة الجسيم؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="أيونات تمر في منتقي سرعات ثم تنحرف في مجال لتفصل النظائر"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="s1">كربون ¹²C ¹³C ¹⁴C</button><button class="btn" type="button" id="s2">كلور ³⁵Cl ³⁷Cl</button><button class="btn" type="button" id="s3">يورانيوم ²³⁵U ²³⁸U</button></div><label>المجال الكهربي E (×10³ V/m) <b id="o2E"></b></label><input id="i2E" type="range" min="1" max="50" step="0.5" value="10"><label>مجال المنتقي B (T) <b id="o2B"></b></label><input id="i2B" type="range" min="0.05" max="0.5" step="0.01" value="0.1"><label>مجال الانحراف B₀ (T) <b id="o2b"></b></label><input id="i2b" type="range" min="0.05" max="1" step="0.01" value="0.2"><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span><span class="eq" id="r2d"></span></div><div class="task"><h3>سؤال</h3>لماذا تخرج كل الأيونات من المنتقي بالسرعة نفسها؟ وأي نظير يسقط أبعد عن الفتحة؟</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="ملف يمر فيه تيار داخل مجال مغناطيسي يدور بفعل العزم"></canvas><div class="ctrl"><label>عدد اللفات N <b id="o3n"></b></label><input id="i3n" type="range" min="1" max="200" step="1" value="50"><label>التيار I (A) <b id="o3i"></b></label><input id="i3i" type="range" min="0.1" max="5" step="0.1" value="1"><label>مساحة الملف A (cm²) <b id="o3a"></b></label><input id="i3a" type="range" min="10" max="200" step="5" value="50"><label>المجال B (T) <b id="o3b"></b></label><input id="i3b" type="range" min="0.05" max="1" step="0.01" value="0.5"><div class="row"><button class="btn" type="button" id="p3">أطلق الملف</button></div><div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span class="eq" id="r3c"></span><span class="eq" id="r3d"></span></div><div class="task"><h3>سؤال</h3>أطلق الملف. عند أي وضع يستقر؟ ولماذا يحتاج المحرك الكهربائي إلى عاكس تيار ليستمر في الدوران؟</div></div></section>
+<footer>المعامل الافتراضية · إعداد أ.د. نجم الحصيني · قسم الفيزياء، جامعة الطائف</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;const T0={};
+const el=k=>T-(T0[k]||0),rs=k=>{T0[k]=T;};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;rs(active);}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.textBaseline='alphabetic';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function ring(g,x,y,r,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){if(Math.hypot(x1-x0,y1-y0)<4)return;seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function poly(g,pts,col,w,d){if(pts.length<2)return;g.setLineDash(d||[]);g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts)g.lineTo(p[0],p[1]);g.strokeStyle=col;g.lineWidth=w||2;g.stroke();g.setLineDash([]);}
+function box(g,x0,y0,w,h,fc){g.fillStyle=fc||css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+function axes(g,x0,y0,w,h,xl,yl){g.fillStyle=css('--plot');seg(g,x0,y0,x0+w,y0,css('--muted'),2);seg(g,x0,y0,x0,y0-h,css('--muted'),2);for(let i=1;i<=4;i++){seg(g,x0+i*w/4,y0,x0+i*w/4,y0-h,css('--grid'),1);seg(g,x0,y0-i*h/4,x0+w,y0-i*h/4,css('--grid'),1);}text(g,xl,x0+w,y0+30,css('--muted'),'right',20);text(g,yl,x0+6,y0-h-10,css('--muted'),'left',20);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const set=(o)=>{for(const k in o)$(k).value=o[k];};
+const deg=Math.PI/180,G=9.8;
+const R=(id,s)=>{const e=$(id);if(!/[؀-ۿ]/.test(s)){e.dir='ltr';e.textContent=s;return;}e.dir='rtl';const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ e.innerHTML=s.split(/([؀-ۿ][؀-ۿ\s()⚠]*)/).map((p,i)=>{if(i%2)return esc(p);const t=p.trim();if(!t)return p;return (/^\s/.test(p)?' ':'')+'<span class="ltr">'+esc(t)+'</span>'+(/\s$/.test(p)?' ':'');}).join('');};
+const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=1e5||a<1e-3))return v.toExponential(d===undefined?2:d).replace('e','×10^').replace('+','');return v.toFixed(d===undefined?2:d);};
+
+
+const qe=1.602e-19,mp=1.673e-27,me=9.109e-31;let PT={n:'البروتون',q:qe,m:mp};$('a1').onclick=()=>PT={n:'البروتون',q:qe,m:mp};$('a2').onclick=()=>PT={n:'الإلكترون',q:-qe,m:me};$('a3').onclick=()=>PT={n:'جسيم ألفا',q:2*qe,m:6.645e-27};
+function lab1(){const g=ctx('c1'),v=sl('i1v','o1v',v=>v.toFixed(1))*1e6,B=sl('i1B','o1B',v=>v.toFixed(2)),th=sl('i1t','o1t',v=>v+'°')*deg;const F=Math.abs(PT.q)*v*B*Math.sin(th),vp=v*Math.sin(th),r=PT.m*vp/(Math.abs(PT.q)*B),T=2*Math.PI*PT.m/(Math.abs(PT.q)*B);
+ R('r1a',PT.n+':  F = |q|vB sinθ = '+f2(F,2)+' N');R('r1b','نصف القطر r = mv⊥/(|q|B) = '+(r<1?(r*100).toFixed(2)+' cm':r.toFixed(2)+' m'));R('r1c','الزمن الدوري T = 2πm/(|q|B) = '+f2(T,2)+' s (لا يعتمد على v)');R('r1d',Math.sin(th)<0.01?'v توازي B: لا قوة، فيتحرك الجسيم في خط مستقيم':'الخطوة (للمسار الحلزوني) = '+f2(v*Math.cos(th)*T,2)+' m');
+ for(let x=60;x<1200;x+=80)for(let y=50;y<600;y+=80){ring(g,x,y,8,css('--muted'),1.5);seg(g,x-5,y-5,x+5,y+5,css('--muted'),1.5);seg(g,x-5,y+5,x+5,y-5,css('--muted'),1.5);}text(g,'B داخل الصفحة ⊗',1180,30,css('--muted'),'right',18,true);
+ const cx=600,cy=300,rp=Math.min(240,Math.max(30,Math.log10(r/1e-4+1)*70)),dir=PT.q>0?1:-1,a=el('t1')*2*dir,x=cx+rp*Math.cos(a),y=cy-rp*Math.sin(a);ring(g,cx,cy,rp,css('--line'),2,[8,8]);
+ if(Math.sin(th)>0.01){arrow(g,x,y,x-dir*Math.sin(a)*70,y-dir*Math.cos(a)*70,css('--b'),4);arrow(g,x,y,x+(cx-x)/rp*60,y+(cy-y)/rp*60,css('--r'),4);text(g,'v',x-dir*Math.sin(a)*80,y-dir*Math.cos(a)*80,css('--b'),'center',22);text(g,'F',x+(cx-x)/rp*75,y+(cy-y)/rp*75,css('--r'),'center',22);}dot(g,x,y,12,PT.q>0?css('--r'):css('--b'));text(g,'نصف القطر المرسوم بمقياس لوغاريتمي',600,585,css('--muted'),'center',18,true);}
+let ISO={n:[12,13,14],l:['¹²C⁺','¹³C⁺','¹⁴C⁺']};$('s1').onclick=()=>ISO={n:[12,13,14],l:['¹²C⁺','¹³C⁺','¹⁴C⁺']};$('s2').onclick=()=>ISO={n:[35,37],l:['³⁵Cl⁺','³⁷Cl⁺']};$('s3').onclick=()=>ISO={n:[235,238],l:['²³⁵U⁺','²³⁸U⁺']};
+function lab2(){const g=ctx('c2'),E=sl('i2E','o2E',v=>v.toFixed(1))*1e3,B=sl('i2B','o2B',v=>v.toFixed(2)),B0=sl('i2b','o2b',v=>v.toFixed(2)),u=1.6605e-27;const v=E/B,rs_=ISO.n.map(A=>A*u*v/(qe*B0));
+ R('r2a','السرعة بعد المنتقي v = E/B = '+f2(v,0)+' m/s');R('r2b','نصف القطر r = mv/(qB₀): '+ISO.l.map((l,i)=>l+' '+(rs_[i]*100).toFixed(2)+' cm').join('،  '));R('r2c','المسافة بين أثري أول نظيرين على الكاشف Δ(2r) = '+((rs_[1]-rs_[0])*200).toFixed(2)+' mm'.replace('mm','cm'));R('r2d','m = qB₀r/v،  فالأثقل أبعد');
+ g.fillStyle='rgba(194,54,47,.15)';g.fillRect(60,250,260,100);text(g,'+ + + + + + + +',190,244,css('--r'),'center',22);text(g,'− − − − − − − −',190,374,css('--b'),'center',22);text(g,'منتقي السرعات',190,410,css('--muted'),'center',18,true);seg(g,320,250,320,290,css('--ink'),5);seg(g,320,310,320,350,css('--ink'),5);
+ seg(g,320,300,1180,300,css('--ink'),3);const mx=Math.max(...rs_),sc=Math.min(260/mx,4000);const cols=[css('--r'),css('--o'),css('--b')];
+ rs_.forEach((r,i)=>{const R_=r*sc*(1+i*0.0);g.strokeStyle=cols[i];g.lineWidth=3;g.beginPath();g.arc(320+R_,300,R_,Math.PI,0,false);g.stroke();dot(g,320+2*R_,300,7,cols[i]);text(g,ISO.l[i],320+2*R_,330+i*24,cols[i],'center',18);});
+ dot(g,90+((el('t2')*120)%230),300,6,css('--ink'));text(g,'B₀ خارج الصفحة ⊙',1180,40,css('--muted'),'right',18,true);text(g,'الكاشف',900,290,css('--muted'),'center',18,true);}
+let th3=Math.PI/2,w3=0,run=false;$('p3').onclick=()=>{th3=Math.PI*0.9;w3=0;run=true;};
+function lab3(){const g=ctx('c3'),N=sl('i3n','o3n'),I=sl('i3i','o3i',v=>v.toFixed(1)),A=sl('i3a','o3a')/1e4,B=sl('i3b','o3b',v=>v.toFixed(2));const mu=N*I*A;if(run){const a=-mu*B*Math.sin(th3)*4-w3*0.9;w3+=a*0.016;th3+=w3*0.016;}const tq=mu*B*Math.sin(th3),U=-mu*B*Math.cos(th3);
+ R('r3a','العزم المغناطيسي μ = NIA = '+mu.toFixed(3)+' A·m²');R('r3b','τ = μB sinθ = '+tq.toFixed(3)+' N·m عند θ = '+(((th3/deg)%360+360)%360).toFixed(0)+'°');R('r3c','طاقة الوضع U = −μB cosθ = '+U.toFixed(3)+' J');R('r3d','أقصى عزم عند θ = 90°:  '+(mu*B).toFixed(3)+' N·m');
+ const cx=420,cy=300;for(let y=80;y<560;y+=60)arrow(g,40,y,1160,y,css('--line'),1.5);text(g,'B',1150,70,css('--muted'),'right',24);const L=170,ex=L*Math.sin(th3),ey=L*Math.cos(th3);
+ seg(g,cx-ex,cy-ey,cx+ex,cy+ey,css('--o'),10);dot(g,cx-ex,cy-ey,9,css('--ink'));dot(g,cx+ex,cy+ey,9,css('--ink'));text(g,'⊙',cx-ex,cy-ey-16,css('--ink'),'center',22);text(g,'⊗',cx+ex,cy+ey+30,css('--ink'),'center',22);
+ arrow(g,cx-ex,cy-ey,cx-ex,cy-ey-70,css('--r'),4);arrow(g,cx+ex,cy+ey,cx+ex,cy+ey+70,css('--r'),4);arrow(g,cx,cy,cx+150*Math.cos(th3),cy-150*Math.sin(th3),css('--b'),5);text(g,'μ',cx+170*Math.cos(th3),cy-170*Math.sin(th3)+8,css('--b'),'center',26);
+ const X0=760,Y0=500,W=380,H=300;axes(g,X0,Y0,W,H,'θ','τ');const p=[];for(let i=0;i<=100;i++){const t=Math.PI*2*i/100;p.push([X0+i/100*W,Y0-H/2-Math.sin(t)*H*0.45]);}poly(g,p,css('--r'),3);const tt=((th3%(2*Math.PI))+2*Math.PI)%(2*Math.PI);dot(g,X0+tt/(2*Math.PI)*W,Y0-H/2-Math.sin(tt)*H*0.45,8,css('--o'));seg(g,X0,Y0-H/2,X0+W,Y0-H/2,css('--muted'),1,[4,5]);text(g,'منظر علوي: الملف يُرى من حافته',420,585,css('--muted'),'center',18,true);}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3};
+function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>
