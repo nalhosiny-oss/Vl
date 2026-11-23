@@ -108,7 +108,7 @@ function lab1(){const g=ctx('c1'),V1=sl('i1v','o1v'),X=sl('i1x','o1x'),T1=sl('i1
  else if(PR===1){T2=T1*V2/V1;for(let i=0;i<=50;i++)pts.push([V1+(V2-V1)*i/50,P1]);W=P1*(V2-V1)/1000;dU=n*Cv*(T2-T1);Q=dU+W;}
  else if(PR===2){T2=T1;for(let i=0;i<=80;i++){const v=V1+(V2-V1)*i/80;pts.push([v,n*Rg*T1/(v/1000)]);}W=n*Rg*T1*Math.log(V2/V1);Q=W;}
  else{T2=T1*Math.pow(V1/V2,gm-1);for(let i=0;i<=80;i++){const v=V1+(V2-V1)*i/80;pts.push([v,P1*Math.pow(V1/v,gm)]);}dU=n*Cv*(T2-T1);W=-dU;}
- R('r1a','عملية '+PN[PR]+' لمول من غاز ثنائي الذرة (γ = 1.4)');R('r1b','T₂ = '+T2.toFixed(0)+' K'+(PR===0?' (المنزلق الثاني × 20 K)':''));R('r1c','W = '+W.toFixed(0)+' J،  Q = '+Q.toFixed(0)+' J،  ΔU = '+dU.toFixed(0)+' J');R('r1d',PR===3?'أديباتية: Q = 0 و PV^γ ثابت':PR===2?'متساوية الحرارة: ΔU = 0 و Q = W':PR===1?'W = PΔV':'W = 0 لأن الحجم ثابت');
+ R('r1a','عملية '+PN[PR]+' لمول من غاز ثنائي الذرة (γ = 1.4)');R('r1b','T₂ = '+T2.toFixed(0)+' K'+(PR===0?' (المنزلق الثاني × 20 K)':''));R('r1c','W = '+W.toFixed(0)+' J،  Q = '+Q.toFixed(0)+' J،  ΔU = '+dU.toFixed(0)+' J');R('r1d',PR===3?'أديباتية عكوسة لغاز مثالي (γ ثابت): Q = 0 و PV^γ ثابت':PR===2?'متساوية الحرارة: ΔU = 0 و Q = W':PR===1?'W = PΔV':'W = 0 لأن الحجم ثابت');
  const X0=110,Y0=520,W0=1020,H=440,pm=Math.max(...pts.map(p=>p[1]),P1)*1.15,xs=v=>X0+v/45*W0,ys=p=>Y0-p/pm*H;axes(g,X0,Y0,W0,H,'V (L)','P');
  for(const t of [200,300,400,500,600]){const q=[];for(let v=4;v<=45;v+=0.5)q.push([xs(v),ys(n*Rg*t/(v/1000))]);poly(g,q.filter(p=>p[1]>Y0-H),css('--line'),1.5);}
  if(PR!==0){g.fillStyle='rgba(194,54,47,.15)';g.beginPath();g.moveTo(xs(pts[0][0]),Y0);pts.forEach(p=>g.lineTo(xs(p[0]),ys(p[1])));g.lineTo(xs(pts[pts.length-1][0]),Y0);g.closePath();g.fill();}

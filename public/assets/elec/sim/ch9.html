@@ -122,7 +122,7 @@ const cbrt=Math.cbrt,ex=Math.exp,sq=Math.sqrt;
 function lab1(){const g=ctx('c1'),vd=sl('i1a','o1a',v=>v.toFixed(1)),vc=sl('i1c','o1c',v=>v.toFixed(0)),cm=sl('i1m','o1m',v=>v.toFixed(0)),Ad=100,Acm=Ad/Math.pow(10,cm/20);
  const v1=t=>vc*Math.sin(2*Math.PI*0.5*t)+vd/2*Math.sin(2*Math.PI*4*t),v2=t=>vc*Math.sin(2*Math.PI*0.5*t)-vd/2*Math.sin(2*Math.PI*4*t);const A=frame(g,90,280,1060,240,0,2,-230,230,'','v₁ و v₂ (mV)'),Bm=frame(g,90,555,1060,240,0,2,-1.5,1.5,'t (s)','v_out (V)');
  plot(g,A,fn(A,v1,800),css('--b'),2);plot(g,A,fn(A,v2,800),css('--o'),2);plot(g,Bm,fn(Bm,t=>(Ad*(v1(t)-v2(t))+Acm*(v1(t)+v2(t))/2)/1000,800),css('--r'),3);
- R('r1a','v_out = A_d(v₁ − v₂) + A_cm(v₁ + v₂)/2');R('r1b','A_d = '+Ad+'،  A_cm = '+Acm.toExponential(2).replace('e','×10^'));R('r1c','الخرج المفيد = '+(Ad*vd/1000).toFixed(2)+' V،  خرج الضوضاء = '+(Acm*vc/1000).toExponential(2).replace('e','×10^')+' V');R('r1d','CMRR = A_d/A_cm = '+cm+' dB');}
+ R('r1a','v_out = A_d(v₁ − v₂) + A_cm(v₁ + v₂)/2');R('r1b','A_d = '+Ad+'،  A_cm = '+Acm.toExponential(2).replace('e','×10^'));R('r1c','الخرج المفيد = '+(Ad*vd/1000).toFixed(2)+' V،  خرج الضوضاء = '+(Acm*vc/1000).toExponential(2).replace('e','×10^')+' V');R('r1d','CMRR = |A_d/A_cm| = '+f2(Math.pow(10,cm/20),0)+'،  وبالديسيبل 20 log₁₀(CMRR) = '+cm+' dB');}
 
 const LABS={t1:lab1};
 function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}

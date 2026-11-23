@@ -188,7 +188,7 @@ function lab3(){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,600);const
 $('p4').onclick=()=>{$('i4d').value=2;$('i4f').value=20;$('i4l').value=450;};
 function lab4(){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,600);const F=+$('i4f').value*1e-2,D=+$('i4d').value*1e-2,l=+$('i4l').value*1e-9,P=+$('i4p').value,d=F/D*l,I=P/(Math.PI*(d/2)**2);
  $('o4f').textContent=(F*100).toFixed(1);$('o4d').textContent=(D*100).toFixed(1);$('o4l').textContent=Math.round(l*1e9);$('o4p').textContent=P.toFixed(2);
- $('r4a').textContent='d = (F/D) λ = '+sci(d)+' m';$('r4b').textContent='I = P/(πd²/4) = '+sci(I)+' W/m²';
+ $('r4a').textContent='d ≈ (F/D) λ = '+sci(d)+' m  (تقدير لرتبة المقدار؛ قطر قرص إيري حتى أول انعدام = 2.44 Fλ/D = '+sci(2.44*d)+' m)';$('r4b').textContent='I ≈ P/(πd²/4) = '+sci(I)+' W/m²  (متوسط تقريبي)';
  const lx=420,y0=300,Dp=Math.min(240,D*1000),fx=lx+Math.min(600,F*1200+40),dp=Math.max(2,Math.min(60,d*1e6*4));g.fillStyle=wl(l*1e9);g.globalAlpha=.5;g.fillRect(40,y0-Dp/2,lx-40,Dp);
  g.beginPath();g.moveTo(lx,y0-Dp/2);g.lineTo(fx,y0-dp/2);g.lineTo(fx,y0+dp/2);g.lineTo(lx,y0+Dp/2);g.closePath();g.fill();g.globalAlpha=1;g.strokeStyle=css('--ink');g.lineWidth=3;g.beginPath();g.ellipse(lx,y0,18,Math.max(Dp/2+20,40),0,0,7);g.stroke();
  seg(g,lx,y0+Dp/2+50,fx,y0+Dp/2+50,css('--muted'),2);text(g,'F',(lx+fx)/2,y0+Dp/2+80,css('--muted'),'center',22);}

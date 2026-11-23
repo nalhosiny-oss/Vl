@@ -94,7 +94,7 @@ const N=v('N'),fs=v('f');const F={sin:[Math.sin,0,Math.PI,2],gauss:[x=>Math.exp(
 let tr=(f(a)+f(b))/2,si=f(a)+f(b);for(let i=1;i<N;i++){tr+=f(a+i*h);si+=(i%2?4:2)*f(a+i*h);}tr*=h;si*=h/3;
 const P=Plot(cv,a,b,-0.1,Math.max(1.1,f(b)*1.1),{xl:'x',yl:'f(x)'});const g=P.g;g.fillStyle='rgba(75,139,190,0.35)';g.strokeStyle=C.blue;for(let i=0;i<N;i++){const x0=a+i*h,x1=x0+h;g.beginPath();g.moveTo(P.tx(x0),P.ty(0));g.lineTo(P.tx(x0),P.ty(f(x0)));g.lineTo(P.tx(x1),P.ty(f(x1)));g.lineTo(P.tx(x1),P.ty(0));g.closePath();g.fill();g.stroke();}
 P.fn(f,C.yel,2.5);
-py('p1',`import numpy as np\na, b, N = ${fmt(a)}, ${fmt(b)}, ${N}\nx = np.linspace(a, b, N+1)\ny = f(x)\nh = (b - a)/N\ntrap = h*(y[0]/2 + y[1:-1].sum() + y[-1]/2)\nsimp = h/3*(y[0] + 4*y[1:-1:2].sum() + 2*y[2:-1:2].sum() + y[-1])`);
+py('p1',`import numpy as np\n${{sin:'def f(x): return np.sin(x)',gauss:'def f(x): return np.exp(-x**2)',poly:'def f(x): return x**3'}[fs]}\na, b, N = ${fs==='sin'?'0, np.pi':fmt(a)+', '+fmt(b)}, ${N}\nexact = ${fs==='gauss'?'0.8820813907624217':fmt(ex)}\nx = np.linspace(a, b, N+1)\ny = f(x)\nh = (b - a)/N\ntrap = h*(y[0]/2 + y[1:-1].sum() + y[-1]/2)\nsimp = h/3*(y[0] + 4*y[1:-1:2].sum() + 2*y[2:-1:2].sum() + y[-1])\nprint(trap, simp, exact)`);
 out('r1','<span class="eq">exact     = '+fmt(ex,8)+'</span><span class="eq">trapezoid = '+fmt(tr,8)+'  err '+fmt(Math.abs(tr-ex))+'</span><span class="eq">Simpson   = '+fmt(si,8)+'  err '+fmt(Math.abs(si-ex))+'</span>');
 }};
 SIMS['x2']={anim:false,draw:function(time){const k=2;const v=n=>V('i2_'+n);const cv=$('c2');
