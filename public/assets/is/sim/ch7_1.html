@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 7 — Digital Holography</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&family=Source+Serif+4:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0B1E3A; --teal:#0E8C9A; --coral:#E8604C; --tint:#E3F4F6; --bg:#F4F8FA; --grey:#5A6B7F; --line:#C9D6E0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--navy); font-family:"Source Sans 3", Calibri, "Segoe UI", Arial, sans-serif; font-size:16px; }
+  header { background:var(--navy); color:#fff; padding:18px 22px 14px; position:relative; overflow:hidden; }
+  header .rings { position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%;
+    background: repeating-radial-gradient(circle, rgba(70,200,215,.55) 0 3px, transparent 3px 14px); opacity:.55; }
+  header h1 { font-family:"Source Serif 4", Cambria, Georgia, serif; margin:0; font-size:23px; }
+  header p { margin:4px 0 0; color:#BFE6EA; font-size:14.5px; }
+  nav { display:flex; gap:6px; flex-wrap:wrap; padding:12px 22px 0; }
+  nav button { border:1px solid var(--line); background:#fff; color:var(--navy); padding:9px 14px; border-radius:10px 10px 0 0; font:inherit; font-weight:600; cursor:pointer; }
+  nav button.on { background:var(--teal); color:#fff; border-color:var(--teal); }
+  main { padding:0 22px 26px; }
+  .exp { display:none; background:#fff; border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; }
+  .exp.on { display:block; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap:16px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  nav { display:none; } .exp { border-radius:12px; margin-top:12px; } header { padding:12px 18px 10px; } header h1 { font-size:19px; } main { padding:0 12px 14px; } footer { display:none; }
+  h2 { font-family:"Source Serif 4", Cambria, Georgia, serif; font-size:19px; margin:0 0 6px; }
+  .lead { color:var(--grey); margin:0 0 12px; font-size:14.5px; }
+  .panel { background:var(--tint); border-radius:10px; padding:12px; }
+  .ctl { margin-bottom:11px; }
+  .ctl label { display:flex; justify-content:space-between; font-size:14px; font-weight:600; }
+  .ctl label span { color:var(--teal); font-variant-numeric: tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--teal); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 10px; }
+  .presets button, .seg button { border:1px solid var(--teal); background:#fff; color:var(--teal); border-radius:16px; padding:4px 11px; font:inherit; font-size:13.5px; cursor:pointer; }
+  .presets button:hover, .seg button.on { background:var(--teal); color:#fff; }
+  .seg { display:flex; gap:6px; margin-bottom:10px; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(135px,1fr)); gap:8px; margin:10px 0; }
+  .card { border:1px solid var(--line); border-radius:9px; padding:7px 9px; background:#fff; }
+  .card b { display:block; font-size:12.5px; color:var(--grey); font-weight:600; }
+  .card span { font-size:18px; font-weight:600; font-variant-numeric: tabular-nums; }
+  .card.ok span { color:var(--teal); } .card.th span { color:var(--coral); }
+  canvas { width:100%; display:block; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .cv-title { font-size:13.5px; font-weight:600; color:var(--grey); margin:10px 0 4px; }
+  .eq { font-family:"Source Serif 4", Cambria, Georgia, serif; background:#fff; border-left:3px solid var(--teal); padding:6px 10px; margin:8px 0; font-size:15px; }
+  .tasks { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .tasks h3 { font-size:15.5px; margin:0 0 4px; }
+  .tasks ol { margin:0; padding-left:20px; font-size:14.5px; } .tasks li { margin:3px 0; }
+  .ar { direction:rtl; text-align:right; font-family:"Noto Naskh Arabic", "Traditional Arabic", Tahoma, serif; background:#FFF6F3; border-right:4px solid var(--coral); border-radius:8px; padding:9px 12px; margin-top:12px; font-size:15.5px; line-height:1.8; }
+  .ar b { color:var(--coral); }
+  footer { color:var(--grey); font-size:13px; padding:0 22px 18px; }
+  .note { font-size:13px; color:var(--grey); }
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header><div class="rings"></div>
+  <h1>Virtual Lab · Chapter 7 — Digital Holography</h1>
+  <p>Interferometric Systems and Their Applications (203673-3) · MSc in Physics · Prof. Najm Al-Hosiny</p>
+</header>
+<nav>
+  <button class="on" data-t="e1">1 · Fresnel reconstruction</button>
+  <button data-t="e2">2 · Convolution and phase</button>
+  <button data-t="e3">3 · Phase shifting and Fourier holography</button>
+</nav>
+<main>
+<!-- ================= Experiment 1 ================= -->
+<section class="exp on" id="e1">
+  <h2>Experiment 1 — Off-axis digital hologram: Fresnel reconstruction, DC term and twin image</h2>
+  <p class="lead">A diffusely reflecting object at distance d sends its wave O to a camera (256 × 256 pixels of 6.45 µm). A tilted plane reference R = exp(i2πf_R x) is added; the camera records H = |O + R|². One FFT (the discrete Fresnel transform) reconstructs the image with pixel λd/(NΔx).</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Distance d <span id="e1dv"></span></label><input type="range" id="e1d" min="0.1" max="0.6" step="0.005" value="0.3"></div>
+      <div class="ctl"><label>Carrier f_R (fraction of Nyquist) <span id="e1fv"></span></label><input type="range" id="e1f" min="0" max="0.95" step="0.01" value="0.55"></div>
+      <div class="ctl"><label>DC-term suppression</label>
+        <div class="seg" id="e1s"><button class="on" data-m="n">None</button><button data-m="m">Subtract mean</button><button data-m="f">Spatial filter</button></div></div>
+      <div class="presets"><button id="e1new">⟳ New speckle</button></div>
+      <div class="eq">Γ = Fresnel₋d{H}, Δξ = λd/(NΔx)<br>Image offset = λd f_R; twin on the opposite side, defocused</div>
+    </div>
+    <div>
+      <div class="cards" id="e1cards"></div>
+      <div class="cv-title">Hologram (centre crop) · its spectrum · Fresnel reconstruction |Γ| (bright values clipped)</div>
+      <canvas id="e1img" height="300"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Set f_R = 0. Why do the image, the twin and the DC term pile up in the centre?</li>
+    <li>Increase f_R step by step. At what carrier is the image free of the DC term? Compare the image offset with λd f_R.</li>
+    <li>Compare the three DC suppression methods. Which one also removes the twin image?</li>
+    <li>Double d. How do the image pixel and the field of view change?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> تحويل فرينل الواحد يعيد بناء ثلاثة أشياء معاً: الحد الصفري في المركز، والصورة الحقيقية مزاحة بمقدار λd f_R، والتوأم في الجهة المقابلة غير مركَّز. الحامل يفصل بينها، والترشيح يزيل ما لا نحتاجه.</div>
+</section>
+
+<!-- ================= Experiment 2 ================= -->
+<section class="exp" id="e2">
+  <h2>Experiment 2 — Convolution reconstruction, numerical focusing and quantitative phase</h2>
+  <p class="lead">A transparent sample (three "cells", phase only) is placed 15 mm in front of the camera (256 × 256 pixels of 3.45 µm). The +1 order is filtered, moved to the centre and propagated back with the angular-spectrum transfer function. The image pixel stays equal to the camera pixel.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Reconstruction distance d_rec <span id="e2dv"></span></label><input type="range" id="e2d" min="5" max="25" step="0.1" value="15"></div>
+      <div class="ctl"><label>Peak phase of the cells <span id="e2pv"></span></label><input type="range" id="e2p" min="0.5" max="6" step="0.1" value="2.5"></div>
+      <div class="ctl"><label>Camera noise (grey levels, 8-bit) <span id="e2nv"></span></label><input type="range" id="e2n" min="0" max="10" step="0.5" value="2"></div>
+      <div class="presets"><button id="e2auto">Autofocus</button></div>
+      <div class="eq">U = ASM₋d{ filtered +1 order }<br>Focus metric: variance of |U| (minimum for a phase object)</div>
+    </div>
+    <div>
+      <div class="cards" id="e2cards"></div>
+      <div class="cv-title">Hologram crop · amplitude |U| · phase arg U at d_rec</div>
+      <canvas id="e2img" height="290"></canvas>
+      <div class="cv-title">Focus metric versus reconstruction distance (dot: current d_rec; true distance 15 mm)</div>
+      <canvas id="e2plot" height="190"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Move d_rec away from 15 mm. What happens to the amplitude image of a pure phase object?</li>
+    <li>Press Autofocus. How close to 15 mm does the minimum of the focus metric fall?</li>
+    <li>At focus, read the phase error. How does it change with camera noise?</li>
+    <li>Raise the peak phase above 2π. What new step is needed before the phase can be used?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الخلية الشفافة لا تغيّر الشدة بل تؤخّر الطور فقط. لذلك تختفي في صورة الشدة عند التبئير الصحيح، ويظهر سُمكها البصري كاملاً في صورة الطور.</div>
+</section>
+
+<!-- ================= Experiment 3 ================= -->
+<section class="exp" id="e3">
+  <h2>Experiment 3 — Phase-shifting and lensless Fourier holography</h2>
+  <p class="lead">In-line (no carrier): one hologram gives image, twin and DC term on top of each other. Four holograms with reference phases 0, π/2, π, 3π/2 give the complex wave directly: O = [(I₁ − I₃) + i(I₂ − I₄)]/(4R*). Lensless Fourier: a point reference in the object plane cancels the quadratic phase, so one FFT gives the image.</p>
+  <div class="seg" id="e3seg"><button class="on" data-m="p">Phase shifting</button><button data-m="f">Lensless Fourier</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div id="e3cp">
+        <div class="ctl"><label>Phase-step error <span id="e3ev"></span></label><input type="range" id="e3e" min="0" max="30" step="0.5" value="0"></div>
+        <div class="ctl"><label>Camera noise (grey levels) <span id="e3nv"></span></label><input type="range" id="e3n" min="0" max="10" step="0.5" value="1"></div>
+        <div class="eq">Steps 0, π/2 + ε, π + 2ε, 3π/2 + 3ε</div>
+      </div>
+      <div id="e3cf" style="display:none">
+        <div class="ctl"><label>Reference-point offset ξ_r <span id="e3rv"></span></label><input type="range" id="e3r" min="0" max="0.45" step="0.005" value="0.3"></div>
+        <div class="eq">Image and twin are mirror images about the centre, offset ±ξ_r</div>
+      </div>
+    </div>
+    <div>
+      <div class="cards" id="e3cards"></div>
+      <div class="cv-title" id="e3t1"></div>
+      <canvas id="e3img" height="300"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Phase shifting: compare the single in-line reconstruction with the four-step one. What has disappeared?</li>
+    <li>Add a phase-step error of 10°. What appears again in the reconstruction, and how large is it?</li>
+    <li>Lensless Fourier: set ξ_r = 0. Why do image and twin overlap? What is the smallest offset that separates them?</li>
+    <li>Why can phase-shifting use the full camera bandwidth for the object while off-axis holography cannot?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> إزاحة الطور تحل أربع معادلات في مجهولين، فتستخرج الموجة المركبة كاملة ولا يبقى توأم ولا حد صفري. لكن أي خطأ في خطوة الإزاحة يعيد شيئاً من التوأم.</div>
+</section>
+</main>
+
+<footer>All results are computed in your browser from the equations of Chapter 7 (Schnars et al., Digital Holography and Wavefront Sensing, 2nd ed.). The MATLAB versions of these experiments are Labs 7.1–7.3.</footer>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const C = { navy:'#0B1E3A', teal:'#0E8C9A', coral:'#E8604C', grey:'#5A6B7F', line:'#C9D6E0', gold:'#D99A1E' };
+const fmt = (v, d = 3) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : (+v.toFixed(d)).toString();
+function lenStr(m) { const a = Math.abs(m); if (a >= 1) return fmt(m, 3) + ' m'; if (a >= 1e-3) return fmt(m * 1e3, 3) + ' mm'; if (a >= 1e-6) return fmt(m * 1e6, 3) + ' µm'; return fmt(m * 1e9, 3) + ' nm'; }
+
+// ---- canvas helpers ----
+function prep(cv) {
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.getAttribute('height');
+  if (cv.width !== Math.round(w * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.clearRect(0, 0, w, h); return { g, w, h };
+}
+function nice(span) { const p = Math.pow(10, Math.floor(Math.log10(span / 5))); const m = span / 5 / p; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; }
+function plot(cv, series, o) {
+  const { g, w, h } = prep(cv); const L = 56, R = 12, T = 10, B = 38;
+  const x0 = o.xmin, x1 = o.xmax, y0 = o.ymin, y1 = o.ymax;
+  const X = x => L + (x - x0) / (x1 - x0) * (w - L - R), Y = y => h - B - (y - y0) / (y1 - y0) * (h - T - B);
+  g.font = '12px "Source Sans 3", Arial'; g.fillStyle = C.grey; g.strokeStyle = '#E6EDF2'; g.lineWidth = 1;
+  const dx = nice(x1 - x0), dy = nice(y1 - y0);
+  for (let t = Math.ceil(x0 / dx) * dx; t <= x1 + 1e-12; t += dx) { g.beginPath(); g.moveTo(X(t), T); g.lineTo(X(t), h - B); g.stroke(); g.textAlign = 'center'; g.fillText(+(Math.abs(t) < dx * 1e-6 ? 0 : t).toPrecision(6), X(t), h - B + 15); }
+  for (let t = Math.ceil(y0 / dy) * dy; t <= y1 + 1e-12; t += dy) { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(w - R, Y(t)); g.stroke(); g.textAlign = 'right'; g.fillText(+(Math.abs(t) < dy * 1e-6 ? 0 : t).toPrecision(6), L - 5, Y(t) + 4); }
+  g.strokeStyle = C.grey; g.strokeRect(L, T, w - L - R, h - T - B);
+  g.fillStyle = C.navy; g.textAlign = 'center'; g.fillText(o.xlabel || '', L + (w - L - R) / 2, h - 6);
+  g.save(); g.translate(13, T + (h - T - B) / 2); g.rotate(-Math.PI / 2); g.fillText(o.ylabel || '', 0, 0); g.restore();
+  g.save(); g.beginPath(); g.rect(L, T, w - L - R, h - T - B); g.clip();
+  for (const s of series) {
+    g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = s.width || 1.6; g.setLineDash(s.dash || []);
+    if (s.points) { for (let i = 0; i < s.x.length; i++) { g.beginPath(); g.arc(X(s.x[i]), Y(s.y[i]), s.r || 3.5, 0, 7); s.hollow ? g.stroke() : g.fill(); } }
+    else { g.beginPath(); for (let i = 0; i < s.x.length; i++) { const px = X(s.x[i]), py = Y(s.y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+  }
+  g.restore(); g.setLineDash([]);
+  if (o.legend) { let ly = o.legendBottom ? h - B - 10 - 16 * (series.filter(s => s.label).length - 1) : T + 8; g.textAlign = 'left'; for (const s of series) { if (!s.label) continue; g.fillStyle = s.color; g.fillRect(w - R - 190, ly - 5, 14, 3); g.fillStyle = C.navy; g.fillText(s.label, w - R - 170, ly); ly += 16; } }
+}
+function wl2rgb(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = -(nm - 440) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = -(nm - 510) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = -(nm - 645) / 65; } else r = 1;
+  const f = nm < 420 ? 0.3 + 0.7 * (nm - 380) / 40 : nm > 700 ? 0.3 + 0.7 * (780 - nm) / 80 : 1;
+  return [r * f, g * f, b * f];
+}
+function image(cv, nx, ny, fn, rgb) {   // fn(i,j) in [0,1]
+  const { g, w, h } = prep(cv); const im = g.createImageData(nx, ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const v = Math.max(0, Math.min(1, fn(i, j))), k = 4 * (j * nx + i);
+    im.data[k] = 255 * v * rgb[0]; im.data[k + 1] = 255 * v * rgb[1]; im.data[k + 2] = 255 * v * rgb[2]; im.data[k + 3] = 255; }
+  const tmp = document.createElement('canvas'); tmp.width = nx; tmp.height = ny; tmp.getContext('2d').putImageData(im, 0, 0);
+  g.imageSmoothingEnabled = true; return { g, w, h, tmp };
+}
+const linspace = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * i / (n - 1));
+
+// ---- tabs ----
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.exp').forEach(s => s.classList.toggle('on', s.id === b.dataset.t));
+  draw();
+});
+function cards(id, list) { $(id).innerHTML = list.map(c => '<div class="card ' + (c[2] || '') + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join(''); }
+function segs(id, cb) { document.querySelectorAll('#' + id + ' button').forEach(b => b.onclick = () => { document.querySelectorAll('#' + id + ' button').forEach(x => x.classList.toggle('on', x === b)); cb(b.dataset.m); draw(); }); }
+let seed = 7; const rnd = () => { seed = (seed + 0x6D2B79F5) | 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return (((t ^ (t >>> 14)) >>> 0) + 0.5) / 4294967296; };
+const randn = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+// ---- FFT (radix 2, in place) ----
+function fft(re, im, inv) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) { let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+  for (let len = 2; len <= n; len <<= 1) { const a = (inv ? 2 : -2) * Math.PI / len, wr = Math.cos(a), wi = Math.sin(a);
+    for (let i = 0; i < n; i += len) { let cr = 1, ci = 0; for (let k = 0; k < len / 2; k++) { const ur = re[i + k], ui = im[i + k], vr = re[i + k + len / 2] * cr - im[i + k + len / 2] * ci, vi = re[i + k + len / 2] * ci + im[i + k + len / 2] * cr;
+      re[i + k] = ur + vr; im[i + k] = ui + vi; re[i + k + len / 2] = ur - vr; im[i + k + len / 2] = ui - vi; const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t; } } }
+  if (inv) for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+}
+function fft2(re, im, n, inv) {
+  const r = new Float64Array(n), q = new Float64Array(n);
+  for (let y = 0; y < n; y++) { for (let x = 0; x < n; x++) { r[x] = re[y * n + x]; q[x] = im[y * n + x]; } fft(r, q, inv); for (let x = 0; x < n; x++) { re[y * n + x] = r[x]; im[y * n + x] = q[x]; } }
+  for (let x = 0; x < n; x++) { for (let y = 0; y < n; y++) { r[y] = re[y * n + x]; q[y] = im[y * n + x]; } fft(r, q, inv); for (let y = 0; y < n; y++) { re[y * n + x] = r[y]; im[y * n + x] = q[y]; } }
+}
+// colour maps and multi-panel images
+function jet(v) { v = Math.max(0, Math.min(1, v)); return [Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 3))), Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 2))), Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 1)))]; }
+function panels(cv, list) {   // list of {data, n, min, max, map:'gray'|'jet', title, circle:{cx,cy,r}}
+  const { g, w, h } = prep(cv); const k = list.length, gap = 10, top = 20, s = Math.min((w - gap * (k - 1)) / k, h - top);
+  const x0 = (w - (k * s + gap * (k - 1))) / 2;
+  list.forEach((p, i) => {
+    const tmp = document.createElement('canvas'); tmp.width = p.n; tmp.height = p.n; const c = tmp.getContext('2d'), im = c.createImageData(p.n, p.n);
+    for (let j = 0; j < p.n * p.n; j++) { const v = (p.data[j] - p.min) / (p.max - p.min || 1); const col = p.map === 'jet' ? jet(v) : [v, v, v].map(z => Math.max(0, Math.min(1, z))); im.data[4 * j] = 255 * col[0]; im.data[4 * j + 1] = 255 * col[1]; im.data[4 * j + 2] = 255 * col[2]; im.data[4 * j + 3] = 255; }
+    c.putImageData(im, 0, 0); const xx = x0 + i * (s + gap); g.imageSmoothingEnabled = false; g.drawImage(tmp, xx, top, s, s);
+    g.fillStyle = C.navy; g.font = '12.5px "Source Sans 3", Arial'; g.textAlign = 'center'; g.fillText(p.title, xx + s / 2, 14);
+    if (p.circle) { g.strokeStyle = '#FFD24D'; g.lineWidth = 1.5; g.beginPath(); g.arc(xx + p.circle.cx * s, top + p.circle.cy * s, p.circle.r * s, 0, 7); g.stroke(); }
+  });
+}
+
+function asm2(re, im, n, dx, lam, z) {
+  fft2(re, im, n, false);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const fx = (x < n / 2 ? x : x - n) / (n * dx), fy = (y < n / 2 ? y : y - n) / (n * dx), u = lam * lam * (fx * fx + fy * fy);
+    const ph = u < 1 ? -2 * Math.PI / lam * z * u / (1 + Math.sqrt(1 - u)) : 0, at = u < 1 ? 1 : 0, c = Math.cos(ph) * at, s = Math.sin(ph) * at, k = y * n + x, r = re[k] * c - im[k] * s; im[k] = re[k] * s + im[k] * c; re[k] = r; }
+  fft2(re, im, n, true);
+}
+// complex helpers on interleaved arrays
+const N0 = 256;
+function cplx(n) { return { re: new Float64Array(n * n), im: new Float64Array(n * n) }; }
+function shift(a, n) { const o = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) o[((y + n / 2) % n) * n + (x + n / 2) % n] = a[y * n + x]; return o; }
+function absArr(c) { return c.re.map((v, i) => Math.hypot(v, c.im[i])); }
+function clipMax(a, q) { const s = Array.from(a).sort((p, r) => p - r); return s[Math.floor(q * (s.length - 1))] || 1; }
+function mulQ(c, n, pix, lam, d, sign) { for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const X = (x - n / 2) * pix, Y = (y - n / 2) * pix, p = sign * Math.PI * (X * X + Y * Y) / (lam * d), k = y * n + x, cs = Math.cos(p), sn = Math.sin(p), r = c.re[k] * cs - c.im[k] * sn; c.im[k] = c.re[k] * sn + c.im[k] * cs; c.re[k] = r; } }
+function fftc(c, n, inv) { // centred FFT
+  const sh = a => { const o = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) o[((y + n / 2) % n) * n + (x + n / 2) % n] = a[y * n + x]; return o; };
+  let re = sh(c.re), im = sh(c.im); fft2(re, im, n, inv); c.re = sh(re); c.im = sh(im); return c;
+}
+function fresnelFwd(o, n, lam, d, dx) { const dxi = lam * d / (n * dx); const c = { re: Float64Array.from(o.re), im: Float64Array.from(o.im) }; mulQ(c, n, dxi, lam, d, 1); fftc(c, n, false); mulQ(c, n, dx, lam, d, 1); return c; }
+function fresnelBack(h, n, lam, d, dx) { const dxi = lam * d / (n * dx); const c = { re: Float64Array.from(h.re), im: Float64Array.from(h.im) }; mulQ(c, n, dx, lam, d, -1); fftc(c, n, true); mulQ(c, n, dxi, lam, d, -1); return c; }
+function shapeMask(n, cx, cy, sc) { const m = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const u = (x - cx) / sc, v = (y - cy) / sc; let a = 0;
+  if (Math.abs(u) < 0.5 && Math.abs(v) < 0.5 && !(Math.abs(u) < 0.3 && v > -0.3 && v < 0.5)) a = 1;   // a "U" shape
+  if (Math.hypot(u - 0.0, v + 0.05) < 0.12) a = 1; m[y * n + x] = a; } return m; }
+function diffuse(mask, n) { const o = cplx(n); for (let i = 0; i < n * n; i++) { const p = 2 * Math.PI * rnd(); o.re[i] = mask[i] * Math.cos(p); o.im[i] = mask[i] * Math.sin(p); } return o; }
+
+// ================= Experiment 1 =================
+let s1 = 1, dcm = 'n'; segs('e1s', m => dcm = m); $('e1new').onclick = () => { s1++; draw(); };
+function e1() {
+  const n = N0, lam = 633e-9, dx = 6.45e-6, d = +$('e1d').value, fr = +$('e1f').value; $('e1dv').textContent = (d * 100).toFixed(1) + ' cm'; $('e1fv').textContent = fr.toFixed(2);
+  seed = 500 + s1; const dxi = lam * d / (n * dx);
+  const ob = diffuse(shapeMask(n, n / 2, n / 2, n * 0.16), n);
+  const O = fresnelFwd(ob, n, lam, d, dx);
+  let om = 0; for (let i = 0; i < n * n; i++) om += O.re[i] ** 2 + O.im[i] ** 2; const Ar = Math.sqrt(om / (n * n));
+  const fR = fr / (2 * dx), H = cplx(n);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const k = y * n + x, p = 2 * Math.PI * fR * (x - n / 2) * dx; H.re[k] = (O.re[k] + Ar * Math.cos(p)) ** 2 + (O.im[k] + Ar * Math.sin(p)) ** 2; }
+  // spectrum
+  const S = fftc({ re: Float64Array.from(H.re), im: new Float64Array(n * n) }, n, false), spec = absArr(S).map(v => Math.log10(1 + v));
+  let Hp = { re: Float64Array.from(H.re), im: new Float64Array(n * n) }, circ = null;
+  if (dcm === 'm') { const mu = H.re.reduce((a, b) => a + b) / (n * n); Hp.re = H.re.map(v => v - mu); }
+  if (dcm === 'f') { // keep the O R* lobe (at -fR), then multiply by R
+    const kc = fR * n * dx, rad = Math.max(3, Math.min(kc * 0.9, n / 2 - kc - 1, n * 0.2)); const F = fftc({ re: Float64Array.from(H.re), im: new Float64Array(n * n) }, n, false);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const fx = x - n / 2, fy = y - n / 2; if ((fx + kc) ** 2 + fy * fy > rad * rad) { F.re[y * n + x] = 0; F.im[y * n + x] = 0; } }
+    fftc(F, n, true);
+    Hp = F; circ = { cx: 0.5 - kc / n, cy: 0.5, r: rad / n };
+  }
+  // reconstruction of H itself (normal plane reconstructing wave): DC at the centre, image offset by λd f_R
+  const G = fresnelBack(Hp, n, lam, d, dx), A = absArr(G);
+  const crop = 96, hc = new Float64Array(crop * crop); for (let y = 0; y < crop; y++) for (let x = 0; x < crop; x++) hc[y * crop + x] = H.re[(y + n / 2 - crop / 2) * n + x + n / 2 - crop / 2];
+  panels($('e1img'), [{ data: hc, n: crop, min: 0, max: clipMax(hc, 0.99), title: 'hologram H (crop)' }, { data: spec, n, min: 0, max: Math.max(...spec), title: 'log |FFT H|', circle: circ }, { data: A, n, min: 0, max: clipMax(A, 0.985), title: '|Γ| at −d' }]);
+  cards('e1cards', [['Image pixel λd/(NΔx)', lenStr(dxi), 'th'], ['Field of view λd/Δx', lenStr(n * dxi)], ['Carrier f_R', fmt(fR / 1000, 3) + ' lines/mm'], ['Twin offset 2λd f_R', lenStr(2 * lam * d * fR)]]);
+}
+
+// ================= Experiment 2 =================
+function asmC(c, n, dx, lam, z) { const r = Float64Array.from(c.re), q = Float64Array.from(c.im); asm2(r, q, n, dx, lam, z); return { re: r, im: q }; }
+let curveKey = '', curve = null;
+function e2data() {
+  const n = N0, lam = 633e-9, dx = 3.45e-6, d = 15e-3, pk = +$('e2p').value, ns = +$('e2n').value;
+  seed = 77; const phi = new Float64Array(n * n);
+  const cells = [[-0.18, -0.12, 0.11, 0.08], [0.15, -0.05, 0.08, 0.12], [-0.02, 0.2, 0.09, 0.07]];
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const u = x / n - 0.5, v = y / n - 0.5; let p = 0; for (const [cx, cy, a, b] of cells) { const r2 = ((u - cx) / a) ** 2 + ((v - cy) / b) ** 2; if (r2 < 1) p = Math.max(p, pk * (1 - r2) ** 2); } phi[y * n + x] = p; }
+  const o = { re: phi.map(Math.cos), im: phi.map(Math.sin) }, O = asmC(o, n, dx, lam, d);
+  const fR = 0.5 / (2 * dx) * 1.0, H = new Float64Array(n * n);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const k = y * n + x, p = 2 * Math.PI * fR * x * dx; H[k] = (O.re[k] + Math.cos(p)) ** 2 + (O.im[k] + Math.sin(p)) ** 2; }
+  const hmax = Math.max(...H) * 1.05; for (let k = 0; k < n * n; k++) H[k] = Math.round(Math.min(255, Math.max(0, 255 / hmax * H[k] + ns * randn())));
+  // filter +1 order (O R*) at -fR and centre it
+  const re = Float64Array.from(H), im = new Float64Array(n * n); fft2(re, im, n, false);
+  const kc = Math.round(fR * n * dx), rad = kc * 0.45, fr = new Float64Array(n * n), fi = new Float64Array(n * n);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const fx = x < n / 2 ? x : x - n, fy = y < n / 2 ? y : y - n; if ((fx + kc) ** 2 + fy * fy <= rad * rad) { const xn = ((fx + kc) + n) % n; fr[y * n + xn] = re[y * n + x]; fi[y * n + xn] = im[y * n + x]; } }
+  fft2(fr, fi, n, true);
+  return { n, lam, dx, d, phi, H, U0: { re: fr, im: fi } };
+}
+let D2 = null, D2key = '';
+function e2() {
+  const key = $('e2p').value + '|' + $('e2n').value; if (key !== D2key) { D2 = e2data(); D2key = key; curve = null; }
+  const { n, lam, dx, phi, H, U0 } = D2, dr = +$('e2d').value * 1e-3;
+  $('e2dv').textContent = (dr * 1e3).toFixed(1) + ' mm'; $('e2pv').textContent = (+$('e2p').value).toFixed(1) + ' rad'; $('e2nv').textContent = $('e2n').value;
+  const U = asmC(U0, n, dx, lam, -dr), A = absArr(U), P = U.re.map((v, i) => Math.atan2(U.im[i], v));
+  // phase error at focus (central 80 %, piston removed)
+  let off = 0, cnt = 0; const ins = (x, y) => x > 0.1 * n && x < 0.9 * n && y > 0.1 * n && y < 0.9 * n;
+  const wr = v => Math.atan2(Math.sin(v), Math.cos(v));
+  let sx = 0, sy = 0; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (ins(x, y)) { const e = P[y * n + x] - phi[y * n + x]; sx += Math.cos(e); sy += Math.sin(e); cnt++; } off = Math.atan2(sy, sx);
+  let se = 0; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (ins(x, y)) se += wr(P[y * n + x] - phi[y * n + x] - off) ** 2;
+  const rms = Math.sqrt(se / cnt);
+  if (!curve) { curve = []; for (const z of linspace(8, 22, 57)) { const Uz = asmC(U0, n, dx, lam, -z * 1e-3), Az = absArr(Uz); let m = 0, v = 0, c = 0; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (ins(x, y)) { m += Az[y * n + x]; c++; } m /= c; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (ins(x, y)) v += (Az[y * n + x] - m) ** 2; curve.push([z, v / c / (m * m)]); } }
+  const best = curve.reduce((a, b) => b[1] < a[1] ? b : a);
+  let m = 0, v = 0, c = 0; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (ins(x, y)) { m += A[y * n + x]; c++; } m /= c; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (ins(x, y)) v += (A[y * n + x] - m) ** 2; const fm = v / c / (m * m);
+  const crop = 96, hc = new Float64Array(crop * crop); for (let y = 0; y < crop; y++) for (let x = 0; x < crop; x++) hc[y * crop + x] = H[(y + 80) * n + x + 80];
+  panels($('e2img'), [{ data: hc, n: crop, min: 0, max: 255, title: 'hologram (crop)' }, { data: A, n, min: 0, max: clipMax(A, 0.995), title: '|U|' }, { data: P.map(p => wr(p - off)), n, min: -Math.PI, max: Math.PI, map: 'jet', title: 'phase arg U' }]);
+  cards('e2cards', [['Image pixel', '3.45 µm (= camera pixel)'], ['Focus metric', fm.toExponential(2), 'ok'], ['Autofocus minimum', best[0].toFixed(1) + ' mm', 'th'], ['Phase error (wrapped, rms)', rms.toFixed(3) + ' rad' + (Math.abs(dr - 15e-3) > 0.3e-3 ? ' (out of focus)' : ''), 'ok']]);
+  plot($('e2plot'), [{ x: curve.map(p => p[0]), y: curve.map(p => p[1]), color: C.teal, width: 2 }, { x: [dr * 1e3], y: [fm], color: C.coral, points: true, r: 5 }, { x: [15, 15], y: [0, Math.max(...curve.map(p => p[1])) * 1.1], color: C.grey, dash: [3, 3], width: 1 }], { xmin: 8, xmax: 22, ymin: 0, ymax: Math.max(...curve.map(p => p[1]), fm) * 1.1, xlabel: 'd_rec  [mm]', ylabel: 'Var|U| / mean²' });
+}
+$('e2auto').onclick = () => { if (curve) { const best = curve.reduce((a, b) => b[1] < a[1] ? b : a); $('e2d').value = best[0]; draw(); } };
+
+// ================= Experiment 3 =================
+let m3 = 'p'; segs('e3seg', m => { m3 = m; $('e3cp').style.display = m === 'p' ? '' : 'none'; $('e3cf').style.display = m === 'f' ? '' : 'none'; });
+function e3() {
+  const n = N0, lam = 633e-9, dx = 6.45e-6, d = 0.3; seed = 900;
+  const ob = diffuse(shapeMask(n, n / 2, n / 2, n * 0.18), n), O = fresnelFwd(ob, n, lam, d, dx);
+  let om = 0; for (let i = 0; i < n * n; i++) om += O.re[i] ** 2 + O.im[i] ** 2; const Ar = Math.sqrt(om / (n * n));
+  if (m3 === 'p') {
+    const eps = +$('e3e').value * Math.PI / 180, ns = +$('e3n').value; $('e3ev').textContent = $('e3e').value + '°'; $('e3nv').textContent = String(ns);
+    const sc = 200 / (4 * Ar * Ar);   // grey levels
+    const I = [0, 1, 2, 3].map(k => { const ph = k * (Math.PI / 2 + eps); return O.re.map((r, i) => sc * ((r + Ar * Math.cos(ph)) ** 2 + (O.im[i] + Ar * Math.sin(ph)) ** 2) + ns * randn()); });
+    // single in-line hologram: reconstruct I1 with R (= Ar) as is
+    const G1 = fresnelBack({ re: I[0].map(v => v * Ar), im: new Float64Array(n * n) }, n, lam, d, dx), A1 = absArr(G1);
+    // four-step: O = [(I1 - I3) + i(I2 - I4)] / (4 R*)  with R = Ar (real)
+    const Oe = { re: I[0].map((v, i) => (v - I[2][i]) / (4 * Ar * sc)), im: I[1].map((v, i) => (v - I[3][i]) / (4 * Ar * sc)) };
+    const G4 = fresnelBack(Oe, n, lam, d, dx), A4 = absArr(G4);
+    // residual outside the object relative to inside
+    const mask = shapeMask(n, n / 2, n / 2, n * 0.18); let inS = 0, inC = 0, outS = 0, outC = 0;
+    for (let i = 0; i < n * n; i++) { if (mask[i]) { inS += A4[i] ** 2; inC++; } else { outS += A4[i] ** 2; outC++; } }
+    const bg = Math.sqrt(outS / outC) / Math.sqrt(inS / inC);
+    panels($('e3img'), [{ data: I[0], n, min: 0, max: clipMax(I[0], 0.995), title: 'one in-line hologram' }, { data: A1, n, min: 0, max: clipMax(A1, 0.985), title: 'single-hologram reconstruction' }, { data: A4, n, min: 0, max: clipMax(A4, 0.995), title: 'four-step reconstruction' }]);
+    $('e3t1').textContent = 'In-line hologram · its reconstruction (image + twin + DC) · four-step phase-shifting reconstruction';
+    cards('e3cards', [['Background / image (rms)', (bg * 100).toFixed(1) + ' %', 'ok'], ['Phase-step error', $('e3e').value + '°', 'th'], ['Image pixel', lenStr(lam * d / (n * dx))]]);
+  } else {
+    const xr = +$('e3r').value; $('e3rv').textContent = xr.toFixed(3) + ' of the field';
+    const dxi = lam * d / (n * dx), xi = xr * n * dxi;
+    // object placed at the centre; reference point at -xi (object plane). Camera reference: exp(i pi x^2/(lam d)) * exp(+i 2 pi x xi/(lam d))
+    const H = new Float64Array(n * n), Ref = cplx(n);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const X = (x - n / 2) * dx, Y = (y - n / 2) * dx, p = Math.PI * (X * X + Y * Y) / (lam * d) + 2 * Math.PI * X * xi / (lam * d), k = y * n + x; H[k] = (O.re[k] + Ar * Math.cos(p)) ** 2 + (O.im[k] + Ar * Math.sin(p)) ** 2; }
+    const F = fftc({ re: Float64Array.from(H), im: new Float64Array(n * n) }, n, true), A = absArr(F);
+    // suppress the very bright DC pixel for display
+    const sep = xr >= 0.5 * 0.36 + 0.18 ? 'image, twin and DC term separated' : xr > 0.18 ? 'image clear of twin, touches DC term' : 'overlap';
+    panels($('e3img'), [{ data: H, n, min: 0, max: clipMax(H, 0.99), title: 'lensless Fourier hologram' }, { data: A, n, min: 0, max: clipMax(A, 0.98), title: '|FFT of H| (one FFT, no distance)' }]);
+    $('e3t1').textContent = 'Hologram with a point reference in the object plane · reconstruction by a single FFT';
+    cards('e3cards', [['Reference offset', lenStr(xi)], ['Object width', lenStr(0.18 * n * dxi)], ['Result', sep, 'ok']]);
+  }
+}
+
+function draw() { const t = document.querySelector('.exp.on').id; if (t === 'e1') e1(); else if (t === 'e2') e2(); else e3(); }
+document.querySelectorAll('input[type=range]').forEach(r => r.oninput = draw);
+window.addEventListener('resize', draw);
+draw();
+</script>
+<script>(function(){var b=document.querySelector('nav button[data-t="e1"]'); if(b) b.click();})();</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الاهتزازات القسرية والرنين</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#FBF5EE;--panel:#FFFFFF;--ink:#2B2420;--muted:#6E5F55;--line:#E8D9CB;--gold:#B5562B;--golddk:#8A3E1C;--chip:#F5EADF;--plot:#FFFCF8;--grid:#F0E3D6;--dark:#2B2420;--blue:#3E6C8C;--ok:#2E7D4F;--bad:#B23A2E}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 44px}
+.fstrip{height:14px;border-radius:7px;margin:0 0 14px;direction:ltr;background:repeating-linear-gradient(115deg,#B5562B 0 7px,#E0956A 7px 9px,#2B2420 9px 12px)}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--golddk);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:66ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}
+@media (max-width:840px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border:1px solid var(--grid);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:11px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.08rem;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--chip);color:var(--ink);width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 11px;border-radius:8px;cursor:pointer;min-height:36px}
+.btn.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.readout{background:var(--chip);border-radius:10px;padding:10px 13px;font-size:.95rem}
+.readout .eq{display:block}
+.eq{font-family:'STIX Two Text',serif;font-size:1.06rem;direction:ltr;unicode-bidi:isolate;text-align:left}
+.note{font-size:.92rem;margin-top:4px}
+.good{color:var(--ok);font-weight:700}.badx{color:var(--bad);font-weight:700}
+.task{border-top:1px solid var(--line);padding-top:10px;font-size:.93rem}
+.task h3{margin:0 0 4px;font-size:1rem;color:var(--golddk)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.93rem;color:var(--ink)}
+.chk input{width:18px;height:18px;accent-color:var(--gold)}
+footer{margin-top:20px;color:var(--muted);font-size:.85rem}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fstrip" aria-hidden="true"></div>
+<header>
+  <span class="badge">الاهتزازات والموجات · <bdi dir="ltr">2034002-4</bdi></span>
+  <h1>معمل الاهتزازات القسرية والرنين</h1>
+  <p>الفصل الرابع. غيّر القيم وراقب النتيجة، وأجب عن السؤال في أسفل كل تجربة.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" aria-selected="true" data-t="t1">١. الاستجابة والظواهر العابرة</button><button role="tab" aria-selected="false" data-t="t2">٢. منحنى الرنين وزاوية الطور</button><button role="tab" aria-selected="false" data-t="t3">٣. القدرة الممتصة</button><button role="tab" aria-selected="false" data-t="t4">٤. الرنين في دائرة RLC</button><button role="tab" aria-selected="false" data-t="t5">٥. الأعداد المركبة والمتجهات الدوارة</button></nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="620" aria-label="استجابة المذبذب القسري من السكون: الجزء العابر والحالة المستقرة"></canvas>
+  <div class="ctrl">
+    <label>التردد الطبيعي ω₀ (rad/s) <b id="o1w0"></b></label><input id="i1w0" type="range" min="2" max="10" step="0.5" value="5">
+    <label>تردد القوة الدافعة ω (rad/s) <b id="o1w"></b></label><input id="i1w" type="range" min="0.5" max="15" step="0.1" value="3">
+    <label>ثابت التخميد γ (s⁻¹) <b id="o1g"></b></label><input id="i1g" type="range" min="0.1" max="5" step="0.1" value="0.6">
+    <label class="chk"><input type="checkbox" id="k1s" checked> أظهر الحل المستقر وحده</label>
+    <div class="readout" id="r1"></div>
+    <div class="task"><h3>سؤال</h3>لماذا تبدو الحركة في البداية غير منتظمة ثم تستقر؟ وبأي تردد يهتز الجسم بعد الاستقرار: ω أم ω₀؟ وكيف يؤثر γ في مدة الجزء العابر؟</div>
+  </div>
+</section>
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="620" aria-label="سعة الاهتزاز القسري وزاوية الطور بدلالة تردد القوة"></canvas>
+  <div class="ctrl">
+    <label>التردد الطبيعي ω₀ (rad/s) <b id="o2w0"></b></label><input id="i2w0" type="range" min="2" max="10" step="0.5" value="5">
+    <label>ثابت التخميد γ (s⁻¹) <b id="o2g"></b></label><input id="i2g" type="range" min="0.1" max="6" step="0.1" value="1">
+    <label>تردد القوة الدافعة ω (rad/s) <b id="o2w"></b></label><input id="i2w" type="range" min="0.2" max="15" step="0.1" value="4">
+    <div class="readout" id="r2"></div>
+    <div class="task"><h3>سؤال</h3>ما زاوية الطور بين الإزاحة والقوة عند الترددات المنخفضة، وعند الرنين، وعند الترددات العالية؟ ولماذا تنزاح قمة السعة قليلًا تحت ω₀ عند زيادة التخميد؟</div>
+  </div>
+</section>
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="620" aria-label="متوسط القدرة الممتصة بدلالة التردد وعرض المنحنى عند نصف القدرة"></canvas>
+  <div class="ctrl">
+    <label>التردد الطبيعي ω₀ (rad/s) <b id="o3w0"></b></label><input id="i3w0" type="range" min="5" max="20" step="1" value="10">
+    <label>ثابت التخميد γ (s⁻¹) <b id="o3g"></b></label><input id="i3g" type="range" min="0.2" max="6" step="0.1" value="1.5">
+    <div class="readout" id="r3"></div>
+    <div class="task"><h3>سؤال</h3>قِس عرض منحنى القدرة عند نصف قيمته العظمى Δω وقارنه بـ γ. لماذا يكون منحنى الرنين لنظام ذي Q كبير حادًا وضيقًا؟</div>
+  </div>
+</section>
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="620" aria-label="شدة التيار في دائرة RLC متوالية بدلالة تردد المصدر"></canvas>
+  <div class="ctrl">
+    <label>تردد المصدر f (Hz) <b id="o4f"></b></label><input id="i4f" type="range" min="10" max="400" step="1" value="120">
+    <label>المقاومة R (Ω) <b id="o4r"></b></label><input id="i4r" type="range" min="5" max="200" step="1" value="30">
+    <label>المحاثة L (mH) <b id="o4l"></b></label><input id="i4l" type="range" min="20" max="500" step="5" value="200">
+    <label>السعة C (μF) <b id="o4c"></b></label><input id="i4c" type="range" min="1" max="50" step="0.5" value="10">
+    <div class="readout" id="r4"></div>
+    <div class="task"><h3>سؤال</h3>عند أي تردد يكون التيار أكبر ما يمكن؟ وكم تكون عندئذٍ زاوية الطور بين الجهد والتيار؟ جرّب تقليل R ولاحظ حدة القمة.</div>
+  </div>
+</section>
+<section class="lab" id="t5" role="tabpanel">
+  <canvas id="c5" width="1200" height="620" aria-label="متجه القوة ومتجه الإزاحة الدواران في المستوى المركب"></canvas>
+  <div class="ctrl">
+    <label>نسبة التردد ω/ω₀ <b id="o5r"></b></label><input id="i5r" type="range" min="0.1" max="3" step="0.05" value="0.8">
+    <label>معامل الجودة Q <b id="o5q"></b></label><input id="i5q" type="range" min="0.5" max="10" step="0.5" value="3">
+    <div class="row"><button class="btn" type="button" id="b5p">إيقاف مؤقت</button></div>
+    <div class="readout" id="r5"></div>
+    <div class="task"><h3>سؤال</h3>المتجهان يدوران معًا بالسرعة الزاوية نفسها، والقيمة الفيزيائية هي مسقطهما على المحور الحقيقي. ما الذي يحدد طول متجه الإزاحة وزاوية تأخره عن متجه القوة؟</div>
+  </div>
+</section>
+<footer>أ.د. نجم الحصيني – الاهتزازات والموجات، الفصل الرابع. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+const TAU=2*Math.PI;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let active='t1',dirty=true;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;dirty=true;}));
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>dirty=true);e.addEventListener('change',()=>dirty=true);});
+
+/* number formatting with real superscripts */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sciParts(v,d){const e=Math.floor(Math.log10(Math.abs(v)));let m=v/Math.pow(10,e);if(+m.toFixed(d)>=10){return [(m/10).toFixed(d),e+1];}return [m.toFixed(d),e];}
+function H(v,d=3){return H0(v,d).replace(/-/g,'−');}
+function H0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10<sup>'+e+'</sup>';}
+function U(v,d=3){return U0(v,d).replace(/-/g,'−');}
+function U0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10'+String(e).split('').map(ch=>SUP[ch]).join('');}
+
+/* drawing helpers */
+function txt(g,s,x,y,col,al,sz,rtl,bold){g.font=(bold?'700 ':'')+(sz||22)+'px "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function poly(g,pts,col,w){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function _strip_unused(g,x,y,w,hh,l0,l1,If){g.fillStyle='#0D0B09';g.fillRect(x,y,w,hh);for(let i=0;i<w;i++){const l=l0+(l1-l0)*i/w;const I=If(l);if(I<=0.003)continue;g.fillStyle=colStr(l,I);g.fillRect(x+i,y,1.2,hh);}g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(x,y,w,hh);}
+function _axis_unused(g,x,y,w,l0,l1,step){seg(g,x,y,x+w,y,css('--muted'),1.5);for(let l=Math.ceil(l0/step)*step;l<=l1+1e-9;l+=step){const px=x+(l-l0)/(l1-l0)*w;seg(g,px,y,px,y+8,css('--muted'),1.5);txt(g,String(Math.round(l)),px,y+30,css('--muted'),'center',18);}txt(g,'λ (nm)',x+w,y+56,css('--muted'),'right',18);}
+
+
+/* spring from (x0,y) to (x1,y) */
+function spring(g,x0,y,x1,n,amp,col,w){const L=x1-x0,lead=Math.min(18,Math.abs(L)*0.12);g.strokeStyle=col;g.lineWidth=w||3;g.lineJoin='round';g.beginPath();g.moveTo(x0,y);g.lineTo(x0+lead,y);const body=L-2*lead;for(let i=0;i<=2*n;i++){const xx=x0+lead+body*(i+0.5)/(2*n+1);g.lineTo(xx,y+(i%2?amp:-amp));}g.lineTo(x1-lead,y);g.lineTo(x1,y);g.stroke();}
+/* vertical spring from (x,y0) down to (x,y1) */
+function vspring(g,x,y0,y1,n,amp,col,w){const L=y1-y0,lead=Math.min(18,Math.abs(L)*0.12);g.strokeStyle=col;g.lineWidth=w||3;g.lineJoin='round';g.beginPath();g.moveTo(x,y0);g.lineTo(x,y0+lead);const body=L-2*lead;for(let i=0;i<=2*n;i++){const yy=y0+lead+body*(i+0.5)/(2*n+1);g.lineTo(x+(i%2?amp:-amp),yy);}g.lineTo(x,y1-lead);g.lineTo(x,y1);g.stroke();}
+/* plot frame: returns mapping functions */
+function frame(g,x,y,w,h,t0,t1,v0,v1,xl,yl,ticks){g.fillStyle='#fff';g.fillRect(x,y,w,h);g.strokeStyle=css('--grid');g.lineWidth=1;g.strokeRect(x,y,w,h);
+ const X=t=>x+(t-t0)/(t1-t0)*w,Y=v=>y+h-(v-v0)/(v1-v0)*h;
+ if(v0<0&&v1>0)seg(g,x,Y(0),x+w,Y(0),css('--muted'),1.2);
+ if(xl)txt(g,xl,x+w,y+h+24,css('--muted'),'right',17);if(yl)txt(g,yl,x+6,y+20,css('--muted'),'left',17);
+ return [X,Y];}
+function curve(g,f,a,b,X,Y,col,w,n,dash){g.setLineDash(dash||[]);g.strokeStyle=col;g.lineWidth=w||2.5;g.beginPath();n=n||400;for(let i=0;i<=n;i++){const t=a+(b-a)*i/n,v=f(t);i?g.lineTo(X(t),Y(v)):g.moveTo(X(t),Y(v));}g.stroke();g.setLineDash([]);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,TAU);g.fill();}
+function arrow(g,x0,y0,x1,y1,col,w){seg(g,x0,y0,x1,y1,col,w||3);const a=Math.atan2(y1-y0,x1-x0),L=12;if(Math.hypot(x1-x0,y1-y0)<4)return;g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-L*Math.cos(a-0.4),y1-L*Math.sin(a-0.4));g.lineTo(x1-L*Math.cos(a+0.4),y1-L*Math.sin(a+0.4));g.closePath();g.fill();}
+function block(g,cx,cy,s,label){g.fillStyle=css('--gold');g.fillRect(cx-s/2,cy-s/2,s,s);g.strokeStyle=css('--golddk');g.lineWidth=2;g.strokeRect(cx-s/2,cy-s/2,s,s);if(label)txt(g,label,cx,cy+7,'#fff','center',20,0,1);}
+
+const INK=()=>css('--ink'),CU=()=>css('--gold'),CUD=()=>css('--golddk'),BL=()=>css('--blue'),GR='#2E7D4F',RD='#7B3F98',MU=()=>css('--muted');
+let now=0;
+function pauser(id){let p=false,off=0,tp=0;const b=$(id);b.onclick=()=>{p=!p;b.textContent=p?'تشغيل':'إيقاف مؤقت';b.classList.toggle('sel',p);if(p)tp=now;else off+=now-tp;dirty=true;};return ()=>p?tp-off:now-off;}
+function clip(g,x,y,w,h){g.save();g.beginPath();g.rect(x,y,w,h);g.clip();}
+function rk4(f,y,t,dt){const k1=f(t,y),k2=f(t+dt/2,y.map((v,i)=>v+dt/2*k1[i])),k3=f(t+dt/2,y.map((v,i)=>v+dt/2*k2[i])),k4=f(t+dt,y.map((v,i)=>v+dt*k3[i]));return y.map((v,i)=>v+dt/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));}
+function bars(g,x,y,h,items,max,bw,gap){items.forEach((r,i)=>{const X0=x+i*(bw+gap);const hh=Math.max(0,Math.min(1,r[1]/max))*h;g.fillStyle=r[2];g.fillRect(X0,y-hh,bw,hh);g.strokeStyle=css('--grid');g.lineWidth=1;g.strokeRect(X0,y-h,bw,h);txt(g,r[0],X0+bw/2,y+26,r[2],'center',19,1,1);});}
+const EQ=s=>'<span class="eq">'+s+'</span>',EQi=s=>'<span class="eq" style="display:inline">'+s+'</span>',NOTE=s=>'<div class="note">'+s+'</div>';
+function sgn(v,d){return v.toFixed(d).replace('-','−');}
+
+
+function amp(w0,g,w){return 1/Math.sqrt((w0*w0-w*w)**2+(g*w)**2);}
+function pha(w0,g,w){return Math.atan2(g*w,w0*w0-w*w);}
+/* 1 */
+let c1=null;
+function lab1(){const g=$('c1').getContext('2d');g.clearRect(0,0,1200,620);const w0=+$('i1w0').value,w=+$('i1w').value,gm=+$('i1g').value;$('o1w0').textContent=w0.toFixed(1);$('o1w').textContent=w.toFixed(1);$('o1g').textContent=gm.toFixed(1);
+ const Tend=Math.max(8/gm,6*TAU/Math.min(w,w0));const Tc=Math.min(Tend,40),dt=Tc/4000;let y=[0,0],t=0,arr=[[0,0]];const f=(s,y)=>[y[1],Math.cos(w*s)-gm*y[1]-w0*w0*y[0]];
+ for(let i=0;i<4000;i++){y=rk4(f,y,t,dt);t+=dt;arr.push([t,y[0]]);}
+ const A=amp(w0,gm,w),d=pha(w0,gm,w),ss=s=>A*Math.cos(w*s-d);const mx=Math.max(...arr.map(p=>Math.abs(p[1])),A)*1.15;
+ const [X,Y]=frame(g,60,30,1100,380,0,Tc,-mx,mx,'t (s)','x');clip(g,60,30,1100,380);g.strokeStyle=CU();g.lineWidth=2.4;g.beginPath();arr.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1])));g.stroke();
+ if($('k1s').checked)curve(g,ss,0,Tc,X,Y,BL(),1.8,2000,[6,5]);g.restore();
+ const [X2,Y2]=frame(g,60,450,1100,130,0,Tc,-1.2,1.2,'t (s)','F/F₀');curve(g,s=>Math.cos(w*s),0,Tc,X2,Y2,MU(),1.6,2000);
+ txt(g,'الحركة الكلية',1150,58,CUD(),'right',17,1);if($('k1s').checked)txt(g,'الحالة المستقرة',1150,84,BL(),'right',17,1);
+ $('r1').innerHTML=EQ('ẍ + γẋ + ω₀²x = (F₀/m) cos ωt')+EQ('x = x<sub>transient</sub> + A cos(ωt − δ)')+EQ('τ<sub>transient</sub> ≈ 2/γ = '+(2/gm).toFixed(2)+' s')+NOTE('بعد زوال الجزء العابر يهتز الجسم بتردد القوة '+EQi('ω')+' لا بتردده الطبيعي.');}
+/* 2 */
+function lab2(){const g=$('c2').getContext('2d');g.clearRect(0,0,1200,620);const w0=+$('i2w0').value,gm=+$('i2g').value,w=+$('i2w').value;$('o2w0').textContent=w0.toFixed(1);$('o2g').textContent=gm.toFixed(1);$('o2w').textContent=w.toFixed(1);
+ const amax=amp(w0,Math.min(gm,0.5),Math.sqrt(Math.max(w0*w0-Math.min(gm,0.5)**2/2,0.01)));const top=Math.min(amp(w0,gm,w0)*1.6,amax*1.05);
+ const [X,Y]=frame(g,60,30,1100,300,0,15,0,top,'','A (F₀/m)');clip(g,60,30,1100,300);[0.5,1,2,4].forEach(gg=>{if(Math.abs(gg-gm)>0.05)curve(g,s=>amp(w0,gg,s),0.01,15,X,Y,css('--grid'),1.6,600);});curve(g,s=>amp(w0,gm,s),0.01,15,X,Y,CU(),3,800);g.restore();
+ seg(g,X(w0),30,X(w0),330,MU(),1,[4,4]);txt(g,'ω₀',X(w0)+6,52,MU(),'left',17);dot(g,X(w),Y(Math.min(amp(w0,gm,w),top)),7,CUD());
+ const [X2,Y2]=frame(g,60,370,1100,210,0,15,0,Math.PI,'ω (rad/s)','δ (rad)');curve(g,s=>pha(w0,gm,s),0.01,15,X2,Y2,BL(),2.8,800);seg(g,60,Y2(Math.PI/2),1160,Y2(Math.PI/2),MU(),1,[3,4]);txt(g,'π/2',66,Y2(Math.PI/2)-6,MU(),'left',15);txt(g,'π',66,Y2(Math.PI)+18,MU(),'left',15);
+ dot(g,X2(w),Y2(pha(w0,gm,w)),7,BL());for(let k=0;k<=15;k+=3)txt(g,String(k),X2(k),602,MU(),'center',15);
+ const wr=w0*w0-gm*gm/2>0?Math.sqrt(w0*w0-gm*gm/2):0;
+ $('r2').innerHTML=EQ('A(ω) = (F₀/m)/√((ω₀² − ω²)² + γ²ω²)')+EQ('tan δ = γω/(ω₀² − ω²)')+EQ('A = '+amp(w0,gm,w).toFixed(4)+' F₀/m ,  δ = '+(pha(w0,gm,w)*180/Math.PI).toFixed(1)+'°')+EQ('ω<sub>max</sub> = √(ω₀² − γ²/2) = '+wr.toFixed(3)+' rad/s');}
+/* 3 */
+function lab3(){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,620);const w0=+$('i3w0').value,gm=+$('i3g').value;$('o3w0').textContent=w0;$('o3g').textContent=gm.toFixed(1);
+ const P=w=>gm*w*w/((w0*w0-w*w)**2+(gm*w)**2),Pm=P(w0);const [X,Y]=frame(g,60,40,1100,500,0,2*w0,0,1.1,'ω (rad/s)','P/P_max');
+ curve(g,w=>P(w)/Pm,0.01,2*w0,X,Y,CU(),3,1000);seg(g,60,Y(0.5),1160,Y(0.5),MU(),1,[4,4]);txt(g,'½',66,Y(0.5)-6,MU(),'left',17);
+ const a=Math.sqrt(w0*w0+gm*gm/4),w1=a-gm/2,w2=a+gm/2;seg(g,X(w1),Y(0.5),X(w1),540,BL(),1.5,[4,4]);seg(g,X(w2),Y(0.5),X(w2),540,BL(),1.5,[4,4]);arrow(g,X(w0),Y(0.5)+30,X(w1),Y(0.5)+30,BL(),2);arrow(g,X(w0),Y(0.5)+30,X(w2),Y(0.5)+30,BL(),2);txt(g,'Δω = γ',X(w0),Y(0.5)+60,BL(),'center',18);
+ for(let k=0;k<=2*w0;k+=Math.max(1,Math.round(w0/5)))txt(g,String(k),X(k),562,MU(),'center',15);
+ $('r3').innerHTML=EQ('P̄(ω) = (F₀²/2m)·γω²/((ω₀² − ω²)² + γ²ω²)')+EQ('ω₁ = '+w1.toFixed(2)+' ,  ω₂ = '+w2.toFixed(2)+' rad/s')+EQ('Δω = ω₂ − ω₁ = '+(w2-w1).toFixed(2)+' = γ')+EQ('Q = ω₀/Δω = '+(w0/gm).toFixed(1));}
+/* 4 */
+function lab4(){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,620);const f=+$('i4f').value,R=+$('i4r').value,L=+$('i4l').value*1e-3,C=+$('i4c').value*1e-6;$('o4f').textContent=f;$('o4r').textContent=R;$('o4l').textContent=Math.round(L*1e3);$('o4c').textContent=(C*1e6).toFixed(1);
+ const V0=10,Z=ff=>{const w=TAU*ff;return Math.sqrt(R*R+(w*L-1/(w*C))**2);},I=ff=>V0/Z(ff),f0=1/(TAU*Math.sqrt(L*C)),Im=V0/R;
+ const [X,Y]=frame(g,60,30,1100,330,0,400,0,Math.min(Im*1.1,V0/5*1.1),'','I₀ (A)');clip(g,60,30,1100,330);curve(g,I,1,400,X,Y,CU(),3,1000);g.restore();
+ if(f0<400){seg(g,X(f0),30,X(f0),360,MU(),1,[4,4]);txt(g,'f₀',X(f0)+6,52,MU(),'left',17);}dot(g,X(f),Y(Math.min(I(f),Im)),7,CUD());
+ const ph=ff=>Math.atan((TAU*ff*L-1/(TAU*ff*C))/R);const [X2,Y2]=frame(g,60,400,1100,180,0,400,-Math.PI/2,Math.PI/2,'f (Hz)','φ');curve(g,ph,1,400,X2,Y2,BL(),2.6,800);dot(g,X2(f),Y2(ph(f)),7,BL());
+ for(let k=0;k<=400;k+=50)txt(g,String(k),X2(k),602,MU(),'center',15);
+ const w=TAU*f,XL=w*L,XC=1/(w*C);
+ $('r4').innerHTML=EQ('X<sub>L</sub> = ωL = '+XL.toFixed(1)+' Ω ,  X<sub>C</sub> = 1/ωC = '+XC.toFixed(1)+' Ω')+EQ('Z = √(R² + (X<sub>L</sub> − X<sub>C</sub>)²) = '+Z(f).toFixed(1)+' Ω')+EQ('I₀ = V₀/Z = '+I(f).toFixed(3)+' A  (V₀ = 10 V)')+EQ('f₀ = 1/(2π√(LC)) = '+f0.toFixed(1)+' Hz')+EQ('φ = '+(ph(f)*180/Math.PI).toFixed(1).replace('-','−')+'°')+NOTE('عند الرنين '+EQi('X<sub>L</sub> = X<sub>C</sub>')+' فيكون '+EQi('Z = R')+' والتيار في طور الجهد.');}
+/* 5 */
+const T5=pauser('b5p');
+function lab5(t){now=t;const g=$('c5').getContext('2d');g.clearRect(0,0,1200,620);const r=+$('i5r').value,Q=+$('i5q').value,tt=T5();$('o5r').textContent=r.toFixed(2);$('o5q').textContent=Q.toFixed(1);
+ const w0=1,gm=1/Q,w=r,A=amp(w0,gm,w),d=pha(w0,gm,w),th=0.9*tt;
+ const cx=330,cy=310,sc=150,Ls=Math.min(A,4)*sc/2.2;g.strokeStyle=css('--grid');g.lineWidth=1;g.beginPath();g.arc(cx,cy,sc,0,TAU);g.stroke();
+ seg(g,cx-260,cy,cx+260,cy,MU(),1.5);seg(g,cx,cy-260,cx,cy+260,MU(),1.5);txt(g,'Re',cx+250,cy-10,MU(),'right',17);txt(g,'Im',cx+8,cy-245,MU(),'left',17);
+ const fx=cx+sc*Math.cos(th),fy=cy-sc*Math.sin(th);arrow(g,cx,cy,fx,fy,BL(),4);txt(g,'F̃',fx+10,fy-8,BL(),'left',22);
+ const xx=cx+Ls*Math.cos(th-d),xy=cy-Ls*Math.sin(th-d);arrow(g,cx,cy,xx,xy,CU(),4);txt(g,'x̃',xx+10,xy-8,CUD(),'left',22);
+ seg(g,fx,fy,fx,cy,BL(),1,[4,4]);seg(g,xx,xy,xx,cy,CU(),1,[4,4]);dot(g,fx,cy,6,BL());dot(g,xx,cy,6,CUD());
+ g.strokeStyle=GR;g.lineWidth=2;g.beginPath();g.arc(cx,cy,48,-th,-(th-d),false);g.stroke();txt(g,'δ',cx+60*Math.cos(th-d/2),cy-60*Math.sin(th-d/2),GR,'center',20);
+ const [X,Y]=frame(g,640,60,520,480,0,4*Math.PI,-2.3,2.3,'ωt','');curve(g,s=>Math.cos(s),0,4*Math.PI,X,Y,BL(),2.2);curve(g,s=>Math.min(A,4)/2.2*Math.cos(s-d),0,4*Math.PI,X,Y,CU(),2.6);
+ const ph=th%(4*Math.PI);seg(g,X(ph),60,X(ph),540,MU(),1,[4,4]);
+ $('r5').innerHTML=EQ('F̃ = F₀ e<sup>iωt</sup> ,  x̃ = Ã e<sup>iωt</sup>')+EQ('Ã = (F₀/m)/(ω₀² − ω² + iγω)')+EQ('|Ã| = '+A.toFixed(3)+' F₀/(mω₀²) ,  δ = '+(d*180/Math.PI).toFixed(1)+'°')+NOTE('الإزاحة الفيزيائية '+EQi('x = Re(x̃)')+'.');}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4,t5:lab5};const ANIM=new Set(["t5"]);let T0=performance.now();
+function loop(t){if(dirty||ANIM.has(active)){dirty=false;LABS[active]((t-T0)/1000);}requestAnimationFrame(loop);}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>dirty=true);
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

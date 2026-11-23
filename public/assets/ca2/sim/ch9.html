@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل تحويل فورييه</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#0F141A;--panel:#161D26;--ink:#E6EDF3;--muted:#8B98A5;--line:#2A3646;--blue:#4B8BBE;--yel:#FFD43B;--chip:#1C2633}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 44px}
+.pstrip{height:12px;border-radius:6px;margin:0 0 14px;background:linear-gradient(90deg,#4B8BBE 0 50%,#FFD43B 50% 100%)}
+.badge{display:inline-block;border:1px solid var(--yel);color:var(--yel);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}header p{margin:0;color:var(--muted);max-width:72ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:880px){.lab.on{grid-template-columns:1fr}}
+.main{min-width:0;display:flex;flex-direction:column;gap:10px}
+canvas{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--line)}
+.intro{background:var(--chip);border-radius:10px;padding:10px 14px;font-size:.95rem}
+pre.py{direction:ltr;text-align:left;font:13.5px/1.5 Consolas,'Courier New',monospace;background:#0B1016;color:#C9D1D9;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0;overflow:auto;white-space:pre}
+pre.py .k{color:#FF7B72}pre.py .s{color:#A5D6FF}pre.py .n{color:#79C0FF}pre.py .c{color:#8B949E;font-style:italic}
+.ph{font-size:.8rem;color:var(--muted);margin:2px 0 -6px}
+.ctrl{display:flex;flex-direction:column;gap:8px;font-size:.95rem}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.ctrl label b{font-family:Consolas,monospace;direction:ltr;color:var(--yel)}
+.ctrl input[type=range]{width:100%;accent-color:var(--blue)}
+.ctrl select{font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;background:#0B1016;color:var(--ink)}
+.btn{font:inherit;border:1px solid var(--blue);background:var(--blue);color:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;min-height:38px}
+.readout{background:#0B1016;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.9rem}
+.readout .eq{display:block;direction:ltr;text-align:left;font-family:Consolas,monospace;color:var(--yel)}
+.task{border-top:2px dashed var(--line);padding-top:8px}.task h3{margin:0 0 4px;font-size:1rem;color:var(--yel)}
+code{font-family:Consolas,monospace;direction:ltr;unicode-bidi:isolate;background:#0B1016;padding:0 4px;border-radius:4px;color:#A5D6FF}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem;text-align:center}
+</style>
+</head><body><div class="wrap"><div class="pstrip" aria-hidden="true"></div>
+<header><span class="badge">تطبيقات الحاسب في الفيزياء (2) · <bdi dir="ltr">2035001-3</bdi></span><h1>معمل تحويل فورييه</h1>
+<p>الفصل التاسع. حرّك المنزلقات وراقب الطريقة العددية تعمل، واقرأ كود بايثون المكافئ تحت الرسم، ثم أجب عن السؤال في كل تجربة.</p></header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" type="button" aria-selected="true" data-t="x1">1. طيف إشارة مركّبة</button><button role="tab" type="button" aria-selected="false" data-t="x2">2. التركيب من التوافقيات</button></nav>
+<section class="lab on" id="x1" role="tabpanel">
+ <div class="main"><div class="intro">إشارة مجموع موجتين جيبيتين مع ضوضاء. تحويل فورييه المتقطع (DFT/FFT) يكشف الترددات المخفية كقمم في الطيف حتى لو لم تظهر في الإشارة الزمنية.</div>
+  <canvas dir="ltr" id="c1" width="1100" height="600" aria-label="1. طيف إشارة مركّبة"></canvas>
+  <div class="ph">كود بايثون المكافئ (يتحدّث مع القيم):</div><pre class="py" id="p1"></pre></div>
+ <div class="ctrl"><label>التردد الأول f₁ (Hz) <b id="o1_f1"></b></label><input type="range" id="i1_f1" min="1" max="40" step="1" value="5"><label>التردد الثاني f₂ (Hz) <b id="o1_f2"></b></label><input type="range" id="i1_f2" min="1" max="40" step="1" value="12"><label>سعة الموجة الثانية <b id="o1_a2"></b></label><input type="range" id="i1_a2" min="0" max="1" step="0.05" value="0.5"><label>شدة الضوضاء <b id="o1_noise"></b></label><input type="range" id="i1_noise" min="0" max="2" step="0.1" value="0.8"><div class="readout" id="r1"></div>
+  <div class="task"><h3>سؤال</h3>اجعل f₂ = 60 Hz وهو أكبر من تردد نايكويست (50 Hz): أين تظهر القمة؟ (التعرج aliasing)</div></div>
+</section><section class="lab" id="x2" role="tabpanel">
+ <div class="main"><div class="intro">أي دالة دورية مجموع جيوب. نبني موجة مربعة من توافقياتها الفردية <code>(4/π) Σ sin(nωt)/n</code> ونلاحظ ظاهرة جيبس عند القفزات.</div>
+  <canvas dir="ltr" id="c2" width="1100" height="560" aria-label="2. التركيب من التوافقيات"></canvas>
+  <div class="ph">كود بايثون المكافئ (يتحدّث مع القيم):</div><pre class="py" id="p2"></pre></div>
+ <div class="ctrl"><label>عدد التوافقيات <b id="o2_M"></b></label><input type="range" id="i2_M" min="1" max="50" step="1" value="5"><label for="i2_w">الموجة</label><select id="i2_w"><option value="sq" selected>مربعة</option><option value="saw">سن المنشار</option></select><div class="readout" id="r2"></div>
+  <div class="task"><h3>سؤال</h3>كم تبلغ قمة التجاوز (overshoot) عند القفزة مع 50 توافقية؟ هل تختفي بزيادة عدد الحدود؟</div></div>
+</section>
+<footer>أ.د. نجم الحصيني – تطبيقات الحاسب في الفيزياء (2)، الفصل التاسع. يعمل على الجوال دون تثبيت.</footer></div>
+<script>(function(){
+const $=id=>document.getElementById(id);
+const C={bg:'#0F141A',panel:'#161D26',ink:'#E6EDF3',mut:'#8B98A5',grid:'#253040',blue:'#4B8BBE',yel:'#FFD43B',grn:'#3FB950',red:'#F85149',vio:'#BC8CFF',cy:'#39C5CF',org:'#F0883E'};
+let active='x1',dirty=true;const SIMS={};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;dirty=true;}));
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>dirty=true);});
+const V=id=>{const e=$(id);const v=e.type==='range'||e.type==='number'?+e.value:e.value;const o=$('o'+id.slice(1));if(o)o.textContent=e.value;return v;};
+function fmt(v,d=4){if(!isFinite(v))return String(v);const a=Math.abs(v);if(a!==0&&(a<1e-3||a>=1e5))return v.toExponential(d-1).replace('e','e');return (+v.toFixed(d)).toString();}
+/* plot helper */
+function Plot(cv,x0,x1,y0,y1,opt={}){const g=cv.getContext('2d'),W=cv.width,H=cv.height;const L=opt.L||70,R=20,T=opt.T||24,B=50;const w=W-L-R,h=H-T-B;
+ const lx=opt.logx,ly=opt.logy;const tx=v=>L+((lx?Math.log10(v):v)-(lx?Math.log10(x0):x0))/((lx?Math.log10(x1):x1)-(lx?Math.log10(x0):x0))*w,ty=v=>T+h-((ly?Math.log10(v):v)-(ly?Math.log10(y0):y0))/((ly?Math.log10(y1):y1)-(ly?Math.log10(y0):y0))*h;
+ if(!opt.keep){g.fillStyle=C.panel;g.fillRect(0,0,W,H);}
+ g.strokeStyle=C.grid;g.lineWidth=1;g.font='15px Consolas,monospace';g.fillStyle=C.mut;g.textAlign='center';
+ const ticks=(a,b,log)=>{if(log){const t=[];for(let e=Math.ceil(Math.log10(a));e<=Math.floor(Math.log10(b));e++)t.push(Math.pow(10,e));return t;}const span=b-a,raw=span/6,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p,st=(f<1.5?1:f<3?2:f<7?5:10)*p,t=[];for(let v=Math.ceil(a/st-1e-9)*st;v<=b+1e-9*st;v+=st)t.push(Math.abs(v)<1e-12?0:v);return t;};
+ const lab=v=>Math.abs(v)>=1e4||(v!==0&&Math.abs(v)<1e-2)?v.toExponential(0):String(+v.toPrecision(4));
+ ticks(x0,x1,lx).forEach(v=>{const p=tx(v);g.beginPath();g.moveTo(p,T);g.lineTo(p,T+h);g.stroke();g.fillText(lab(v),p,T+h+20);});
+ g.textAlign='right';ticks(y0,y1,ly).forEach(v=>{const p=ty(v);g.beginPath();g.moveTo(L,p);g.lineTo(L+w,p);g.stroke();g.fillText(lab(v),L-6,p+5);});
+ g.strokeStyle=C.mut;g.strokeRect(L,T,w,h);
+ if(opt.xl){g.textAlign='center';g.fillStyle=C.mut;g.fillText(opt.xl,L+w/2,H-8);}if(opt.yl){g.save();g.translate(16,T+h/2);g.rotate(-Math.PI/2);g.textAlign='center';g.fillText(opt.yl,0,0);g.restore();}
+ const P={g,tx,ty,L,T,w,h,
+  line(xs,ys,col,lw=2.2,dash){g.save();g.beginPath();g.rect(L,T,w,h);g.clip();g.strokeStyle=col;g.lineWidth=lw;g.setLineDash(dash||[]);g.beginPath();let pen=false;xs.forEach((x,i)=>{const y=ys[i];if(!isFinite(y)||(ly&&y<=0)){pen=false;return;}pen?g.lineTo(tx(x),ty(y)):g.moveTo(tx(x),ty(y));pen=true;});g.stroke();g.restore();},
+  fn(f,col,lw,dash,n=400){const xs=[],ys=[];for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n;xs.push(x);ys.push(f(x));}P.line(xs,ys,col,lw,dash);},
+  pts(xs,ys,col,r=4.5,fill=true){g.save();g.beginPath();g.rect(L,T,w,h);g.clip();xs.forEach((x,i)=>{g.beginPath();g.arc(tx(x),ty(ys[i]),r,0,7);g.fillStyle=col;g.strokeStyle=col;fill?g.fill():g.stroke();});g.restore();},
+  vline(x,col,dash){g.strokeStyle=col;g.setLineDash(dash||[6,4]);g.beginPath();g.moveTo(tx(x),T);g.lineTo(tx(x),T+h);g.stroke();g.setLineDash([]);},
+  hline(y,col,dash){g.strokeStyle=col;g.setLineDash(dash||[6,4]);g.beginPath();g.moveTo(L,ty(y));g.lineTo(L+w,ty(y));g.stroke();g.setLineDash([]);},
+  text(s,x,y,col,al='left',sz=16){g.fillStyle=col;g.font=sz+'px "IBM Plex Sans Arabic",Tahoma';g.textAlign=al;g.fillText(s,x,y);},
+  legend(items){g.font='15px Tahoma';let y=T+22;items.forEach(([s,col])=>{g.fillStyle=col;g.fillRect(L+w-170,y-10,22,4);g.fillStyle=C.ink;g.textAlign='left';g.fillText(s,L+w-142,y-3);y+=22;});}};
+ return P;}
+/* python code panel with live values */
+const KW=new Set(['def','return','for','in','range','if','elif','else','while','import','from','as','and','or','not','True','False','None','print','lambda']);
+function py(id,code){const el=$(id);if(!el)return;el.innerHTML=code.split('\n').map(l=>{let h=l.replace(/&/g,'&amp;').replace(/</g,'&lt;');const cm=h.indexOf('#');let tail='';if(cm>=0){tail='<span class="c">'+h.slice(cm)+'</span>';h=h.slice(0,cm);}
+ h=h.replace(/('[^']*'|"[^"]*")/g,'<span class="s">$1</span>').replace(/\b([A-Za-z_]+)\b/g,(m)=>KW.has(m)?'<span class="k">'+m+'</span>':m).replace(/\b(\d+\.?\d*(e-?\d+)?)\b/g,'<span class="n">$1</span>');return h+tail;}).join('\n');}
+function out(id,html){const e=$(id);if(e)e.innerHTML=html;}
+function loop(){if(dirty||(SIMS[active]&&SIMS[active].anim)){dirty=false;const S=SIMS[active];if(S)S.draw(performance.now()/1000);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+
+SIMS['x1']={anim:false,draw:function(time){const k=1;const v=n=>V('i1_'+n);const cv=$('c1');
+const f1=v('f1'),f2=v('f2'),a2=v('a2'),nz=v('noise');const N=256,fs=100;let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647-0.5;};
+const t=[],x=[];for(let n=0;n<N;n++){t.push(n/fs);x.push(Math.sin(2*Math.PI*f1*n/fs)+a2*Math.sin(2*Math.PI*f2*n/fs)+nz*2*rnd());}
+const fr=[],A=[];for(let k2=0;k2<=N/2;k2++){let re=0,im=0;for(let n=0;n<N;n++){re+=x[n]*Math.cos(2*Math.PI*k2*n/N);im-=x[n]*Math.sin(2*Math.PI*k2*n/N);}fr.push(k2*fs/N);A.push(2*Math.hypot(re,im)/N);}
+const H=cv.height;
+const g=cv.getContext('2d');g.fillStyle=C.panel;g.fillRect(0,0,cv.width,H);
+const top=Plot({getContext:()=>g,width:cv.width,height:H/2},0,t[N-1],-3.5,3.5,{xl:'t (s)',yl:'x(t)',keep:true});top.line(t,x,C.blue,1.6);
+const bot=Plot({getContext:()=>g,width:cv.width,height:H},0,50,0,1.2,{xl:'f (Hz)',yl:'|X(f)|',keep:true,T:H/2+20});bot.line(fr,A,C.yel,2.2);
+const pk=A.map((a,i)=>[a,fr[i]]).sort((a,b)=>b[0]-a[0]).slice(0,2);
+py('p1',`fs, N = 100, 256\nt = np.arange(N)/fs\nx = np.sin(2*np.pi*${f1}*t) + ${a2}*np.sin(2*np.pi*${f2}*t) + ${nz}*np.random.randn(N)\nX = np.fft.rfft(x)\nf = np.fft.rfftfreq(N, 1/fs)\nA = 2*np.abs(X)/N`);
+out('r1','<span class="eq">peaks at '+pk.map(p=>fmt(p[1],3)+' Hz').join(' , ')+'</span><span class="eq">df = fs/N = '+fmt(fs/N,4)+' Hz</span><span class="eq">Nyquist = 50 Hz</span>');
+}};
+SIMS['x2']={anim:false,draw:function(time){const k=2;const v=n=>V('i2_'+n);const cv=$('c2');
+const M=v('M'),w=v('w');const S=t=>{let s=0;for(let m=1;m<=M;m++){if(w==='sq'){const n=2*m-1;s+=4/Math.PI*Math.sin(n*t)/n;}else s+=2*Math.pow(-1,m+1)*Math.sin(m*t)/m;}return s;};
+const ex=t=>{const u=((t%(2*Math.PI))+2*Math.PI)%(2*Math.PI);return w==='sq'?(u<Math.PI?1:-1):(u<Math.PI?u:u-2*Math.PI);};
+const lim=w==='sq'?1.5:4;const P=Plot(cv,-Math.PI,3*Math.PI,-lim,lim,{xl:'omega t',yl:'f'});P.fn(ex,C.mut,1.5,[5,4],800);P.fn(S,C.yel,2.4,null,1500);
+let mx=0;for(let i=0;i<=3000;i++){mx=Math.max(mx,S(Math.PI*i/3000));}
+py('p2',`t = np.linspace(-np.pi, 3*np.pi, 2000)\nf = np.zeros_like(t)\nfor m in range(1, ${M}+1):\n${w==='sq'?'    n = 2*m - 1\n    f += 4/np.pi*np.sin(n*t)/n':'    f += 2*(-1)**(m+1)*np.sin(m*t)/m'}`);
+out('r2','<span class="eq">max = '+fmt(mx,4)+'</span>'+(w==='sq'?'<span class="eq">overshoot = '+fmt((mx-1)/2*100,3)+' % of jump (Gibbs ~ 9 %)</span>':''));
+}};
+})();</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

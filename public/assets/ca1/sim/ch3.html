@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل ملفات الأوامر والدوال</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#F3F7F6;--panel:#FFFFFF;--ink:#17302B;--muted:#5B6E69;--line:#D3E2DE;--acc:#0F7B6C;--accdk:#0A5A4F;--vio:#6B4FA0;--chip:#E4F1EE;--code:#FBFCFC;--con:#F6F9F8;--hl:#FFF3C4;--ok:#2E7D4F;--bad:#B23A2E;--warn:#9A6A00}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 44px}
+.cstrip{height:14px;border-radius:7px;margin:0 0 14px;direction:ltr;background:linear-gradient(90deg,#0F7B6C 0 22%,#6B4FA0 22% 24%,#0F7B6C 24% 48%,#17302B 48% 50%,#0F7B6C 50% 74%,#6B4FA0 74% 76%,#0F7B6C 76%);opacity:.9}
+.badge{display:inline-block;border:1px solid var(--acc);color:var(--accdk);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:72ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--acc);color:#fff;border-color:var(--acc)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--vio);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:880px){.lab.on{grid-template-columns:1fr}}
+.main{min-width:0;display:flex;flex-direction:column;gap:10px}
+.intro{background:var(--chip);border-radius:10px;padding:10px 14px;font-size:.95rem}
+.pane{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--code)}
+.pane h4{margin:0;font-size:.8rem;font-weight:600;color:var(--muted);background:#EEF4F2;padding:4px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;direction:rtl}
+.pane h4 span.l{direction:ltr;font-family:Consolas,'Courier New',monospace}
+.ed{display:flex;direction:ltr;font:14px/1.55 Consolas,'Courier New',monospace;max-height:340px;overflow:auto}
+.ln{padding:8px 6px 8px 8px;text-align:right;color:#9AAEA9;background:#F1F6F4;user-select:none;min-width:34px;white-space:pre}
+.ln b{display:block;font-weight:400}.ln b.cur{background:var(--hl);color:var(--ink);font-weight:700}
+.ed textarea{flex:1;border:0;resize:none;line-height:1.55;padding:8px 10px;font:inherit;color:#13252A;background:transparent;white-space:pre;overflow:hidden;min-height:120px;tab-size:4}
+.con{direction:ltr;text-align:left;font:13.5px/1.5 Consolas,'Courier New',monospace;white-space:pre-wrap;padding:8px 10px;margin:0;max-height:260px;overflow:auto;background:var(--con);color:#1D2B28;min-height:60px}
+.con .er{color:var(--bad)}.con .wr{color:var(--warn)}.con .pr{color:var(--acc)}
+canvas.fig{width:100%;height:auto;display:block;background:#fff}
+.ctrl{display:flex;flex-direction:column;gap:8px;font-size:.95rem}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.ctrl label b{font-family:Consolas,monospace;direction:ltr;color:var(--accdk)}
+.ctrl input[type=range]{width:100%;accent-color:var(--acc)}
+.ctrl select{font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;border:1px solid var(--acc);background:var(--acc);color:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;min-height:38px}
+.btn.alt{background:#fff;color:var(--accdk)}.btn.sel{background:var(--vio);border-color:var(--vio);color:#fff}
+.vars{width:100%;border-collapse:collapse;font-size:.85rem;direction:ltr}
+.vars th,.vars td{border-bottom:1px solid var(--line);padding:3px 6px;text-align:left;font-family:Consolas,monospace;vertical-align:top}
+.vars th{background:#EEF4F2;font-family:inherit;font-weight:600}
+.vars tr.chg td{background:var(--hl)}
+.task{border-top:2px dashed var(--line);padding-top:8px}.task h3{margin:0 0 4px;font-size:1rem;color:var(--vio)}
+.intro code,.note code{white-space:nowrap;}
+.task code,.ans code{white-space:normal;overflow-wrap:anywhere;}
+.task code,.intro code,.note code,.ans code{font-family:Consolas,monospace;direction:ltr;unicode-bidi:isolate;background:#EEF4F2;padding:0 4px;border-radius:4px}
+.ans{display:none;background:#F0F7F2;border:1px solid #CFE5D6;border-radius:8px;padding:8px;margin-top:6px}
+.ans.on{display:block}
+.note{font-size:.85rem;color:var(--muted)}
+.ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem;text-align:center}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<div class="cstrip" aria-hidden="true"></div>
+<header>
+  <span class="badge">تطبيقات الحاسب في الفيزياء (1) · <bdi dir="ltr">2034001-3</bdi></span>
+  <h1>معمل ملفات الأوامر والدوال</h1>
+  <p>الفصل الثالث. محاكي MATLAB يعمل داخل المتصفح: عدّل الكود أو حرّك المنزلقات، ثم اضغط «تشغيل» وراقب نافذة الأوامر ومساحة العمل والرسم، وأنجز المهمة في كل تجربة.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" type="button" aria-selected="true" data-t="x1">1. ملف الأوامر الأول</button><button role="tab" type="button" aria-selected="false" data-t="x2">2. دالة محلية داخل السكربت</button><button role="tab" type="button" aria-selected="false" data-t="x3">3. دوال بعدة مخرجات</button><button role="tab" type="button" aria-selected="false" data-t="x4">4. تتبّع التنفيذ</button></nav>
+<section class="lab on" id="x1" role="tabpanel">
+ <div class="main">
+  <div class="intro">ملف الأوامر (Script) سلسلة أوامر محفوظة في ملف <code>.m</code> تُنفذ بالترتيب، وتشارك نافذة الأوامر في مساحة العمل نفسها. ابدأ دائمًا بتعليق يشرح البرنامج.</div>
+  
+  <div class="pane"><h4>المحرر <span class="l">projectile.m</span></h4><div class="ed"><div class="ln"></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="كود MATLAB"></textarea></div></div>
+  <div class="row"><button class="btn run" type="button">▶ تشغيل (Ctrl+Enter)</button><button class="btn alt reset" type="button">إعادة الكود</button></div>
+  <div class="pane"><h4>نافذة الأوامر <span class="l">Command Window</span></h4><pre class="con" aria-live="polite"></pre></div>
+  
+ </div>
+ <div class="ctrl">
+  <label>السرعة الابتدائية v0 (m/s) <b id="o1_v0"></b></label><input type="range" id="p1_v0" min="5" max="40" step="1" value="20"><label>زاوية الإطلاق (°) <b id="o1_th"></b></label><input type="range" id="p1_th" min="5" max="85" step="5" value="45">
+  <div class="pane"><h4>مساحة العمل <span class="l">Workspace</span></h4><table class="vars"><thead><tr><th>Name</th><th>Value</th><th>Size</th></tr></thead><tbody></tbody></table></div>
+  <div class="task"><h3>مهمة</h3>عند أي زاوية يكون المدى أكبر ما يمكن؟ أضف إلى السكربت سطرًا يحسب نسبة المدى إلى أقصى ارتفاع <code>ratio = R/H</code> واعرضه.<div class="chk note"></div><button class="btn alt showans" type="button">أظهر الإجابة</button><div class="ans">أكبر مدى عند 45°. <code>ratio = R/H</code> تساوي <code>4/tand(theta)</code>، أي 4 عند 45°.</div></div>
+ </div>
+</section>
+<section class="lab" id="x2" role="tabpanel">
+ <div class="main">
+  <div class="intro">الدالة ملف مستقل يبدأ بالكلمة <code>function</code> وله مدخلات ومخرجات ومساحة عمل خاصة. يمكن أيضًا وضع دوال محلية في آخر السكربت، ثم استدعاؤها باسمها.</div>
+  
+  <div class="pane"><h4>المحرر <span class="l">main.m</span></h4><div class="ed"><div class="ln"></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="كود MATLAB"></textarea></div></div>
+  <div class="row"><button class="btn run" type="button">▶ تشغيل (Ctrl+Enter)</button><button class="btn alt reset" type="button">إعادة الكود</button></div>
+  <div class="pane"><h4>نافذة الأوامر <span class="l">Command Window</span></h4><pre class="con" aria-live="polite"></pre></div>
+  
+ </div>
+ <div class="ctrl">
+  <label>السرعة v0 (m/s) <b id="o2_v0"></b></label><input type="range" id="p2_v0" min="5" max="40" step="1" value="20">
+  <div class="pane"><h4>مساحة العمل <span class="l">Workspace</span></h4><table class="vars"><thead><tr><th>Name</th><th>Value</th><th>Size</th></tr></thead><tbody></tbody></table></div>
+  <div class="task"><h3>مهمة</h3>لاحظ أن <code>g</code> لا تظهر في مساحة العمل لأنها محلية داخل الدالة. أضف دالة محلية <code>Hmax = height_of(v0, theta)</code> ثم احسب <code>h45 = height_of(20, 45)</code> في السكربت.<div class="chk note"></div><button class="btn alt showans" type="button">أظهر الإجابة</button><div class="ans"><code>function Hmax = height_of(v0, theta)</code><br><code>    Hmax = (v0*sind(theta))^2/(2*9.81);</code><br><code>end</code><br>و<code>h45 = height_of(20, 45)</code> = 10.19 m. (الدالة توضع في آخر الملف، والاستدعاء قبلها.)</div></div>
+ </div>
+</section>
+<section class="lab" id="x3" role="tabpanel">
+ <div class="main">
+  <div class="intro">الدالة قد تعيد أكثر من مخرج: <code>function [x, y] = pol2xy(r, th)</code>. وعند الاستدعاء نكتب <code>[a, b] = pol2xy(...)</code>. وإن طلبنا مخرجًا واحدًا نحصل على الأول فقط.</div>
+  
+  <div class="pane"><h4>المحرر <span class="l">convert.m</span></h4><div class="ed"><div class="ln"></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="كود MATLAB"></textarea></div></div>
+  <div class="row"><button class="btn run" type="button">▶ تشغيل (Ctrl+Enter)</button><button class="btn alt reset" type="button">إعادة الكود</button></div>
+  <div class="pane"><h4>نافذة الأوامر <span class="l">Command Window</span></h4><pre class="con" aria-live="polite"></pre></div>
+  
+ </div>
+ <div class="ctrl">
+  <label>نصف القطر r <b id="o3_r"></b></label><input type="range" id="p3_r" min="1" max="10" step="1" value="5"><label>الزاوية θ (°) <b id="o3_th"></b></label><input type="range" id="p3_th" min="0" max="360" step="15" value="30">
+  <div class="pane"><h4>مساحة العمل <span class="l">Workspace</span></h4><table class="vars"><thead><tr><th>Name</th><th>Value</th><th>Size</th></tr></thead><tbody></tbody></table></div>
+  <div class="task"><h3>مهمة</h3>أضف دالة <code>[r, th] = xy2pol(x, y)</code> تعكس التحويل باستخدام <code>hypot</code> و<code>atan2d</code> أو <code>atan2(y,x)*180/pi</code>، وتحقق بها من <code>[rr, tt] = xy2pol(3, 4)</code>.<div class="chk note"></div><button class="btn alt showans" type="button">أظهر الإجابة</button><div class="ans"><code>function [r, th] = xy2pol(x, y)</code><br><code>    r = hypot(x, y);</code><br><code>    th = atan2(y, x)*180/pi;</code><br><code>end</code> → <code>rr = 5, tt = 53.13</code>.</div></div>
+ </div>
+</section>
+<section class="lab" id="x4" role="tabpanel">
+ <div class="main">
+  <div class="intro">اضغط «خطوة بخطوة» لترى ترتيب تنفيذ السكربت سطرًا سطرًا، وكيف تُنشأ المتغيرات في مساحة العمل. الأسطر المظللة في مساحة العمل هي التي تغيّرت للتو.</div>
+  
+  <div class="pane"><h4>المحرر <span class="l">trace_demo.m</span></h4><div class="ed"><div class="ln"></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="كود MATLAB"></textarea></div></div>
+  <div class="row"><button class="btn run" type="button">▶ تشغيل (Ctrl+Enter)</button><button class="btn alt step" type="button">خطوة بخطوة ⏭</button><button class="btn alt reset" type="button">إعادة الكود</button></div>
+  <div class="pane"><h4>نافذة الأوامر <span class="l">Command Window</span></h4><pre class="con" aria-live="polite"></pre></div>
+  
+ </div>
+ <div class="ctrl">
+  <label>ثابت النابض k (N/m) <b id="o4_k"></b></label><input type="range" id="p4_k" min="2" max="200" step="2" value="50">
+  <div class="pane"><h4>مساحة العمل <span class="l">Workspace</span></h4><table class="vars"><thead><tr><th>Name</th><th>Value</th><th>Size</th></tr></thead><tbody></tbody></table></div>
+  <div class="task"><h3>مهمة</h3>تتبع البرنامج خطوة خطوة. ماذا يحدث لو بدّلت ترتيب السطرين الثالث والرابع؟ جرّب ذلك في المحرر وفسّر رسالة الخطأ.<button class="btn alt showans" type="button">أظهر الإجابة</button><div class="ans">السطر <code>T = 2*pi/w</code> يحتاج <code>w</code> معرّفًا قبله؛ عند تبديل الترتيب يظهر <code>Undefined function or variable &#x27;w&#x27;.</code> لأن السكربت يُنفذ من الأعلى إلى الأسفل.</div></div>
+ </div>
+</section>
+<footer>أ.د. نجم الحصيني – تطبيقات الحاسب في الفيزياء (1)، الفصل الثالث. المحاكي تعليمي ويدعم جزءًا من لغة MATLAB، ويعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+const PAGE={exps:[{"code": "% projectile.m : range and flight time of a projectile\n% inputs\nv0 = {{v0}};          % initial speed (m/s)\ntheta = {{th}};       % launch angle (degrees)\ng = 9.81;\n% calculations\nT = 2*v0*sind(theta)/g;          % flight time\nR = v0^2*sind(2*theta)/g;        % range\nH = (v0*sind(theta))^2/(2*g);    % max height\n% output\nfprintf('T = %.2f s,  R = %.2f m,  H = %.2f m\\n', T, R, H)", "params": [{"id": "v0", "type": "range", "label": "السرعة الابتدائية v0 (m/s)", "min": 5, "max": 40, "step": 1, "val": 20}, {"id": "th", "type": "range", "label": "زاوية الإطلاق (°)", "min": 5, "max": 85, "step": 5, "val": 45}], "presets": [],"check":(V,out)=>V.has("ratio")&&Math.abs(V.get("ratio").d[0]-V.get("R").d[0]/V.get("H").d[0])<1e-9},
+{"code": "angles = 15:15:75;\nfor k = 1:length(angles)\n    fprintf('theta = %2d deg  ->  R = %6.2f m\\n', angles(k), range_of({{v0}}, angles(k)))\nend\n\nfunction R = range_of(v0, theta)\n% RANGE_OF  horizontal range on level ground\n    g = 9.81;\n    R = v0^2*sind(2*theta)/g;\nend", "params": [{"id": "v0", "type": "range", "label": "السرعة v0 (m/s)", "min": 5, "max": 40, "step": 1, "val": 20}], "presets": [],"check":(V,out)=>V.has("h45")&&Math.abs(V.get("h45").d[0]-(20*Math.sin(Math.PI/4))**2/(2*9.81))<1e-6},
+{"code": "[x, y] = pol2xy({{r}}, {{th}})\nd = pol2xy({{r}}, {{th}})        % only the first output\n[m, s] = stats([9.79 9.83 9.81 9.78 9.84])\n\nfunction [x, y] = pol2xy(r, th)\n    x = r*cosd(th);\n    y = r*sind(th);\nend\n\nfunction [m, s] = stats(v)\n    m = mean(v);\n    s = std(v);\nend", "params": [{"id": "r", "type": "range", "label": "نصف القطر r", "min": 1, "max": 10, "step": 1, "val": 5}, {"id": "th", "type": "range", "label": "الزاوية θ (°)", "min": 0, "max": 360, "step": 15, "val": 30}], "presets": [],"check":(V,out)=>V.has("rr")&&V.has("tt")&&Math.abs(V.get("rr").d[0]-5)<1e-9&&Math.abs(V.get("tt").d[0]-53.13010235)<1e-6},
+{"code": "m = 2;              % kg\nk = {{k}};            % N/m\nw = sqrt(k/m);      % angular frequency\nT = 2*pi/w;\nf = 1/T;\nfprintf('T = %.3f s, f = %.3f Hz\\n', T, f)", "params": [{"id": "k", "type": "range", "label": "ثابت النابض k (N/m)", "min": 2, "max": 200, "step": 2, "val": 50}], "presets": []}]};
+/* mini-MATLAB interpreter for the Computer Applications in Physics (1) virtual labs.
+   Supports a teaching subset: matrices, ranges, element-wise ops, indexing, control flow,
+   anonymous & local functions, display formats, fprintf/disp, plotting hooks. */
+const ML=(function(){
+'use strict';
+class MErr extends Error{constructor(m){super(m);this.ml=true;}}
+const err=m=>{throw new MErr(m);};
+/* ---------------- values ---------------- */
+function M(r,c,d){return {t:'m',r,c,d:d||new Float64Array(r*c)};}
+const S=v=>{const m=M(1,1);m.d[0]=v;return m;};
+const STR=s=>({t:'s',s:String(s)});
+const isM=v=>v&&v.t==='m',isS=v=>v&&v.t==='s',isF=v=>v&&v.t==='f';
+function num(v){if(isS(v)){const m=M(1,v.s.length);for(let i=0;i<v.s.length;i++)m.d[i]=v.s.charCodeAt(i);return m;}if(isM(v))return v;err('Expected a numeric value.');}
+const numel=v=>isS(v)?v.s.length:v.r*v.c;
+const scal=v=>{v=num(v);if(v.r*v.c<1)err('Value must be a scalar, not empty.');return v.d[0];};
+function fromRows(rows){const r=rows.length,c=r?rows[0].length:0,m=M(r,c);for(let i=0;i<r;i++)for(let j=0;j<c;j++)m.d[i+j*r]=rows[i][j];return m;}
+function rowv(a){const m=M(1,a.length);a.forEach((x,i)=>m.d[i]=x);return m;}
+function colv(a){const m=M(a.length,1);a.forEach((x,i)=>m.d[i]=x);return m;}
+const arr=v=>Array.from(num(v).d);
+const isVec=m=>m.r===1||m.c===1;
+/* ---------------- lexer ---------------- */
+const KW=new Set(['if','elseif','else','end','for','while','switch','case','otherwise','break','continue','function','return']);
+function lex(src){const T=[];let i=0,n=src.length,sp=false;
+ const push=(k,v)=>{T.push({k,v,sp});sp=false;};
+ while(i<n){const ch=src[i];
+  if(ch===' '||ch==='\t'||ch==='\r'){sp=true;i++;continue;}
+  if(ch==='.'&&src.substr(i,3)==='...'){while(i<n&&src[i]!=='\n')i++;i++;sp=true;continue;}
+  if(ch==='%'){while(i<n&&src[i]!=='\n')i++;continue;}
+  if(ch==='\n'){push('nl','\n');i++;continue;}
+  if(/[0-9]/.test(ch)||(ch==='.'&&/[0-9]/.test(src[i+1]||''))){let j=i;while(j<n&&/[0-9.]/.test(src[j])){if(src[j]==='.'&&/[*\/\\^']/.test(src[j+1]||''))break;j++;}
+   if(j<n&&/[eE]/.test(src[j])&&/[-+0-9]/.test(src[j+1]||'')){j++;if(/[-+]/.test(src[j]))j++;while(j<n&&/[0-9]/.test(src[j]))j++;}
+   push('num',parseFloat(src.slice(i,j)));i=j;continue;}
+  if(/[A-Za-z_]/.test(ch)){let j=i;while(j<n&&/[A-Za-z0-9_]/.test(src[j]))j++;const w=src.slice(i,j);push(KW.has(w)?'kw':'id',w);i=j;continue;}
+  if(ch==="'"){const p=T[T.length-1];const tr=p&&!sp&&(p.k==='num'||p.k==='id'||p.v===')'||p.v===']'||p.v==="'"||p.v==="}"||(p.k==='kw'&&p.v==='end'&&false));
+   if(tr){push('op',"'");i++;continue;}
+   let j=i+1,s='';while(j<n){if(src[j]==="'"){if(src[j+1]==="'"){s+="'";j+=2;continue;}break;}if(src[j]==='\n')err('String is not terminated properly.');s+=src[j++];}
+   if(j>=n)err('String is not terminated properly.');push('str',s);i=j+1;continue;}
+  if(ch==='"'){let j=i+1,s='';while(j<n&&src[j]!=='"'){if(src[j]==='\n')err('String is not terminated properly.');s+=src[j++];}push('str',s);i=j+1;continue;}
+  const two=src.substr(i,2);
+  if(['.*','./','.^','.\\',".'",'==','~=','<=','>=','&&','||'].includes(two)){push('op',two);i+=2;continue;}
+  if('+-*/\\^<>&|~=(),;:[]{}@!'.includes(ch)){push('op',ch==='!'?'~':ch);i++;continue;}
+  err('Invalid character "'+ch+'" in the command.');}
+ push('nl','\n');T.push({k:'eof',v:'',sp:false});return T;}
+/* ---------------- parser ---------------- */
+function parse(src){const T=lex(src);let p=0,brk=0;
+ const pk=(o=0)=>T[p+o],nx=()=>T[p++];
+ const is=(k,v)=>{const t=T[p];return t.k===k&&(v===undefined||t.v===v);};
+ const isop=v=>is('op',v);
+ const exp=(k,v)=>{if(!is(k,v))err(v?('Parse error: expected "'+v+'" near "'+(T[p].v||'end of line')+'".'):'Parse error near "'+T[p].v+'".');return nx();};
+ function block(stops){const out=[];while(true){while(is('nl')||isop(';')||isop(','))nx();const t=pk();if(t.k==='eof'||(t.k==='kw'&&stops.includes(t.v)))return out;out.push(stmt());}}
+ function endStmt(){let show=true;if(isop(';')){nx();show=false;}else if(isop(','))nx();else if(is('nl'))nx();else if(!is('eof')&&!is('kw'))err('Parse error near "'+T[p].v+'".');return show;}
+ function stmt(){const t=pk(),line=lineOf(p);
+  if(t.k==='kw'){nx();
+   if(t.v==='if'){const br=[];let c=expr();let b=block(['elseif','else','end']);br.push([c,b]);let el=null;
+    while(true){const k=nx();if(k.k==='eof')err('Parse error: \'if\' statement is missing its \'end\'.');if(k.v==='elseif'){c=expr();b=block(['elseif','else','end']);br.push([c,b]);}else if(k.v==='else'){el=block(['end']);}else if(k.v==='end')break;}
+    return {k:'if',br,el,line};}
+   if(t.v==='for'){const v=exp('id').v;exp('op','=');const e=expr();const b=block(['end']);exp('kw','end');return {k:'for',v,e,b,line};}
+   if(t.v==='while'){const c=expr();const b=block(['end']);exp('kw','end');return {k:'while',c,b,line};}
+   if(t.v==='switch'){const e=expr();const cs=[];let ow=null;while(is('nl')||isop(';')||isop(','))nx();
+    while(true){const k=nx();if(k.v==='case'){const v=expr();cs.push([v,block(['case','otherwise','end'])]);}else if(k.v==='otherwise'){ow=block(['end']);}else if(k.v==='end')break;else err('Parse error in switch.');}
+    return {k:'switch',e,cs,ow,line};}
+   if(t.v==='break'||t.v==='continue'||t.v==='return'){endStmt();return {k:t.v,line};}
+   if(t.v==='function'){let outs=[];if(isop('[')){nx();while(!isop(']')){outs.push(exp('id').v);if(isop(','))nx();}nx();exp('op','=');}
+    else if(is('id')&&pk(1).k==='op'&&pk(1).v==='='){outs=[nx().v];nx();}
+    const name=exp('id').v;const args=[];if(isop('(')){nx();while(!isop(')')){args.push(exp('id').v);if(isop(','))nx();}nx();}
+    const b=block(['end','function']);if(is('kw','end'))nx();return {k:'fdef',name,outs,args,b,line};}
+   err('Parse error: unexpected "'+t.v+'".');}
+  // command syntax: format long, hold on, grid on, clc, clear x
+  if(t.k==='id'&&['format','hold','grid','clc','clear','close','axis','figure','clf','disp_off','legend_off','box'].includes(t.v)&&(pk(1).k==='nl'||pk(1).k==='eof'||(pk(1).k==='id'&&pk(1).sp)||(pk(1).k==='op'&&(pk(1).v===';'||pk(1).v===',')))){
+   nx();const args=[];while(is('id')||is('num')){args.push(String(nx().v));}const show=endStmt();return {k:'cmd',name:t.v,args,line};}
+  // multi-assign
+  if(isop('[')){let q=p+1,ok=true,names=[];while(true){const a=T[q];if(a.k==='id'||(a.k==='op'&&a.v==='~')){names.push(a.v);q++;if(T[q].v===',')q++;else if(T[q].v===']')break;else if(T[q].k==='id'||(T[q].k==='op'&&T[q].v==='~'))continue;else{ok=false;break;}}else{ok=false;break;}}
+   if(ok&&T[q].v===']'&&T[q+1].v==='='&&T[q+2].v!=='='){p=q+2;const e=expr();const show=endStmt();return {k:'massign',names,e,show,line};}}
+  // assignment
+  if(t.k==='id'){let q=p+1;let depth=0;if(T[q].v==='('){depth=1;q++;while(depth>0&&T[q].k!=='eof'){if(T[q].v==='(')depth++;else if(T[q].v===')')depth--;q++;}}
+   if(T[q].k==='op'&&T[q].v==='='&&!(T[q+1].k==='op'&&T[q+1].v==='=')){nx();let idx=null;if(isop('(')){nx();idx=args(')');}exp('op','=');const e=expr();const show=endStmt();return {k:'assign',name:t.v,idx,e,show,line};}}
+  const e=expr();const show=endStmt();return {k:'expr',e,show,line};}
+ function lineOf(q){let l=1;for(let i=0;i<q;i++)if(T[i].k==='nl')l++;return l;}
+ function args(close){const a=[];if(isop(close)){nx();return a;}const sb=brk;brk=0;while(true){if(isop(':')&&(pk(1).v===','||pk(1).v===close)){nx();a.push({k:'colon'});}else a.push(expr());if(isop(',')){nx();continue;}exp('op',close);break;}brk=sb;return a;}
+ const PREC=[['||'],['&&'],['|'],['&'],['==','~=','<','<=','>','>='],[':'],['+','-'],['*','/','\\','.*','./','.\\'],['u'],['^','.^']];
+ function expr(){return bin(0);}
+ function stopInBracket(){const t=pk();return brk>0&&t.sp&&(t.v==='+'||t.v==='-')&&!pk(1).sp;}
+ function bin(l){if(l===8)return unary();if(l===9)return post();
+  if(l===5){let a=bin(6);if(isop(':')&&!(brk>0&&false)){nx();let b=bin(6);if(isop(':')){nx();const c=bin(6);return {k:'range',a,s:b,b:c};}return {k:'range',a,s:null,b};}return a;}
+  let a=bin(l+1);while(is('op')&&PREC[l].includes(pk().v)&&!stopInBracket()){const op=nx().v;const b=bin(l+1);a={k:'bin',op,a,b};}return a;}
+ function unary(){if(isop('-')||isop('+')||isop('~')){const op=nx().v;const e=unary();return {k:'un',op,e};}return bin(9);}
+ function post(){let a=prim();while(true){
+   if(isop("'")||isop(".'")){nx();a={k:'tr',e:a};continue;}
+   if((isop('^')||isop('.^'))){const op=nx().v;let b;if(isop('-')||isop('+')){const u=nx().v;b={k:'un',op:u,e:prim()};}else b=prim();while(isop("'")||isop(".'")){nx();b={k:'tr',e:b};}a={k:'bin',op,a,b};continue;}
+   return a;}}
+ function prim(){const t=pk();
+  if(t.k==='num'){nx();return {k:'num',v:t.v};}
+  if(t.k==='str'){nx();return {k:'str',v:t.v};}
+  if(t.k==='kw'&&t.v==='end'){nx();return {k:'endidx'};}
+  if(t.k==='id'){nx();let node={k:'id',v:t.v};if(isop('(')&&!(brk>0&&pk().sp)){nx();node={k:'call',v:t.v,a:args(')')};}return node;}
+  if(isop('(')){nx();const sb=brk;brk=0;const e=expr();brk=sb;exp('op',')');return {k:'paren',e};}
+  if(isop('@')){nx();if(isop('(')){nx();const ps=[];while(!isop(')')){ps.push(exp('id').v);if(isop(','))nx();}nx();const sb=brk;brk=0;const e=expr();brk=sb;return {k:'anon',ps,e};}return {k:'handle',v:exp('id').v};}
+  if(isop('[')||isop('{')){const close=nx().v==='['?']':'}';brk++;const rows=[[]];
+   while(true){if(isop(close)){nx();break;}if(isop(';')||is('nl')){nx();rows.push([]);continue;}if(isop(',')){nx();continue;}if(is('eof'))err('Parse error: missing "'+close+'".');rows[rows.length-1].push(expr());}
+   brk--;if(close==='}')return {k:'cell',items:rows.filter(r=>r.length).flat()};return {k:'mat',rows:rows.filter(r=>r.length)};}
+  if(t.k==='eof'||t.k==='nl')err('Parse error: incomplete expression.');
+  err('Parse error near "'+t.v+'".');}
+ const prog=block([]);if(!is('eof'))err('Parse error: unexpected "'+pk().v+'" (an extra "end"?).');return prog;}
+/* ---------------- arithmetic ---------------- */
+function bcast(a,b,f,name){a=num(a);b=num(b);const na=a.r*a.c,nb=b.r*b.c;
+ if(na===1){const m=M(b.r,b.c);for(let i=0;i<nb;i++)m.d[i]=f(a.d[0],b.d[i]);return m;}
+ if(nb===1){const m=M(a.r,a.c);for(let i=0;i<na;i++)m.d[i]=f(a.d[i],b.d[0]);return m;}
+ if(a.r===b.r&&a.c===b.c){const m=M(a.r,a.c);for(let i=0;i<na;i++)m.d[i]=f(a.d[i],b.d[i]);return m;}
+ if((a.r===b.r&&(a.c===1||b.c===1))||(a.c===b.c&&(a.r===1||b.r===1))||(a.r===1&&b.c===1)||(a.c===1&&b.r===1)){const r=Math.max(a.r,b.r),c=Math.max(a.c,b.c),m=M(r,c);
+  for(let j=0;j<c;j++)for(let i=0;i<r;i++)m.d[i+j*r]=f(a.d[(a.r===1?0:i)+(a.c===1?0:j)*a.r],b.d[(b.r===1?0:i)+(b.c===1?0:j)*b.r]);return m;}
+ err('Matrix dimensions must agree ('+a.r+'×'+a.c+' and '+b.r+'×'+b.c+') for "'+name+'".');}
+function mmul(a,b){a=num(a);b=num(b);if(a.r*a.c===1||b.r*b.c===1)return bcast(a,b,(x,y)=>x*y,'*');
+ if(a.c!==b.r)err('Inner matrix dimensions must agree ('+a.r+'×'+a.c+' * '+b.r+'×'+b.c+'). Use .* for element-wise multiplication.');
+ const m=M(a.r,b.c);for(let i=0;i<a.r;i++)for(let j=0;j<b.c;j++){let s=0;for(let k=0;k<a.c;k++)s+=a.d[i+k*a.r]*b.d[k+j*b.r];m.d[i+j*a.r]=s;}return m;}
+function trans(a){if(isS(a))a=num(a);const m=M(a.c,a.r);for(let i=0;i<a.r;i++)for(let j=0;j<a.c;j++)m.d[j+i*a.c]=a.d[i+j*a.r];return m;}
+function eye(n){const m=M(n,n);for(let i=0;i<n;i++)m.d[i+i*n]=1;return m;}
+function copy(a){return M(a.r,a.c,new Float64Array(a.d));}
+function lsolve(A,B){A=num(A);B=num(B);if(A.r!==B.r)err('Matrix dimensions must agree for "\\".');
+ const n=A.r,c=A.c;if(n===c){const a=copy(A),b=copy(B);const m=B.c;
+  for(let k=0;k<n;k++){let pr=k,mx=Math.abs(a.d[k+k*n]);for(let i=k+1;i<n;i++)if(Math.abs(a.d[i+k*n])>mx){mx=Math.abs(a.d[i+k*n]);pr=i;}
+   if(mx<1e-14){W.warn('Warning: Matrix is singular to working precision.');const o=M(n,m);o.d.fill(Infinity);return o;}
+   if(pr!==k){for(let j=0;j<n;j++){const t=a.d[k+j*n];a.d[k+j*n]=a.d[pr+j*n];a.d[pr+j*n]=t;}for(let j=0;j<m;j++){const t=b.d[k+j*n];b.d[k+j*n]=b.d[pr+j*n];b.d[pr+j*n]=t;}}
+   for(let i=k+1;i<n;i++){const f=a.d[i+k*n]/a.d[k+k*n];if(!f)continue;for(let j=k;j<n;j++)a.d[i+j*n]-=f*a.d[k+j*n];for(let j=0;j<m;j++)b.d[i+j*n]-=f*b.d[k+j*n];}}
+  const x=M(n,m);for(let j=0;j<m;j++)for(let i=n-1;i>=0;i--){let s=b.d[i+j*n];for(let k=i+1;k<n;k++)s-=a.d[i+k*n]*x.d[k+j*n];x.d[i+j*n]=s/a.d[i+i*n];}return x;}
+ return lstsq(A,B);}
+function lstsq(A,B){const At=trans(A);return lsolve(mmul(At,A),mmul(At,B));}
+function inv(A){A=num(A);if(A.r!==A.c)err('Matrix must be square.');return lsolve(A,eye(A.r));}
+function det(A){A=num(A);if(A.r!==A.c)err('Matrix must be square.');const n=A.r,a=copy(A);let d=1;
+ for(let k=0;k<n;k++){let pr=k;for(let i=k+1;i<n;i++)if(Math.abs(a.d[i+k*n])>Math.abs(a.d[pr+k*n]))pr=i;if(Math.abs(a.d[pr+k*n])<1e-300)return 0;
+  if(pr!==k){d=-d;for(let j=0;j<n;j++){const t=a.d[k+j*n];a.d[k+j*n]=a.d[pr+j*n];a.d[pr+j*n]=t;}}d*=a.d[k+k*n];
+  for(let i=k+1;i<n;i++){const f=a.d[i+k*n]/a.d[k+k*n];for(let j=k;j<n;j++)a.d[i+j*n]-=f*a.d[k+j*n];}}return d;}
+const snap=v=>Math.abs(v-Math.round(v))<1e-10*Math.max(1,Math.abs(v))?Math.round(v)+0:v;
+function eigsym(A){const n=A.r,a=[];for(let i=0;i<n;i++){a.push([]);for(let j=0;j<n;j++)a[i].push(A.d[i+j*n]);}const V=[];for(let i=0;i<n;i++){V.push(new Array(n).fill(0));V[i][i]=1;}
+ for(let sweep=0;sweep<100;sweep++){let off=0;for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)off+=a[i][j]*a[i][j];if(off<1e-22)break;
+  for(let p=0;p<n;p++)for(let q=p+1;q<n;q++){if(Math.abs(a[p][q])<1e-300)continue;const th=(a[q][q]-a[p][p])/(2*a[p][q]);const t=Math.sign(th||1)/(Math.abs(th)+Math.sqrt(th*th+1));const c=1/Math.sqrt(t*t+1),s=t*c;
+   for(let k=0;k<n;k++){const akp=a[k][p],akq=a[k][q];a[k][p]=c*akp-s*akq;a[k][q]=s*akp+c*akq;}
+   for(let k=0;k<n;k++){const apk=a[p][k],aqk=a[q][k];a[p][k]=c*apk-s*aqk;a[q][k]=s*apk+c*aqk;}
+   for(let k=0;k<n;k++){const vkp=V[k][p],vkq=V[k][q];V[k][p]=c*vkp-s*vkq;V[k][q]=s*vkp+c*vkq;}}}
+ const idx=[...Array(n).keys()].sort((i,j)=>a[i][i]-a[j][j]);const vals=idx.map(i=>snap(a[i][i]));const Vm=M(n,n);
+ idx.forEach((ii,j)=>{let sg=0;for(let k=0;k<n;k++){if(Math.abs(V[k][ii])>1e-12){sg=V[k][ii]<0?-1:1;break;}}for(let k=0;k<n;k++)Vm.d[k+j*n]=V[k][ii]*(sg<0&&false?-1:1);});
+ return [vals,Vm];}
+function eigval(A){A=num(A);if(A.r!==A.c)err('Matrix must be square.');const n=A.r;let sym=true;for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(Math.abs(A.d[i+j*n]-A.d[j+i*n])>1e-12*(1+Math.abs(A.d[i+j*n])))sym=false;
+ if(sym)return eigsym(A);
+ // unsymmetric: QR iteration with Wilkinson-free simple shifts (teaching sizes)
+ let a=copy(A);for(let it=0;it<500*n;it++){const mu=a.d[(n-1)+(n-1)*n];for(let i=0;i<n;i++)a.d[i+i*n]-=mu;const [Q,R]=qr(a);a=mmul(R,Q);for(let i=0;i<n;i++)a.d[i+i*n]+=mu;}
+ for(let i=1;i<n;i++)if(Math.abs(a.d[i+(i-1)*n])>1e-6*(Math.abs(a.d[i+i*n])+Math.abs(a.d[(i-1)+(i-1)*n])+1e-9))err('This matrix has complex eigenvalues; complex numbers are not supported in this simulator.');
+ const vals=[];for(let i=0;i<n;i++)vals.push(snap(a.d[i+i*n]));vals.sort((x,y)=>x-y);
+ const Vm=M(n,n);vals.forEach((lam,j)=>{const B=copy(A);for(let i=0;i<n;i++)B.d[i+i*n]-=lam+1e-10*(1+Math.abs(lam));let v=M(n,1);v.d.fill(1);for(let k=0;k<6;k++){v=lsolveQuiet(B,v);let s=0;for(const x of v.d)s+=x*x;s=Math.sqrt(s)||1;for(let i=0;i<n;i++)v.d[i]/=s;}
+  let k0=0;for(let i=0;i<n;i++)if(Math.abs(v.d[i])>Math.abs(v.d[k0]))k0=i;const sg=v.d[k0]<0?-1:1;for(let i=0;i<n;i++)Vm.d[i+j*n]=v.d[i]*sg*(1);});
+ return [vals,Vm];}
+function lsolveQuiet(A,B){const w=W.warn;W.warn=()=>{};try{return lsolve(A,B);}finally{W.warn=w;}}
+function qr(A){const m=A.r,n=A.c;const Q=eye(m),R=copy(A);for(let k=0;k<Math.min(m-1,n);k++){let nrm=0;for(let i=k;i<m;i++)nrm+=R.d[i+k*m]**2;nrm=Math.sqrt(nrm);if(nrm<1e-300)continue;const al=R.d[k+k*m]>0?-nrm:nrm;const v=new Float64Array(m);for(let i=k;i<m;i++)v[i]=R.d[i+k*m];v[k]-=al;let vn=0;for(let i=k;i<m;i++)vn+=v[i]*v[i];if(vn<1e-300)continue;
+ for(let j=0;j<n;j++){let s=0;for(let i=k;i<m;i++)s+=v[i]*R.d[i+j*m];s*=2/vn;for(let i=k;i<m;i++)R.d[i+j*m]-=s*v[i];}
+ for(let j=0;j<m;j++){let s=0;for(let i=k;i<m;i++)s+=v[i]*Q.d[j+i*m];s*=2/vn;for(let i=k;i<m;i++)Q.d[j+i*m]-=s*v[i];}}return [Q,R];}
+/* ---------------- splines ---------------- */
+function splineCoef(x,y){const n=x.length;if(n<2)err('interp1/spline needs at least 2 points.');if(n===2){const s=(y[1]-y[0])/(x[1]-x[0]);return {x,y,b:[s,s],c:[0,0],d:[0,0]};}
+ if(n===3){const p=polyfitA(x,y,2);return {poly:p,x,y};}
+ const h=[];for(let i=0;i<n-1;i++)h.push(x[i+1]-x[i]);const A=[],r=[];for(let i=0;i<n;i++){A.push(new Array(n).fill(0));r.push(0);}
+ // second derivatives s_i, not-a-knot
+ A[0][0]=h[1];A[0][1]=-(h[0]+h[1]);A[0][2]=h[0];
+ for(let i=1;i<n-1;i++){A[i][i-1]=h[i-1];A[i][i]=2*(h[i-1]+h[i]);A[i][i+1]=h[i];r[i]=6*((y[i+1]-y[i])/h[i]-(y[i]-y[i-1])/h[i-1]);}
+ A[n-1][n-3]=h[n-2];A[n-1][n-2]=-(h[n-3]+h[n-2]);A[n-1][n-1]=h[n-3];
+ const s=arr(lsolve(fromRows(A),colv(r)));return {x,y,s,h};}
+function splineEval(C,t){if(C.poly)return polyvalA(C.poly,t);const {x,y}=C;const n=x.length;if(C.b)return y[0]+C.b[0]*(t-x[0]);
+ let i=0;if(t>=x[n-1])i=n-2;else if(t>x[0]){let lo=0,hi=n-1;while(hi-lo>1){const md=(lo+hi)>>1;if(x[md]<=t)lo=md;else hi=md;}i=lo;}
+ const h=C.h[i],s=C.s,a=x[i+1]-t,b=t-x[i];return s[i]*a*a*a/(6*h)+s[i+1]*b*b*b/(6*h)+(y[i]/h-s[i]*h/6)*a+(y[i+1]/h-s[i+1]*h/6)*b;}
+function pchipCoef(x,y){const n=x.length,h=[],del=[];for(let i=0;i<n-1;i++){h.push(x[i+1]-x[i]);del.push((y[i+1]-y[i])/h[i]);}const d=new Array(n).fill(0);
+ if(n===2){d[0]=d[1]=del[0];return {x,y,d};}
+ for(let k=1;k<n-1;k++){if(del[k-1]*del[k]>0){const w1=2*h[k]+h[k-1],w2=h[k]+2*h[k-1];d[k]=(w1+w2)/(w1/del[k-1]+w2/del[k]);}}
+ const end=(h0,h1,d0,d1)=>{let v=((2*h0+h1)*d0-h0*d1)/(h0+h1);if(Math.sign(v)!==Math.sign(d0))v=0;else if(Math.sign(d0)!==Math.sign(d1)&&Math.abs(v)>Math.abs(3*d0))v=3*d0;return v;};
+ d[0]=end(h[0],h[1],del[0],del[1]);d[n-1]=end(h[n-2],h[n-3],del[n-2],del[n-3]);return {x,y,d,h,del};}
+function pchipEval(C,t){const {x,y,d}=C,n=x.length;let i=0;if(t>=x[n-1])i=n-2;else if(t>x[0]){while(i<n-2&&x[i+1]<=t)i++;}const h=x[i+1]-x[i],s=(t-x[i])/h;
+ const h00=2*s**3-3*s*s+1,h10=s**3-2*s*s+s,h01=-2*s**3+3*s*s,h11=s**3-s*s;return h00*y[i]+h10*h*d[i]+h01*y[i+1]+h11*h*d[i+1];}
+function polyvalA(p,t){let s=0;for(const c of p)s=s*t+c;return s;}
+function polyfitA(x,y,n){if(x.length!==y.length)err('X and Y vectors must be the same size.');if(x.length<=n)W.warn('Warning: Polynomial is not unique; degree >= number of data points.');
+ const V=M(x.length,n+1);x.forEach((xi,i)=>{for(let j=0;j<=n;j++)V.d[i+j*x.length]=Math.pow(xi,n-j);});const [Q,R]=qr(V);const qty=mmul(trans(Q),colv(y));const c=new Array(n+1).fill(0);
+ for(let i=n;i>=0;i--){let s=qty.d[i];for(let k=i+1;k<=n;k++)s-=R.d[i+k*x.length]*c[k];c[i]=Math.abs(R.d[i+i*x.length])<1e-14?0:s/R.d[i+i*x.length];}return c;}
+/* ---------------- display ---------------- */
+const W={fmt:'short',out:s=>{},warn:s=>W.out(s+'\n'),plot:null,hold:false};
+function fnum(v,mode){if(Number.isNaN(v))return 'NaN';if(v===Infinity)return 'Inf';if(v===-Infinity)return '-Inf';
+ switch(mode){case 'long':return (Math.abs(v)>=1e5||(v!==0&&Math.abs(v)<1e-3))?expo(v,15):v.toFixed(15).replace(/^(-?\d+\.\d{15})\d*/,'$1');
+  case 'shortE':return expo(v,4);case 'longE':return expo(v,15);case 'bank':return v.toFixed(2);case 'rat':return rat(v);
+  case 'shortG':return (+v.toPrecision(5)).toString();case 'longG':return (+v.toPrecision(15)).toString();
+  default:return (Math.abs(v)>=1e5||(v!==0&&Math.abs(v)<1e-3))?expo(v,4):v.toFixed(4);}}
+function expo(v,d){let s=v.toExponential(d);return s.replace(/e([+-])(\d)$/,'e$10$2');}
+function rat(v){if(Number.isInteger(v))return String(v);let h1=1,h0=0,k1=0,k0=1,x=v;for(let i=0;i<20;i++){const a=Math.floor(x);[h1,h0]=[a*h1+h0,h1];[k1,k0]=[a*k1+k0,k1];if(Math.abs(v-h1/k1)<1e-6*Math.abs(v)||x===a)break;x=1/(x-a);}return h1+'/'+k1;}
+function dispVal(v,mode){mode=mode||W.fmt;if(isS(v))return v.s;if(isF(v))return v.src;const m=v;if(m.r*m.c===0)return '[]';
+ const ints=Array.from(m.d).every(x=>Number.isInteger(x)||!isFinite(x));let cells;
+ if(ints&&mode!=='shortE'&&mode!=='longE'&&mode!=='bank'&&Array.from(m.d).every(x=>!isFinite(x)||Math.abs(x)<1e9))cells=Array.from(m.d,x=>isFinite(x)?String(x):fnum(x));
+ else if(m.r*m.c>1&&(mode==='short'||mode==='long')){let mx=0;for(const x of m.d)if(isFinite(x))mx=Math.max(mx,Math.abs(x));const e=mx>0?Math.floor(Math.log10(mx)):0;
+  if(e>=4||e<=-4){const sc=Math.pow(10,e);const dd=mode==='long'?15:4;cells=Array.from(m.d,x=>isFinite(x)?(x/sc).toFixed(dd):fnum(x));const w=Math.max(...cells.map(s=>s.length))+3;
+   const lines=['   1.0e'+(e<0?'-':'+')+String(Math.abs(e)).padStart(2,'0')+' *',''];for(let i=0;i<m.r;i++){let row='';for(let j=0;j<m.c;j++)row+=cells[i+j*m.r].padStart(w);lines.push(row);}return lines.join('\n');}
+  cells=Array.from(m.d,x=>x===0?'0':fnum(x,mode));}
+ else cells=Array.from(m.d,x=>(x===0&&m.r*m.c>1&&mode!=='shortE'&&mode!=='longE')?'0':fnum(x,mode));
+ const w=Math.max(...cells.map(s=>s.replace(/^-/,'').length))+(ints?5:4);if(m.r*m.c===1)return '   '+cells[0].trim();
+ const lines=[];for(let i=0;i<m.r;i++){let row='';for(let j=0;j<m.c;j++)row+=cells[i+j*m.r].padStart(w);lines.push(row);}return lines.join('\n');}
+function show(name,v){if(isS(v)){W.out(name+' =\n\n    \''+v.s+'\'\n\n');return;}if(isF(v)){W.out(name+' =\n\n  function_handle with value:\n\n    '+v.src+'\n\n');return;}
+ if(v.r*v.c===0){W.out(name+' =\n\n     []\n\n');return;}W.out(name+' =\n\n'+dispVal(v)+'\n\n');}
+/* ---------------- printf ---------------- */
+function sprintf(fmt,args){fmt=fmt.replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\\\/g,'\\').replace(/%%/g,'\u0001');
+ const vals=[];args.forEach(a=>{if(isS(a))vals.push(a.s);else arr(a).forEach(x=>vals.push(x));});
+ const re=/%([-+ 0#]*)(\d*)(?:\.(\d+))?([dicfeEgGsux])/g;const specs=fmt.match(re)||[];let out='',k=0;
+ const one=()=>fmt.replace(re,(m0,fl,wd,pr,cv)=>{let v=vals[k++];if(v===undefined)return '';let s;
+   if(cv==='s'){s=typeof v==='number'?((Number.isInteger(v)?String(v):(+v.toPrecision(5)).toString())):v;}
+   else if(cv==='c')s=typeof v==='number'?String.fromCharCode(v):v;
+   else{if(typeof v==='string')v=Number(v);if(cv==='d'||cv==='i'||cv==='u'){s=Number.isInteger(v)?String(v):expo(v,6);}
+    else if(cv==='f')s=isFinite(v)?v.toFixed(pr===undefined?6:+pr):(Number.isNaN(v)?'NaN':(v>0?'Inf':'-Inf'));
+    else if(cv==='e'||cv==='E'){s=expo(v,pr===undefined?6:+pr);if(cv==='E')s=s.toUpperCase();}
+    else{const P=pr===undefined?6:Math.max(1,+pr);const e=v===0?0:Math.floor(Math.log10(Math.abs(v)));s=(e<-4||e>=P)?expo(+v.toPrecision(P),Math.max(0,P-1)).replace(/\.?0+e/,'e'):String(+v.toPrecision(P));}
+    if(fl.includes('+')&&v>=0)s='+'+s;}
+   if(wd){s=fl.includes('-')?s.padEnd(+wd):s.padStart(+wd,fl.includes('0')&&cv!=='s'?'0':' ');}return s;});
+ if(!specs.length)out=fmt;else{do{out+=one();}while(k<vals.length);}return out.replace(/\u0001/g,'%');}
+/* ---------------- interpreter ---------------- */
+class Ctl{constructor(k){this.k=k;}}
+function Interp(){this.vars=new Map();this.funcs=new Map();this.steps=0;}
+Interp.prototype.run=function(src){const prog=parse(src);prog.filter(s=>s.k==='fdef').forEach(f=>this.funcs.set(f.name,f));this.steps=0;
+ try{this.block(prog.filter(s=>s.k!=='fdef'),this.vars);}catch(e){if(e instanceof Ctl)return;throw e;}};
+Interp.prototype.block=function(b,V){for(const s of b){this.stmt(s,V);}};
+Interp.prototype.tick=function(){if(++this.steps>2e6)err('Execution stopped: the program ran too long (infinite loop?).');};
+Interp.prototype.stmt=function(s,V){this.tick();this.line=s.line;if(W.trace&&V===this.vars&&s.k!=='if'&&s.k!=='for'&&s.k!=='while'&&s.k!=='switch')W.trace(s.line,V);
+ switch(s.k){
+ case 'expr':{if(s.e.k==='id'&&!V.has(s.e.v)&&!this.funcs.has(s.e.v)&&!BUILT[s.e.v])err("Undefined function or variable '"+s.e.v+"'.");
+  const v=this.ev(s.e,V,true);if(v===undefined)return;V.set('ans',v);if(s.show){const nm=(s.e.k==='id'&&V.has(s.e.v))?s.e.v:'ans';show(nm,v);}return;}
+ case 'assign':{let v=this.ev(s.e,V);if(v===undefined)err('Value on the right side produces no output.');
+  if(s.idx){const old=V.has(s.name)?V.get(s.name):M(0,0);v=this.setIdx(old,s.idx,v,V);}V.set(s.name,v);if(s.show)show(s.name,v);return;}
+ case 'massign':{const outs=this.ev(s.e,V,false,s.names.length);const L=Array.isArray(outs)?outs:[outs];if(L.length<s.names.length)err('Too many output arguments.');
+  s.names.forEach((nm,i)=>{if(nm!=='~'){V.set(nm,L[i]);if(s.show)show(nm,L[i]);}});return;}
+ case 'if':{if(W.trace&&V===this.vars)W.trace(s.line,V);for(const [c,b] of s.br){if(truthy(this.ev(c,V))){this.block(b,V);return;}}if(s.el)this.block(s.el,V);return;}
+ case 'for':{const e=num(this.ev(s.e,V));const cols=e.c;for(let j=0;j<cols;j++){const col=M(e.r,1);for(let i=0;i<e.r;i++)col.d[i]=e.d[i+j*e.r];V.set(s.v,col);this.tick();if(W.trace&&V===this.vars)W.trace(s.line,V);
+   try{this.block(s.b,V);}catch(x){if(x instanceof Ctl){if(x.k==='break')break;if(x.k==='continue')continue;}throw x;}}return;}
+ case 'while':{while((W.trace&&V===this.vars&&W.trace(s.line,V),truthy(this.ev(s.c,V)))){this.tick();try{this.block(s.b,V);}catch(x){if(x instanceof Ctl){if(x.k==='break')break;if(x.k==='continue')continue;}throw x;}}return;}
+ case 'switch':{if(W.trace&&V===this.vars)W.trace(s.line,V);const v=this.ev(s.e,V);for(const [cv,b] of s.cs){const c=this.ev(cv,V);const opts=c.t==='cell'?c.items:[c];if(opts.some(o=>eqv(v,o))){this.block(b,V);return;}}if(s.ow)this.block(s.ow,V);return;}
+ case 'break':case 'continue':case 'return':throw new Ctl(s.k);
+ case 'cmd':return this.cmd(s.name,s.args,V);
+ }};
+function eqv(a,b){if(isS(a)||isS(b))return isS(a)&&isS(b)&&a.s===b.s;return scal(a)===scal(b);}
+function truthy(v){if(isS(v))return v.s.length>0;v=num(v);if(v.r*v.c===0)return false;for(const x of v.d){if(Number.isNaN(x))err('NaN cannot be converted to logical.');if(!x)return false;}return true;}
+Interp.prototype.cmd=function(name,args,V){
+ if(name==='format'){const a=(args[0]||'short');const map={short:'short',long:'long',shorte:'shortE',longe:'longE',bank:'bank',rat:'rat',shortg:'shortG',longg:'longG',compact:null,loose:null};const k=a.toLowerCase();if(!(k in map))err("Unknown format '"+a+"'.");if(map[k])W.fmt=map[k];return;}
+ if(name==='clc'){W.clc&&W.clc();return;}
+ if(name==='clear'){if(args.length)args.forEach(a=>V.delete(a));else V.clear();W.vars&&W.vars();return;}
+ if(name==='hold'){W.hold=(args[0]||'on')!=='off';return;}
+ if(name==='grid'){W.plot&&W.plot({k:'grid',on:(args[0]||'on')!=='off'});return;}
+ if(name==='figure'||name==='clf'||name==='close'){W.plot&&W.plot({k:'clf'});return;}
+ if(name==='axis'){W.plot&&W.plot({k:'axis',a:args[0]});return;}
+ if(name==='box')return;};
+Interp.prototype.ev=function(e,V,stmtCtx,nout){switch(e.k){
+ case 'num':return S(e.v);
+ case 'str':return STR(e.v);
+ case 'paren':return this.ev(e.e,V);
+ case 'id':if(V.has(e.v))return V.get(e.v);return this.call(e.v,[],V,stmtCtx,nout);
+ case 'endidx':if(!this.endStack||!this.endStack.length)err("'end' used outside of an index.");return S(this.endStack[this.endStack.length-1]);
+ case 'call':{if(V.has(e.v)){const base=V.get(e.v);if(isF(base))return this.apply(base,e.a.map(a=>this.ev(a,V)),nout);return this.index(base,e.a,V);}
+  if(e.v==='plot'||e.v==='fplot'||e.v==='surf'||e.v==='mesh'||e.v==='plot3'||e.v==='bar'||e.v==='scatter'||e.v==='semilogy'||e.v==='loglog'||e.v==='stem')return this.call(e.v,e.a.map(a=>this.ev(a,V)),V,stmtCtx,nout);
+  return this.call(e.v,e.a.map(a=>a.k==='colon'?STR(':'):this.ev(a,V)),V,stmtCtx,nout);}
+ case 'mat':{const rows=e.rows.map(r=>r.map(x=>this.ev(x,V)));return hvcat(rows);}
+ case 'cell':return {t:'cell',items:e.items.map(x=>this.ev(x,V))};
+ case 'range':{const a=scal(this.ev(e.a,V)),b=scal(this.ev(e.b,V)),s=e.s?scal(this.ev(e.s,V)):1;if(s===0||(s>0&&a>b)||(s<0&&a<b))return M(1,0);const n=Math.floor((b-a)/s+1e-10)+1;if(n>1e7)err('Range is too large.');const m=M(1,n);for(let i=0;i<n;i++)m.d[i]=a+i*s;return m;}
+ case 'tr':{const v=this.ev(e.e,V);return trans(isS(v)?num(v):v);}
+ case 'un':{const v=this.ev(e.e,V);if(e.op==='-')return bcast(S(0),v,(x,y)=>-y,'-');if(e.op==='+')return num(v);return LG(bcast(S(0),v,(x,y)=>y?0:1,'~'));}
+ case 'anon':{const ps=e.ps,body=e.e,cap=new Map(V);return {t:'f',src:'@('+ps.join(',')+')'+srcOf(body),fn:(args)=>{const L=new Map(cap);ps.forEach((p,i)=>{if(args[i]!==undefined)L.set(p,args[i]);});return this.ev(body,L);}};}
+ case 'handle':{const nm=e.v;return {t:'f',src:'@'+nm,fn:(args,no)=>this.call(nm,args,V,false,no)};}
+ case 'bin':{const op=e.op;
+  if(op==='&&'||op==='||'){const a=this.ev(e.a,V);const ta=truthy(a);if(op==='&&'&&!ta)return S(0);if(op==='||'&&ta)return S(1);return S(truthy(this.ev(e.b,V))?1:0);}
+  const a=this.ev(e.a,V),b=this.ev(e.b,V);
+  switch(op){case '+':return bcast(a,b,(x,y)=>x+y,'+');case '-':return bcast(a,b,(x,y)=>x-y,'-');case '.*':return bcast(a,b,(x,y)=>x*y,'.*');case './':return bcast(a,b,(x,y)=>x/y,'./');case '.\\':return bcast(a,b,(x,y)=>y/x,'.\\');case '.^':return bcast(a,b,(x,y)=>Math.pow(x,y),'.^');
+   case '*':return mmul(a,b);case '/':{const B=num(b);if(B.r*B.c===1)return bcast(a,b,(x,y)=>x/y,'/');return trans(lsolve(trans(B),trans(num(a))));}
+   case '\\':{const A=num(a);if(A.r*A.c===1)return bcast(a,b,(x,y)=>y/x,'\\');return lsolve(A,b);}
+   case '^':{const A=num(a),B=num(b);if(A.r*A.c===1&&B.r*B.c===1)return S(Math.pow(A.d[0],B.d[0]));if(A.r!==A.c)err('Inputs must be a scalar and a square matrix. To compute elementwise POWER, use POWER (.^) instead.');const p=scal(B);if(!Number.isInteger(p))err('Only integer matrix powers are supported here.');let R=eye(A.r),X=p<0?inv(A):A;for(let i=0;i<Math.abs(p);i++)R=mmul(R,X);return R;}
+   case '==':return LG(cmp(a,b,(x,y)=>x===y,'=='));case '~=':return LG(cmp(a,b,(x,y)=>x!==y,'~='));case '<':return LG(bcast(a,b,(x,y)=>+(x<y),'<'));case '<=':return LG(bcast(a,b,(x,y)=>+(x<=y),'<='));case '>':return LG(bcast(a,b,(x,y)=>+(x>y),'>'));case '>=':return LG(bcast(a,b,(x,y)=>+(x>=y),'>='));
+   case '&':return LG(bcast(a,b,(x,y)=>+(!!x&&!!y),'&'));case '|':return LG(bcast(a,b,(x,y)=>+(!!x||!!y),'|'));}
+  err('Unknown operator '+op);}
+ }err('Cannot evaluate expression.');};
+function LG(m){m.lg=true;return m;}
+function cmp(a,b,f,op){if(isS(a)&&isS(b)&&a.s.length!==b.s.length)err('Matrix dimensions must agree. Use strcmp to compare strings of different lengths.');return bcast(a,b,(x,y)=>+f(x,y),op);}
+function srcOf(e){switch(e.k){case 'num':return String(e.v);case 'str':return "'"+e.v+"'";case 'id':return e.v;case 'paren':return '('+srcOf(e.e)+')';case 'call':return e.v+'('+e.a.map(a=>a.k==='colon'?':':srcOf(a)).join(',')+')';
+ case 'bin':return srcOf(e.a)+e.op+srcOf(e.b);case 'un':return e.op+srcOf(e.e);case 'tr':return srcOf(e.e)+"'";case 'range':return srcOf(e.a)+':'+(e.s?srcOf(e.s)+':':'')+srcOf(e.b);
+ case 'mat':return '['+e.rows.map(r=>r.map(srcOf).join(',')).join(';')+']';case 'anon':return '@('+e.ps.join(',')+')'+srcOf(e.e);case 'handle':return '@'+e.v;case 'endidx':return 'end';}return '?';}
+function hvcat(rows){const rr=rows.map(r=>{if(r.some(isS)&&r.every(x=>isS(x)||isM(x))){return STR(r.map(x=>isS(x)?x.s:String.fromCharCode(...num(x).d)).join(''));}
+  const ms=r.map(num).filter(m=>m.r*m.c>0);if(!ms.length)return M(0,0);const h=ms[0].r;if(ms.some(m=>m.r!==h))err('Dimensions of arrays being concatenated are not consistent.');const c=ms.reduce((s,m)=>s+m.c,0),o=M(h,c);let off=0;ms.forEach(m=>{o.d.set(m.d,off*h);off+=m.c;});return o;});
+ if(rr.length===1)return rr[0];if(rr.every(isS)){const L=rr[0].s.length;if(rr.some(s=>s.s.length!==L))err('Dimensions of arrays being concatenated are not consistent.');const m=M(rr.length,L);rr.forEach((s,i)=>{for(let j=0;j<L;j++)m.d[i+j*rr.length]=s.s.charCodeAt(j);});m.chr=true;return m;}
+ const ms=rr.map(num).filter(m=>m.r*m.c>0);if(!ms.length)return M(0,0);const c=ms[0].c;if(ms.some(m=>m.c!==c))err('Dimensions of arrays being concatenated are not consistent.');const r=ms.reduce((s,m)=>s+m.r,0),o=M(r,c);let off=0;ms.forEach(m=>{for(let j=0;j<c;j++)for(let i=0;i<m.r;i++)o.d[off+i+j*r]=m.d[i+j*m.r];off+=m.r;});return o;}
+/* indexing */
+Interp.prototype.idxList=function(base,a,V,k,n){const dimLen=n===1?numel(base):(k===0?(isS(base)?1:base.r):(isS(base)?base.s.length:base.c));
+ if(a.k==='colon')return [...Array(dimLen).keys()];this.endStack=this.endStack||[];this.endStack.push(dimLen);let v;try{v=num(this.ev(a,V));}finally{this.endStack.pop();}this.lastIdx=v;
+ const L=Array.from(v.d);if(v.lg){return L.map((x,i)=>x?i:-1).filter(i=>i>=0);}
+ return L.map(x=>{if(!Number.isInteger(x)||x<1)err('Array indices must be positive integers or logical values (got '+fnum(x,'shortG')+').');return x-1;});};
+Interp.prototype.index=function(base,args,V){if(isF(base))err('Use f(x) to call a function handle.');
+ if(args.length===1){const I=this.idxList(base,args[0],V,0,1);const N=numel(base);I.forEach(i=>{if(i>=N)err('Index exceeds the number of array elements ('+N+').');});
+  if(isS(base))return STR(I.map(i=>base.s[i]).join(''));let res;
+  if(args[0].k==='colon')res=M(I.length,1);else if(base.r===1)res=M(1,I.length);else if(base.c===1)res=M(I.length,1);else{const iv=this.lastIdx;res=(iv&&iv.r===1)?M(1,I.length):M(I.length,1);}
+  I.forEach((i,k)=>res.d[k]=base.d[i]);return res;}
+ if(args.length===2){const b=num(base);const I=this.idxList(b,args[0],V,0,2),J=this.idxList(b,args[1],V,1,2);const o=M(I.length,J.length);
+  I.forEach((i,ii)=>J.forEach((j,jj)=>{if(i>=b.r||j>=b.c)err('Index in position '+(i>=b.r?1:2)+' exceeds array bounds (must not exceed '+(i>=b.r?b.r:b.c)+').');o.d[ii+jj*I.length]=b.d[i+j*b.r];}));return o;}
+ err('Only 1-D and 2-D indexing is supported.');};
+Interp.prototype.setIdx=function(old,args,v,V){let b=isS(old)?num(old):copy(old);const vv=num(v);
+ const grow=(r,c)=>{if(r<=b.r&&c<=b.c)return;const nr=Math.max(r,b.r),nc=Math.max(c,b.c),n=M(nr,nc);for(let i=0;i<b.r;i++)for(let j=0;j<b.c;j++)n.d[i+j*nr]=b.d[i+j*b.r];b=n;};
+ if(args.length===1){const I=args[0].k==='colon'?[...Array(numel(b)).keys()]:this.idxList(b,args[0],V,0,1);if(vv.r*vv.c===0){const keep=Array.from(b.d).filter((x,i)=>!I.includes(i));return b.c===1&&b.r>1?colv(keep):rowv(keep);}
+  if(vv.r*vv.c!==1&&vv.r*vv.c!==I.length)err('Unable to perform assignment because the left and right sides have a different number of elements.');
+  const mx=Math.max(-1,...I)+1;if(mx>numel(b)){if(b.r<=1)grow(1,mx);else if(b.c===1)grow(mx,1);else err('Attempt to grow array along ambiguous dimension.');}
+  I.forEach((i,k)=>b.d[i]=vv.r*vv.c===1?vv.d[0]:vv.d[k]);return b;}
+ const I=this.idxList(b,args[0],V,0,2),J=this.idxList(b,args[1],V,1,2);if(args[0].k==='colon'&&b.r===0)I.push(...[...Array(vv.r).keys()]);if(args[1].k==='colon'&&b.c===0)J.push(...[...Array(vv.c).keys()]);
+ if(vv.r*vv.c!==1&&vv.r*vv.c!==I.length*J.length)err('Unable to perform assignment because the size of the left side is '+I.length+'×'+J.length+' and the size of the right side is '+vv.r+'×'+vv.c+'.');
+ grow(Math.max(0,...I)+1,Math.max(0,...J)+1);let k=0;J.forEach(j=>I.forEach(i=>{b.d[i+j*b.r]=vv.r*vv.c===1?vv.d[0]:vv.d[k];k++;}));return b;};
+Interp.prototype.apply=function(f,args,nout){if(!isF(f))err('Expected a function handle.');return f.fn(args,nout);};
+Interp.prototype.callUser=function(f,args,nout){if(args.length>f.args.length)err('Too many input arguments for '+f.name+'.');const L=new Map();f.args.forEach((a,i)=>{if(args[i]!==undefined)L.set(a,args[i]);});L.set('nargin',S(args.length));
+ this.depth=(this.depth||0)+1;if(this.depth>200)err('Maximum recursion limit reached.');try{this.block(f.b,L);}catch(x){if(!(x instanceof Ctl&&x.k==='return'))throw x;}finally{this.depth--;}
+ const outs=f.outs.map(o=>{if(!L.has(o))err("Output argument '"+o+"' (and possibly others) not assigned a value in the execution with function '"+f.name+"'.");return L.get(o);});
+ if((nout||1)>1)return outs;return outs[0];};
+Interp.prototype.call=function(name,args,V,stmtCtx,nout){if(this.funcs.has(name))return this.callUser(this.funcs.get(name),args,nout);const f=BUILT[name];if(!f)err("Undefined function or variable '"+name+"'.");return f.call(this,args,nout||1,V);};
+/* ---------------- built-ins ---------------- */
+const map1=f=>function(a){if(a.length<1)err('Not enough input arguments.');const x=num(a[0]);const m=M(x.r,x.c);for(let i=0;i<x.d.length;i++)m.d[i]=f(x.d[i]);return m;};
+function reduce(a,f,init){const x=num(a[0]);const dim=a[1]?scal(a[1]):(x.r===1?2:1);if(x.r*x.c===0)return S(init);
+ if(dim===2){const o=M(x.r,1);for(let i=0;i<x.r;i++){const row=[];for(let j=0;j<x.c;j++)row.push(x.d[i+j*x.r]);o.d[i]=f(row);}return o;}
+ const o=M(1,x.c);for(let j=0;j<x.c;j++){const col=[];for(let i=0;i<x.r;i++)col.push(x.d[i+j*x.r]);o.d[j]=f(col);}return o;}
+function minmax(a,nout,big){if(a.length>=2&&numel(a[1])>0){return bcast(a[0],a[1],(x,y)=>big?Math.max(x,y):Math.min(x,y),big?'max':'min');}
+ const x=num(a[0]);const vec=x.r===1||x.c===1;const cols=vec?[Array.from(x.d)]:[...Array(x.c).keys()].map(j=>Array.from(x.d.slice(j*x.r,(j+1)*x.r)));
+ const v=[],ix=[];cols.forEach(c=>{let k=0;c.forEach((y,i)=>{if(big?y>c[k]:y<c[k])k=i;});v.push(c[k]);ix.push(k+1);});return nout>1?[rowv(v),rowv(ix)]:rowv(v);}
+function zfill(a,v){let r,c;if(!a.length){r=c=1;}else if(a.length===1){const s=num(a[0]);if(s.r*s.c===2){r=s.d[0];c=s.d[1];}else r=c=scal(s);}else{r=scal(a[0]);c=scal(a[1]);}const m=M(r,c);m.d.fill(v);return m;}
+function fz(f,x0,self){const F=x=>scal(self.apply(f,[S(x)]));let a,b;const X=num(x0);if(X.r*X.c===2){a=X.d[0];b=X.d[1];}else{const x=X.d[0];let dx=x?Math.abs(x)/50:0.02;a=x;b=x;let fa=F(a),fb=fa;for(let k=0;k<60&&fa*fb>0;k++){a=x-dx;b=x+dx;fa=F(a);fb=F(b);dx*=1.6;}if(fa*fb>0)err('fzero: could not find a sign change around the starting point.');}
+ let fa=F(a),fb=F(b);if(fa===0)return a;if(fb===0)return b;if(fa*fb>0)err('fzero: the function values at the interval endpoints must differ in sign.');for(let i=0;i<200;i++){const m=(a+b)/2,fm=F(m);if(fm===0||Math.abs(b-a)<1e-15*Math.max(1,Math.abs(m)))return m;if(fa*fm<0){b=m;fb=fm;}else{a=m;fa=fm;}}return (a+b)/2;}
+function integ(f,a,b,self){const F=x=>scal(self.apply(f,[S(x)]));const simp=(a,b,fa,fm,fb)=>(b-a)/6*(fa+4*fm+fb);
+ const rec=(a,b,fa,fm,fb,whole,eps,d)=>{const m=(a+b)/2,lm=(a+m)/2,rm=(m+b)/2,flm=F(lm),frm=F(rm);const L=simp(a,m,fa,flm,fm),R=simp(m,b,fm,frm,fb);if(d>40||Math.abs(L+R-whole)<=15*eps)return L+R+(L+R-whole)/15;return rec(a,m,fa,flm,fm,L,eps/2,d+1)+rec(m,b,fm,frm,fb,R,eps/2,d+1);};
+ const fa=F(a),fb=F(b),fm=F((a+b)/2);return rec(a,b,fa,fm,fb,simp(a,b,fa,fm,fb),1e-10,0);}
+const BUILT={
+ pi:()=>S(Math.PI),eps:()=>S(Number.EPSILON),Inf:()=>S(Infinity),inf:()=>S(Infinity),NaN:()=>S(NaN),nan:()=>S(NaN),e:null,true:()=>S(1),false:()=>S(0),realmax:()=>S(Number.MAX_VALUE),realmin:()=>S(2.2250738585072014e-308),intmax:()=>S(2147483647),
+ i:()=>err('Complex numbers are not supported in this simulator.'),j:()=>err('Complex numbers are not supported in this simulator.'),
+ sin:map1(Math.sin),cos:map1(Math.cos),tan:map1(Math.tan),asin:map1(Math.asin),acos:map1(Math.acos),atan:map1(Math.atan),sinh:map1(Math.sinh),cosh:map1(Math.cosh),tanh:map1(Math.tanh),
+ sind:map1(x=>Math.sin(x*Math.PI/180)),cosd:map1(x=>Math.cos(x*Math.PI/180)),tand:map1(x=>Math.tan(x*Math.PI/180)),asind:map1(x=>Math.asin(x)*180/Math.PI),acosd:map1(x=>Math.acos(x)*180/Math.PI),atand:map1(x=>Math.atan(x)*180/Math.PI),
+ exp:map1(Math.exp),log:map1(x=>{if(x<0)err('log of a negative number gives a complex result (not supported here).');return Math.log(x);}),log10:map1(Math.log10),log2:map1(Math.log2),
+ sqrt:map1(x=>{if(x<0)err('sqrt of a negative number gives a complex result (not supported here).');return Math.sqrt(x);}),abs:map1(Math.abs),sign:map1(Math.sign),
+ round:function(a){if(a.length>1){const d=scal(a[1]),p=Math.pow(10,d);return map1(x=>Math.sign(x)*Math.round(Math.abs(x)*p)/p)([a[0]]);}return map1(x=>Math.sign(x)*Math.round(Math.abs(x)))(a);},
+ floor:map1(Math.floor),ceil:map1(Math.ceil),fix:map1(Math.trunc),factorial:map1(x=>{if(x<0||!Number.isInteger(x))err('N must be a non-negative integer.');let p=1;for(let k=2;k<=x;k++)p*=k;return p;}),
+ atan2:a=>bcast(a[0],a[1],Math.atan2,'atan2'),atan2d:a=>bcast(a[0],a[1],(y,x)=>Math.atan2(y,x)*180/Math.PI,'atan2d'),mod:a=>bcast(a[0],a[1],(x,y)=>y===0?x:x-Math.floor(x/y)*y,'mod'),rem:a=>bcast(a[0],a[1],(x,y)=>y===0?NaN:x-Math.trunc(x/y)*y,'rem'),hypot:a=>bcast(a[0],a[1],Math.hypot,'hypot'),power:a=>bcast(a[0],a[1],Math.pow,'power'),
+ nthroot:a=>bcast(a[0],a[1],(x,n)=>x<0&&n%2?-Math.pow(-x,1/n):Math.pow(x,1/n),'nthroot'),
+ sum:a=>reduce(a,c=>c.reduce((s,x)=>s+x,0),0),prod:a=>reduce(a,c=>c.reduce((s,x)=>s*x,1),1),mean:a=>reduce(a,c=>c.reduce((s,x)=>s+x,0)/c.length,NaN),
+ median:a=>reduce(a,c=>{const s=[...c].sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;},NaN),
+ std:a=>reduce([a[0]],c=>{const m=c.reduce((s,x)=>s+x,0)/c.length;return Math.sqrt(c.reduce((s,x)=>s+(x-m)**2,0)/(c.length-1));},NaN),
+ var:a=>reduce([a[0]],c=>{const m=c.reduce((s,x)=>s+x,0)/c.length;return c.reduce((s,x)=>s+(x-m)**2,0)/(c.length-1);},NaN),
+ max:(a,n)=>minmax(a,n,true),min:(a,n)=>minmax(a,n,false),
+ cumsum:a=>{const x=num(a[0]);const o=copy(x);if(isVec(x)){for(let i=1;i<o.d.length;i++)o.d[i]+=o.d[i-1];}else for(let j=0;j<x.c;j++)for(let i=1;i<x.r;i++)o.d[i+j*x.r]+=o.d[i-1+j*x.r];return o;},
+ cumprod:a=>{const x=num(a[0]);const o=copy(x);for(let i=1;i<o.d.length;i++)o.d[i]*=o.d[i-1];return o;},
+ diff:a=>{const x=arr(a[0]);const o=[];for(let i=1;i<x.length;i++)o.push(x[i]-x[i-1]);return num(a[0]).c===1?colv(o):rowv(o);},
+ sort:(a,n)=>{const x=num(a[0]);const desc=a[1]&&isS(a[1])&&a[1].s.toLowerCase()==='descend';const idx=[...x.d.keys()].sort((i,j)=>desc?x.d[j]-x.d[i]:x.d[i]-x.d[j]);const o=M(x.r,x.c),ix=M(x.r,x.c);idx.forEach((k,p)=>{o.d[p]=x.d[k];ix.d[p]=k+1;});return n>1?[o,ix]:o;},
+ find:a=>{const x=num(a[0]);const o=[];x.d.forEach((v,i)=>{if(v)o.push(i+1);});return x.r===1?rowv(o):colv(o);},
+ any:a=>S(Array.from(num(a[0]).d).some(x=>x)?1:0),all:a=>S(Array.from(num(a[0]).d).every(x=>x)?1:0),
+ isempty:a=>S(numel(a[0])===0?1:0),isnan:a=>LG(map1(x=>+Number.isNaN(x))(a)),isinf:map1(x=>+(Math.abs(x)===Infinity)),isnumeric:a=>S(isM(a[0])?1:0),ischar:a=>S(isS(a[0])?1:0),
+ length:a=>{const x=a[0];if(isS(x))return S(x.s.length);return S(x.r*x.c?Math.max(x.r,x.c):0);},numel:a=>S(numel(a[0])),ndims:()=>S(2),
+ size:(a,n)=>{const x=a[0];const r=isS(x)?1:x.r,c=isS(x)?x.s.length:x.c;if(a[1])return S(scal(a[1])===1?r:c);return n>1?[S(r),S(c)]:rowv([r,c]);},
+ zeros:a=>zfill(a,0),ones:a=>zfill(a,1),eye:a=>{if(!a.length)return S(1);const r=scal(a[0]),c=a[1]?scal(a[1]):r;const m=M(r,c);for(let i=0;i<Math.min(r,c);i++)m.d[i+i*r]=1;return m;},
+ rand:a=>{const m=zfill(a,0);for(let i=0;i<m.d.length;i++)m.d[i]=Math.random();return m;},
+ randn:a=>{const m=zfill(a,0);for(let i=0;i<m.d.length;i++){const u=1-Math.random(),v=Math.random();m.d[i]=Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}return m;},
+ randi:a=>{const mx=scal(a[0]);const m=zfill(a.slice(1),0);for(let i=0;i<m.d.length;i++)m.d[i]=1+Math.floor(Math.random()*mx);return m;},
+ magic:a=>{const n=scal(a[0]);if(n===3)return fromRows([[8,1,6],[3,5,7],[4,9,2]]);if(n===4)return fromRows([[16,2,3,13],[5,11,10,8],[9,7,6,12],[4,14,15,1]]);if(n%2===1){const m=M(n,n);let i=0,j=(n-1)/2;for(let k=1;k<=n*n;k++){m.d[i+j*n]=k;const ni=(i-1+n)%n,nj=(j+1)%n;if(m.d[ni+nj*n]){i=(i+1)%n;}else{i=ni;j=nj;}}return m;}err('magic: only odd n or n = 4 are supported here.');},
+ linspace:a=>{const x0=scal(a[0]),x1=scal(a[1]),n=a[2]?scal(a[2]):100;const m=M(1,n);for(let i=0;i<n;i++)m.d[i]=n===1?x1:x0+(x1-x0)*i/(n-1);return m;},
+ diag:a=>{const x=num(a[0]);if(isVec(x)){const n=x.d.length,m=M(n,n);for(let i=0;i<n;i++)m.d[i+i*n]=x.d[i];return m;}const n=Math.min(x.r,x.c);const o=M(n,1);for(let i=0;i<n;i++)o.d[i]=x.d[i+i*x.r];return o;},
+ trace:a=>{const x=num(a[0]);let s=0;for(let i=0;i<Math.min(x.r,x.c);i++)s+=x.d[i+i*x.r];return S(s);},
+ transpose:a=>trans(num(a[0])),inv:a=>inv(a[0]),det:a=>S(det(a[0])),rank:a=>{const x=num(a[0]);const [,R]=qr(x);let r=0;for(let i=0;i<Math.min(x.r,x.c);i++)if(Math.abs(R.d[i+i*x.r])>1e-10)r++;return S(r);},
+ eig:(a,n)=>{const [v,V]=eigval(a[0]);if(n>1){const D=M(v.length,v.length);v.forEach((x,i)=>D.d[i+i*v.length]=x);return [V,D];}return colv(v);},
+ norm:a=>{const x=num(a[0]);return S(Math.sqrt(Array.from(x.d).reduce((s,y)=>s+y*y,0)));},
+ dot:a=>{const x=arr(a[0]),y=arr(a[1]);if(x.length!==y.length)err('A and B must be the same size.');return S(x.reduce((s,v,i)=>s+v*y[i],0));},
+ cross:a=>{const x=arr(a[0]),y=arr(a[1]);if(x.length!==3||y.length!==3)err('A and B must be of length 3.');const o=[x[1]*y[2]-x[2]*y[1],x[2]*y[0]-x[0]*y[2],x[0]*y[1]-x[1]*y[0]];return num(a[0]).c===1?colv(o):rowv(o);},
+ reshape:a=>{const x=num(a[0]);let r,c;if(a.length===2){const s=num(a[1]);r=s.d[0];c=s.d[1];}else{r=scal(a[1]);c=scal(a[2]);}if(r*c!==x.d.length)err('Number of elements must not change. Use [] as one of the size inputs to automatically calculate the appropriate size for that dimension.');return M(r,c,new Float64Array(x.d));},
+ repmat:a=>{const x=num(a[0]),R=scal(a[1]),C=a[2]?scal(a[2]):R;return hvcat(Array(R).fill(0).map(()=>Array(C).fill(x)));},
+ fliplr:a=>{const x=num(a[0]);const o=M(x.r,x.c);for(let j=0;j<x.c;j++)for(let i=0;i<x.r;i++)o.d[i+j*x.r]=x.d[i+(x.c-1-j)*x.r];return o;},
+ flipud:a=>{const x=num(a[0]);const o=M(x.r,x.c);for(let j=0;j<x.c;j++)for(let i=0;i<x.r;i++)o.d[i+j*x.r]=x.d[(x.r-1-i)+j*x.r];return o;},
+ meshgrid:(a,n)=>{const x=arr(a[0]),y=arr(a[1]||a[0]);const X=M(y.length,x.length),Y=M(y.length,x.length);for(let i=0;i<y.length;i++)for(let j=0;j<x.length;j++){X.d[i+j*y.length]=x[j];Y.d[i+j*y.length]=y[i];}return n>1?[X,Y]:X;},
+ polyval:a=>{const p=arr(a[0]);return map1(t=>polyvalA(p,t))([a[1]]);},
+ polyfit:a=>rowv(polyfitA(arr(a[0]),arr(a[1]),scal(a[2]))),
+ roots:a=>{let p=arr(a[0]);while(p.length&&p[0]===0)p.shift();let z=0;while(p.length&&p[p.length-1]===0){p.pop();z++;}const n=p.length-1;const out=[];
+  if(n>=1){const c=p.map(v=>v/p[0]);let R=Array.from({length:n},(_,k)=>[Math.cos(2*Math.PI*k/n+0.4)*1.1,Math.sin(2*Math.PI*k/n+0.4)*1.1]);
+   const mul=(a,b)=>[a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1]],dv=(a,b)=>{const d=b[0]*b[0]+b[1]*b[1];return [(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d];};
+   const P=x=>{let r=[1,0];for(let k=1;k<=n;k++)r=[r[0]*x[0]-r[1]*x[1]+c[k],r[0]*x[1]+r[1]*x[0]];return r;};
+   for(let it=0;it<2000;it++){let mx=0;R=R.map((x,i)=>{let den=[1,0];R.forEach((y,j)=>{if(j!==i)den=mul(den,sub(x,y));});const d=dv(P(x),den);mx=Math.max(mx,Math.hypot(d[0],d[1]));return sub(x,d);});if(mx<1e-15)break;}
+   if(R.some(x=>Math.abs(x[1])>1e-7*(1+Math.hypot(x[0],x[1]))))err('These roots are complex; complex numbers are not supported in this simulator.');
+   R.forEach(x=>out.push(snap(x[0])));}
+  for(let k=0;k<z;k++)out.push(0);return colv(out.sort((x,y)=>y-x));},
+ conv:a=>{const x=arr(a[0]),y=arr(a[1]);const o=new Array(x.length+y.length-1).fill(0);x.forEach((u,i)=>y.forEach((v,j)=>o[i+j]+=u*v));return rowv(o);},
+ polyder:a=>{const p=arr(a[0]),n=p.length-1;return rowv(p.slice(0,n).map((c,i)=>c*(n-i)));},
+ polyint:a=>{const p=arr(a[0]),n=p.length;return rowv([...p.map((c,i)=>c/(n-i)),a[1]?scal(a[1]):0]);},
+ trapz:a=>{let x,y;if(a.length===1){y=arr(a[0]);x=y.map((_,i)=>i+1);}else{x=arr(a[0]);y=arr(a[1]);}if(x.length!==y.length)err('trapz: X and Y must be the same length.');let s=0;for(let i=1;i<x.length;i++)s+=(x[i]-x[i-1])*(y[i]+y[i-1])/2;return S(s);},
+ interp1:a=>{const x=arr(a[0]),y=arr(a[1]),xi=num(a[2]);let meth='linear',ext=false;a.slice(3).forEach(o=>{if(isS(o)){const s=o.s.toLowerCase();if(s==='extrap')ext=true;else meth=s;}});
+  for(let i=1;i<x.length;i++)if(!(x[i]>x[i-1]))err('The sample points must be strictly increasing (sort the data first).');if(x.length!==y.length)err('The lengths of X and Y must match.');
+  let C=null;if(meth==='spline')C=splineCoef(x,y);if(meth==='pchip'||meth==='cubic')C=pchipCoef(x,y);
+  const o=M(xi.r,xi.c);for(let k=0;k<xi.d.length;k++){const t=xi.d[k];const out=t<x[0]||t>x[x.length-1];
+   if(out&&!ext&&meth!=='spline'&&meth!=='pchip'&&meth!=='cubic'){o.d[k]=NaN;continue;}
+   if(meth==='nearest'){let b=0;x.forEach((v,i)=>{if(Math.abs(v-t)<Math.abs(x[b]-t)||(Math.abs(v-t)===Math.abs(x[b]-t)&&v>x[b]))b=i;});o.d[k]=y[b];}
+   else if(meth==='linear'){let i=0;if(t>=x[x.length-1])i=x.length-2;else if(t>x[0])while(i<x.length-2&&x[i+1]<=t)i++;o.d[k]=y[i]+(y[i+1]-y[i])*(t-x[i])/(x[i+1]-x[i]);}
+   else if(meth==='spline')o.d[k]=splineEval(C,t);else if(meth==='pchip'||meth==='cubic')o.d[k]=pchipEval(C,t);else err("interp1: unknown method '"+meth+"'.");}return o;},
+ spline:a=>{const x=arr(a[0]),y=arr(a[1]);const C=splineCoef(x,y);return map1(t=>splineEval(C,t))([a[2]]);},
+ pchip:a=>{const x=arr(a[0]),y=arr(a[1]);const C=pchipCoef(x,y);return map1(t=>pchipEval(C,t))([a[2]]);},
+ num2str:a=>{const x=num(a[0]);if(a[1]){if(isS(a[1]))return STR(sprintf(a[1].s,[x]));const p=scal(a[1]);return STR(Array.from(x.d).map(v=>String(+v.toPrecision(p))).join('  '));}
+  return STR(Array.from(x.d).map(v=>Number.isInteger(v)?String(v):(()=>{const e=Math.floor(Math.log10(Math.abs(v)||1));const s=v.toPrecision(Math.max(1,e+5));return String(+s).length<=s.length?String(+(+s).toFixed(Math.max(0,4-Math.min(e,4)))):s;})()).join('  '));},
+ str2num:a=>{const it=new Interp();const v=it.ev(parse(a[0].s)[0].e,new Map());return v;},str2double:a=>S(parseFloat(a[0].s)),
+ strcat:a=>STR(a.map(x=>isS(x)?x.s.trimEnd():String(scal(x))).join('')),upper:a=>STR(a[0].s.toUpperCase()),lower:a=>STR(a[0].s.toLowerCase()),strcmp:a=>S(isS(a[0])&&isS(a[1])&&a[0].s===a[1].s?1:0),
+ disp:function(a){const v=a[0];if(isS(v))W.out(v.s+'\n');else if(numel(v)===0)W.out('');else W.out(dispVal(v)+'\n');},
+ fprintf:function(a){if(!a.length||!isS(a[0]))err('fprintf: the first argument must be a format string.');W.out(sprintf(a[0].s,a.slice(1)));},
+ sprintf:a=>STR(sprintf(a[0].s,a.slice(1))),
+ error:a=>{err(a.length>1?sprintf(a[0].s,a.slice(1)):a[0].s);},warning:a=>{W.warn('Warning: '+(a.length>1?sprintf(a[0].s,a.slice(1)):a[0].s));},
+ feval:function(a,n){const f=a[0];if(isS(f))return this.call(f.s,a.slice(1),this.vars,false,n);return this.apply(f,a.slice(1),n);},
+ fzero:function(a){return S(fz(a[0],a[1],this));},integral:function(a){return S(integ(a[0],scal(a[1]),scal(a[2]),this));},quad:function(a){return S(integ(a[0],scal(a[1]),scal(a[2]),this));},
+ fminbnd:function(a,n){const F=x=>scal(this.apply(a[0],[S(x)]));let lo=scal(a[1]),hi=scal(a[2]);const g=(Math.sqrt(5)-1)/2;let c=hi-g*(hi-lo),d=lo+g*(hi-lo);for(let i=0;i<200;i++){if(F(c)<F(d))hi=d;else lo=c;c=hi-g*(hi-lo);d=lo+g*(hi-lo);}const x=(lo+hi)/2;return n>1?[S(x),S(F(x))]:S(x);},
+ arrayfun:function(a){const x=num(a[1]);const o=M(x.r,x.c);for(let i=0;i<x.d.length;i++)o.d[i]=scal(this.apply(a[0],[S(x.d[i])]));return o;},
+ func2str:a=>STR(a[0].src),str2func:function(a){const s=a[0].s;if(s.startsWith('@'))return this.ev(parse('__f='+s)[0].e,this.vars);return {t:'f',src:'@'+s,fn:(args,no)=>this.call(s,args,this.vars,false,no)};},
+ tic:function(){this._tic=performance.now();},toc:function(a,n,V){const t=(performance.now()-(this._tic||0))/1000;W.out('Elapsed time is '+t.toFixed(6)+' seconds.\n');},
+ who:function(){W.out('Your variables are:\n\n'+[...this.vars.keys()].join('  ')+'\n\n');},
+ whos:function(){let s='  Name      Size            Bytes  Class\n\n';for(const [k,v] of this.vars){const r=isS(v)?1:v.r,c=isS(v)?v.s.length:(isF(v)?1:v.c);s+='  '+k.padEnd(10)+(r+'x'+c).padEnd(16)+String(isS(v)?2*c:(isF(v)?32:8*r*c)).padStart(5)+'  '+(isS(v)?'char':isF(v)?'function_handle':'double')+'\n';}W.out(s+'\n');},
+ exist:function(a){return S(this.vars.has(a[0].s)?1:(BUILT[a[0].s]?5:0));},isrow:a=>S(num(a[0]).r===1?1:0),iscolumn:a=>S(num(a[0]).c===1?1:0),
+ input:()=>err('input() is not available in the browser simulator; assign the value in the script instead.'),
+ load:()=>err('load: files are not available here; paste your data as a matrix, e.g. data = [1 2; 3 4];'),save:()=>W.out('(save is not available in the browser simulator)\n'),
+ xlabel:a=>{W.plot&&W.plot({k:'xlabel',s:a[0].s});},ylabel:a=>{W.plot&&W.plot({k:'ylabel',s:a[0].s});},zlabel:a=>{W.plot&&W.plot({k:'zlabel',s:a[0].s});},title:a=>{W.plot&&W.plot({k:'title',s:a[0].s});},
+ legend:a=>{W.plot&&W.plot({k:'legend',items:a.filter(isS).map(x=>x.s)});},grid:a=>{W.plot&&W.plot({k:'grid',on:!a.length||a[0].s!=='off'});},
+ hold:a=>{W.hold=!a.length||a[0].s!=='off';},axis:a=>{W.plot&&W.plot({k:'axis',a:a[0]&&(isS(a[0])?a[0].s:arr(a[0]))});},figure:()=>{W.plot&&W.plot({k:'clf'});},clf:()=>{W.plot&&W.plot({k:'clf'});},
+ subplot:()=>{},close:()=>{W.plot&&W.plot({k:'clf'});},
+ plot:function(a){plotCall('plot',a);},semilogy:function(a){plotCall('semilogy',a);},loglog:function(a){plotCall('loglog',a);},stem:function(a){plotCall('stem',a);},scatter:function(a){plotCall('scatter',a);},bar:function(a){plotCall('bar',a);},
+ fplot:function(a){const f=a[0];const r=a[1]?arr(a[1]):[-5,5];const xs=[],ys=[];for(let i=0;i<=400;i++){const x=r[0]+(r[1]-r[0])*i/400;xs.push(x);ys.push(scal(this.apply(f,[S(x)])));}plotCall('plot',[rowv(xs),rowv(ys),...a.slice(2)]);},
+ plot3:function(a){if(!W.plot)return;const x=arr(a[0]),y=arr(a[1]),z=arr(a[2]);W.plot({k:'plot3',x,y,z,style:a[3]&&isS(a[3])?a[3].s:'',hold:W.hold});},
+ surf:function(a){surfCall(a,'surf');},mesh:function(a){surfCall(a,'mesh');},
+ clc:()=>{W.clc&&W.clc();},clear:function(){this.vars.clear();},format:function(a){this.cmd('format',a.map(x=>x.s),this.vars);},
+ numel_:null};
+BUILT.e=null;delete BUILT.e;delete BUILT.numel_;
+function plotCall(kind,a){if(!W.plot)return;const series=[];let i=0;while(i<a.length){if(isS(a[i])){i++;continue;}let x,y,st='';if(i+1<a.length&&!isS(a[i+1])){x=arr(a[i]);y=num(a[i+1]);i+=2;}else{y=num(a[i]);x=null;i++;}
+  if(i<a.length&&isS(a[i])&&!['LineWidth','MarkerSize','Color','linewidth','DisplayName'].includes(a[i].s)){st=a[i].s;i++;}
+  while(i+1<a.length&&isS(a[i])&&['LineWidth','MarkerSize','Color','linewidth','DisplayName'].includes(a[i].s))i+=2;
+  const cols=y.r>1&&y.c>1?[...Array(y.c).keys()].map(j=>Array.from(y.d.slice(j*y.r,(j+1)*y.r))):[Array.from(y.d)];
+  cols.forEach(yy=>{const xx=x||yy.map((_,k)=>k+1);if(xx.length!==yy.length)err('Vectors must be the same length.');series.push({x:xx,y:yy,style:st});});}
+ W.plot({k:kind,series,hold:W.hold});}
+function surfCall(a,kind){if(!W.plot)return;let X,Y,Z;if(a.length>=3){X=num(a[0]);Y=num(a[1]);Z=num(a[2]);}else{Z=num(a[0]);X=null;}if(X&&(X.r!==Z.r||X.c!==Z.c))err('Data dimensions must agree.');W.plot({k:kind,X,Y,Z});}
+/* ---------------- public API ---------------- */
+return {Interp,W,parse,dispVal,MErr,num,arr,scal,isS,isM,S,STR,rowv,colv,fromRows,show,sprintf};
+})();
+if(typeof module!=='undefined')module.exports=ML;
+
+/* lab UI engine: editor + command window + workspace + figure, driven by PAGE.exps */
+const $=id=>document.getElementById(id);
+const COL=['#0072BD','#D95319','#EDB120','#7E2F8E','#77AC30','#4DBEEE','#A2142F'];
+const LC={r:'#E00000',g:'#00A000',b:'#0000E0',c:'#00BFBF',m:'#BF00BF',y:'#D8C000',k:'#000000',w:'#FFFFFF'};
+function parseStyle(s){s=s||'';let col=null,ls=null,mk=null;for(const ch of s)if(LC[ch])col=LC[ch];
+ if(s.includes('--'))ls='--';else if(s.includes('-.'))ls='-.';else if(s.includes(':'))ls=':';else if(s.includes('-'))ls='-';
+ const m=s.replace(/--|-\.|-|:/g,'').replace(/[rgbcmykw]/g,'').match(/[o+*.xsd^v]/);if(m)mk=m[0];if(!ls&&!mk)ls='-';return {col,ls,mk};}
+function Fig(cv){this.cv=cv;this.g=cv.getContext('2d');this.clear();}
+Fig.prototype.clear=function(){this.S=[];this.title='';this.xl='';this.yl='';this.zl='';this.leg=null;this.grid=false;this.kind='2d';this.logy=false;this.logx=false;this.d3=null;this.ax=null;this.used=false;};
+Fig.prototype.cmd=function(o){const k=o.k;this.used=true;
+ if(k==='clf'){this.clear();return;}
+ if(['plot','semilogy','loglog','stem','scatter','bar'].includes(k)){if(!o.hold){const keep=[this.title,this.xl,this.yl,this.grid];this.clear();this.used=true;}
+  this.kind='2d';this.d3=null;if(k==='semilogy'||k==='loglog')this.logy=true;if(k==='loglog')this.logx=true;
+  o.series.forEach(s=>{const st=parseStyle(s.style);if(k==='scatter'){st.ls=null;st.mk=st.mk||'o';}this.S.push({x:s.x,y:s.y,st,kind:k,ci:this.S.length});});return;}
+ if(k==='plot3'){if(!o.hold){this.clear();this.used=true;}this.kind='3d';this.d3=this.d3||{lines:[],surf:null};this.d3.lines.push({x:o.x,y:o.y,z:o.z,st:parseStyle(o.style)});return;}
+ if(k==='surf'||k==='mesh'){this.clear();this.used=true;this.kind='3d';this.d3={lines:[],surf:{X:o.X,Y:o.Y,Z:o.Z,mesh:k==='mesh'}};return;}
+ if(k==='title')this.title=o.s;if(k==='xlabel')this.xl=o.s;if(k==='ylabel')this.yl=o.s;if(k==='zlabel')this.zl=o.s;if(k==='legend')this.leg=o.items;if(k==='grid')this.grid=o.on;if(k==='axis')this.ax=o.a;};
+const nice=(lo,hi,n)=>{const span=hi-lo||1;const raw=span/n,p=Math.pow(10,Math.floor(Math.log10(raw)));const f=raw/p;const st=(f<1.5?1:f<3?2:f<7?5:10)*p;const t=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+st*1e-9;v+=st)t.push(Math.abs(v)<st*1e-9?0:v);return t;};
+const tickLbl=v=>{if(v===0)return '0';const a=Math.abs(v);if(a>=1e4||a<1e-3)return v.toExponential(0).replace('e+','e');return String(+v.toPrecision(6));};
+Fig.prototype.draw=function(){const g=this.g,W=this.cv.width,H=this.cv.height;g.direction='ltr';g.fillStyle='#fff';g.fillRect(0,0,W,H);
+ if(!this.used){g.fillStyle='#9AAEA9';g.font='22px "IBM Plex Sans Arabic",Tahoma';g.textAlign='center';g.direction='rtl';g.fillText('لا يوجد رسم بعد — استخدم plot أو surf',W/2,H/2);return;}
+ if(this.kind==='3d')return this.draw3();
+ const L=90,R=30,T=this.title?52:26,B=72,w=W-L-R,h=H-T-B;let xs=[],ys=[];this.S.forEach(s=>{s.x.forEach(v=>{if(isFinite(v))xs.push(v);});s.y.forEach(v=>{if(isFinite(v)&&(!this.logy||v>0))ys.push(v);});});
+ if(!xs.length){xs=[0,1];}if(!ys.length)ys=[0,1];let x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+ if(this.S.some(s=>s.kind==='bar'||s.kind==='stem')&&!this.logy){y0=Math.min(0,y0);y1=Math.max(0,y1);if(this.S.some(s=>s.kind==='bar')){x0-=0.6;x1+=0.6;}}
+ if(Array.isArray(this.ax)&&this.ax.length>=4){[x0,x1,y0,y1]=this.ax;}
+ const ly=v=>this.logy?Math.log10(v):v,lx=v=>this.logx?Math.log10(v):v;let Y0=ly(y0),Y1=ly(y1),X0=lx(x0),X1=lx(x1);
+ if(Y1===Y0){Y0-=1;Y1+=1;}if(X1===X0){X0-=1;X1+=1;}if(!(Array.isArray(this.ax))){const pad=(Y1-Y0)*0.06;Y0-=pad;Y1+=pad;}
+ const tx=v=>L+(lx(v)-X0)/(X1-X0)*w,ty=v=>T+h-(ly(v)-Y0)/(Y1-Y0)*h;
+ g.strokeStyle='#26332F';g.lineWidth=1.2;g.strokeRect(L,T,w,h);g.font='17px Consolas,monospace';g.fillStyle='#26332F';
+ const xt=this.logx?nice(X0,X1,6).map(v=>Math.pow(10,v)):nice(X0,X1,7),yt=this.logy?nice(Y0,Y1,6).filter(v=>Number.isInteger(v)).map(v=>Math.pow(10,v)):nice(Y0,Y1,6);
+ g.textAlign='center';g.direction='ltr';xt.forEach(v=>{const px=tx(v);if(px<L-1||px>L+w+1)return;if(this.grid){g.strokeStyle='#E3E8E6';g.beginPath();g.moveTo(px,T);g.lineTo(px,T+h);g.stroke();}g.strokeStyle='#26332F';g.beginPath();g.moveTo(px,T+h);g.lineTo(px,T+h-7);g.stroke();g.fillText(this.logx?'10^'+Math.round(Math.log10(v)):tickLbl(v),px,T+h+24);});
+ g.textAlign='right';yt.forEach(v=>{const py=ty(v);if(py<T-1||py>T+h+1)return;if(this.grid){g.strokeStyle='#E3E8E6';g.beginPath();g.moveTo(L,py);g.lineTo(L+w,py);g.stroke();}g.strokeStyle='#26332F';g.beginPath();g.moveTo(L,py);g.lineTo(L+7,py);g.stroke();g.fillText(this.logy?'10^'+Math.round(Math.log10(v)):tickLbl(v),L-8,py+6);});
+ g.save();g.beginPath();g.rect(L,T,w,h);g.clip();
+ this.S.forEach((s,i)=>{const col=s.st.col||COL[i%COL.length];g.strokeStyle=col;g.fillStyle=col;g.lineWidth=2.2;
+  if(s.kind==='bar'){const bw=Math.max(4,w/(s.x.length*1.6));s.x.forEach((xv,k)=>{const yv=s.y[k];const px=tx(xv),py=ty(yv),p0=ty(Math.max(0,Y0));g.fillRect(px-bw/2,Math.min(py,p0),bw,Math.abs(p0-py));});return;}
+  if(s.kind==='stem'){s.x.forEach((xv,k)=>{const px=tx(xv),py=ty(s.y[k]),p0=ty(0);g.beginPath();g.moveTo(px,p0);g.lineTo(px,py);g.stroke();g.beginPath();g.arc(px,py,5,0,7);g.stroke();});return;}
+  if(s.st.ls){g.setLineDash(s.st.ls==='--'?[12,7]:s.st.ls===':'?[3,5]:s.st.ls==='-.'?[12,5,3,5]:[]);g.beginPath();let pen=false;s.x.forEach((xv,k)=>{const yv=s.y[k];if(!isFinite(yv)||!isFinite(xv)||(this.logy&&yv<=0)){pen=false;return;}const px=tx(xv),py=ty(yv);pen?g.lineTo(px,py):g.moveTo(px,py);pen=true;});g.stroke();g.setLineDash([]);}
+  if(s.st.mk){s.x.forEach((xv,k)=>{const yv=s.y[k];if(!isFinite(yv))return;const px=tx(xv),py=ty(yv);mark(g,s.st.mk,px,py,col);});}});
+ g.restore();
+ g.fillStyle='#17302B';g.textAlign='center';g.font='bold 20px Tahoma,Arial';if(this.title)g.fillText(this.title,L+w/2,T-16);g.font='18px Tahoma,Arial';if(this.xl)g.fillText(this.xl,L+w/2,H-14);
+ if(this.yl){g.save();g.translate(22,T+h/2);g.rotate(-Math.PI/2);g.fillText(this.yl,0,0);g.restore();}
+ if(this.leg&&this.leg.length){g.font='16px Tahoma,Arial';const lw=Math.max(...this.leg.map(t=>g.measureText(t).width))+56,lh=24*Math.min(this.leg.length,this.S.length)+10;g.fillStyle='rgba(255,255,255,.92)';g.fillRect(L+w-lw-8,T+8,lw,lh);g.strokeStyle='#9AAEA9';g.strokeRect(L+w-lw-8,T+8,lw,lh);
+  this.leg.slice(0,this.S.length).forEach((t,i)=>{const s=this.S[i],col=s.st.col||COL[i%COL.length],yy=T+26+24*i;g.strokeStyle=col;g.lineWidth=2.2;if(s.st.ls){g.setLineDash(s.st.ls==='--'?[8,5]:s.st.ls===':'?[3,4]:[]);g.beginPath();g.moveTo(L+w-lw,yy-5);g.lineTo(L+w-lw+30,yy-5);g.stroke();g.setLineDash([]);}if(s.st.mk)mark(g,s.st.mk,L+w-lw+15,yy-5,col);g.fillStyle='#17302B';g.textAlign='left';g.fillText(t,L+w-lw+38,yy);});}};
+function mark(g,m,x,y,col){g.strokeStyle=col;g.fillStyle=col;g.lineWidth=1.8;g.beginPath();const r=5.5;
+ if(m==='o'){g.arc(x,y,r,0,7);g.stroke();}else if(m==='.'){g.arc(x,y,3,0,7);g.fill();}else if(m==='s'){g.strokeRect(x-r,y-r,2*r,2*r);}else if(m==='d'){g.moveTo(x,y-r-1);g.lineTo(x+r,y);g.lineTo(x,y+r+1);g.lineTo(x-r,y);g.closePath();g.stroke();}
+ else if(m==='^'||m==='v'){const s=m==='^'?-1:1;g.moveTo(x,y+s*r);g.lineTo(x+r,y-s*r);g.lineTo(x-r,y-s*r);g.closePath();g.stroke();}
+ else{g.moveTo(x-r,y-r);g.lineTo(x+r,y+r);g.moveTo(x+r,y-r);g.lineTo(x-r,y+r);if(m==='+'||m==='*'){g.moveTo(x,y-r-1);g.lineTo(x,y+r+1);g.moveTo(x-r-1,y);g.lineTo(x+r+1,y);}if(m==='+'){g.closePath();}g.stroke();}}
+function cmap(t){t=Math.max(0,Math.min(1,t));const st=[[0.2422,0.1504,0.6603],[0.2788,0.3556,0.9757],[0.0815,0.5602,0.8888],[0.0592,0.7059,0.7215],[0.4477,0.8007,0.4078],[0.9411,0.7298,0.2049],[0.9763,0.9831,0.0538]];const f=t*(st.length-1),i=Math.min(st.length-2,Math.floor(f)),u=f-i;const c=st[i].map((v,k)=>Math.round(255*(v+(st[i+1][k]-v)*u)));return 'rgb('+c.join(',')+')';}
+Fig.prototype.draw3=function(){const g=this.g,W=this.cv.width,H=this.cv.height;g.direction='ltr';const az=-37.5*Math.PI/180,el=30*Math.PI/180;let P=[];const d=this.d3;
+ let xs=[],ys=[],zs=[];if(d.surf){const {X,Y,Z}=d.surf;for(let k=0;k<Z.d.length;k++){zs.push(Z.d[k]);xs.push(X?X.d[k]:Math.floor(k/Z.r)+1);ys.push(Y?Y.d[k]:k%Z.r+1);}}d.lines.forEach(l=>{xs.push(...l.x);ys.push(...l.y);zs.push(...l.z);});
+ const mn=a=>Math.min(...a.filter(isFinite)),mx=a=>Math.max(...a.filter(isFinite));const x0=mn(xs),x1=mx(xs),y0=mn(ys),y1=mx(ys),z0=mn(zs),z1=mx(zs);
+ const nx=v=>(v-x0)/((x1-x0)||1)-0.5,ny=v=>(v-y0)/((y1-y0)||1)-0.5,nz=v=>(v-z0)/((z1-z0)||1)-0.5;
+ const pr=(x,y,z)=>{const X=nx(x),Y=ny(y),Z=nz(z)*0.8;const u=X*Math.cos(az)-Y*Math.sin(az);const v=X*Math.sin(az)+Y*Math.cos(az);const sx=u,sy=-(Z*Math.cos(el)-v*Math.sin(el));const dep=v*Math.cos(el)+Z*Math.sin(el);return [W/2+sx*W*0.5,H/2+sy*H*0.62+20,dep];};
+ g.fillStyle='#fff';g.fillRect(0,0,W,H);
+ // box floor
+ g.strokeStyle='#C9D4D1';g.lineWidth=1;const corners=[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(c=>pr(c[0],c[1],z0));g.beginPath();corners.forEach((c,i)=>i?g.lineTo(c[0],c[1]):g.moveTo(c[0],c[1]));g.closePath();g.stroke();
+ g.font='15px Consolas';g.fillStyle='#26332F';g.textAlign='center';[[x0,y0],[x1,y0]].forEach(c=>{const p=pr(c[0],c[1],z0);g.fillText(tickLbl(c[0]),p[0],p[1]+20);});[[x1,y1]].forEach(c=>{const p=pr(c[0],c[1],z0);g.fillText(tickLbl(c[1]),p[0]+18,p[1]+14);});
+ const pz0=pr(x0,y1,z0),pz1=pr(x0,y1,z1);g.beginPath();g.moveTo(pz0[0],pz0[1]);g.lineTo(pz1[0],pz1[1]);g.stroke();g.textAlign='right';g.fillText(tickLbl(z0),pz0[0]-6,pz0[1]);g.fillText(tickLbl(z1),pz1[0]-6,pz1[1]);
+ if(d.surf){const {X,Y,Z,mesh}=d.surf,r=Z.r,c=Z.c;const at=(i,j)=>[X?X.d[i+j*r]:j+1,Y?Y.d[i+j*r]:i+1,Z.d[i+j*r]];const faces=[];
+  for(let i=0;i<r-1;i++)for(let j=0;j<c-1;j++){const q=[at(i,j),at(i+1,j),at(i+1,j+1),at(i,j+1)];if(q.some(p=>!isFinite(p[2])))continue;const pp=q.map(p=>pr(...p));const zc=(q[0][2]+q[1][2]+q[2][2]+q[3][2])/4;faces.push({pp,dep:pp.reduce((s,p)=>s+p[2],0)/4,zc});}
+  faces.sort((a,b)=>a.dep-b.dep);faces.forEach(f=>{g.beginPath();f.pp.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();const cc=cmap((f.zc-z0)/((z1-z0)||1));if(mesh){g.fillStyle='#fff';g.fill();g.strokeStyle=cc;g.lineWidth=1.2;g.stroke();}else{g.fillStyle=cc;g.fill();g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=0.6;g.stroke();}});}
+ d.lines.forEach((l,i)=>{const col=l.st.col||COL[i%COL.length];g.strokeStyle=col;g.lineWidth=2.2;g.beginPath();l.x.forEach((x,k)=>{const p=pr(x,l.y[k],l.z[k]);k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);});if(l.st.ls)g.stroke();if(l.st.mk)l.x.forEach((x,k)=>{const p=pr(x,l.y[k],l.z[k]);mark(g,l.st.mk,p[0],p[1],col);});});
+ g.fillStyle='#17302B';g.textAlign='center';g.font='bold 20px Tahoma,Arial';if(this.title)g.fillText(this.title,W/2,26);g.font='17px Tahoma';if(this.xl){const p=pr((x0+x1)/2,y0,z0);g.fillText(this.xl,p[0]-10,p[1]+42);}if(this.yl){const p=pr(x1,(y0+y1)/2,z0);g.fillText(this.yl,p[0]+40,p[1]+30);}if(this.zl){g.save();g.translate(pz0[0]-50,(pz0[1]+pz1[1])/2);g.rotate(-Math.PI/2);g.fillText(this.zl,0,0);g.restore();}};
+/* -------- value preview for workspace -------- */
+function preview(v){if(ML.isS(v))return ["'"+v.s+"'",'1×'+v.s.length];if(v.t==='f')return [v.src,'1×1'];const n=v.r*v.c;let s;
+ const f=x=>Number.isInteger(x)?String(x):(Math.abs(x)>=1e5||(x!==0&&Math.abs(x)<1e-3))?x.toExponential(3):String(+x.toFixed(4));
+ if(n===0)s='[]';else if(n===1)s=f(v.d[0]);else if(n<=8&&(v.r===1||v.c===1))s='['+Array.from(v.d).map(f).join(v.r===1?' ':'; ')+']';else s='<'+v.r+'×'+v.c+' double>';return [s,v.r+'×'+v.c];}
+/* -------- experiment wiring -------- */
+function setupExp(k,E){const root=$('x'+k);const ta=root.querySelector('textarea'),ln=root.querySelector('.ln'),con=root.querySelector('.con'),cv=root.querySelector('canvas.fig'),tb=root.querySelector('tbody');
+ const fig=cv?new Fig(cv):null;let traceData=null,tstep=0;
+ const params=(E.params||[]).map(p=>({p,el:$('p'+k+'_'+p.id),out:$('o'+k+'_'+p.id)}));
+ const fill=()=>{let s=E.code;params.forEach(({p,el,out})=>{const v=el.value;if(out)out.textContent=v;s=s.split('{{'+p.id+'}}').join(v);});return s;};
+ const lines=()=>{const n=ta.value.split('\n').length;ln.innerHTML=Array.from({length:n},(_,i)=>'<b>'+(i+1)+'</b>').join('');ta.rows=n;};
+ const hl=l=>{ln.querySelectorAll('b').forEach((b,i)=>b.classList.toggle('cur',i+1===l));};
+ const ws=(V,prev)=>{if(!tb)return;tb.innerHTML='';for(const [nm,v] of V){if(nm==='nargin')continue;const [s,sz]=preview(v);const tr=document.createElement('tr');if(prev&&prev.get(nm)!==s)tr.className='chg';tr.innerHTML='<td>'+nm+'</td><td>'+esc(s)+'</td><td>'+sz+'</td>';tb.appendChild(tr);}};
+ let userRun=false;function run(trace){const it=new ML.Interp();let out='';ML.W.fmt='short';ML.W.hold=false;ML.W.out=s=>{out+=s;};ML.W.warn=s=>{out+='\u0002'+s+'\u0003\n';};ML.W.clc=()=>{out='';};
+  if(fig){fig.clear();ML.W.plot=o=>fig.cmd(o);}else ML.W.plot=null;const steps=[];ML.W.trace=trace?((l,V)=>{if(steps.length<4000)steps.push({l,o:out.length,v:new Map([...V].map(([a,b])=>[a,b]))});}):null;
+  let errm=null;try{it.run(ta.value);}catch(e){errm=(e.ml?'Error: ':'Error: ')+e.message+(it.line?'  (line '+it.line+')':'');if(!e.ml)console.error(e);}
+  ML.W.trace=null;con.innerHTML=fmtOut(out)+(errm?'<span class="er">'+esc(errm)+'</span>':'');if(!out&&!errm)con.innerHTML='<span class="pr">(تم التنفيذ دون مخرجات — أزل الفاصلة المنقوطة ; لعرض النتيجة)</span>';
+  if(fig)fig.draw();ws(it.vars);hl(errm?it.line:0);root.dataset.ran='1';if(E.check&&userRun)check(it,out,errm);return {it,out,steps,errm};}
+ function check(it,out,errm){const el=root.querySelector('.chk');if(!el)return;let ok=false;try{ok=!errm&&E.check(it.vars,out);}catch(e){ok=false;}el.innerHTML=ok?'<span class="ok">✓ أحسنت، النتيجة صحيحة.</span>':'<span class="bad">✗ ليست بعد؛ راجع الكود وحاول مرة أخرى.</span>';}
+ function showStep(){const s=traceData.steps[tstep];if(!s){hl(0);con.innerHTML=fmtOut(traceData.out)+(traceData.errm?'<span class="er">'+esc(traceData.errm)+'</span>':'')+'\n<span class="pr">— انتهى التنفيذ —</span>';ws(traceData.it.vars,tstep>0?snap(traceData.steps[tstep-1]):null);if(fig)fig.draw();return;}
+  hl(s.l);con.innerHTML=fmtOut(traceData.out.slice(0,s.o))+'<span class="pr">▶ السطر التالي: '+s.l+'  ('+(tstep+1)+' من '+traceData.steps.length+')</span>';ws(s.v,tstep>0?snap(traceData.steps[tstep-1]):null);}
+ const snap=st=>new Map([...st.v].map(([a,b])=>[a,preview(b)[0]]));
+ const setCode=()=>{ta.value=fill();lines();traceData=null;run();};
+ params.forEach(({el})=>el.addEventListener('input',setCode));ta.addEventListener('input',()=>{lines();traceData=null;});
+ ta.addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const s=ta.selectionStart;ta.value=ta.value.slice(0,s)+'    '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+4;}if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();traceData=null;userRun=true;run();}});
+ root.querySelector('.run').onclick=()=>{traceData=null;userRun=true;run();};
+ const rs=root.querySelector('.reset');if(rs)rs.onclick=()=>setCode();
+ const st=root.querySelector('.step');if(st)st.onclick=()=>{if(!traceData){traceData=run(true);tstep=0;traceData.it.vars;}else tstep++;if(tstep>traceData.steps.length)tstep=0;showStep();};
+ const ab=root.querySelector('.showans');if(ab)ab.onclick=()=>root.querySelector('.ans').classList.toggle('on');
+ const pre=root.querySelectorAll('.preset');pre.forEach(b=>b.onclick=()=>{ta.value=E.presets[+b.dataset.i].code;lines();traceData=null;run();});
+ ta.value=fill();lines();run();}
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtOut=s=>esc(s).replace(/\u0002/g,'<span class="wr">').replace(/\u0003/g,'</span>');
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));}));
+PAGE.exps.forEach((E,k)=>setupExp(k+1,E));
+
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 3 — Electro-, Acousto- and Magneto-optic Modulators; Liquid Crystal Devices</title><style>
+:root{--mid:#101634;--mag:#C2185B;--pink:#E7B3C8;--pk2:#FBEAF0;--lt:#F6F6F9;--sl:#5B6380;--line:#D6D8E4;--teal:#1F8A9E;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--lt);color:var(--mid);font-family:Calibri,"Source Sans 3","Segoe UI",Arial,sans-serif;font-size:16px}
+header{background:var(--mid);color:#fff;padding:18px 22px 14px;position:relative;overflow:hidden}
+header .lat{position:absolute;right:-10px;top:-10px;width:260px;height:120px;opacity:.55;
+ background-image:radial-gradient(circle,rgba(231,179,200,.9) 0 4px,transparent 5px);background-size:22px 22px}
+header h1{font-family:Cambria,Georgia,serif;margin:0;font-size:23px;position:relative}
+header p{margin:4px 0 0;color:#E7B3C8;font-size:14.5px;position:relative}
+nav{display:flex;gap:6px;flex-wrap:wrap;padding:12px 22px 0}
+nav button{border:1px solid var(--line);background:#fff;color:var(--mid);padding:9px 14px;border-radius:10px 10px 0 0;font:inherit;font-weight:600;cursor:pointer}
+nav button.on{background:var(--mag);color:#fff;border-color:var(--mag)}
+main{padding:0 22px 26px}
+.exp{display:none;background:#fff;border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:16px}
+.exp.on{display:block}
+.grid{display:grid;grid-template-columns:310px 1fr;gap:16px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+h2{font-family:Cambria,Georgia,serif;font-size:19px;margin:0 0 6px}
+.lead{color:var(--sl);margin:0 0 12px;font-size:14.5px}
+.panel{background:var(--pk2);border-radius:10px;padding:12px}
+.ctl{margin-bottom:11px}
+.ctl label{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600}
+.ctl label i{font-style:normal}
+.ctl label span{color:var(--mag);font-variant-numeric:tabular-nums;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--mag)}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.btns button{border:1px solid var(--mag);background:#fff;color:var(--mag);border-radius:16px;padding:4px 11px;font:inherit;font-size:13.5px;cursor:pointer}
+.btns button:hover,.btns button.on{background:var(--mag);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:0 0 10px}
+.card{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:#fff}
+.card b{display:block;font-size:12.5px;color:var(--sl);font-weight:600}
+.card span{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.card.ok span{color:var(--teal)} .card.th span{color:var(--mag)}
+canvas{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:8px}
+.cv-title{font-size:13.5px;font-weight:600;color:var(--sl);margin:10px 0 4px}
+.eq{font-family:Cambria,Georgia,serif;background:#fff;border-left:3px solid var(--mag);padding:6px 10px;margin:8px 0;font-size:15px;line-height:1.55}
+.tasks{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.tasks h3{font-size:15.5px;margin:0 0 4px}
+.tasks ol{margin:0;padding-left:20px;font-size:14.5px}.tasks li{margin:3px 0}
+.ar{direction:rtl;text-align:right;font-family:"Traditional Arabic","Noto Naskh Arabic",Tahoma,Arial,serif;background:#FFF5F9;border-right:4px solid var(--mag);border-radius:8px;padding:9px 12px;margin-top:12px;font-size:16px;line-height:1.8}
+.ar b{color:var(--mag)}
+footer{color:var(--sl);font-size:13px;padding:0 22px 18px}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><div class="lat"></div><h1>Virtual Lab · Chapter 3 — Electro-, Acousto- and Magneto-optic Modulators; Liquid Crystal Devices</h1>
+<p>Optoelectronics (203675-3) · MSc in Physics · Prof. Najm Al-Hosiny</p></header>
+<nav><button class="on" data-t="e1">1 · Pockels cell</button><button data-t="e2">2 · Liquid-crystal cells</button><button data-t="e3">3 · Acousto-optic diffraction</button><button data-t="e4">4 · Faraday isolator</button></nav><main><section class="exp on" id="e1">
+<h2>Experiment 1 — Electro-optic amplitude modulator (Pockels cell)</h2><p class="lead">A longitudinal KDP cell between crossed polarisers is a voltage-controlled wave plate: Γ(V) = Γ₀ + πV/V<sub>π</sub>, T = sin²(Γ/2). The transmission is computed both from the sin² law and from the full Jones-matrix product.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Crystal (0 = KDP, 1 = KD*P)</i> <span id="e1cv"></span></label><input type="range" id="e1c" min="0" max="1" step="1" value="0"></div><div class="ctl"><label><i>Optical bias Γ₀ [units of π/2]</i> <span id="e1bv"></span></label><input type="range" id="e1b" min="0" max="2" step="0.01" value="1"></div><div class="ctl"><label><i>Drive amplitude V<sub>m</sub> / V<sub>π</sub></i> <span id="e1mv"></span></label><input type="range" id="e1m" min="0" max="0.5" step="0.005" value="0.1"></div><div class="eq">λ = 633 nm, n<sub>o</sub> = 1.507<br>V<sub>π</sub> = λ/(2n<sub>o</sub>³r<sub>63</sub>) (independent of size)<br>T = sin²[(Γ₀ + πV/V<sub>π</sub>)/2]</div></div>
+<div><div class="cards" id="e1cards"></div><div class="cv-title" id="e1tt">Transmission versus voltage (lines: sin² law; dots: Jones matrices)</div><canvas id="e1t" height="220"></canvas><div class="cv-title" id="e1wt">Output intensity for V = V<sub>m</sub> sin ωt</div><canvas id="e1w" height="200"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Compare V<sub>π</sub> of KDP and KD*P. Why does deuteration lower the half-wave voltage?</li><li>Set Γ₀ = 0 and a small drive. Why is the output at twice the drive frequency and very weak?</li><li>Set Γ₀ = π/2 (quarter-wave bias). Explain why the response becomes linear.</li><li>Increase V<sub>m</sub> to 0.4 V<sub>π</sub> with quarter-wave bias. How large is the distortion of the output waveform?</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> خلية بوكلز صفيحة موجية يتحكم الجهد في تأخيرها. وضع صفيحة ربع موجية ثابتة قبلها ينقل نقطة التشغيل إلى منتصف المنحنى، فيصبح الخرج متناسباً مع الجهد بدلاً من مربعه.</div></section><section class="exp" id="e2">
+<h2>Experiment 2 — Liquid-crystal devices: ECB retarder and twisted-nematic cell</h2><p class="lead">Above the Fréedericksz threshold the directors tilt toward the field and the retardation falls. In a 90° twisted-nematic (TN) cell between parallel polarisers the light follows the twist (waveguiding) when u = 2dΔn/λ is large.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Voltage V<sub>rms</sub> [V]</i> <span id="e2Vv"></span></label><input type="range" id="e2V" min="0" max="6" step="0.01" value="2"></div><div class="ctl"><label><i>Cell thickness d [µm]</i> <span id="e2dv"></span></label><input type="range" id="e2d" min="2" max="10" step="0.1" value="5"></div><div class="ctl"><label><i>Extraordinary index n<sub>e</sub></i> <span id="e2nv"></span></label><input type="range" id="e2n" min="1.55" max="1.8" step="0.005" value="1.7"></div><div class="eq">n<sub>o</sub> = 1.50, K<sub>11</sub> = 10 pN, Δε = 10, λ = 633 nm<br>V<sub>th</sub> = π√(K<sub>11</sub>/ε₀Δε)<br>Γ = 2πd(n<sub>eff</sub> − n<sub>o</sub>)/λ, T = sin²(Γ/2) at 45°<br>TN: T = sin²[(π/2)√(1 + u²)]/(1 + u²)</div></div>
+<div><div class="cards" id="e2cards"></div><div class="cv-title" id="e2at">ECB cell: retardation Γ/π and transmission versus voltage (dot: current V)</div><canvas id="e2a" height="220"></canvas><div class="cv-title" id="e2bt">TN cell between parallel polarisers: Gooch–Tarry (line) and 200-slab Jones model (dots)</div><canvas id="e2b" height="210"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Read V<sub>th</sub>. Why does nothing happen below it?</li><li>Find the voltage at which the ECB cell acts as a half-wave plate (Γ = π). Why are LC devices slow compared with Pockels cells?</li><li>For the TN cell, find the first Gooch–Tarry minimum u = √3. What thickness gives it for Δn = 0.2?</li><li>Why does a TN display between crossed polarisers look bright with no voltage and dark with voltage?</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> جزيئات البلور السائل طويلة كالعصيّ، والمجال الكهربائي يديرها نحو اتجاهه فيقلّ الانكسار المزدوج الذي يراه الضوء. وفي الخلية الملتوية يدور استقطاب الضوء مع التواء الجزيئات كأنه يُقاد بموجّه.</div></section><section class="exp" id="e3">
+<h2>Experiment 3 — Acousto-optic diffraction: Raman–Nath and Bragg regimes</h2><p class="lead">The Klein–Cook coupled-wave equations are integrated for 17 diffraction orders. Q → 0 gives Raman–Nath diffraction (I<sub>m</sub> = J<sub>m</sub>²(ν)); Q ≫ 1 at the Bragg angle gives a single order with I₁ = sin²(ν/2).</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Peak phase modulation ν [rad]</i> <span id="e3vv"></span></label><input type="range" id="e3v" min="0.01" max="6.3" step="0.01" value="2"></div><div class="ctl"><label><i>Klein–Cook parameter Q</i> <span id="e3qv"></span></label><input type="range" id="e3q" min="0" max="50" step="0.1" value="40"></div><div class="ctl"><label><i>Incidence angle α [units of θ<sub>B</sub>]</i> <span id="e3av"></span></label><input type="range" id="e3a" min="-3" max="1" step="0.01" value="-1"></div><div class="eq">dE<sub>m</sub>/dξ = (ν/2)[E<sub>m−1</sub>e<sup>−i(Q/2)ξ(α+2m−1)</sup> − E<sub>m+1</sub>e<sup>+i(Q/2)ξ(α+2m+1)</sup>]<br>Q = 2πλL/(nΛ²); TeO₂ at 110 MHz, L = 10 mm: Q ≈ 27</div></div>
+<div><div class="cards" id="e3cards"></div><div class="cv-title" id="e3ot">Intensity of each diffraction order at the current settings</div><canvas id="e3o" height="200"></canvas><div class="cv-title" id="e3ct">Orders 0 and 1 versus ν (lines) with the limiting laws (dots)</div><canvas id="e3c" height="220"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Set Q = 0. Check that I₀ = J₀²(ν) and I₁ = J₁²(ν). How many orders appear for ν = 5?</li><li>Set Q = 40 and α = −1. At which ν does all the light go into order +1? Compare with sin²(ν/2).</li><li>Keep Q = 40 and move α away from −1. How fast does the efficiency drop (angular selectivity)?</li><li>Use Q = 5. Why does the device behave in neither limit cleanly?</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> الموجة الصوتية تصنع محزوزاً متحركاً من تغيرات معامل الانكسار. إذا كان المحزوز رقيقاً حادَ الضوء إلى رتب كثيرة، وإذا كان سميكاً لم ينعكس الضوء إلا عند زاوية براغ وإلى رتبة واحدة كالانعكاس من مستويات بلورية.</div></section><section class="exp" id="e4">
+<h2>Experiment 4 — Magneto-optic Faraday rotator and optical isolator</h2><p class="lead">The Faraday rotation θ<sub>F</sub> = V<sub>B</sub>BL has the same sense for forward and backward light. Polariser (0°) → rotator (45°) → polariser (45°) passes forward light and blocks reflections; any rotation error δ leaks T<sub>back</sub> = sin²δ.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Magnetic field B [T]</i> <span id="e4Bv"></span></label><input type="range" id="e4B" min="0" max="1.5" step="0.005" value="1"></div><div class="ctl"><label><i>TGG rod length L [mm]</i> <span id="e4Lv"></span></label><input type="range" id="e4L" min="5" max="40" step="0.1" value="19.6"></div><div class="ctl"><label><i>Temperature [K]</i> <span id="e4Tv"></span></label><input type="range" id="e4T" min="150" max="350" step="1" value="300"></div><div class="eq">TGG at 1064 nm: V<sub>B</sub>(300 K) = −40 rad T⁻¹ m⁻¹, V<sub>B</sub> ∝ 1/T<br>Forward: T<sub>f</sub> = cos²(θ<sub>F</sub> − 45°)<br>Backward: T<sub>b</sub> = cos²(θ<sub>F</sub> + 45°) = sin²δ</div></div>
+<div><div class="cards" id="e4cards"></div><div class="cv-title" id="e4at">Forward and backward transmission versus Faraday rotation (dot: current θ_F)</div><canvas id="e4a" height="210"></canvas><div class="cv-title" id="e4bt">Isolation versus rotation error (dot: current δ)</div><canvas id="e4b" height="200"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Find the rod length that gives exactly 45° at B = 1 T and 300 K.</li><li>Heat the rod to 330 K. How much does the rotation drift, and what isolation is left?</li><li>What rotation error is allowed for 30 dB isolation? For 40 dB?</li><li>Why would an optically active (reciprocal) rotator of 45° not work as an isolator?</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> دوران فاراداي يحدده اتجاه المجال المغناطيسي لا اتجاه سير الضوء. لذلك يدور الضوء المرتد 45 درجة أخرى في الاتجاه نفسه، فيصل إلى المستقطِب الأول عمودياً عليه فيُحجب.</div></section></main>
+<footer>All results are computed in your browser from the equations of Chapter 3 (Yariv &amp; Yeh, Photonics; Saleh &amp; Teich, Fundamentals of Photonics). The MATLAB versions of these experiments are Labs 3.1–3.4.</footer>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const C={mid:'#101634',mag:'#C2185B',sl:'#5B6380',pink:'#E7B3C8',teal:'#1F8A9E',gold:'#D99A1E',green:'#3E8E41',grey:'#9AA0B5'};
+const PAL=[C.mag,C.teal,C.gold,C.mid,C.green,C.sl];
+const fmt=(v,d=3)=>{if(!isFinite(v))return '—';const a=Math.abs(v);return (a>=1e4||(a<1e-3&&v!==0))?v.toExponential(2).replace('e','×10^').replace(/\^\+?(-?\d+)/,(m,e)=>sup(e)):(+v.toPrecision(d)).toString()};
+function sup(e){const m={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};return String(e).split('').map(c=>m[c]||c).join('')}
+const linspace=(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+const logspace=(a,b,n)=>linspace(a,b,n).map(v=>Math.pow(10,v));
+const val=id=>+$(id).value;
+function show(id,t){$(id+'v').textContent=t}
+const subs=t=>String(t).replace(/_\{([^}]+)\}|_([A-Za-z0-9α-ωΑ-Ω]+)/g,(m,a,b)=>'<sub>'+(a||b)+'</sub>');
+function cards(id,list){$(id).innerHTML=list.map(c=>'<div class="card '+(c[2]||'')+'"><b>'+subs(c[0])+'</b><span>'+subs(c[1])+'</span></div>').join('')}
+function prep(cv){const r=window.devicePixelRatio||1,w=cv.clientWidth||600,h=+cv.getAttribute('height');
+ if(cv.width!==Math.round(w*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r);cv.style.height=h+'px'}
+ const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,w,h);return{g,w,h}}
+function nice(span){const p=Math.pow(10,Math.floor(Math.log10(span/5)));const m=span/5/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p}
+// series: {x,y,color,width,dash,label,points,r,fill}; o: xmin..ymax, xlabel, ylabel, logx, logy, legend
+function plot(cv,series,o){const {g,w,h}=prep(cv);const L=60,R=12,T=10,B=38;
+ const tx=v=>o.logx?Math.log10(v):v, ty=v=>o.logy?Math.log10(v):v;
+ const x0=tx(o.xmin),x1=tx(o.xmax),y0=ty(o.ymin),y1=ty(o.ymax);
+ const X=x=>L+(tx(x)-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(ty(y)-y0)/(y1-y0)*(h-T-B);
+ g.font='12px Calibri,Arial';g.fillStyle=C.sl;g.strokeStyle='#ECEDF3';g.lineWidth=1;
+ const tick=(lo,hi,lg)=>{const t=[];if(lg){const st=(hi-lo)>10?2:1;for(let k=Math.ceil(lo-1e-9);k<=hi+1e-9;k+=st)t.push(k)}else{const d=nice(hi-lo);for(let v=Math.ceil(lo/d)*d;v<=hi+d*1e-6;v+=d)t.push(+v.toPrecision(10))}return t};
+ const lab=(v,lg)=>lg?('10'+sup(Math.round(v))):(+v.toPrecision(6)).toString();
+ for(const t of tick(x0,x1,o.logx)){const px=L+(t-x0)/(x1-x0)*(w-L-R);g.beginPath();g.moveTo(px,T);g.lineTo(px,h-B);g.stroke();g.textAlign='center';g.fillText(lab(t,o.logx),px,h-B+15)}
+ for(const t of tick(y0,y1,o.logy)){const py=h-B-(t-y0)/(y1-y0)*(h-T-B);g.beginPath();g.moveTo(L,py);g.lineTo(w-R,py);g.stroke();g.textAlign='right';g.fillText(lab(t,o.logy),L-5,py+4)}
+ g.strokeStyle=C.sl;g.strokeRect(L,T,w-L-R,h-T-B);
+ const U=t=>(t||'').replace(/_/g,'');g.fillStyle=C.mid;g.textAlign='center';g.fillText(U(o.xlabel),L+(w-L-R)/2,h-6);
+ g.save();g.translate(14,T+(h-T-B)/2);g.rotate(-Math.PI/2);g.fillText(U(o.ylabel),0,0);g.restore();
+ g.save();g.beginPath();g.rect(L,T,w-L-R,h-T-B);g.clip();
+ if(o.bands)for(const b of o.bands){g.fillStyle=b.color||'rgba(231,179,200,.45)';if(b.y){g.fillRect(L,Y(b.y[1]),w-L-R,Y(b.y[0])-Y(b.y[1]))}else{g.fillRect(X(b.x[0]),T,X(b.x[1])-X(b.x[0]),h-T-B)}}
+ for(const s of series){g.strokeStyle=s.color;g.fillStyle=s.color;g.lineWidth=s.width||1.8;g.setLineDash(s.dash||[]);
+  if(s.points){for(let i=0;i<s.x.length;i++){if(!isFinite(s.y[i]))continue;g.beginPath();g.arc(X(s.x[i]),Y(s.y[i]),s.r||3.5,0,7);s.hollow?g.stroke():g.fill()}}
+  else{g.beginPath();let pen=false;for(let i=0;i<s.x.length;i++){const yy=s.y[i];if(!isFinite(yy)||!isFinite(s.x[i])||(o.logy&&yy<=0)){pen=false;continue}const px=X(s.x[i]),py=Y(yy);pen?g.lineTo(px,py):g.moveTo(px,py);pen=true}g.stroke()}}
+ g.restore();g.setLineDash([]);
+ if(o.legend){const ls=series.filter(s=>s.label);let ly=o.legendBottom?h-B-10-16*(ls.length-1):T+12;const lx=o.legendLeft?L+10:w-R-(o.legendW||200);g.textAlign='left';
+  for(const s of ls){g.fillStyle='rgba(255,255,255,.85)';g.fillRect(lx-4,ly-11,(o.legendW||200)-4,15);g.fillStyle=s.color;if(s.points){g.beginPath();g.arc(lx+7,ly-4,3.5,0,7);g.fill()}else g.fillRect(lx,ly-5,14,3);g.fillStyle=C.mid;g.fillText(U(s.label),lx+20,ly);ly+=16}}
+ return {X,Y,g,w,h};}
+let seed=12345;const rnd=()=>{seed=(seed+0x6D2B79F5)|0;let t=seed;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return(((t^(t>>>14))>>>0)+0.5)/4294967296};
+const randn=()=>Math.sqrt(-2*Math.log(rnd()))*Math.cos(2*Math.PI*rnd());
+function erfc(x){const z=Math.abs(x),t=1/(1+0.5*z);const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return x>=0?r:2-r}
+function besselJ(n,x){let s=0;const N=60;for(let k=0;k<N;k++){const th=Math.PI*(k+0.5)/N;s+=Math.cos(n*th-x*Math.sin(th))}return s/N}
+function bisect(f,a,b,it=80){let fa=f(a);for(let i=0;i<it;i++){const m=(a+b)/2,fm=f(m);if(fa*fm<=0)b=m;else{a=m;fa=fm}}return(a+b)/2}
+// complex helpers
+const cx=(re,im=0)=>({re,im});const cadd=(a,b)=>cx(a.re+b.re,a.im+b.im);const cmul=(a,b)=>cx(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const cexp=t=>cx(Math.cos(t),Math.sin(t));const cabs2=a=>a.re*a.re+a.im*a.im;const cscale=(a,s)=>cx(a.re*s,a.im*s);
+const cdiv=(a,b)=>{const d=b.re*b.re+b.im*b.im;return cx((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d)};
+function setupTabs(draw){document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.exp').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));draw()});
+ document.querySelectorAll('input[type=range],select').forEach(r=>r.oninput=draw);window.addEventListener('resize',draw);}
+
+
+function jonesCrossed(G){// polariser x, retarder axes at 45deg, analyser y
+ const c=Math.SQRT1_2;const a=cexp(-G/2),b=cexp(G/2);// R(-45) diag R(45) applied to (1,0): field components
+ // R(45)*(1,0) = (c, -c)?? use explicit: components along fast/slow axes
+ const u1=cscale(a,c),u2=cscale(b,-c);// projections then back to x,y
+ const ey=cadd(cscale(u1,c),cscale(u2,c));return cabs2(ey)}
+function e1(){const kd=val('e1c')===1,G0=val('e1b')*Math.PI/2,vm=val('e1m');const lam=633e-9,no=1.507,r=kd?26.4e-12:10.5e-12;const Vpi=lam/(2*no**3*r);
+ show('e1c',kd?'KD*P':'KDP');show('e1b',(G0/Math.PI).toFixed(2)+' π');show('e1m',vm.toFixed(3));
+ const V=linspace(-1,2,300),Ta=V.map(v=>Math.sin((G0+Math.PI*v)/2)**2),Tj=V.map(v=>jonesCrossed(G0+Math.PI*v));let err=0;Ta.forEach((t,i)=>err=Math.max(err,Math.abs(t-Tj[i])));
+ const N=256,out=[];for(let i=0;i<N;i++)out.push(Math.sin((G0+Math.PI*vm*Math.sin(2*Math.PI*2*i/N))/2)**2);
+ const dft=k=>{let re=0,im=0;out.forEach((v,i)=>{re+=v*Math.cos(2*Math.PI*k*i/N);im+=v*Math.sin(2*Math.PI*k*i/N)});return 2*Math.hypot(re,im)/N};
+ const h1=dft(2),h2=dft(4);
+ cards('e1cards',[['V_π (KDP)',(lam/(2*no**3*10.5e-12)/1e3).toFixed(2)+' kV'],['V_π (KD*P)',(lam/(2*no**3*26.4e-12)/1e3).toFixed(2)+' kV'],['max |T_Jones − sin²|',fmt(err,2),'ok'],['Fundamental (ω)',fmt(h1,3),'th'],['Second harmonic (2ω)',fmt(h2,3)],['2ω / ω',h1<1e-9?'only 2ω':(h2<1e-9*h1?'≈ 0 (no 2ω)':(20*Math.log10(h2/h1)).toFixed(1)+' dB')]]);
+ plot($('e1t'),[{x:V,y:Ta,color:C.mag,width:2.2,label:'sin² law'},{x:V.filter((_,i)=>i%10==0),y:Tj.filter((_,i)=>i%10==0),color:C.mid,points:true,r:3,label:'Jones matrices'}],{xmin:-1,xmax:2,ymin:0,ymax:1.05,xlabel:'V / V_π',ylabel:'Transmission T',legend:true,legendW:140,bands:[{x:[-vm,vm]}]});
+ const t=linspace(0,2,N);plot($('e1w'),[{x:t,y:out,color:C.teal,width:2,label:'output T(t)'},{x:t,y:t.map(x=>0.5+vm*Math.sin(2*Math.PI*x)),color:C.grey,width:1,dash:[5,4],label:'drive (scaled)'}],{xmin:0,xmax:2,ymin:0,ymax:1.05,xlabel:'Time [drive periods]',ylabel:'Intensity',legend:true,legendW:140});}
+function tnJones(u,N=200){// 90 deg twist, parallel polarisers; dn d = u lambda/2 -> total retardation pi u
+ const dl=Math.PI*u/N;let ex=cx(1),ey=cx(0);
+ for(let k=0;k<N;k++){const ph=(k+0.5)*(Math.PI/2)/N,c=Math.cos(ph),s=Math.sin(ph);
+  let a=cadd(cscale(ex,c),cscale(ey,s)),b=cadd(cscale(ex,-s),cscale(ey,c));a=cmul(a,cexp(-dl/2));b=cmul(b,cexp(dl/2));ex=cadd(cscale(a,c),cscale(b,-s));ey=cadd(cscale(a,s),cscale(b,c))}
+ return cabs2(ex)}
+function e2(){const V=val('e2V'),d=val('e2d')*1e-6,ne=val('e2n'),no=1.5,lam=633e-9,V0=0.6;show('e2V',V.toFixed(2)+' V');show('e2d',(d*1e6).toFixed(1)+' µm');show('e2n',ne.toFixed(3));
+ const Vth=Math.PI*Math.sqrt(10e-12/(8.854e-12*10));
+ const tilt=v=>v>Vth?Math.PI/2-2*Math.atan(Math.exp(-(v-Vth)/V0)):0;const neff=v=>1/Math.sqrt(Math.cos(tilt(v))**2/ne**2+Math.sin(tilt(v))**2/no**2);
+ const Gam=v=>2*Math.PI*d*(neff(v)-no)/lam;const u=2*d*(ne-no)/lam;const gt=x=>Math.sin(Math.PI/2*Math.sqrt(1+x*x))**2/(1+x*x);
+ cards('e2cards',[['Fréedericksz V_th',Vth.toFixed(3)+' V'],['Tilt angle',(tilt(V)*180/Math.PI).toFixed(1)+'°'],['Γ / π',(Gam(V)/Math.PI).toFixed(3),'th'],['T (ECB, 45°)',(Math.sin(Gam(V)/2)**2).toFixed(3)],['TN: u = 2dΔn/λ',u.toFixed(2)],['TN leakage (parallel pol.)',fmt(gt(u),3),'ok']]);
+ const VV=linspace(0,6,400);plot($('e2a'),[{x:VV,y:VV.map(v=>Gam(v)/Math.PI/Math.max(1,Gam(0)/Math.PI)),color:C.mag,width:2,label:'Γ/π ÷ '+Math.max(1,Gam(0)/Math.PI).toFixed(2)},{x:VV,y:VV.map(v=>Math.sin(Gam(v)/2)**2),color:C.teal,width:2,label:'T (crossed, 45°)'},{x:[V],y:[Math.sin(Gam(V)/2)**2],color:C.mid,points:true,r:6}],{xmin:0,xmax:6,ymin:0,ymax:1.05,xlabel:'Voltage [V rms]',ylabel:'Normalised value',legend:true,legendW:170,bands:[{x:[0,Vth],color:'rgba(91,99,128,.12)'}]});
+ const U=linspace(0.05,6,300),Uj=linspace(0.1,6,30);plot($('e2b'),[{x:U,y:U.map(gt),color:C.mag,width:2,label:'Gooch–Tarry'},{x:Uj,y:Uj.map(x=>tnJones(x)),color:C.mid,points:true,r:3,label:'Jones (200 slabs)'},{x:[u],y:[gt(u)],color:C.teal,points:true,r:6}],{xmin:0,xmax:6,ymin:0,ymax:1.05,xlabel:'u = 2dΔn/λ',ylabel:'Transmission (parallel)',legend:true,legendW:150});}
+function kleinCook(nu,Q,al,M=8,steps=400){const n=2*M+1;let E=Array.from({length:n},()=>cx(0));E[M]=cx(1);const h=1/steps;
+ const f=(xi,E)=>E.map((_,j)=>{const m=j-M;let r=cx(0);if(j>0)r=cadd(r,cmul(E[j-1],cexp(-(Q/2)*xi*(al+2*m-1))));if(j<n-1)r=cadd(r,cscale(cmul(E[j+1],cexp((Q/2)*xi*(al+2*m+1))),-1));return cscale(r,nu/2)});
+ for(let s=0;s<steps;s++){const x=s*h;const k1=f(x,E),k2=f(x+h/2,E.map((e,i)=>cadd(e,cscale(k1[i],h/2)))),k3=f(x+h/2,E.map((e,i)=>cadd(e,cscale(k2[i],h/2)))),k4=f(x+h,E.map((e,i)=>cadd(e,cscale(k3[i],h))));
+  E=E.map((e,i)=>cadd(e,cscale(cadd(cadd(k1[i],cscale(k2[i],2)),cadd(cscale(k3[i],2),k4[i])),h/6)))}
+ return E.map(cabs2)}
+function e3(){const nu=val('e3v'),Q=val('e3q'),al=val('e3a');show('e3v',nu.toFixed(2));show('e3q',Q.toFixed(1));show('e3a',al.toFixed(2));
+ const M=8,I=kleinCook(nu,Q,al,M);const sum=I.reduce((a,b)=>a+b);
+ cards('e3cards',[['I₀',I[M].toFixed(4)],['I₊₁',I[M+1].toFixed(4),'th'],['I₋₁',I[M-1].toFixed(4)],['Σ I_m (conservation)',sum.toFixed(6),'ok'],['J₁²(ν) (Raman–Nath)',besselJ(1,nu)**2>=0?(besselJ(1,nu)**2).toFixed(4):''],['sin²(ν/2) (Bragg)',(Math.sin(nu/2)**2).toFixed(4)]]);
+ const ord=I.map((_,j)=>j-M);const q=plot($('e3o'),[],{xmin:-M-0.6,xmax:M+0.6,ymin:0,ymax:1.05,xlabel:'Diffraction order m',ylabel:'Intensity'});q.g.fillStyle='rgba(194,24,91,.7)';I.forEach((v,j)=>q.g.fillRect(q.X(ord[j])-9,q.Y(v),18,q.Y(0)-q.Y(v)));
+ const NU=linspace(0.05,6.3,36),R=NU.map(x=>kleinCook(x,Q,al,M,250));
+ const lim=Q<1?[{x:NU,y:NU.map(x=>besselJ(0,x)**2),color:C.mid,points:true,r:3,label:'J₀², J₁² (Q→0)'},{x:NU,y:NU.map(x=>besselJ(1,x)**2),color:C.mid,points:true,r:3}]:[{x:NU,y:NU.map(x=>Math.sin(x/2)**2),color:C.mid,points:true,r:3,label:'sin²(ν/2) (Bragg)'}];
+ plot($('e3c'),[{x:NU,y:R.map(r=>r[M]),color:C.teal,width:2,label:'order 0'},{x:NU,y:R.map(r=>r[M+1]),color:C.mag,width:2,label:'order +1'}].concat(lim).concat([{x:[nu],y:[I[M+1]],color:C.gold,points:true,r:6}]),{xmin:0,xmax:6.3,ymin:0,ymax:1.05,xlabel:'ν [rad]',ylabel:'Intensity',legend:true,legendW:170});}
+function e4(){const B=val('e4B'),L=val('e4L')*1e-3,T=val('e4T');show('e4B',B.toFixed(3)+' T');show('e4L',(L*1e3).toFixed(1)+' mm');show('e4T',T.toFixed(0)+' K');
+ const VB=40*300/T,th=VB*B*L,thd=th*180/Math.PI,dl=thd-45;const Tf=Math.cos((thd-45)*Math.PI/180)**2,Tb=Math.cos((thd+45)*Math.PI/180)**2;
+ cards('e4cards',[['Verdet |V_B|',VB.toFixed(1)+' rad T⁻¹ m⁻¹'],['Rotation θ_F',thd.toFixed(2)+'°','th'],['L for 45° at this B, T',B>0?(Math.PI/4/(VB*B)*1e3).toFixed(2)+' mm':'—'],['Forward T',Tf.toFixed(4),'ok'],['Backward T = sin²δ',fmt(Tb,3)],['Isolation',Tb>0?(-10*Math.log10(Tb)).toFixed(1)+' dB':'∞']]);
+ const A=linspace(0,90,300);plot($('e4a'),[{x:A,y:A.map(a=>Math.cos((a-45)*Math.PI/180)**2),color:C.teal,width:2,label:'forward'},{x:A,y:A.map(a=>Math.cos((a+45)*Math.PI/180)**2),color:C.mag,width:2,dash:[6,4],label:'backward'},{x:[Math.min(thd,90)],y:[Tb],color:C.mid,points:true,r:6}],{xmin:0,xmax:90,ymin:0,ymax:1.05,xlabel:'Faraday rotation θ_F [deg]',ylabel:'Transmission',legend:true,legendW:120});
+ const D=linspace(0.1,10,200);plot($('e4b'),[{x:D,y:D.map(x=>-20*Math.log10(Math.sin(x*Math.PI/180))),color:C.mag,width:2},{x:[Math.max(Math.abs(dl),0.1)],y:[Tb>0?-10*Math.log10(Tb):60],color:C.mid,points:true,r:6}],{xmin:0,xmax:10,ymin:15,ymax:60,xlabel:'Rotation error |δ| [deg]',ylabel:'Isolation [dB]'});}
+
+const FN=[e1,e2,e3,e4];
+function draw(){const id=document.querySelector('.exp.on').id;FN[+id.slice(1)-1]();}
+setupTabs(draw);draw();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

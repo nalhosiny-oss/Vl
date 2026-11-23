@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الموجات المتنقلة</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#FBF5EE;--panel:#FFFFFF;--ink:#2B2420;--muted:#6E5F55;--line:#E8D9CB;--gold:#B5562B;--golddk:#8A3E1C;--chip:#F5EADF;--plot:#FFFCF8;--grid:#F0E3D6;--dark:#2B2420;--blue:#3E6C8C;--ok:#2E7D4F;--bad:#B23A2E}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 44px}
+.fstrip{height:14px;border-radius:7px;margin:0 0 14px;direction:ltr;background:repeating-linear-gradient(115deg,#B5562B 0 7px,#E0956A 7px 9px,#2B2420 9px 12px)}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--golddk);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:66ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}
+@media (max-width:840px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border:1px solid var(--grid);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:11px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.08rem;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--chip);color:var(--ink);width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 11px;border-radius:8px;cursor:pointer;min-height:36px}
+.btn.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.readout{background:var(--chip);border-radius:10px;padding:10px 13px;font-size:.95rem}
+.readout .eq{display:block}
+.eq{font-family:'STIX Two Text',serif;font-size:1.06rem;direction:ltr;unicode-bidi:isolate;text-align:left}
+.note{font-size:.92rem;margin-top:4px}
+.good{color:var(--ok);font-weight:700}.badx{color:var(--bad);font-weight:700}
+.task{border-top:1px solid var(--line);padding-top:10px;font-size:.93rem}
+.task h3{margin:0 0 4px;font-size:1rem;color:var(--golddk)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.93rem;color:var(--ink)}
+.chk input{width:18px;height:18px;accent-color:var(--gold)}
+footer{margin-top:20px;color:var(--muted);font-size:.85rem}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fstrip" aria-hidden="true"></div>
+<header>
+  <span class="badge">الاهتزازات والموجات · <bdi dir="ltr">2034002-4</bdi></span>
+  <h1>معمل الموجات المتنقلة</h1>
+  <p>الفصل السابع. غيّر القيم وراقب النتيجة، وأجب عن السؤال في أسفل كل تجربة.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" aria-selected="true" data-t="t1">١. الموجة الجيبية المتنقلة</button><button role="tab" aria-selected="false" data-t="t2">٢. سرعة الموجة على الوتر</button><button role="tab" aria-selected="false" data-t="t3">٣. الطاقة وانتقالها</button><button role="tab" aria-selected="false" data-t="t4">٤. معادلة الموجة والنبضات</button><button role="tab" aria-selected="false" data-t="t5">٥. الموجات في بعدين وثلاثة</button></nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="620" aria-label="موجة جيبية متنقلة على وتر مع حركة جسيمات الوسط"></canvas>
+  <div class="ctrl">
+    <label>السعة A (cm) <b id="o1a"></b></label><input id="i1a" type="range" min="0.5" max="4" step="0.25" value="2">
+    <label>الطول الموجي λ (m) <b id="o1l"></b></label><input id="i1l" type="range" min="0.5" max="4" step="0.1" value="2">
+    <label>التردد f (Hz) <b id="o1f"></b></label><input id="i1f" type="range" min="0.1" max="1" step="0.05" value="0.4">
+    <div class="row" id="m1"><button class="btn sel" type="button" data-d="1">نحو اليمين (+x)</button><button class="btn" type="button" data-d="-1">نحو اليسار (−x)</button></div>
+    <div class="row"><button class="btn" type="button" id="b1p">إيقاف مؤقت</button></div>
+    <div class="readout" id="r1"></div>
+    <div class="task"><h3>سؤال</h3>تابع الجسيم الملوّن: هل يتحرك مع الموجة نحو اليمين؟ ما الذي ينتقل فعلًا؟ وما الفرق بين سرعة الموجة وسرعة الجسيم؟</div>
+  </div>
+</section>
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="620" aria-label="نبضة تنتقل على وتر مشدود وقياس سرعتها"></canvas>
+  <div class="ctrl">
+    <label>قوة الشد T (N) <b id="o2t"></b></label><input id="i2t" type="range" min="5" max="200" step="5" value="50">
+    <label>الكتلة لوحدة الطول μ (g/m) <b id="o2m"></b></label><input id="i2m" type="range" min="1" max="50" step="1" value="10">
+    <div class="row"><button class="btn" type="button" id="b2g">أطلق نبضة</button></div>
+    <div class="readout" id="r2"></div>
+    <div class="task"><h3>سؤال</h3>ضاعف قوة الشد أربع مرات. كم تتغير سرعة النبضة؟ ولماذا تبطؤ النبضة على الوتر الأثقل؟</div>
+  </div>
+</section>
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="620" aria-label="توزيع الطاقة على طول الموجة والقدرة المنقولة"></canvas>
+  <div class="ctrl">
+    <label>السعة A (mm) <b id="o3a"></b></label><input id="i3a" type="range" min="1" max="10" step="0.5" value="5">
+    <label>التردد f (Hz) <b id="o3f"></b></label><input id="i3f" type="range" min="10" max="120" step="5" value="50">
+    <label>قوة الشد T (N) <b id="o3t"></b></label><input id="i3t" type="range" min="10" max="200" step="5" value="80">
+    <label>الكتلة لوحدة الطول μ (g/m) <b id="o3m"></b></label><input id="i3m" type="range" min="1" max="20" step="0.5" value="5">
+    <div class="readout" id="r3"></div>
+    <div class="task"><h3>سؤال</h3>أين تتركز الطاقة على الموجة: عند القمم أم عند نقاط مرور الوتر بالاتزان؟ وكيف تتغير القدرة المنقولة إذا ضاعفت التردد؟</div>
+  </div>
+</section>
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="620" aria-label="نبضتان تتحركان في اتجاهين متعاكسين وتتراكبان"></canvas>
+  <div class="ctrl">
+    <label for="s4a">النبضة اليسرى (تتحرك نحو اليمين)</label><select id="s4a"><option value="g">نبضة غاوسية موجبة</option><option value="t">نبضة مثلثية موجبة</option></select>
+    <label for="s4b">النبضة اليمنى (تتحرك نحو اليسار)</label><select id="s4b"><option value="1">غاوسية موجبة</option><option value="-1">غاوسية سالبة (مقلوبة)</option></select>
+    <label>الزمن t (s) <b id="o4t"></b></label><input id="i4t" type="range" min="0" max="8" step="0.05" value="2">
+    <div class="readout" id="r4"></div>
+    <div class="task"><h3>سؤال</h3>اجعل النبضة اليمنى مقلوبة وحرّك الزمن حتى تتطابق النبضتان. أين ذهبت الطاقة لحظة اختفاء الإزاحة؟ ولماذا تخرج كل نبضة بعد التلاقي دون تغيير؟</div>
+  </div>
+</section>
+<section class="lab" id="t5" role="tabpanel">
+  <canvas id="c5" width="1200" height="620" aria-label="موجات دائرية من مصدر نقطي واضمحلال السعة مع المسافة"></canvas>
+  <div class="ctrl">
+    <div class="row" id="m5"><button class="btn sel" type="button" data-m="2">موجة سطحية (بعدان)</button><button class="btn" type="button" data-m="3">موجة كروية (ثلاثة أبعاد)</button></div>
+    <label>الطول الموجي λ (cm) <b id="o5l"></b></label><input id="i5l" type="range" min="1" max="6" step="0.5" value="3">
+    <div class="readout" id="r5"></div>
+    <div class="task"><h3>سؤال</h3>لماذا تقل سعة الموجة مع ابتعادها عن المصدر حتى دون أي تخميد؟ وما الفرق بين اضمحلال الموجة السطحية والموجة الكروية؟</div>
+  </div>
+</section>
+<footer>أ.د. نجم الحصيني – الاهتزازات والموجات، الفصل السابع. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+const TAU=2*Math.PI;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let active='t1',dirty=true;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;dirty=true;}));
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>dirty=true);e.addEventListener('change',()=>dirty=true);});
+
+/* number formatting with real superscripts */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sciParts(v,d){const e=Math.floor(Math.log10(Math.abs(v)));let m=v/Math.pow(10,e);if(+m.toFixed(d)>=10){return [(m/10).toFixed(d),e+1];}return [m.toFixed(d),e];}
+function H(v,d=3){return H0(v,d).replace(/-/g,'−');}
+function H0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10<sup>'+e+'</sup>';}
+function U(v,d=3){return U0(v,d).replace(/-/g,'−');}
+function U0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10'+String(e).split('').map(ch=>SUP[ch]).join('');}
+
+/* drawing helpers */
+function txt(g,s,x,y,col,al,sz,rtl,bold){g.font=(bold?'700 ':'')+(sz||22)+'px "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function poly(g,pts,col,w){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function _strip_unused(g,x,y,w,hh,l0,l1,If){g.fillStyle='#0D0B09';g.fillRect(x,y,w,hh);for(let i=0;i<w;i++){const l=l0+(l1-l0)*i/w;const I=If(l);if(I<=0.003)continue;g.fillStyle=colStr(l,I);g.fillRect(x+i,y,1.2,hh);}g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(x,y,w,hh);}
+function _axis_unused(g,x,y,w,l0,l1,step){seg(g,x,y,x+w,y,css('--muted'),1.5);for(let l=Math.ceil(l0/step)*step;l<=l1+1e-9;l+=step){const px=x+(l-l0)/(l1-l0)*w;seg(g,px,y,px,y+8,css('--muted'),1.5);txt(g,String(Math.round(l)),px,y+30,css('--muted'),'center',18);}txt(g,'λ (nm)',x+w,y+56,css('--muted'),'right',18);}
+
+
+/* spring from (x0,y) to (x1,y) */
+function spring(g,x0,y,x1,n,amp,col,w){const L=x1-x0,lead=Math.min(18,Math.abs(L)*0.12);g.strokeStyle=col;g.lineWidth=w||3;g.lineJoin='round';g.beginPath();g.moveTo(x0,y);g.lineTo(x0+lead,y);const body=L-2*lead;for(let i=0;i<=2*n;i++){const xx=x0+lead+body*(i+0.5)/(2*n+1);g.lineTo(xx,y+(i%2?amp:-amp));}g.lineTo(x1-lead,y);g.lineTo(x1,y);g.stroke();}
+/* vertical spring from (x,y0) down to (x,y1) */
+function vspring(g,x,y0,y1,n,amp,col,w){const L=y1-y0,lead=Math.min(18,Math.abs(L)*0.12);g.strokeStyle=col;g.lineWidth=w||3;g.lineJoin='round';g.beginPath();g.moveTo(x,y0);g.lineTo(x,y0+lead);const body=L-2*lead;for(let i=0;i<=2*n;i++){const yy=y0+lead+body*(i+0.5)/(2*n+1);g.lineTo(x+(i%2?amp:-amp),yy);}g.lineTo(x,y1-lead);g.lineTo(x,y1);g.stroke();}
+/* plot frame: returns mapping functions */
+function frame(g,x,y,w,h,t0,t1,v0,v1,xl,yl,ticks){g.fillStyle='#fff';g.fillRect(x,y,w,h);g.strokeStyle=css('--grid');g.lineWidth=1;g.strokeRect(x,y,w,h);
+ const X=t=>x+(t-t0)/(t1-t0)*w,Y=v=>y+h-(v-v0)/(v1-v0)*h;
+ if(v0<0&&v1>0)seg(g,x,Y(0),x+w,Y(0),css('--muted'),1.2);
+ if(xl)txt(g,xl,x+w,y+h+24,css('--muted'),'right',17);if(yl)txt(g,yl,x+6,y+20,css('--muted'),'left',17);
+ return [X,Y];}
+function curve(g,f,a,b,X,Y,col,w,n,dash){g.setLineDash(dash||[]);g.strokeStyle=col;g.lineWidth=w||2.5;g.beginPath();n=n||400;for(let i=0;i<=n;i++){const t=a+(b-a)*i/n,v=f(t);i?g.lineTo(X(t),Y(v)):g.moveTo(X(t),Y(v));}g.stroke();g.setLineDash([]);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,TAU);g.fill();}
+function arrow(g,x0,y0,x1,y1,col,w){seg(g,x0,y0,x1,y1,col,w||3);const a=Math.atan2(y1-y0,x1-x0),L=12;if(Math.hypot(x1-x0,y1-y0)<4)return;g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-L*Math.cos(a-0.4),y1-L*Math.sin(a-0.4));g.lineTo(x1-L*Math.cos(a+0.4),y1-L*Math.sin(a+0.4));g.closePath();g.fill();}
+function block(g,cx,cy,s,label){g.fillStyle=css('--gold');g.fillRect(cx-s/2,cy-s/2,s,s);g.strokeStyle=css('--golddk');g.lineWidth=2;g.strokeRect(cx-s/2,cy-s/2,s,s);if(label)txt(g,label,cx,cy+7,'#fff','center',20,0,1);}
+
+const INK=()=>css('--ink'),CU=()=>css('--gold'),CUD=()=>css('--golddk'),BL=()=>css('--blue'),GR='#2E7D4F',RD='#7B3F98',MU=()=>css('--muted');
+let now=0;
+function pauser(id){let p=false,off=0,tp=0;const b=$(id);b.onclick=()=>{p=!p;b.textContent=p?'تشغيل':'إيقاف مؤقت';b.classList.toggle('sel',p);if(p)tp=now;else off+=now-tp;dirty=true;};return ()=>p?tp-off:now-off;}
+function clip(g,x,y,w,h){g.save();g.beginPath();g.rect(x,y,w,h);g.clip();}
+function rk4(f,y,t,dt){const k1=f(t,y),k2=f(t+dt/2,y.map((v,i)=>v+dt/2*k1[i])),k3=f(t+dt/2,y.map((v,i)=>v+dt/2*k2[i])),k4=f(t+dt,y.map((v,i)=>v+dt*k3[i]));return y.map((v,i)=>v+dt/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));}
+function bars(g,x,y,h,items,max,bw,gap){items.forEach((r,i)=>{const X0=x+i*(bw+gap);const hh=Math.max(0,Math.min(1,r[1]/max))*h;g.fillStyle=r[2];g.fillRect(X0,y-hh,bw,hh);g.strokeStyle=css('--grid');g.lineWidth=1;g.strokeRect(X0,y-h,bw,h);txt(g,r[0],X0+bw/2,y+26,r[2],'center',19,1,1);});}
+const EQ=s=>'<span class="eq">'+s+'</span>',EQi=s=>'<span class="eq" style="display:inline">'+s+'</span>',NOTE=s=>'<div class="note">'+s+'</div>';
+function sgn(v,d){return v.toFixed(d).replace('-','−');}
+
+
+/* 1 */
+const T1=pauser('b1p');let dir1=1;
+document.querySelectorAll('#m1 .btn').forEach(b=>b.onclick=()=>{dir1=+b.dataset.d;document.querySelectorAll('#m1 .btn').forEach(x=>x.classList.toggle('sel',x===b));dirty=true;});
+function lab1(t){now=t;const g=$('c1').getContext('2d');g.clearRect(0,0,1200,620);const A=+$('i1a').value,l=+$('i1l').value,f=+$('i1f').value,tt=T1();$('o1a').textContent=A.toFixed(2);$('o1l').textContent=l.toFixed(1);$('o1f').textContent=f.toFixed(2);
+ const k=TAU/l,w=TAU*f,v=f*l,y=(x,s)=>A*Math.sin(k*x-dir1*w*s);const L=8;const [X,Y]=frame(g,60,60,1100,360,0,L,-4.6,4.6,'x (m)','y (cm)');
+ curve(g,x=>y(x,tt),0,L,X,Y,CU(),3,800);for(let i=0;i<=40;i++){const x=i*L/40;dot(g,X(x),Y(y(x,tt)),i==13?10:4,i==13?BL():INK());}
+ seg(g,X(13*L/40),60,X(13*L/40),420,BL(),1,[4,4]);
+ /* crest marker */
+ let xc=((Math.PI/2+dir1*w*tt)/k)%l;if(xc<0)xc+=l;dot(g,X(xc),Y(A),7,GR);arrow(g,X(xc),Y(A)-26,X(xc)+dir1*60,Y(A)-26,GR,2.5);txt(g,'قمة',X(xc),Y(A)-40,GR,'center',16,1);
+ for(let i=0;i<=8;i++)txt(g,String(i),X(i),442,MU(),'center',15);
+ const [X2,Y2]=frame(g,60,480,1100,100,0,3/f,-4.6,4.6,'t (s)','y');curve(g,s=>y(13*L/40,s),0,3/f,X2,Y2,BL(),2.2,400);seg(g,X2(tt%(3/f)),480,X2(tt%(3/f)),580,MU(),1,[4,4]);
+ $('r1').innerHTML=EQ('y(x,t) = A sin(kx '+(dir1>0?'−':'+')+' ωt)')+EQ('k = 2π/λ = '+k.toFixed(2)+' rad/m ,  ω = 2πf = '+w.toFixed(2)+' rad/s')+EQ('v = fλ = ω/k = '+v.toFixed(2)+' m/s')+EQ('u<sub>max</sub> = Aω = '+(A*w).toFixed(2)+' cm/s')+NOTE('الجسيم يهتز رأسيًا فقط؛ الذي ينتقل هو الطور والطاقة.');}
+/* 2 */
+let t2s=-99;$('b2g').onclick=()=>{t2s=now;dirty=true;};
+function lab2(t){now=t;const g=$('c2').getContext('2d');g.clearRect(0,0,1200,620);const T=+$('i2t').value,mu=+$('i2m').value/1000;$('o2t').textContent=T;$('o2m').textContent=Math.round(mu*1000);
+ const v=Math.sqrt(T/mu),L=20,tt=now-t2s,xp=tt*v;const [X,Y]=frame(g,60,120,1100,260,0,L,-1.4,1.4,'x (m)','');
+ const p=x=>Math.exp(-1*((x-xp)/0.6)**2);curve(g,p,0,L,X,Y,CU(),3.2,1200);
+ g.fillStyle=INK();g.fillRect(40,150,20,200);g.fillRect(1160,150,20,200);txt(g,'الوتر مشدود بقوة T',600,90,MU(),'center',18,1);
+ for(let i=0;i<=20;i+=2)txt(g,String(i),X(i),402,MU(),'center',15);
+ [5,15].forEach(xx=>{seg(g,X(xx),130,X(xx),370,BL(),1.5,[5,4]);txt(g,'حسّاس',X(xx),465-40,BL(),'center',16,1);});
+ const t5=5/v,t15=15/v;let txtv='';if(tt>=t15&&tt<99)txtv=NOTE('زمن الانتقال بين الحساسين: '+EQi((t15-t5).toFixed(3)+' s')+' لمسافة '+EQi('10 m'));
+ bars(g,300,580,120,[['T',T/200,RD],['μ',mu*1000/50,GR],['v',v/450,CU()]],1,90,60);
+ $('r2').innerHTML=EQ('v = √(T/μ) = '+v.toFixed(1)+' m/s')+txtv+NOTE('مضاعفة الشد أربع مرات تضاعف السرعة مرتين.');}
+/* 3 */
+function lab3(){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,620);const A=+$('i3a').value/1000,f=+$('i3f').value,T=+$('i3t').value,mu=+$('i3m').value/1000;$('o3a').textContent=(A*1000).toFixed(1);$('o3f').textContent=f;$('o3t').textContent=T;$('o3m').textContent=(mu*1000).toFixed(1);
+ const v=Math.sqrt(T/mu),w=TAU*f,l=v/f,k=TAU/l,L=2*l;const [X,Y]=frame(g,60,40,1100,260,0,L,-1.3,1.3,'x','y/A');curve(g,x=>Math.sin(k*x),0,L,X,Y,CU(),3,600);
+ /* energy density colored band */
+ for(let i=0;i<1100;i++){const x=L*i/1100,e=Math.cos(k*x)**2;g.fillStyle='rgba(181,86,43,'+(0.08+0.8*e).toFixed(3)+')';g.fillRect(60+i,320,1.2,40);}g.strokeStyle=css('--grid');g.strokeRect(60,320,1100,40);
+ txt(g,'كثافة الطاقة على طول الموجة (الأغمق = طاقة أكبر)',600,384,MU(),'center',16,1);
+ const P=0.5*mu*v*w*w*A*A,e=0.5*mu*w*w*A*A;bars(g,300,580,160,[['القدرة P',P,CU()]],Math.max(P*1.4,0.5),140,40);
+ $('r3').innerHTML=EQ('v = √(T/μ) = '+v.toFixed(1)+' m/s ,  λ = v/f = '+l.toFixed(2)+' m')+EQ('ε̄ = ½μω²A² = '+U(e,3)+' J/m')+EQ('P̄ = ½μvω²A² = '+U(P,3)+' W')+NOTE('القدرة تتناسب مع مربع التردد ومربع السعة.');}
+/* 4 */
+function lab4(){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,620);const sa=$('s4a').value,sb=+$('s4b').value,t=+$('i4t').value;$('o4t').textContent=t.toFixed(2);
+ const v=1,L=10,fa=x=>sa==='g'?Math.exp(-1*((x)/0.6)**2):Math.max(0,1-Math.abs(x)/0.9),fb=x=>sb*Math.exp(-1*((x)/0.6)**2);
+ const y1=x=>fa(x-(1+v*t)),y2=x=>fb(x-(9-v*t));const [X,Y]=frame(g,60,40,1100,500,0,L,-2.3,2.3,'x','y');
+ curve(g,y1,0,L,X,Y,BL(),2,800,[6,4]);curve(g,y2,0,L,X,Y,GR,2,800,[6,4]);curve(g,x=>y1(x)+y2(x),0,L,X,Y,CU(),3.4,1200);
+ arrow(g,X(1+v*t),Y(1.6),X(1+v*t)+60,Y(1.6),BL(),2.5);arrow(g,X(9-v*t),Y(-1.6)+(sb>0?0:0),X(9-v*t)-60,Y(-1.6),GR,2.5);
+ txt(g,'f(x − vt)',X(1+v*t),Y(1.9),BL(),'center',18);txt(g,'g(x + vt)',X(9-v*t),Y(-1.9),GR,'center',18);
+ $('r4').innerHTML=EQ('∂²y/∂x² = (1/v²) ∂²y/∂t²')+EQ('y = f(x − vt) + g(x + vt)')+NOTE(sb<0?'عند التطابق التام تنعدم الإزاحة، لكن الوتر يتحرك بأقصى سرعة: الطاقة كلها حركية.':'عند التطابق تتضاعف الإزاحة ثم تفترق النبضتان دون تغيير (مبدأ التراكب).');}
+/* 5 */
+let mode5='2';document.querySelectorAll('#m5 .btn').forEach(b=>b.onclick=()=>{mode5=b.dataset.m;document.querySelectorAll('#m5 .btn').forEach(x=>x.classList.toggle('sel',x===b));dirty=true;});
+let img5=null;
+function lab5(t){now=t;const g=$('c5').getContext('2d');g.clearRect(0,0,1200,620);const l=+$('i5l').value;$('o5l').textContent=l.toFixed(1);
+ const N=280,cx=N/2,sc=0.2,k=TAU/l,w=TAU*0.8;if(!img5)img5=g.createImageData(N,N);const d=img5.data,decay=r=>mode5==='2'?1/Math.sqrt(Math.max(r,0.6)):1/Math.max(r,0.6);
+ for(let j=0;j<N;j++)for(let i=0;i<N;i++){const r=Math.hypot(i-cx,j-cx)*sc,a=decay(r)*Math.cos(k*r-w*t)*0.9;const q=(j*N+i)*4,s=Math.max(-1,Math.min(1,a));d[q]=s>0?255:Math.round(255*(1+s));d[q+1]=Math.round(255*(1-Math.abs(s)*0.65));d[q+2]=s<0?255:Math.round(255*(1-s));d[q+3]=255;}
+ const off=document.createElement('canvas');off.width=N;off.height=N;off.getContext('2d').putImageData(img5,0,0);g.imageSmoothingEnabled=true;g.drawImage(off,40,40,540,540);
+ const [X,Y]=frame(g,640,60,520,480,0,N/2*sc,0,1.8,'r (cm)','السعة');curve(g,r=>decay(r),0.6,N/2*sc,X,Y,CU(),3,400);curve(g,r=>mode5==='2'?1/Math.sqrt(r):1/r,0.6,N/2*sc,X,Y,MU(),1,400,[4,4]);
+ $('r5').innerHTML=(mode5==='2'?EQ('A ∝ 1/√r ,  I ∝ 1/r'):EQ('A ∝ 1/r ,  I ∝ 1/r²'))+NOTE('الطاقة نفسها تتوزع على '+(mode5==='2'?'محيط دائرة '+EQi('2πr'):'سطح كرة '+EQi('4πr²'))+' يكبر مع البعد عن المصدر.');}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4,t5:lab5};const ANIM=new Set(["t1", "t2", "t5"]);let T0=performance.now();
+function loop(t){if(dirty||ANIM.has(active)){dirty=false;LABS[active]((t-T0)/1000);}requestAnimationFrame(loop);}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>dirty=true);
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

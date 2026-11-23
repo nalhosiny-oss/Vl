@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الذرة في المجالات الخارجية: زيمان وشتارك</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#FBF8F1;--panel:#FFFFFF;--ink:#2A2623;--muted:#6F6553;--line:#E2DACB;--gold:#B8862B;--golddk:#8C6414;--chip:#F4EEE2;--plot:#FFFDF8;--grid:#EEE6D6;--dark:#1A1714;--blue:#3D4E8C;--ok:#2E7D4F;--bad:#B23A2E}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 44px}
+.fstrip{height:14px;border-radius:7px;margin:0 0 14px;direction:ltr;background:
+ linear-gradient(90deg,transparent 0 21%,#1A1714 21% 21.4%,transparent 21.4% 45%,#1A1714 45% 45.3%,transparent 45.3% 62.6%,#1A1714 62.6% 63.2%,transparent 63.2% 86%,#1A1714 86% 86.4%,transparent 86.4%),
+ linear-gradient(90deg,#6B3FB0,#3D5BD9 16%,#2BA5D9 32%,#3BB55A 48%,#E3D332 64%,#F29A2E 80%,#E0402F)}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--golddk);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:66ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}
+@media (max-width:840px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border:1px solid var(--grid);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:11px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.08rem;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--chip);color:var(--ink);width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 11px;border-radius:8px;cursor:pointer;min-height:36px}
+.btn.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.readout{background:var(--chip);border-radius:10px;padding:10px 13px;font-size:.95rem}
+.readout .eq{display:block}
+.eq{font-family:'STIX Two Text',serif;font-size:1.06rem;direction:ltr;unicode-bidi:isolate;text-align:left}
+.note{font-size:.92rem;margin-top:4px}
+.good{color:var(--ok);font-weight:700}.badx{color:var(--bad);font-weight:700}
+.task{border-top:1px solid var(--line);padding-top:10px;font-size:.93rem}
+.task h3{margin:0 0 4px;font-size:1rem;color:var(--golddk)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.93rem;color:var(--ink)}
+.chk input{width:18px;height:18px;accent-color:var(--gold)}
+footer{margin-top:20px;color:var(--muted);font-size:.85rem}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fstrip" aria-hidden="true"></div>
+<header>
+  <span class="badge">الأطياف الذرية والجزيئية · <bdi dir="ltr">2037003-4</bdi></span>
+  <h1>معمل الذرة في المجالات الخارجية: زيمان وشتارك</h1>
+  <p>الفصل الخامس. غيّر القيم وراقب النتيجة، وأجب عن السؤال في أسفل كل تجربة.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" aria-selected="true" data-t="t1">١. العزم المغناطيسي والمبادرة</button><button role="tab" aria-selected="false" data-t="t2">٢. تأثير زيمان العادي</button><button role="tab" aria-selected="false" data-t="t3">٣. زيمان الشاذ وعامل لاندي</button><button role="tab" aria-selected="false" data-t="t4">٤. تأثير شتارك</button></nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="620" aria-label="مبادرة متجه الزخم الزاوي حول المجال المغناطيسي"></canvas>
+  <div class="ctrl">
+    <label>العدد الكمي المداري l <b id="o1l"></b></label><input id="i1l" type="range" min="1" max="3" step="1" value="2">
+    <label><span>m<sub>l</sub></span> <b id="o1m"></b></label><input id="i1m" type="range" min="-3" max="3" step="1" value="1">
+    <label>المجال المغناطيسي B (T) <b id="o1b"></b></label><input id="i1b" type="range" min="0" max="2" step="0.01" value="1">
+    <div class="readout" id="r1"></div>
+    <div class="task"><h3>سؤال</h3>لماذا لا يمكن أن يكون متجه L موازيًا تمامًا للمجال B؟ وكم مستوى ينقسم إليه المستوى d في المجال؟</div>
+  </div>
+</section>
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="620" aria-label="انقسام خط الكادميوم الأحمر إلى ثلاث مركّبات"></canvas>
+  <div class="ctrl">
+    <div class="readout" style="font-size:.9rem">الخط الأحمر للكادميوم: <span class="eq" style="display:inline">¹D₂ → ¹P₁ ، λ = 643.85 nm</span> (S = 0)</div>
+    <label>المجال المغناطيسي B (T) <b id="o2b"></b></label><input id="i2b" type="range" min="0" max="3" step="0.01" value="1">
+    <div class="row" id="m2"><button class="btn sel" type="button" data-m="tr">رصد عمودي على B</button><button class="btn" type="button" data-m="lo">رصد موازٍ لـ B</button></div>
+    <div class="readout" id="r2"></div>
+    <div class="task"><h3>سؤال</h3>كم انتقالًا يحدث بين المستويات الفرعية؟ ولماذا تظهر ثلاث مركّبات فقط؟ ولماذا تختفي المركّبة الوسطى عند الرصد على امتداد المجال؟</div>
+  </div>
+</section>
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="620" aria-label="انقسام خطي الصوديوم في مجال مغناطيسي"></canvas>
+  <div class="ctrl">
+    <div class="row" id="m3"><button class="btn sel" type="button" data-m="D1">الخط D₁</button><button class="btn" type="button" data-m="D2">الخط D₂</button><button class="btn" type="button" data-m="N">خط عادي (S = 0)</button></div>
+    <label>المجال المغناطيسي B (T) <b id="o3b"></b></label><input id="i3b" type="range" min="0" max="3" step="0.01" value="1">
+    <div class="readout" id="r3"></div>
+    <div class="task"><h3>سؤال</h3>احسب عامل لاندي للمستويات ²S₁/₂ و²P₁/₂ و²P₃/₂. كم مركّبة يعطي كل من D₁ وD₂؟ ولماذا يسمى هذا التأثير «شاذًا»؟</div>
+  </div>
+</section>
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="620" aria-label="إزاحة مستويات الطاقة في مجال كهربي"></canvas>
+  <div class="ctrl">
+    <label>شدة المجال الكهربي F (kV/cm) <b id="o4f"></b></label><input id="i4f" type="range" min="0" max="1000" step="1" value="100">
+    <div class="readout" id="r4"></div>
+    <div class="task"><h3>سؤال</h3>قارن إزاحة المستوى n = 2 في الهيدروجين بإزاحة المستوى الأرضي للصوديوم عند 100 kV/cm. لماذا يكون تأثير شتارك خطيًا في الهيدروجين وتربيعيًا في الصوديوم؟</div>
+  </div>
+</section>
+<footer>أ.د. نجم الحصيني – الأطياف الذرية والجزيئية، الفصل الخامس. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+const h=6.62607015e-34,c=2.99792458e8,kB=1.380649e-23,eV=1.602176634e-19;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let active='t1',dirty=true;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;dirty=true;}));
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>dirty=true);e.addEventListener('change',()=>dirty=true);});
+
+/* number formatting with real superscripts */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sciParts(v,d){const e=Math.floor(Math.log10(Math.abs(v)));let m=v/Math.pow(10,e);if(+m.toFixed(d)>=10){return [(m/10).toFixed(d),e+1];}return [m.toFixed(d),e];}
+function H(v,d=3){return H0(v,d).replace(/-/g,'−');}
+function H0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10<sup>'+e+'</sup>';}
+function U(v,d=3){return U0(v,d).replace(/-/g,'−');}
+function U0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10'+String(e).split('').map(ch=>SUP[ch]).join('');}
+
+/* colour of a wavelength (nm) */
+function rgbOf(l){let r=0,g=0,b=0;
+ if(l>=380&&l<440){r=-(l-440)/60;b=1;}else if(l<490){g=(l-440)/50;b=1;}else if(l<510){g=1;b=-(l-510)/20;}else if(l<580){r=(l-510)/70;g=1;}else if(l<645){r=1;g=-(l-645)/65;}else if(l<=750){r=1;}
+ let f=0;if(l>=380&&l<420)f=0.3+0.7*(l-380)/40;else if(l>=420&&l<=700)f=1;else if(l>700&&l<=750)f=0.3+0.7*(750-l)/50;
+ return [r*f,g*f,b*f];}
+function colStr(l,I){const v=l>=380&&l<=750?rgbOf(l):[0.62,0.6,0.58];const k=Math.pow(Math.max(0,Math.min(1,I)),0.55);return 'rgb('+v.map(x=>Math.round(255*x*k)).join(',')+')';}
+function planck(lnm,T){const l=lnm*1e-9;const x=h*c/(l*kB*T);if(x>700)return 0;return 2*h*c*c/Math.pow(l,5)/(Math.expm1(x));}
+
+/* drawing helpers */
+function txt(g,s,x,y,col,al,sz,rtl,bold){g.font=(bold?'700 ':'')+(sz||22)+'px "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function poly(g,pts,col,w){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function strip(g,x,y,w,hh,l0,l1,If){g.fillStyle='#0D0B09';g.fillRect(x,y,w,hh);for(let i=0;i<w;i++){const l=l0+(l1-l0)*i/w;const I=If(l);if(I<=0.003)continue;g.fillStyle=colStr(l,I);g.fillRect(x+i,y,1.2,hh);}g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(x,y,w,hh);}
+function axisNm(g,x,y,w,l0,l1,step){seg(g,x,y,x+w,y,css('--muted'),1.5);for(let l=Math.ceil(l0/step)*step;l<=l1+1e-9;l+=step){const px=x+(l-l0)/(l1-l0)*w;seg(g,px,y,px,y+8,css('--muted'),1.5);txt(g,String(Math.round(l)),px,y+30,css('--muted'),'center',18);}txt(g,'λ (nm)',x+w,y+56,css('--muted'),'right',18);}
+
+/* atomic line data: air wavelengths (nm) and relative intensities */
+const LINES={
+ H:[[656.28,1],[486.13,.55],[434.05,.32],[410.17,.22],[397.01,.14]],
+ He:[[447.15,.45],[471.31,.22],[492.19,.25],[501.57,.55],[587.56,1],[667.82,.45],[706.52,.4]],
+ Na:[[588.995,1],[589.592,.55],[568.82,.08],[615.42,.07],[497.85,.04]],
+ Hg:[[253.65,1],[365.02,.55],[404.66,.45],[435.83,.85],[546.07,1],[576.96,.5],[579.07,.5]],
+ Ne:[[585.25,.6],[588.19,.3],[594.48,.4],[609.61,.4],[614.31,.5],[626.65,.4],[633.44,.45],[640.22,.9],[650.65,.5],[659.90,.3],[692.95,.4],[703.24,.55]]};
+const NAME={H:'الهيدروجين',He:'الهيليوم',Na:'الصوديوم',Hg:'الزئبق',Ne:'النيون'};
+function lineSpec(el,w){const L=LINES[el];return l=>{let s=0;for(const [l0,a] of L){const d=(l-l0)/w;if(Math.abs(d)<6)s+=a*Math.exp(-d*d/2);}return s;};}
+
+
+
+const muB=9.2740100783e-24,hP=6.62607015e-34,eVJ=1.602176634e-19,muBcm=0.46686447;/* cm^-1 per tesla */
+function fr(x){return Number.isInteger(x)?String(x):((x<0?'−':'')+Math.round(Math.abs(x)*2)+'/2');}
+function arrowTo(g,x0,y0,x1,y1,col,w){seg(g,x0,y0,x1,y1,col,w);const an=Math.atan2(y1-y0,x1-x0);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-14*Math.cos(an-0.4),y1-14*Math.sin(an-0.4));g.lineTo(x1-14*Math.cos(an+0.4),y1-14*Math.sin(an+0.4));g.fill();}
+/* 1. precession */
+function lab1(t){const g=$('c1').getContext('2d');g.clearRect(0,0,1200,620);const sl=$('i1l'),sm=$('i1m');const l=+sl.value;sm.min=-l;sm.max=l;if(Math.abs(+sm.value)>l)sm.value=0;const m=+sm.value,B=+$('i1b').value;
+ $('o1l').textContent=l;$('o1m').textContent=(m>0?'+':'')+m;$('o1b').textContent=B.toFixed(2);
+ const Lm=Math.sqrt(l*(l+1)),sc=200/Math.sqrt(12),cx=330,cy=360,th=Math.acos(m/Lm),fL=muB*B/hP,ph=t*(B>0?1.2*B+0.2:0);
+ arrowTo(g,cx,560,cx,90,'#3D4E8C',3);txt(g,'B',cx+12,100,'#3D4E8C','left',24,0,1);
+ const P=(x,y,z)=>[cx+x+0.35*z,cy-y-0.2*z];const R=Lm*sc*Math.sin(th),h=Lm*sc*Math.cos(th);
+ g.strokeStyle=css('--line');g.beginPath();for(let k=0;k<=60;k++){const q=k/60*2*Math.PI,p=P(R*Math.cos(q),h,R*Math.sin(q));k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();
+ const tip=P(R*Math.cos(ph),h,R*Math.sin(ph));arrowTo(g,cx,cy,tip[0],tip[1],css('--golddk'),4);txt(g,'L',tip[0]+10,tip[1],css('--golddk'),'left',24,0,1);
+ seg(g,cx,cy-h,tip[0],tip[1],css('--muted'),1,[4,4]);txt(g,'Lz = mₗħ',cx-20,cy-h,css('--muted'),'right',18);
+ /* levels */
+ const X=700,W=420,y0=330,dy=B>0?(60*B/2+4):0;txt(g,'B = 0',X+60,y0+150,css('--muted'),'center',17);seg(g,X,y0,X+120,y0,css('--ink'),3);
+ for(let k=-l;k<=l;k++){const y=y0-k*dy;seg(g,X+120,y0,X+220,y,css('--line'),1.2,[4,4]);seg(g,X+220,y,X+W-60,y,k===m?css('--golddk'):css('--ink'),k===m?4:2);txt(g,'mₗ = '+(k>0?'+':'')+k,X+W,y+6,k===m?css('--golddk'):css('--muted'),'right',16);}
+ const dE=muB*B/eVJ;
+ $('r1').innerHTML='<span class="eq">|L| = √(l(l+1)) ħ = '+H(Lm,3)+' ħ ,  cos θ = m<sub>l</sub>/√(l(l+1)) ⇒ θ = '+H(th*180/Math.PI,3)+'°</span><span class="eq">U = m<sub>l</sub> μ<sub>B</sub> B ,  μ<sub>B</sub>B = '+H(dE,3)+' eV</span><span class="eq">f<sub>Larmor</sub> = μ<sub>B</sub>B/h = '+H(fL/1e9,4)+' GHz</span><div class="note">ينقسم المستوى إلى 2l + 1 = <b>'+(2*l+1)+'</b> مستويات متساوية الأبعاد.</div>';}
+/* 2. normal Zeeman */
+let mode2='tr';document.querySelectorAll('#m2 .btn').forEach(b=>b.onclick=()=>{mode2=b.dataset.m;document.querySelectorAll('#m2 .btn').forEach(x=>x.classList.toggle('sel',x===b));dirty=true;});
+function lab2(){const g=$('c2').getContext('2d');g.clearRect(0,0,1200,620);const B=+$('i2b').value;$('o2b').textContent=B.toFixed(2);const l0=643.847,dk=muBcm*B,dl=l0*l0*1e-7*dk;
+ const Xu=80,yU=150,yL=420,s=B*18;
+ for(let m=-2;m<=2;m++){seg(g,Xu,yU-m*s,Xu+520,yU-m*s,css('--ink'),2);txt(g,(m>0?'+':'')+m,Xu+530,yU-m*s+6,css('--muted'),'left',15);}txt(g,'¹D₂',Xu-10,yU+6,css('--ink'),'right',20);
+ for(let m=-1;m<=1;m++){seg(g,Xu,yL-m*s,Xu+520,yL-m*s,css('--ink'),2);txt(g,(m>0?'+':'')+m,Xu+530,yL-m*s+6,css('--muted'),'left',15);}txt(g,'¹P₁',Xu-10,yL+6,css('--ink'),'right',20);
+ let k=0;const cols={'-1':'#3D4E8C','0':'#B23A2E','1':css('--golddk')};for(let mu=-2;mu<=2;mu++)for(let ml=-1;ml<=1;ml++){const d=mu-ml;if(Math.abs(d)>1)continue;const x=Xu+30+k*52;k++;arrowTo(g,x,yU-mu*s,x,yL-ml*s-4,cols[String(d)],2.5);}
+ txt(g,'Δmₗ = −1 , 0 , +1 : تسعة انتقالات بثلاث طاقات فقط',Xu+260,560,css('--ink'),'center',18,1);
+ /* spectrum */
+ const SX=700,SW=440,sy=380,span=Math.max(0.12,dl*3.2),lx=l=>SX+SW/2+(l-l0)/span*SW;g.fillStyle='#0D0B09';g.fillRect(SX,sy-120,SW,120);
+ const comps=mode2==='tr'?[[0,'π','#B23A2E'],[-1,'σ','#3D4E8C'],[1,'σ',css('--golddk')]]:[[-1,'σ⁻ دائري','#3D4E8C'],[1,'σ⁺ دائري',css('--golddk')]];
+ comps.forEach(([d,lb,c])=>{const l=l0-d*dl;seg(g,lx(l),sy-120,lx(l),sy,colStr(643.8,1),5);txt(g,lb,lx(l),sy+30,c,'center',17,1);});
+ txt(g,mode2==='tr'?'رصد عمودي: ثلاث مركّبات':'رصد موازٍ: تختفي المركّبة π',SX+SW,sy-140,css('--golddk'),'right',19,1,1);
+ txt(g,'Δλ = λ² μB B / hc',SX+SW/2,sy+90,css('--ink'),'center',24);
+ $('r2').innerHTML='<span class="eq">Δν̃ = μ<sub>B</sub>B/hc = 0.4669 B = '+H(dk,4)+' cm<sup>−1</sup></span><span class="eq">Δλ = λ²Δν̃ = '+H(dl*1000,4)+' pm</span><div class="note">في المستويات ذات S = 0 يكون g = 1 للمستويين، فتتساوى المسافات بين المستويات الفرعية في الأعلى والأدنى، فيعطي كل Δm<sub>l</sub> خطًا واحدًا.</div>';}
+/* 3. anomalous Zeeman */
+let mode3='D1';document.querySelectorAll('#m3 .btn').forEach(b=>b.onclick=()=>{mode3=b.dataset.m;document.querySelectorAll('#m3 .btn').forEach(x=>x.classList.toggle('sel',x===b));dirty=true;});
+const gJ=(L,S,J)=>J===0?0:1+(J*(J+1)+S*(S+1)-L*(L+1))/(2*J*(J+1));
+function lab3(){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,620);const B=+$('i3b').value;$('o3b').textContent=B.toFixed(2);
+ const P={D1:{u:[1,0.5,0.5],d:[0,0.5,0.5],lam:589.592,nu:'²P₁/₂',nd:'²S₁/₂'},D2:{u:[1,0.5,1.5],d:[0,0.5,0.5],lam:588.995,nu:'²P₃/₂',nd:'²S₁/₂'},N:{u:[2,0,2],d:[1,0,1],lam:643.847,nu:'¹D₂',nd:'¹P₁'}}[mode3];
+ const gu=gJ(...P.u),gd=gJ(...P.d),Ju=P.u[2],Jd=P.d[2],ms=J=>{const a=[];for(let m=-J;m<=J+1e-9;m++)a.push(m);return a;};
+ const Xu=80,yU=170,yL=440,s=B*22+0.0;const MU=ms(Ju),MD=ms(Jd);
+ MU.forEach(m=>{seg(g,Xu,yU-gu*m*s,Xu+520,yU-gu*m*s,css('--ink'),2);txt(g,'m = '+fr(m),Xu+530,yU-gu*m*s+6,css('--muted'),'left',14);});txt(g,P.nu,Xu-10,yU+6,css('--ink'),'right',20);
+ MD.forEach(m=>{seg(g,Xu,yL-gd*m*s,Xu+520,yL-gd*m*s,css('--ink'),2);txt(g,'m = '+fr(m),Xu+530,yL-gd*m*s+6,css('--muted'),'left',14);});txt(g,P.nd,Xu-10,yL+6,css('--ink'),'right',20);
+ const comps=[];let k=0;MU.forEach(mu=>MD.forEach(md=>{const d=mu-md;if(Math.abs(d)>1+1e-9)return;const sh=gu*mu-gd*md;comps.push([sh,d]);const x=Xu+30+k*(470/Math.max(1,(MU.length*3)));k++;arrowTo(g,x,yU-gu*mu*s,x,yL-gd*md*s-4,Math.abs(d)<1e-9?'#B23A2E':'#3D4E8C',2.5);}));
+ const uniq=[...new Map(comps.map(c=>[c[0].toFixed(4),c])).values()].sort((a,b)=>a[0]-b[0]);
+ /* pattern in units of muB B */
+ const SX=700,SW=440,sy=360,mxs=Math.max(1.5,...uniq.map(c=>Math.abs(c[0]))),lx=v=>SX+SW/2+v/mxs*SW*0.45;seg(g,SX,sy,SX+SW,sy,css('--muted'),1.5);
+ uniq.forEach(([sh,d])=>{const x=lx(sh);seg(g,x,sy,x,sy-(Math.abs(d)<1e-9?150:110),Math.abs(d)<1e-9?'#B23A2E':'#3D4E8C',5);txt(g,H(sh,3),x,sy+26,css('--muted'),'center',15);});
+ seg(g,lx(0),sy,lx(0),sy-190,css('--muted'),1,[4,4]);txt(g,'الإزاحة بوحدة μB B',SX+SW,sy+56,css('--muted'),'right',16,1);txt(g,'π (Δm = 0)',SX+SW,sy-210,'#B23A2E','right',16);txt(g,'σ (Δm = ±1)',SX+80,sy-210,'#3D4E8C','left',16);
+ txt(g,'gJ = 1 + [J(J+1) + S(S+1) − L(L+1)] / 2J(J+1)',SX+SW/2,560,css('--ink'),'center',19);
+ const dk=muBcm*B;
+ $('r3').innerHTML='<span class="eq">g('+P.nu+') = '+H(gu,4)+' ,  g('+P.nd+') = '+H(gd,4)+'</span><span class="eq">ΔE = (g<sub>u</sub>m<sub>u</sub> − g<sub>l</sub>m<sub>l</sub>) μ<sub>B</sub>B</span><div class="note">عدد المركّبات: <b>'+uniq.length+'</b>. عند B = '+B.toFixed(2)+' T تكون μ<sub>B</sub>B = '+H(dk,3)+' cm<sup>−1</sup>.'+(mode3==='N'?'':'<br>«شاذ» لأن عامل g يختلف بين المستويين بسبب مغزل الإلكترون، فيتجاوز عدد المركّبات ثلاثًا.')+'</div>';}
+/* 4. Stark */
+function lab4(){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,620);const F=+$('i4f').value,FV=F*1e5;$('o4f').textContent=F;
+ const a0=5.29177e-11,ea0=1.602176634e-19*a0,Jcm=1/(hP*2.99792458e10),lin=n12=>1.5*2*n12*ea0*FV*Jcm,lin3=n12=>1.5*3*n12*ea0*FV*Jcm;
+ const alpha=162.7*1.64877727e-41,quad=-0.5*alpha*FV*FV*Jcm;
+ /* fan diagram: shift vs F for H n=2 */
+ const X=70,W=500,y0=320,Fm=1000,Smax=1.5*2*1*ea0*Fm*1e5*Jcm,ys=v=>y0-v/Smax*230,xs=f=>X+W*f/Fm;
+ seg(g,X,y0,X+W,y0,css('--muted'),1.5);seg(g,X,80,X,560,css('--muted'),1.5);
+ [[1,'#B23A2E'],[0,css('--ink')],[-1,'#3D4E8C']].forEach(([n12,c])=>{const v=1.5*2*n12*ea0*Fm*1e5*Jcm;seg(g,xs(0),ys(0),xs(Fm),ys(v),c,3);});
+ seg(g,xs(F),80,xs(F),560,css('--gold'),2,[6,5]);
+ txt(g,'الهيدروجين n = 2: تأثير خطي',X+W/2,50,css('--golddk'),'center',19,1,1);txt(g,'F (kV/cm)',X+W,y0+30,css('--muted'),'right',16);txt(g,'الإزاحة (cm⁻¹)',X+8,90,css('--muted'),'left',16,1);
+ txt(g,'+'+U(Smax,3),X+6,ys(Smax)+18,css('--muted'),'left',14);txt(g,'−'+U(Smax,3),X+6,ys(-Smax)-6,css('--muted'),'left',14);
+ /* Na quadratic */
+ const X2=650,W2=480,qmax=0.5*alpha*1e16*Jcm,yq=v=>110+(v/qmax)*420;seg(g,X2,110,X2+W2,110,css('--muted'),1.5);seg(g,X2,110,X2,560,css('--muted'),1.5);
+ const pts=[];for(let f=0;f<=Fm;f+=5){pts.push([X2+W2*f/Fm,yq(0.5*alpha*(f*1e5)**2*Jcm)]);}poly(g,pts,css('--golddk'),3);seg(g,X2+W2*F/Fm,110,X2+W2*F/Fm,560,css('--gold'),2,[6,5]);
+ txt(g,'الصوديوم 3s: تأثير تربيعي (إزاحة سالبة)',X2+W2/2,50,css('--golddk'),'center',19,1,1);txt(g,'−'+U(qmax,3)+' cm⁻¹',X2+6,yq(qmax)-6,css('--muted'),'left',14);txt(g,'F (kV/cm)',X2+W2,600,css('--muted'),'right',16);
+ $('r4').innerHTML='<b>H، n = 2</b> (المستويان 2s و2p منحلان):<span class="eq">ΔE = ±3 e a₀ F = ±'+H(lin(1),4)+' cm<sup>−1</sup></span><b>Na 3s</b> (لا انحلال):<span class="eq">ΔE = −½ α F² = '+H(quad,3)+' cm<sup>−1</sup></span><div class="note">النسبة بينهما ≈ '+(F>0?H(Math.abs(lin(1)/quad),3):'—')+'. التأثير الخطي يحتاج مستويات متساوية الطاقة ومختلفة التماثل يمزجها المجال، وهذا خاص بالهيدروجين.</div>';}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4};const ANIM=new Set(["t1"]);let T0=performance.now();
+function loop(t){if(dirty||ANIM.has(active)){dirty=false;LABS[active]((t-T0)/1000);}requestAnimationFrame(loop);}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>dirty=true);
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

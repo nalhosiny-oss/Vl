@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cache simulator · DMP Ch5</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+select{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 5 · SIMULATOR 1</small><h1>Trace-driven cache simulator</h1></header>
+<div class="wrap"><div class="grid">
+<div class="card">
+ <div class="eq">set = b mod S ,  C = S × W blocks ,  hit ratio = hits/references</div>
+ <label>Access pattern: <select id="pat"><option value="ws">Working set 48 blocks (70%) + streaming</option><option value="rand">Uniform random over N = 256 blocks</option><option value="loop">Loop over L blocks</option><option value="hand">Hand trace 0 8 0 6 8 (C = 4)</option></select></label>
+ <label>Loop length L: <span class="val" id="lv"></span></label><input type="range" id="L" min="8" max="160" step="1" value="65">
+ <label>Cache size C (blocks): <span class="val" id="cv"></span></label><input type="range" id="C" min="2" max="8" step="1" value="6">
+ <label>Associativity: <select id="W"><option value="1">Direct-mapped</option><option value="2">2-way</option><option value="4" selected>4-way</option><option value="0">Fully associative</option></select>
+ Policy: <select id="pol"><option value="lru">LRU</option><option value="fifo">FIFO</option><option value="rand">Random</option></select></label>
+ <div class="stats"><div class="s"><span>Hit ratio</span><b id="s1">—</b></div><div class="s"><span>Misses / references</span><b id="s2">—</b></div><div class="s"><span>Theory (if known)</span><b id="s3">—</b></div></div>
+ <div class="ar">جرّب الحلقة بطول يزيد كتلة واحدة على سعة الذاكرة المخبئية مع سياسة LRU: تنهار نسبة النجاح إلى الصفر، بينما تحافظ السياسة العشوائية على معظمها. وللمراجع العشوائية المنتظمة تكون النسبة C/N مهما كانت السياسة.</div>
+</div>
+<div class="card"><canvas id="c" width="800" height="360"></canvas><canvas id="t" width="800" height="150"></canvas></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+function trace(p,L){seed=7;const t=[];if(p==='hand')return[0,8,0,6,8];
+ if(p==='rand'){for(let i=0;i<40000;i++)t.push(Math.floor(rnd()*256));return t}
+ if(p==='loop'){for(let k=0;k<400;k++)for(let b=0;b<L;b++)t.push(b);return t}
+ let s=10000;for(let i=0;i<40000;i++){if(rnd()<0.7)t.push(Math.floor(rnd()*48));else t.push(s++)}return t}
+function sim(tr,C,W,pol,keep){if(W===0||W>C)W=C;const S=C/W,sets=Array.from({length:S},()=>[]);let m=0;const hist=[];let rs=11;const r2=()=>{rs=(rs*48271)%2147483647;return rs/2147483647};
+ for(const b of tr){const s=sets[b%S],k=s.indexOf(b);if(k>=0){if(pol==='lru'){s.splice(k,1);s.push(b)}if(keep)hist.push(1)}
+  else{m++;if(keep)hist.push(0);if(s.length<W)s.push(b);else if(pol==='rand')s[Math.floor(r2()*W)]=b;else{s.shift();s.push(b)}}}
+ return{m,hist}}
+function draw(){const p=$('pat').value,L=+$('L').value,W=+$('W').value,pol=$('pol').value;let C=Math.pow(2,+$('C').value);if(p==='hand')C=4;
+ $('lv').textContent=L;$('cv').textContent=C;const tr=trace(p,L);const r=sim(tr,C,W,pol,true);
+ $('s1').textContent=(1-r.m/tr.length).toFixed(3);$('s2').textContent=r.m+' / '+tr.length;
+ let th='—';if(p==='rand'&&W===0)th=(C/256).toFixed(3)+' (C/N)';if(p==='ws')th='≤ 0.700';if(p==='hand')th=['5','4','3'][W===1?0:W===2?1:2]+' misses (LRU)';if(p==='loop'&&W===0&&pol==='lru')th=L<=C?'≈ 1':'0';$('s3').textContent=th;
+ const c=$('c').getContext('2d'),Wd=800,H=360,Lm=60,B=40;c.clearRect(0,0,Wd,H);const X=k=>Lm+(k-1)/7*(Wd-Lm-30),Y=v=>H-B-v*(H-B-20);
+ c.strokeStyle='#E2DCCF';c.beginPath();c.moveTo(Lm,H-B);c.lineTo(Wd-20,H-B);c.moveTo(Lm,H-B);c.lineTo(Lm,10);c.stroke();
+ c.fillStyle='#5A5650';c.font='15px Calibri';for(let k=1;k<=8;k++)c.fillText(Math.pow(2,k),X(k)-8,H-B+18);for(let v=0;v<=1;v+=0.25)c.fillText(v.toFixed(2),Lm-40,Y(v)+5);c.fillText('cache size C (blocks)',Wd-170,H-6);c.fillText('hit ratio',8,22);
+ if(p!=='hand'){const col={lru:'#E07B1A',fifo:'#2E6F8E',rand:'#1E1E22'};
+  for(const q of ['lru','fifo','rand']){c.strokeStyle=col[q];c.lineWidth=q===pol?3:1.2;c.beginPath();for(let k=1;k<=8;k++){const cc=Math.pow(2,k),hr=1-sim(tr,cc,W,q,false).m/tr.length;k>1?c.lineTo(X(k),Y(hr)):c.moveTo(X(k),Y(hr))}c.stroke()}
+  c.font='14px Calibri';[['lru','LRU'],['fifo','FIFO'],['rand','Random']].forEach((a,i)=>{c.fillStyle=col[a[0]];c.fillText(a[1],Wd-210+i*60,24)});
+  c.fillStyle='#E07B1A';c.beginPath();c.arc(X(Math.log2(C)),Y(1-r.m/tr.length),7,0,7);c.fill()}
+ const g=$('t').getContext('2d');g.clearRect(0,0,800,150);g.fillStyle='#5A5650';g.font='14px Calibri';g.fillText('last references: hit (green) or miss (red)',10,18);
+ const h=r.hist.slice(-60);h.forEach((v,i)=>{g.fillStyle=v?'#1F8A5B':'#B3332F';g.fillRect(10+i*13,35,11,40)});
+ if(p==='hand'){g.fillStyle='#1E1E22';g.font='16px Cambria';tr.forEach((b,i)=>g.fillText(b,14+i*13,95))}}
+['pat','L','C','W','pol'].forEach(id=>$(id).oninput=draw);draw();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Steady state · DMP Ch3</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+select{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 3 · SIMULATOR 3</small><h1>Steady state: Welch warm-up and batch means for a switch port</h1></header>
+<div class="wrap"><div class="grid">
+<div class="card"><canvas id="wl" width="800" height="330"></canvas>
+ <label>Utilization ρ: <span class="val" id="rv"></span></label><input type="range" id="rho" min="0.5" max="0.95" step="0.05" value="0.8">
+ <label>Welch window half-width w: <span class="val" id="wv"></span></label><input type="range" id="w" min="5" max="300" step="5" value="100">
+ <label>Deletion point d (packets): <span class="val" id="dv"></span></label><input type="range" id="d" min="0" max="3000" step="100" value="1000">
+ <button class="main" id="go">New runs</button>
+ <div class="eq">Theory (μ = 1): W<sub>Q</sub> = ρ/(1 − ρ) = <span id="th"></span></div>
+</div>
+<div class="card"><canvas id="bm" width="800" height="330"></canvas>
+ <label>Number of batches k: <span class="val" id="kv"></span></label><input type="range" id="k" min="5" max="200" step="5" value="20">
+ <div class="stats"><div class="s"><span>Batch-means CI</span><b id="s1">—</b></div><div class="s"><span>Lag-1 corr. of batch means</span><b id="s2">—</b></div><div class="s"><span>SE batch / naive</span><b id="s3">—</b></div></div>
+ <div class="ar">اختر نقطة الحذف حيث يستقر المنحنى المنعّم في الشكل الأيسر. ثم زد عدد الدفعات كثيراً: تصبح الدفعات قصيرة ومترابطة، فيضيق المجال بشكل مضلل. وارفع ρ نحو 0.95 لترى كم يصبح الوصول إلى الحالة المستقرة بطيئاً.</div>
+</div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);let runs=[],long=[];
+function lind(n,rho){const W=new Float64Array(n);for(let i=1;i<n;i++){W[i]=Math.max(0,W[i-1]-Math.log(1-Math.random())+Math.log(1-Math.random())/rho)}return W}
+function gen(){const rho=+$('rho').value;runs=[];for(let r=0;r<10;r++)runs.push(lind(4000,rho));long=lind(120000,rho);draw()}
+function tq(df){const z=1.96;return z+(z**3+z)/(4*df)+(5*z**5+16*z**3+3*z)/(96*df*df)}
+function draw(){const rho=+$('rho').value,w=+$('w').value,d=+$('d').value,k=+$('k').value,th=rho/(1-rho);
+ $('rv').textContent=rho.toFixed(2);$('wv').textContent=w;$('dv').textContent=d;$('kv').textContent=k;$('th').textContent=th.toFixed(2);
+ const n=4000,avg=new Float64Array(n);runs.forEach(r=>{for(let j=0;j<n;j++)avg[j]+=r[j]/10});const sm=new Float64Array(n);
+ for(let j=0;j<n;j++){const a=Math.max(0,j-w),b=Math.min(n-1,j+w);let s=0;for(let i=a;i<=b;i++)s+=avg[i];sm[j]=s/(b-a+1)}
+ const g=$('wl').getContext('2d');g.clearRect(0,0,800,330);const ym=Math.max(th*2.2,...sm)*1.05,X=j=>40+j/n*740,Y=v=>300-Math.min(v,ym)/ym*280;
+ g.strokeStyle='#D9D2C3';g.beginPath();for(let j=0;j<n;j+=4){j?g.lineTo(X(j),Y(avg[j])):g.moveTo(X(j),Y(avg[j]))}g.stroke();
+ g.strokeStyle='#E07B1A';g.lineWidth=2.5;g.beginPath();for(let j=0;j<n;j+=4){j?g.lineTo(X(j),Y(sm[j])):g.moveTo(X(j),Y(sm[j]))}g.stroke();g.lineWidth=1;
+ g.strokeStyle='#1E1E22';g.setLineDash([6,4]);g.beginPath();g.moveTo(40,Y(th));g.lineTo(780,Y(th));g.stroke();g.strokeStyle='#2E6F8E';g.beginPath();g.moveTo(X(d),10);g.lineTo(X(d),300);g.stroke();g.setLineDash([]);
+ g.fillStyle='#5A5650';g.font='14px Calibri';g.fillText('Welch plot: average of 10 runs (grey), smoothed (orange), theory (dashed), deletion point (blue)',40,18);g.fillText('packet number',360,322);
+ const x=long.subarray(d),m=Math.floor(x.length/k),bm=[];for(let b=0;b<k;b++){let s=0;for(let i=b*m;i<(b+1)*m;i++)s+=x[i];bm.push(s/m)}
+ const M=bm.reduce((a,b)=>a+b,0)/k,S=Math.sqrt(bm.reduce((a,b)=>a+(b-M)**2,0)/(k-1)),h=tq(k-1)*S/Math.sqrt(k);
+ let num=0,den=0;bm.forEach((v,i)=>{den+=(v-M)**2;if(i)num+=(v-M)*(bm[i-1]-M)});
+ let xm=0;for(let i=0;i<m*k;i++)xm+=x[i];xm/=m*k;let vs=0;for(let i=0;i<m*k;i++)vs+=(x[i]-xm)**2;const seN=Math.sqrt(vs/(m*k-1))/Math.sqrt(m*k);
+ $('s1').textContent=M.toFixed(2)+' ± '+h.toFixed(2)+(Math.abs(M-th)<=h?' ✓':' ✗');$('s2').textContent=(num/den).toFixed(2);$('s3').textContent=(S/Math.sqrt(k)/seN).toFixed(1)+'×';
+ const c=$('bm').getContext('2d');c.clearRect(0,0,800,330);const lo=Math.min(...bm,th,M-h)*0.9,hi=Math.max(...bm,th,M+h)*1.05,BY=v=>300-(v-lo)/(hi-lo)*280,BX=i=>50+i/(k-1)*720;
+ c.fillStyle='#E07B1A';bm.forEach((v,i)=>{c.beginPath();c.arc(BX(i),BY(v),k>60?2.5:4.5,0,7);c.fill()});
+ c.strokeStyle='#1E1E22';c.setLineDash([6,4]);c.beginPath();c.moveTo(50,BY(th));c.lineTo(770,BY(th));c.stroke();c.setLineDash([]);
+ c.fillStyle='rgba(46,111,142,0.15)';c.fillRect(50,BY(M+h),720,BY(M-h)-BY(M+h));c.fillStyle='#5A5650';c.font='14px Calibri';c.fillText('batch means (orange), 95% interval (blue band), theory (dashed)',50,18)}
+['w','d','k'].forEach(i=>$(i).oninput=draw);$('rho').oninput=()=>{$('rv').textContent=(+$('rho').value).toFixed(2)};$('rho').onchange=gen;$('go').onclick=gen;gen();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f4"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

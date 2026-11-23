@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الاهتزازات الحرة بدرجة حرية واحدة</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#FBF5EE;--panel:#FFFFFF;--ink:#2B2420;--muted:#6E5F55;--line:#E8D9CB;--gold:#B5562B;--golddk:#8A3E1C;--chip:#F5EADF;--plot:#FFFCF8;--grid:#F0E3D6;--dark:#2B2420;--blue:#3E6C8C;--ok:#2E7D4F;--bad:#B23A2E}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 44px}
+.fstrip{height:14px;border-radius:7px;margin:0 0 14px;direction:ltr;background:repeating-linear-gradient(115deg,#B5562B 0 7px,#E0956A 7px 9px,#2B2420 9px 12px)}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--golddk);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:66ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}
+@media (max-width:840px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border:1px solid var(--grid);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:11px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.08rem;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--chip);color:var(--ink);width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 11px;border-radius:8px;cursor:pointer;min-height:36px}
+.btn.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.readout{background:var(--chip);border-radius:10px;padding:10px 13px;font-size:.95rem}
+.readout .eq{display:block}
+.eq{font-family:'STIX Two Text',serif;font-size:1.06rem;direction:ltr;unicode-bidi:isolate;text-align:left}
+.note{font-size:.92rem;margin-top:4px}
+.good{color:var(--ok);font-weight:700}.badx{color:var(--bad);font-weight:700}
+.task{border-top:1px solid var(--line);padding-top:10px;font-size:.93rem}
+.task h3{margin:0 0 4px;font-size:1rem;color:var(--golddk)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.93rem;color:var(--ink)}
+.chk input{width:18px;height:18px;accent-color:var(--gold)}
+footer{margin-top:20px;color:var(--muted);font-size:.85rem}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fstrip" aria-hidden="true"></div>
+<header>
+  <span class="badge">الاهتزازات والموجات · <bdi dir="ltr">2034002-4</bdi></span>
+  <h1>معمل الاهتزازات الحرة بدرجة حرية واحدة</h1>
+  <p>الفصل الثاني. غيّر القيم وراقب النتيجة، وأجب عن السؤال في أسفل كل تجربة.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" aria-selected="true" data-t="t1">١. النابض الأفقي والرأسي</button><button role="tab" aria-selected="false" data-t="t2">٢. البندول البسيط</button><button role="tab" aria-selected="false" data-t="t3">٣. البندول المركب والالتوائي</button><button role="tab" aria-selected="false" data-t="t4">٤. السائل في أنبوب U</button><button role="tab" aria-selected="false" data-t="t5">٥. دائرة LC</button></nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="620" aria-label="كتلة على نابض أفقي وأخرى على نابض رأسي"></canvas>
+  <div class="ctrl">
+    <label>الكتلة m (kg) <b id="o1m"></b></label><input id="i1m" type="range" min="0.1" max="2" step="0.05" value="0.5">
+    <label>ثابت النابض k (N/m) <b id="o1k"></b></label><input id="i1k" type="range" min="5" max="100" step="1" value="20">
+    <div class="row"><button class="btn" type="button" id="b1p">إيقاف مؤقت</button></div>
+    <div class="readout" id="r1"></div>
+    <div class="task"><h3>سؤال</h3>النابض الرأسي يستطيل أولًا مسافة <span class="eq" style="display:inline">e = mg/k</span> قبل أن يهتز. هل يغيّر هذا الاستطالة الزمن الدوري؟ قارن حركة الكتلتين ثم فسّر.</div>
+  </div>
+</section>
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="620" aria-label="بندول بسيط ومقارنة الحل الدقيق بتقريب الزاوية الصغيرة"></canvas>
+  <div class="ctrl">
+    <label>طول الخيط L (m) <b id="o2l"></b></label><input id="i2l" type="range" min="0.2" max="2" step="0.05" value="1">
+    <label>زاوية الإزاحة الابتدائية θ₀ (°) <b id="o2a"></b></label><input id="i2a" type="range" min="5" max="170" step="5" value="20">
+    <label for="s2g">المكان</label><select id="s2g"><option value="9.81">الأرض (g = 9.81 m/s²)</option><option value="1.62">القمر (g = 1.62 m/s²)</option><option value="3.71">المريخ (g = 3.71 m/s²)</option></select>
+    <div class="row"><button class="btn" type="button" id="b2p">إيقاف مؤقت</button></div>
+    <div class="readout" id="r2"></div>
+    <div class="task"><h3>سؤال</h3>ارفع θ₀ تدريجيًا. عند أي زاوية تقريبًا يبدأ الفرق بين الزمن الدوري الحقيقي وتقريب الزاوية الصغيرة <span class="eq" style="display:inline">2π√(L/g)</span> بتجاوز 1%؟</div>
+  </div>
+</section>
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="620" aria-label="ساق تهتز حول محور ومنحنى الزمن الدوري مقابل بعد المحور عن مركز الكتلة"></canvas>
+  <div class="ctrl">
+    <div class="row" id="m3"><button class="btn sel" type="button" data-m="c">البندول المركب</button><button class="btn" type="button" data-m="t">البندول الالتوائي</button></div>
+    <div id="g3c">
+      <label>طول الساق ℓ (m) <b id="o3l"></b></label><input id="i3l" type="range" min="0.4" max="1.5" step="0.05" value="1">
+      <label>بعد المحور عن مركز الكتلة d (m) <b id="o3d"></b></label><input id="i3d" type="range" min="0.02" max="0.75" step="0.01" value="0.4">
+    </div>
+    <div id="g3t" class="hide">
+      <label>ثابت الالتواء κ (N·m/rad) <b id="o3k"></b></label><input id="i3k" type="range" min="0.002" max="0.05" step="0.001" value="0.01">
+      <label>نصف قطر القرص R (cm) <b id="o3r"></b></label><input id="i3r" type="range" min="3" max="15" step="0.5" value="8">
+      <label>كتلة القرص M (kg) <b id="o3m"></b></label><input id="i3m" type="range" min="0.1" max="1" step="0.05" value="0.4">
+    </div>
+    <div class="row"><button class="btn" type="button" id="b3p">إيقاف مؤقت</button></div>
+    <div class="readout" id="r3"></div>
+    <div class="task"><h3>سؤال</h3>في البندول المركب حرّك المحور نحو مركز الكتلة. لماذا يكبر الزمن الدوري جدًا عندما <span class="eq" style="display:inline">d → 0</span>؟ وعند أي d يكون الزمن الدوري أصغر ما يمكن؟</div>
+  </div>
+</section>
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="620" aria-label="سائل يهتز في أنبوب على شكل حرف U"></canvas>
+  <div class="ctrl">
+    <label>طول عمود السائل الكلي L (m) <b id="o4l"></b></label><input id="i4l" type="range" min="0.2" max="1.2" step="0.05" value="0.6">
+    <label>الإزاحة الابتدائية x₀ (cm) <b id="o4x"></b></label><input id="i4x" type="range" min="1" max="8" step="0.5" value="5">
+    <label for="s4f">السائل</label><select id="s4f"><option value="1000">ماء (ρ = 1000 kg/m³)</option><option value="13600">زئبق (ρ = 13600 kg/m³)</option><option value="800">كحول (ρ = 800 kg/m³)</option></select>
+    <div class="row"><button class="btn" type="button" id="b4p">إيقاف مؤقت</button></div>
+    <div class="readout" id="r4"></div>
+    <div class="task"><h3>سؤال</h3>غيّر نوع السائل. لماذا لا يتغير الزمن الدوري مع الكثافة؟ وما القوة المعيدة التي تعيد السائل إلى الاتزان؟</div>
+  </div>
+</section>
+<section class="lab" id="t5" role="tabpanel">
+  <canvas id="c5" width="1200" height="620" aria-label="دائرة ملف ومكثف وتبادل الطاقة بين المجالين الكهربي والمغناطيسي"></canvas>
+  <div class="ctrl">
+    <label>محاثة الملف L (H) <b id="o5l"></b></label><input id="i5l" type="range" min="0.5" max="10" step="0.5" value="4">
+    <label>سعة المكثف C (μF) <b id="o5c"></b></label><input id="i5c" type="range" min="100" max="5000" step="100" value="1000">
+    <label>الشحنة الابتدائية Q₀ (mC) <b id="o5q"></b></label><input id="i5q" type="range" min="1" max="10" step="0.5" value="5">
+    <div class="row"><button class="btn" type="button" id="b5p">إيقاف مؤقت</button></div>
+    <div class="readout" id="r5"></div>
+    <div class="task"><h3>سؤال</h3>قارن الدائرة بالكتلة والنابض: ما الذي يقابل الكتلة m؟ وما الذي يقابل ثابت النابض k؟ وأين تكون الطاقة كلها عندما يكون التيار أكبر ما يمكن؟</div>
+  </div>
+</section>
+<footer>أ.د. نجم الحصيني – الاهتزازات والموجات، الفصل الثاني. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+const TAU=2*Math.PI;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let active='t1',dirty=true;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;dirty=true;}));
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>dirty=true);e.addEventListener('change',()=>dirty=true);});
+
+/* number formatting with real superscripts */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sciParts(v,d){const e=Math.floor(Math.log10(Math.abs(v)));let m=v/Math.pow(10,e);if(+m.toFixed(d)>=10){return [(m/10).toFixed(d),e+1];}return [m.toFixed(d),e];}
+function H(v,d=3){return H0(v,d).replace(/-/g,'−');}
+function H0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10<sup>'+e+'</sup>';}
+function U(v,d=3){return U0(v,d).replace(/-/g,'−');}
+function U0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10'+String(e).split('').map(ch=>SUP[ch]).join('');}
+
+/* drawing helpers */
+function txt(g,s,x,y,col,al,sz,rtl,bold){g.font=(bold?'700 ':'')+(sz||22)+'px "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function poly(g,pts,col,w){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function _strip_unused(g,x,y,w,hh,l0,l1,If){g.fillStyle='#0D0B09';g.fillRect(x,y,w,hh);for(let i=0;i<w;i++){const l=l0+(l1-l0)*i/w;const I=If(l);if(I<=0.003)continue;g.fillStyle=colStr(l,I);g.fillRect(x+i,y,1.2,hh);}g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(x,y,w,hh);}
+function _axis_unused(g,x,y,w,l0,l1,step){seg(g,x,y,x+w,y,css('--muted'),1.5);for(let l=Math.ceil(l0/step)*step;l<=l1+1e-9;l+=step){const px=x+(l-l0)/(l1-l0)*w;seg(g,px,y,px,y+8,css('--muted'),1.5);txt(g,String(Math.round(l)),px,y+30,css('--muted'),'center',18);}txt(g,'λ (nm)',x+w,y+56,css('--muted'),'right',18);}
+
+
+/* spring from (x0,y) to (x1,y) */
+function spring(g,x0,y,x1,n,amp,col,w){const L=x1-x0,lead=Math.min(18,Math.abs(L)*0.12);g.strokeStyle=col;g.lineWidth=w||3;g.lineJoin='round';g.beginPath();g.moveTo(x0,y);g.lineTo(x0+lead,y);const body=L-2*lead;for(let i=0;i<=2*n;i++){const xx=x0+lead+body*(i+0.5)/(2*n+1);g.lineTo(xx,y+(i%2?amp:-amp));}g.lineTo(x1-lead,y);g.lineTo(x1,y);g.stroke();}
+/* vertical spring from (x,y0) down to (x,y1) */
+function vspring(g,x,y0,y1,n,amp,col,w){const L=y1-y0,lead=Math.min(18,Math.abs(L)*0.12);g.strokeStyle=col;g.lineWidth=w||3;g.lineJoin='round';g.beginPath();g.moveTo(x,y0);g.lineTo(x,y0+lead);const body=L-2*lead;for(let i=0;i<=2*n;i++){const yy=y0+lead+body*(i+0.5)/(2*n+1);g.lineTo(x+(i%2?amp:-amp),yy);}g.lineTo(x,y1-lead);g.lineTo(x,y1);g.stroke();}
+/* plot frame: returns mapping functions */
+function frame(g,x,y,w,h,t0,t1,v0,v1,xl,yl,ticks){g.fillStyle='#fff';g.fillRect(x,y,w,h);g.strokeStyle=css('--grid');g.lineWidth=1;g.strokeRect(x,y,w,h);
+ const X=t=>x+(t-t0)/(t1-t0)*w,Y=v=>y+h-(v-v0)/(v1-v0)*h;
+ if(v0<0&&v1>0)seg(g,x,Y(0),x+w,Y(0),css('--muted'),1.2);
+ if(xl)txt(g,xl,x+w,y+h+24,css('--muted'),'right',17);if(yl)txt(g,yl,x+6,y+20,css('--muted'),'left',17);
+ return [X,Y];}
+function curve(g,f,a,b,X,Y,col,w,n,dash){g.setLineDash(dash||[]);g.strokeStyle=col;g.lineWidth=w||2.5;g.beginPath();n=n||400;for(let i=0;i<=n;i++){const t=a+(b-a)*i/n,v=f(t);i?g.lineTo(X(t),Y(v)):g.moveTo(X(t),Y(v));}g.stroke();g.setLineDash([]);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,TAU);g.fill();}
+function arrow(g,x0,y0,x1,y1,col,w){seg(g,x0,y0,x1,y1,col,w||3);const a=Math.atan2(y1-y0,x1-x0),L=12;if(Math.hypot(x1-x0,y1-y0)<4)return;g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-L*Math.cos(a-0.4),y1-L*Math.sin(a-0.4));g.lineTo(x1-L*Math.cos(a+0.4),y1-L*Math.sin(a+0.4));g.closePath();g.fill();}
+function block(g,cx,cy,s,label){g.fillStyle=css('--gold');g.fillRect(cx-s/2,cy-s/2,s,s);g.strokeStyle=css('--golddk');g.lineWidth=2;g.strokeRect(cx-s/2,cy-s/2,s,s);if(label)txt(g,label,cx,cy+7,'#fff','center',20,0,1);}
+
+const INK=()=>css('--ink'),CU=()=>css('--gold'),CUD=()=>css('--golddk'),BL=()=>css('--blue'),GR='#2E7D4F',RD='#7B3F98',MU=()=>css('--muted');
+let now=0;
+function pauser(id){let p=false,off=0,tp=0;const b=$(id);b.onclick=()=>{p=!p;b.textContent=p?'تشغيل':'إيقاف مؤقت';b.classList.toggle('sel',p);if(p)tp=now;else off+=now-tp;dirty=true;};return ()=>p?tp-off:now-off;}
+function clip(g,x,y,w,h){g.save();g.beginPath();g.rect(x,y,w,h);g.clip();}
+function rk4(f,y,t,dt){const k1=f(t,y),k2=f(t+dt/2,y.map((v,i)=>v+dt/2*k1[i])),k3=f(t+dt/2,y.map((v,i)=>v+dt/2*k2[i])),k4=f(t+dt,y.map((v,i)=>v+dt*k3[i]));return y.map((v,i)=>v+dt/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));}
+function bars(g,x,y,h,items,max,bw,gap){items.forEach((r,i)=>{const X0=x+i*(bw+gap);const hh=Math.max(0,Math.min(1,r[1]/max))*h;g.fillStyle=r[2];g.fillRect(X0,y-hh,bw,hh);g.strokeStyle=css('--grid');g.lineWidth=1;g.strokeRect(X0,y-h,bw,h);txt(g,r[0],X0+bw/2,y+26,r[2],'center',19,1,1);});}
+const EQ=s=>'<span class="eq">'+s+'</span>',EQi=s=>'<span class="eq" style="display:inline">'+s+'</span>',NOTE=s=>'<div class="note">'+s+'</div>';
+function sgn(v,d){return v.toFixed(d).replace('-','−');}
+
+
+const G=9.81;
+/* 1 */
+const T1=pauser('b1p');
+function lab1(t){now=t;const g=$('c1').getContext('2d');g.clearRect(0,0,1200,620);const m=+$('i1m').value,k=+$('i1k').value,tt=T1();$('o1m').textContent=m.toFixed(2);$('o1k').textContent=k;
+ const w=Math.sqrt(k/m),A=0.05,x=A*Math.cos(w*tt),sc=1500,e=m*G/k;
+ /* horizontal */
+ txt(g,'نابض أفقي',300,50,INK(),'center',20,1,1);const cx=300,y0=200;g.fillStyle=css('--chip');g.fillRect(60,y0-50,14,100);seg(g,60,y0+36,560,y0+36,MU(),2);
+ spring(g,74,y0,cx-90+x*sc,12,14,INK(),3);block(g,cx-60+x*sc,y0,60,'m');seg(g,cx-60,y0+40,cx-60,y0+54,MU(),2);txt(g,'الاتزان',cx-60,y0+76,MU(),'center',16,1);
+ /* vertical */
+ txt(g,'نابض رأسي',820,50,INK(),'center',20,1,1);const vx=820,top=80,L0=170,es=Math.min(e*600,230),yb=top+L0+es+x*sc;
+ seg(g,720,top,920,top,INK(),6);vspring(g,vx,top,yb-30,14,14,INK(),3);block(g,vx,yb,60,'m');
+ seg(g,930,top+L0,990,top+L0,MU(),1.5,[5,4]);txt(g,'طرف النابض دون كتلة',1000,top+L0+6,MU(),'left',15,1);
+ seg(g,930,top+L0+es+30,990,top+L0+es+30,CU(),1.5,[5,4]);txt(g,'موضع الاتزان الجديد',1000,top+L0+es+36,CUD(),'left',15,1);
+ arrow(g,960,top+L0,960,top+L0+es+30,CUD(),2);arrow(g,960,top+L0+es+30,960,top+L0,CUD(),2);txt(g,'e',970,top+L0+es/2+20,CUD(),'left',20);
+ /* x(t) graphs */
+ const [X,Y]=frame(g,60,430,500,150,0,3*TAU/w,-A*1.3,A*1.3,'t','x');curve(g,s=>A*Math.cos(w*s),0,3*TAU/w,X,Y,CU(),2.5);dot(g,X(tt%(3*TAU/w)),Y(x),6,CUD());
+ $('r1').innerHTML=EQ('ω = √(k/m) = '+w.toFixed(2)+' rad/s')+EQ('T = 2π√(m/k) = '+(TAU/w).toFixed(3)+' s')+EQ('e = mg/k = '+(e*100).toFixed(1)+' cm')+NOTE('الزمن الدوري واحد للنابضين: الجاذبية تغيّر موضع الاتزان فقط.');}
+/* 2 */
+const T2=pauser('b2p');let p2=null;
+function per2(L,gg,th0){/* exact period via AGM */let a=1,b=Math.cos(th0/2);for(let i=0;i<20;i++){const an=(a+b)/2;b=Math.sqrt(a*b);a=an;}return TAU*Math.sqrt(L/gg)/a;}
+function lab2(t){now=t;const g=$('c2').getContext('2d');g.clearRect(0,0,1200,620);const L=+$('i2l').value,th0=+$('i2a').value*Math.PI/180,gg=+$('s2g').value,tt=T2();
+ $('o2l').textContent=L.toFixed(2);$('o2a').textContent=Math.round(th0*180/Math.PI);
+ const key=L+'|'+th0+'|'+gg;if(!p2||p2.key!==key){const dt=0.002,Tend=3*per2(L,gg,th0);let y=[th0,0],tt0=0,arr=[[0,th0]];const f=(s,y)=>[y[1],-gg/L*Math.sin(y[0])];while(tt0<Tend){y=rk4(f,y,tt0,dt);tt0+=dt;arr.push([tt0,y[0]]);}p2={key,arr,Tend};}
+ const Tex=per2(L,gg,th0),T0=TAU*Math.sqrt(L/gg),tm=tt%p2.Tend,idx=Math.min(p2.arr.length-1,Math.round(tm/0.002)),th=p2.arr[idx][1];
+ const px=260,py=60,R=220,bx=px+R*Math.sin(th),by=py+R*Math.cos(th);seg(g,140,py,380,py,INK(),6);seg(g,px,py,bx,by,INK(),2.5);dot(g,bx,by,22,CU());
+ const ths=th0*Math.cos(TAU/T0*tm),gx=px+R*Math.sin(ths),gy=py+R*Math.cos(ths);g.strokeStyle=BL();g.lineWidth=2;g.setLineDash([5,4]);g.beginPath();g.moveTo(px,py);g.lineTo(gx,gy);g.stroke();g.setLineDash([]);g.beginPath();g.arc(gx,gy,22,0,TAU);g.stroke();
+ seg(g,px,py,px,py+R+40,MU(),1,[3,4]);txt(g,'الحل الدقيق',px,py+R+90,CUD(),'center',18,1);txt(g,'تقريب الزاوية الصغيرة (متقطع)',px,py+R+118,BL(),'center',16,1);
+ const lim=th0*1.25;const [X,Y]=frame(g,520,40,640,460,0,p2.Tend,-lim,lim,'t (s)','θ (rad)');clip(g,520,40,640,460);
+ g.strokeStyle=CU();g.lineWidth=2.6;g.beginPath();p2.arr.forEach((p,i)=>{if(i%5)return;i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1]));});g.stroke();
+ curve(g,s=>th0*Math.cos(TAU/T0*s),0,p2.Tend,X,Y,BL(),2,600,[7,5]);g.restore();seg(g,X(tm),40,X(tm),500,MU(),1,[4,4]);
+ const err=(Tex/T0-1)*100;
+ $('r2').innerHTML=EQ('T₀ = 2π√(L/g) = '+T0.toFixed(3)+' s')+EQ('T (exact) = '+Tex.toFixed(3)+' s')+NOTE('الفرق النسبي: '+EQi(err.toFixed(2)+'%')+(err<1?' — التقريب جيد.':' — التقريب لم يعد دقيقًا.'));}
+/* 3 */
+const T3=pauser('b3p');let mode3='c';
+document.querySelectorAll('#m3 .btn').forEach(b=>b.onclick=()=>{mode3=b.dataset.m;document.querySelectorAll('#m3 .btn').forEach(x=>x.classList.toggle('sel',x===b));$('g3c').classList.toggle('hide',mode3!=='c');$('g3t').classList.toggle('hide',mode3!=='t');dirty=true;});
+function lab3(t){now=t;const g=$('c3').getContext('2d');g.clearRect(0,0,1200,620);const tt=T3();
+ if(mode3==='c'){const l=+$('i3l').value,dmax=l/2-0.01;const ds=$('i3d');ds.max=dmax.toFixed(2);let d=Math.min(+ds.value,dmax);$('o3l').textContent=l.toFixed(2);$('o3d').textContent=d.toFixed(2);
+  const Tof=dd=>TAU*Math.sqrt((l*l/12+dd*dd)/(G*dd)),T=Tof(d),th=0.25*Math.cos(TAU/T*tt);
+  const px=260,py=80,sc=300/l;const ux=Math.sin(th),uy=Math.cos(th);const x1=px-ux*(l/2-d)*sc,y1=py-uy*(l/2-d)*sc,x2=px+ux*(l/2+d)*sc,y2=py+uy*(l/2+d)*sc;
+  g.lineCap='round';seg(g,x1,y1,x2,y2,CU(),18);g.lineCap='butt';dot(g,px,py,7,INK());dot(g,px+ux*d*sc,py+uy*d*sc,7,BL());txt(g,'المحور',px-16,py-14,INK(),'right',16,1);txt(g,'مركز الكتلة',px+ux*d*sc+16,py+uy*d*sc+6,BL(),'left',16,1);
+  const [X,Y]=frame(g,560,60,600,440,0,0.75,0,6,'d (m)','T (s)');clip(g,560,60,600,440);curve(g,Tof,0.01,l/2,X,Y,CU(),2.6);g.restore();
+  const dm=l/Math.sqrt(12);seg(g,X(dm),60,X(dm),500,MU(),1,[4,4]);txt(g,'d = ℓ/√12',X(dm)+6,80,MU(),'left',16);dot(g,X(d),Y(T),7,CUD());
+  for(let k=0.1;k<0.76;k+=0.1){txt(g,k.toFixed(1),X(k),522,MU(),'center',15);}for(let k=1;k<=6;k++)txt(g,String(k),552,Y(k)+5,MU(),'right',15);
+  $('r3').innerHTML=EQ('I = mℓ²/12 + md²')+EQ('T = 2π√(I/(mgd)) = '+T.toFixed(3)+' s')+EQ('L<sub>eq</sub> = I/(md) = '+((l*l/12+d*d)/d).toFixed(3)+' m')+NOTE('أصغر زمن دوري عند '+EQi('d = ℓ/√12 = '+dm.toFixed(3)+' m'));}
+ else{const kap=+$('i3k').value,R=+$('i3r').value/100,M=+$('i3m').value;$('o3k').textContent=kap.toFixed(3);$('o3r').textContent=(R*100).toFixed(1);$('o3m').textContent=M.toFixed(2);
+  const I=0.5*M*R*R,T=TAU*Math.sqrt(I/kap),th=1.2*Math.cos(TAU/T*tt);const cx=400,cy=360,rr=60+R*900;
+  seg(g,cx-80,60,cx+80,60,INK(),6);seg(g,cx,60,cx,cy,INK(),3);g.fillStyle=css('--chip');g.beginPath();g.ellipse(cx,cy,rr,rr*0.32,0,0,TAU);g.fill();g.strokeStyle=CU();g.lineWidth=3;g.stroke();
+  const mx=cx+rr*Math.cos(th),my=cy+rr*0.32*Math.sin(th);seg(g,cx,cy,mx,my,CUD(),4);dot(g,mx,my,8,CUD());txt(g,'السلك',cx+10,200,MU(),'left',16,1);
+  $('r3').innerHTML=EQ('τ = −κθ')+EQ('I = ½MR² = '+U(I,3)+' kg·m²')+EQ('T = 2π√(I/κ) = '+T.toFixed(2)+' s')+NOTE('لا تظهر g في القانون: القوة المعيدة من مرونة السلك.');}}
+/* 4 */
+const T4=pauser('b4p');
+function lab4(t){now=t;const g=$('c4').getContext('2d');g.clearRect(0,0,1200,620);const L=+$('i4l').value,x0=+$('i4x').value/100,rho=+$('s4f').value,tt=T4();$('o4l').textContent=L.toFixed(2);$('o4x').textContent=(x0*100).toFixed(1);
+ const w=Math.sqrt(2*G/L),x=x0*Math.cos(w*tt),sc=1200;const lx=250,rx=550,tw=60,base=520,h0=Math.min(380,(L/2)*500);
+ const col=rho>5000?'#9AA3AD':rho<900?'#E9C46A':'#6FA8DC';
+ g.fillStyle=col;g.fillRect(lx-tw/2,base-h0-x*sc,tw,h0+x*sc);g.fillRect(rx-tw/2,base-h0+x*sc,tw,h0-x*sc);g.fillRect(lx-tw/2,base,rx-lx+tw,50);
+ g.strokeStyle=INK();g.lineWidth=4;g.beginPath();g.moveTo(lx-tw/2,base-430);g.lineTo(lx-tw/2,base+50);g.lineTo(rx+tw/2,base+50);g.lineTo(rx+tw/2,base-430);g.moveTo(lx+tw/2,base-430);g.lineTo(lx+tw/2,base);g.lineTo(rx-tw/2,base);g.lineTo(rx-tw/2,base-430);g.stroke();
+ seg(g,lx-60,base-h0,rx+60,base-h0,MU(),1.5,[6,5]);txt(g,'مستوى الاتزان',rx+70,base-h0+6,MU(),'left',16,1);
+ arrow(g,rx+50,base-h0,rx+50,base-h0+x*sc,CUD(),2);txt(g,'x',rx+60,base-h0+x*sc/2,CUD(),'left',18);
+ const [X,Y]=frame(g,760,80,400,300,0,3*TAU/w,-x0*1.3,x0*1.3,'t (s)','x');curve(g,s=>x0*Math.cos(w*s),0,3*TAU/w,X,Y,CU(),2.5);dot(g,X(tt%(3*TAU/w)),Y(x),6,CUD());
+ $('r4').innerHTML=EQ('F = −2ρgAx ,  m = ρAL')+EQ('ω = √(2g/L) = '+w.toFixed(2)+' rad/s')+EQ('T = 2π√(L/(2g)) = '+(TAU/w).toFixed(3)+' s')+NOTE('الكثافة ومساحة المقطع تُختصران من الكتلة والقوة المعيدة.');}
+/* 5 */
+const T5=pauser('b5p');
+function lab5(t){now=t;const g=$('c5').getContext('2d');g.clearRect(0,0,1200,620);const L=+$('i5l').value,C=+$('i5c').value*1e-6,Q0=+$('i5q').value*1e-3,tt=T5();$('o5l').textContent=L.toFixed(1);$('o5c').textContent=Math.round(C*1e6);$('o5q').textContent=(Q0*1e3).toFixed(1);
+ const w=1/Math.sqrt(L*C),q=Q0*Math.cos(w*tt),I=-Q0*w*Math.sin(w*tt),UE=q*q/(2*C),UB=0.5*L*I*I,E=Q0*Q0/(2*C);
+ /* circuit */
+ const x0=80,y0=90,x1=480,y1=330;g.strokeStyle=INK();g.lineWidth=3;g.strokeRect(x0,y0,x1-x0,y1-y0);
+ g.fillStyle=css('--plot');g.fillRect(x0-20,y0+80,40,80);seg(g,x0-30,y0+110,x0+30,y0+110,INK(),4);seg(g,x0-30,y0+130,x0+30,y0+130,INK(),4);
+ const qf=q/Q0;txt(g,qf>=0?'+':'−',x0-44,y0+114,RD,'center',22,0,1);txt(g,qf>=0?'−':'+',x0-44,y0+144,BL(),'center',22,0,1);
+ for(let i=-2;i<=2;i++){const a=Math.abs(qf);if(a>0.05){g.globalAlpha=a;arrow(g,x0+i*9,y0+(qf>0?114:126),x0+i*9,y0+(qf>0?126:114),RD,1.5);g.globalAlpha=1;}}
+ txt(g,'C',x0+40,y0+126,INK(),'left',20);
+ g.fillStyle=css('--plot');g.fillRect(x1-20,y0+50,40,140);g.strokeStyle=CU();g.lineWidth=3;for(let i=0;i<6;i++){g.beginPath();g.arc(x1,y0+62+i*22,11,-Math.PI/2,Math.PI/2);g.stroke();}txt(g,'L',x1-30,y0+126,INK(),'right',20);
+ const If=I/(Q0*w);const ph=(tt*2)%1;if(Math.abs(If)>0.05)for(let i=0;i<6;i++){const s=((i/6+(If>0?ph:-ph))%1+1)%1,px=x0+40+s*(x1-x0-80);g.globalAlpha=Math.abs(If);arrow(g,px,y0,px+(If>0?14:-14),y0,BL(),2.5);g.globalAlpha=1;}
+ txt(g,'اتجاه التيار',(x0+x1)/2,y0-14,BL(),'center',16,1);
+ bars(g,620,330,240,[['كهربية',UE,RD],['مغناطيسية',UB,BL()],['الكلية',E,INK()]],E,80,30);
+ const Tend=2*TAU/w;const [X,Y]=frame(g,60,400,1100,180,0,Tend,-1.2,1.2,'t','');curve(g,s=>Math.cos(w*s),0,Tend,X,Y,RD,2.5);curve(g,s=>-Math.sin(w*s),0,Tend,X,Y,BL(),2.5);seg(g,X(tt%Tend),400,X(tt%Tend),580,MU(),1,[4,4]);
+ txt(g,'q/Q₀',70,422,RD,'left',16);txt(g,'I/I₀',140,422,BL(),'left',16);
+ $('r5').innerHTML=EQ('L d²q/dt² + q/C = 0')+EQ('ω = 1/√(LC) = '+w.toFixed(2)+' rad/s')+EQ('f = '+(w/TAU).toFixed(3)+' Hz ,  T = '+(TAU/w).toFixed(3)+' s')+EQ('I<sub>max</sub> = Q₀ω = '+(Q0*w*1e3).toFixed(2)+' mA')+NOTE('المحاثة '+EQi('L')+' تقابل الكتلة، والمقدار '+EQi('1/C')+' يقابل ثابت النابض.');}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4,t5:lab5};const ANIM=new Set(["t1", "t2", "t3", "t4", "t5"]);let T0=performance.now();
+function loop(t){if(dirty||ANIM.has(active)){dirty=false;LABS[active]((t-T0)/1000);}requestAnimationFrame(loop);}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>dirty=true);
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

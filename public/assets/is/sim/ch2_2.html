@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 2 — Two-Beam Interferometers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&family=Source+Serif+4:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0B1E3A; --teal:#0E8C9A; --coral:#E8604C; --tint:#E3F4F6; --bg:#F4F8FA; --grey:#5A6B7F; --line:#C9D6E0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--navy); font-family:"Source Sans 3", Calibri, "Segoe UI", Arial, sans-serif; font-size:16px; }
+  header { background:var(--navy); color:#fff; padding:18px 22px 14px; position:relative; overflow:hidden; }
+  header .rings { position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%;
+    background: repeating-radial-gradient(circle, rgba(70,200,215,.55) 0 3px, transparent 3px 14px); opacity:.55; }
+  header h1 { font-family:"Source Serif 4", Cambria, Georgia, serif; margin:0; font-size:23px; }
+  header p { margin:4px 0 0; color:#BFE6EA; font-size:14.5px; }
+  nav { display:flex; gap:6px; flex-wrap:wrap; padding:12px 22px 0; }
+  nav button { border:1px solid var(--line); background:#fff; color:var(--navy); padding:9px 14px; border-radius:10px 10px 0 0; font:inherit; font-weight:600; cursor:pointer; }
+  nav button.on { background:var(--teal); color:#fff; border-color:var(--teal); }
+  main { padding:0 22px 26px; }
+  .exp { display:none; background:#fff; border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; }
+  .exp.on { display:block; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap:16px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  nav { display:none; } .exp { border-radius:12px; margin-top:12px; } header { padding:12px 18px 10px; } header h1 { font-size:19px; } main { padding:0 12px 14px; } footer { display:none; }
+  h2 { font-family:"Source Serif 4", Cambria, Georgia, serif; font-size:19px; margin:0 0 6px; }
+  .lead { color:var(--grey); margin:0 0 12px; font-size:14.5px; }
+  .panel { background:var(--tint); border-radius:10px; padding:12px; }
+  .ctl { margin-bottom:11px; }
+  .ctl label { display:flex; justify-content:space-between; font-size:14px; font-weight:600; }
+  .ctl label span { color:var(--teal); font-variant-numeric: tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--teal); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 10px; }
+  .presets button, .seg button { border:1px solid var(--teal); background:#fff; color:var(--teal); border-radius:16px; padding:4px 11px; font:inherit; font-size:13.5px; cursor:pointer; }
+  .presets button:hover, .seg button.on { background:var(--teal); color:#fff; }
+  .seg { display:flex; gap:6px; margin-bottom:10px; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(135px,1fr)); gap:8px; margin:10px 0; }
+  .card { border:1px solid var(--line); border-radius:9px; padding:7px 9px; background:#fff; }
+  .card b { display:block; font-size:12.5px; color:var(--grey); font-weight:600; }
+  .card span { font-size:18px; font-weight:600; font-variant-numeric: tabular-nums; }
+  .card.ok span { color:var(--teal); } .card.th span { color:var(--coral); }
+  canvas { width:100%; display:block; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .cv-title { font-size:13.5px; font-weight:600; color:var(--grey); margin:10px 0 4px; }
+  .eq { font-family:"Source Serif 4", Cambria, Georgia, serif; background:#fff; border-left:3px solid var(--teal); padding:6px 10px; margin:8px 0; font-size:15px; }
+  .tasks { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .tasks h3 { font-size:15.5px; margin:0 0 4px; }
+  .tasks ol { margin:0; padding-left:20px; font-size:14.5px; } .tasks li { margin:3px 0; }
+  .ar { direction:rtl; text-align:right; font-family:"Noto Naskh Arabic", "Traditional Arabic", Tahoma, serif; background:#FFF6F3; border-right:4px solid var(--coral); border-radius:8px; padding:9px 12px; margin-top:12px; font-size:15.5px; line-height:1.8; }
+  .ar b { color:var(--coral); }
+  footer { color:var(--grey); font-size:13px; padding:0 22px 18px; }
+  .note { font-size:13px; color:var(--grey); }
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header><div class="rings"></div>
+  <h1>Virtual Lab · Chapter 2 — Two-Beam Interferometers</h1>
+  <p>Interferometric Systems and Their Applications (203673-3) · MSc in Physics · Prof. Najm Al-Hosiny</p>
+</header>
+<nav>
+  <button class="on" data-t="e1">1 · Michelson interferometer</button>
+  <button data-t="e2">2 · Mach–Zehnder interferometer</button>
+  <button data-t="e3">3 · Fourier-transform spectrometer</button>
+</nav>
+<main>
+<!-- ================= Experiment 1 ================= -->
+<section class="exp on" id="e1">
+  <h2>Experiment 1 — The Michelson interferometer</h2>
+  <p class="lead">Rings: parallel mirrors and an extended source, fringes of equal inclination seen in the focal plane of a lens (f = 200 mm). Tilt: collimated light with one mirror tilted — straight fringes, bent by a test surface with a curvature error (Twyman–Green).</p>
+  <div class="seg" id="e1seg"><button class="on" data-m="r">Rings (equal inclination)</button><button data-m="t">Tilt fringes (Twyman–Green)</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Wavelength λ <span id="e1lamv"></span></label><input type="range" id="e1lam" min="400" max="700" step="1" value="633"></div>
+      <div id="e1cr">
+        <div class="ctl"><label>Mirror separation d <span id="e1dv"></span></label><input type="range" id="e1d" min="0" max="3" step="0.001" value="1"></div>
+        <div class="ctl"><label>Fine adjust Δd <span id="e1ddv"></span></label><input type="range" id="e1dd" min="0" max="2" step="0.005" value="0"></div>
+        <div class="presets"><button id="e1play">▶ Move mirror</button><button id="e1reset">Reset count</button></div>
+        <div class="eq">2d cos θ = mλ (bright rings)<br>N = 2Δd/λ fringes pass the centre</div>
+      </div>
+      <div id="e1ct" style="display:none">
+        <div class="ctl"><label>Mirror tilt α <span id="e1av"></span></label><input type="range" id="e1a" min="0" max="300" step="1" value="80"></div>
+        <div class="ctl"><label>Surface error (sag at edge) <span id="e1wv"></span></label><input type="range" id="e1w" min="-2" max="2" step="0.05" value="0.5"></div>
+        <div class="eq">Spacing λ/(2α); a sag h bends a fringe by 2h/λ fringe spacings</div>
+        <p class="note">Aperture 20 mm. The sag is given in wavelengths.</p>
+      </div>
+    </div>
+    <div>
+      <div class="cards" id="e1cards"></div>
+      <div class="cv-title" id="e1t1"></div>
+      <canvas id="e1img" height="330"></canvas>
+      <div class="cv-title" id="e1t2"></div>
+      <canvas id="e1plot" height="190"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Rings: press ▶ and watch the centre. Do the rings collapse into the centre or come out of it as d decreases? Count the fringes for Δd = 1 µm and compare with 2Δd/λ.</li>
+    <li>Reduce d towards 0. Why do the rings grow and the field become uniform at d = 0?</li>
+    <li>Tilt: find the tilt that gives 10 fringes across the 20 mm aperture.</li>
+    <li>Tilt: set the sag to +0.5λ and then −0.5λ. How can you tell a bump from a dent from the fringe shape?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> تحريك المرآة بمقدار نصف طول موجة يغيّر فرق المسار بطول موجة كامل، فتمر هدبة واحدة. لذلك يقيس عدّ الهدب الإزاحة بدقة جزء من الميكرومتر.</div>
+</section>
+
+<!-- ================= Experiment 2 ================= -->
+<section class="exp" id="e2">
+  <h2>Experiment 2 — The Mach–Zehnder interferometer</h2>
+  <p class="lead">Each beam splitter is a 2 × 2 unitary matrix B = [t r; r t] with r = i√R, t = √T. The output is E_out = B₂ · diag(e^{iφ₁}, e^{iφ₂}) · B₁ · [1; 0]. Below, a phase object (a hot-gas plume) in one arm bends tilted fringes.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Reflectance of splitter 1, R₁ <span id="e2r1v"></span></label><input type="range" id="e2r1" min="0.05" max="0.95" step="0.01" value="0.5"></div>
+      <div class="ctl"><label>Reflectance of splitter 2, R₂ <span id="e2r2v"></span></label><input type="range" id="e2r2" min="0.05" max="0.95" step="0.01" value="0.5"></div>
+      <div class="ctl"><label>Phase difference Δφ <span id="e2pv"></span></label><input type="range" id="e2p" min="0" max="4" step="0.01" value="0.5"></div>
+      <div class="presets"><button data-s="0.5,0.5">50 : 50</button><button data-s="0.3,0.3">R = 0.3 both</button><button data-s="0.1,0.1">R = 0.1 both</button><button data-s="0.3,0.7">0.3 / 0.7</button></div>
+      <div class="ctl"><label>Plume peak phase φ_max <span id="e2fv"></span></label><input type="range" id="e2f" min="0" max="30" step="0.5" value="12"></div>
+      <div class="ctl"><label>Reference tilt (fringes across field) <span id="e2nv"></span></label><input type="range" id="e2n" min="0" max="20" step="1" value="8"></div>
+      <div class="eq">50 : 50: I₃ = sin²(Δφ/2), I₄ = cos²(Δφ/2)<br>R₁ = R₂ = R: V = 2RT/(R² + T²)</div>
+    </div>
+    <div>
+      <div class="cards" id="e2cards"></div>
+      <div class="cv-title">Output intensities versus Δφ (from the matrix product) — dots: current Δφ</div>
+      <canvas id="e2plot" height="220"></canvas>
+      <div class="cv-title">Output port 4 with a hot-gas plume in one arm and a tilted reference</div>
+      <canvas id="e2img" height="300"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>With 50 : 50 splitters, check that I₃ + I₄ = 1 for every Δφ. Where does the energy go when port 3 is dark?</li>
+    <li>Set R = 0.3 for both splitters. Read V and check 2RT/(R² + T²).</li>
+    <li>Use R₁ = 0.3 and R₂ = 0.7. Why is the visibility 1 again in one port?</li>
+    <li>Plume: how many fringes does a peak phase of 4π shift a fringe by? Turn the tilt to 0: what pattern do you see now?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الطاقة لا تضيع في مقياس ماخ–زندر بل تنتقل من مخرج إلى الآخر. وحين يكون المجزئان غير متساويين يبقى في كل مخرج جزء من الضوء لا يتداخل، فتقل الرؤية.</div>
+</section>
+
+<!-- ================= Experiment 3 ================= -->
+<section class="exp" id="e3">
+  <h2>Experiment 3 — The Michelson as a Fourier-transform spectrometer</h2>
+  <p class="lead">Scanning the optical path difference x records I(x) = ∫S(σ)[1 + cos 2πσx] dσ. The spectrum is the Fourier transform of the AC part. Two lines are resolved only if x_max exceeds about 1/Δσ.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="presets"><button data-s="589.0,589.6,0.5">Sodium D doublet</button><button data-s="546.1,577.0,0.8">Hg green + yellow</button><button data-s="632.8,632.9,1">Close pair 0.1 nm</button></div>
+      <div class="ctl"><label>Line 1 λ₁ <span id="e3l1v"></span></label><input type="range" id="e3l1" min="500" max="650" step="0.1" value="589.0"></div>
+      <div class="ctl"><label>Line 2 λ₂ <span id="e3l2v"></span></label><input type="range" id="e3l2" min="500" max="650" step="0.1" value="589.6"></div>
+      <div class="ctl"><label>Strength of line 2 <span id="e3av"></span></label><input type="range" id="e3a" min="0.1" max="1" step="0.05" value="0.5"></div>
+      <div class="ctl"><label>Maximum path difference x_max <span id="e3xv"></span></label><input type="range" id="e3x" min="-1.3" max="0.6" step="0.01" value="-0.52"></div>
+      <div class="presets"><button id="e3apo">Apodization: off</button></div>
+      <div class="eq">Resolution δσ ≈ 1/x_max<br>Resolving power σ/δσ = σ x_max</div>
+    </div>
+    <div>
+      <div class="cards" id="e3cards"></div>
+      <div class="cv-title" id="e3t1"></div>
+      <canvas id="e3ig" height="200"></canvas>
+      <div class="cv-title">Recovered spectrum |FT of the AC part| (true line positions dashed)</div>
+      <canvas id="e3sp" height="220"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Sodium doublet: find the smallest x_max that resolves the two lines. Compare with 1/Δσ.</li>
+    <li>Why does the interferogram of the doublet show beats? Relate the beat period to Δσ.</li>
+    <li>Switch apodization on. What happens to the side lobes and to the line width?</li>
+    <li>Close pair (0.1 nm): what scan length is needed? What resolving power is that?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الخطان الطيفيان يرسمان هدباً بمسافتين مختلفتين قليلاً. لا يظهر الفرق بينهما إلا بعد مسح فرق مسار طويل بما يكفي ليتأخر أحدهما عن الآخر بهدبة كاملة. هذا هو حد الدقة 1/x_max.</div>
+</section>
+</main>
+
+<footer>All results are computed in your browser from the equations of Chapter 2 (Hariharan, Basics of Interferometry, 2nd ed.). The MATLAB versions of these experiments are Labs 2.1–2.3.</footer>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const C = { navy:'#0B1E3A', teal:'#0E8C9A', coral:'#E8604C', grey:'#5A6B7F', line:'#C9D6E0', gold:'#D99A1E' };
+const fmt = (v, d = 3) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : (+v.toFixed(d)).toString();
+function lenStr(m) { const a = Math.abs(m); if (a >= 1) return fmt(m, 3) + ' m'; if (a >= 1e-3) return fmt(m * 1e3, 3) + ' mm'; if (a >= 1e-6) return fmt(m * 1e6, 3) + ' µm'; return fmt(m * 1e9, 3) + ' nm'; }
+
+// ---- canvas helpers ----
+function prep(cv) {
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.getAttribute('height');
+  if (cv.width !== Math.round(w * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.clearRect(0, 0, w, h); return { g, w, h };
+}
+function nice(span) { const p = Math.pow(10, Math.floor(Math.log10(span / 5))); const m = span / 5 / p; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; }
+function plot(cv, series, o) {
+  const { g, w, h } = prep(cv); const L = 56, R = 12, T = 10, B = 38;
+  const x0 = o.xmin, x1 = o.xmax, y0 = o.ymin, y1 = o.ymax;
+  const X = x => L + (x - x0) / (x1 - x0) * (w - L - R), Y = y => h - B - (y - y0) / (y1 - y0) * (h - T - B);
+  g.font = '12px "Source Sans 3", Arial'; g.fillStyle = C.grey; g.strokeStyle = '#E6EDF2'; g.lineWidth = 1;
+  const dx = nice(x1 - x0), dy = nice(y1 - y0);
+  for (let t = Math.ceil(x0 / dx) * dx; t <= x1 + 1e-12; t += dx) { g.beginPath(); g.moveTo(X(t), T); g.lineTo(X(t), h - B); g.stroke(); g.textAlign = 'center'; g.fillText(+t.toPrecision(6), X(t), h - B + 15); }
+  for (let t = Math.ceil(y0 / dy) * dy; t <= y1 + 1e-12; t += dy) { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(w - R, Y(t)); g.stroke(); g.textAlign = 'right'; g.fillText(+t.toPrecision(6), L - 5, Y(t) + 4); }
+  g.strokeStyle = C.grey; g.strokeRect(L, T, w - L - R, h - T - B);
+  g.fillStyle = C.navy; g.textAlign = 'center'; g.fillText(o.xlabel || '', L + (w - L - R) / 2, h - 6);
+  g.save(); g.translate(13, T + (h - T - B) / 2); g.rotate(-Math.PI / 2); g.fillText(o.ylabel || '', 0, 0); g.restore();
+  g.save(); g.beginPath(); g.rect(L, T, w - L - R, h - T - B); g.clip();
+  for (const s of series) {
+    g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = s.width || 1.6; g.setLineDash(s.dash || []);
+    if (s.points) { for (let i = 0; i < s.x.length; i++) { g.beginPath(); g.arc(X(s.x[i]), Y(s.y[i]), s.r || 3.5, 0, 7); s.hollow ? g.stroke() : g.fill(); } }
+    else { g.beginPath(); for (let i = 0; i < s.x.length; i++) { const px = X(s.x[i]), py = Y(s.y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+  }
+  g.restore(); g.setLineDash([]);
+  if (o.legend) { let ly = o.legendBottom ? h - B - 10 - 16 * (series.filter(s => s.label).length - 1) : T + 8; g.textAlign = 'left'; for (const s of series) { if (!s.label) continue; g.fillStyle = s.color; g.fillRect(w - R - 190, ly - 5, 14, 3); g.fillStyle = C.navy; g.fillText(s.label, w - R - 170, ly); ly += 16; } }
+}
+function wl2rgb(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = -(nm - 440) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = -(nm - 510) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = -(nm - 645) / 65; } else r = 1;
+  const f = nm < 420 ? 0.3 + 0.7 * (nm - 380) / 40 : nm > 700 ? 0.3 + 0.7 * (780 - nm) / 80 : 1;
+  return [r * f, g * f, b * f];
+}
+function image(cv, nx, ny, fn, rgb) {   // fn(i,j) in [0,1]
+  const { g, w, h } = prep(cv); const im = g.createImageData(nx, ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const v = Math.max(0, Math.min(1, fn(i, j))), k = 4 * (j * nx + i);
+    im.data[k] = 255 * v * rgb[0]; im.data[k + 1] = 255 * v * rgb[1]; im.data[k + 2] = 255 * v * rgb[2]; im.data[k + 3] = 255; }
+  const tmp = document.createElement('canvas'); tmp.width = nx; tmp.height = ny; tmp.getContext('2d').putImageData(im, 0, 0);
+  g.imageSmoothingEnabled = true; return { g, w, h, tmp };
+}
+const linspace = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * i / (n - 1));
+
+// ---- tabs ----
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.exp').forEach(s => s.classList.toggle('on', s.id === b.dataset.t));
+  draw();
+});
+function cards(id, list) { $(id).innerHTML = list.map(c => '<div class="card ' + (c[2] || '') + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join(''); }
+function square(cv, n, fn, rgb) { const { g, w, h, tmp } = image(cv, n, n, fn, rgb); const s = Math.min(w, h); g.drawImage(tmp, (w - s) / 2, 0, s, s); }
+
+// ================= Experiment 1: Michelson =================
+let m1 = 'r', count0 = null, playing = false, timer = null;
+document.querySelectorAll('#e1seg button').forEach(b => b.onclick = () => { m1 = b.dataset.m; document.querySelectorAll('#e1seg button').forEach(x => x.classList.toggle('on', x === b)); $('e1cr').style.display = m1 === 'r' ? '' : 'none'; $('e1ct').style.display = m1 === 't' ? '' : 'none'; draw(); });
+$('e1play').onclick = () => {
+  playing = !playing; $('e1play').textContent = playing ? '❚❚ Stop' : '▶ Move mirror';
+  if (playing) timer = setInterval(() => { let v = +$('e1dd').value + 0.005; if (v > 2) v = 0; $('e1dd').value = v; draw(); }, 60); else clearInterval(timer);
+};
+$('e1reset').onclick = () => { $('e1dd').value = 0; draw(); };
+function e1() {
+  const lamnm = +$('e1lam').value, lam = lamnm * 1e-9, rgb = wl2rgb(lamnm); $('e1lamv').textContent = lamnm + ' nm';
+  if (m1 === 'r') {
+    const dd = +$('e1dd').value * 1e-6, d = +$('e1d').value * 1e-3 + dd, f = 0.2, Rm = 15e-3, n = 320;
+    $('e1dv').textContent = (+$('e1d').value).toFixed(3) + ' mm'; $('e1ddv').textContent = (+$('e1dd').value).toFixed(3) + ' µm';
+    const xs = linspace(-Rm, Rm, n);
+    const Ir = r => { const th = Math.atan(r / f); return 1 + Math.cos(2 * Math.PI * 2 * d * Math.cos(th) / lam); };
+    square($('e1img'), n, (i, j) => Ir(Math.hypot(xs[i], xs[j])) / 2, rgb);
+    const thm = Math.atan(Rm / f), m0 = 2 * d / lam, rings = Math.floor(m0 * (1 - Math.cos(thm)));
+    cards('e1cards', [['Centre order 2d/λ', fmt(m0, 2)], ['Rings inside 15 mm', String(rings), 'ok'], ['Fringes passed N = 2Δd/λ', fmt(2 * dd / lam, 2), 'th'], ['Δd', lenStr(dd || 0)]]);
+    $('e1t1').textContent = 'Focal plane of the viewing lens, 30 mm × 30 mm'; $('e1t2').textContent = 'Radial profile I(r)';
+    const rr = linspace(0, Rm, 1500);
+    plot($('e1plot'), [{ x: rr.map(v => v * 1e3), y: rr.map(Ir), color: C.teal, width: 1.2 }], { xmin: 0, xmax: 15, ymin: 0, ymax: 2.1, xlabel: 'r  [mm]', ylabel: 'I(r)' });
+  } else {
+    const al = +$('e1a').value * 1e-6, W = +$('e1w').value, A = 10e-3, n = 320;
+    $('e1av').textContent = $('e1a').value + ' µrad'; $('e1wv').textContent = (W >= 0 ? '+' : '') + W.toFixed(2) + ' λ';
+    const xs = linspace(-A, A, n);
+    const opd = (x, y) => 2 * al * x + 2 * W * lam * (x * x + y * y) / (A * A);
+    square($('e1img'), n, (i, j) => Math.hypot(xs[i], xs[j]) > A ? 0.06 : (1 + Math.cos(2 * Math.PI * opd(xs[i], xs[j]) / lam)) / 2, rgb);
+    const sp = al > 0 ? lam / (2 * al) : Infinity;
+    cards('e1cards', [['Fringe spacing λ/2α', isFinite(sp) ? lenStr(sp) : '∞'], ['Fringes across 20 mm', fmt(2 * A * 2 * al / lam, 1), 'ok'], ['Fringe bending 2h/λ', fmt(2 * Math.abs(W), 2) + ' fringes', 'th']]);
+    $('e1t1').textContent = 'Twyman–Green fringes over a 20 mm aperture'; $('e1t2').textContent = 'Optical path difference along the central row, in waves';
+    const xr = linspace(-A, A, 400);
+    plot($('e1plot'), [{ x: xr.map(v => v * 1e3), y: xr.map(x => opd(x, 0) / lam), color: C.teal, width: 2 }], { xmin: -10, xmax: 10, ymin: Math.min(...xr.map(x => opd(x, 0) / lam)) - 0.5, ymax: Math.max(...xr.map(x => opd(x, 0) / lam)) + 0.5, xlabel: 'x  [mm]', ylabel: 'OPD / λ' });
+  }
+}
+
+// ================= Experiment 2: Mach–Zehnder =================
+const cm = (a, b) => [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]], ca = (a, b) => [a[0] + b[0], a[1] + b[1]], ab2 = a => a[0] * a[0] + a[1] * a[1];
+function mz(R1, R2, dphi) {   // returns [I3, I4]
+  const t1 = [Math.sqrt(1 - R1), 0], r1 = [0, Math.sqrt(R1)], t2 = [Math.sqrt(1 - R2), 0], r2 = [0, Math.sqrt(R2)];
+  const a = t1, b = cm(r1, [Math.cos(dphi), Math.sin(dphi)]);   // arm fields after B1 and phases (phi1 = 0, phi2 = dphi)
+  const out3 = ca(cm(t2, a), cm(r2, b)), out4 = ca(cm(r2, a), cm(t2, b));
+  return [ab2(out3), ab2(out4)];
+}
+function e2() {
+  const R1 = +$('e2r1').value, R2 = +$('e2r2').value, p = +$('e2p').value * Math.PI, fm = +$('e2f').value, nf = +$('e2n').value;
+  $('e2r1v').textContent = R1.toFixed(2); $('e2r2v').textContent = R2.toFixed(2); $('e2pv').textContent = (+$('e2p').value).toFixed(2) + ' π'; $('e2fv').textContent = fm.toFixed(1) + ' rad'; $('e2nv').textContent = String(nf);
+  const ph = linspace(0, 4 * Math.PI, 401), I = ph.map(q => mz(R1, R2, q));
+  const I3 = I.map(v => v[0]), I4 = I.map(v => v[1]);
+  const V = arr => (Math.max(...arr) - Math.min(...arr)) / (Math.max(...arr) + Math.min(...arr));
+  const cur = mz(R1, R2, p), esum = Math.max(...I.map(v => Math.abs(v[0] + v[1] - 1)));
+  const T = 1 - R1, Vth = Math.abs(R1 - R2) < 1e-9 ? (2 * R1 * T / (R1 * R1 + T * T)).toFixed(3) : '—';
+  cards('e2cards', [['I₃ / I₄ now', cur[0].toFixed(3) + ' / ' + cur[1].toFixed(3)], ['V port 3', V(I3).toFixed(3), 'ok'], ['V port 4', V(I4).toFixed(3), 'ok'], ['V theory (R₁ = R₂)', Vth, 'th'], ['max |I₃ + I₄ − 1|', esum.toExponential(1)]]);
+  plot($('e2plot'), [{ x: ph.map(v => v / Math.PI), y: I3, color: C.teal, width: 2, label: 'I₃' }, { x: ph.map(v => v / Math.PI), y: I4, color: C.coral, width: 2, dash: [6, 4], label: 'I₄' }, { x: [p / Math.PI, p / Math.PI], y: cur, color: C.navy, points: true, r: 5 }],
+    { xmin: 0, xmax: 4, ymin: 0, ymax: 1.05, xlabel: 'Δφ / π', ylabel: 'Output intensity', legend: true });
+  const n = 300, xs = linspace(-1, 1, n);
+  square($('e2img'), n, (i, j) => { const x = xs[i], y = xs[j]; const phi = 2 * Math.PI * nf * (x + 1) / 2 + fm * Math.exp(-(x * x + (y + 0.25) ** 2 * 0.6) / 0.08); return mz(R1, R2, phi)[1]; }, wl2rgb(633));
+}
+document.querySelectorAll('#e2 .presets button').forEach(b => b.onclick = () => { const [a, c] = b.dataset.s.split(','); $('e2r1').value = a; $('e2r2').value = c; draw(); });
+
+// ================= Experiment 3: FTS =================
+let apo = false;
+$('e3apo').onclick = () => { apo = !apo; $('e3apo').textContent = 'Apodization: ' + (apo ? 'triangular' : 'off'); draw(); };
+function e3() {
+  const l1 = +$('e3l1').value * 1e-9, l2 = +$('e3l2').value * 1e-9, a2 = +$('e3a').value, xmax = Math.pow(10, +$('e3x').value) * 1e-3;
+  $('e3l1v').textContent = (+$('e3l1').value).toFixed(1) + ' nm'; $('e3l2v').textContent = (+$('e3l2').value).toFixed(1) + ' nm'; $('e3av').textContent = a2.toFixed(2); $('e3xv').textContent = lenStr(xmax);
+  const s1 = 1 / l1, s2 = 1 / l2, ds = Math.abs(s1 - s2);
+  const dx = 0.12e-6, Nx = Math.min(Math.round(xmax / dx) + 1, 40000), dxx = xmax / (Nx - 1);
+  const xs = new Float64Array(Nx), ac = new Float64Array(Nx);
+  for (let i = 0; i < Nx; i++) { const x = i * dxx; xs[i] = x; ac[i] = (Math.cos(2 * Math.PI * s1 * x) + a2 * Math.cos(2 * Math.PI * s2 * x)) / (1 + a2) * (apo ? 1 - x / xmax : 1); }
+  // spectrum on a window around the lines
+  const sm = (s1 + s2) / 2, half = Math.max(4 * ds, 6 / xmax), Ns = 500, sg = linspace(sm - half, sm + half, Ns), sp = new Float64Array(Ns);
+  for (let k = 0; k < Ns; k++) { let re = 0; const w = 2 * Math.PI * sg[k] * dxx; let c = 1, s = 0; const cw = Math.cos(w), sw = Math.sin(w);
+    for (let i = 0; i < Nx; i++) { re += ac[i] * c; const cn = c * cw - s * sw; s = s * cw + c * sw; c = cn; }
+    sp[k] = Math.abs(re); }
+  const mxs = Math.max(...sp); for (let k = 0; k < Ns; k++) sp[k] /= mxs;
+  // resolved? two separate local maxima near the two lines with a dip below 0.8 of the smaller one
+  const near = s => { let b = 0; for (let k = 0; k < Ns; k++) if (Math.abs(sg[k] - s) < Math.abs(sg[b] - s)) b = k; return b; };
+  const k1 = near(s1), k2 = near(s2), wdt = Math.max(3, Math.abs(k2 - k1));
+  const lo = Math.max(1, Math.min(k1, k2) - wdt), hi = Math.min(Ns - 2, Math.max(k1, k2) + wdt);
+  const mx = []; for (let k = lo; k <= hi; k++) if (sp[k] >= sp[k - 1] && sp[k] > sp[k + 1] && sp[k] > 0.15) mx.push(k);
+  mx.sort((p, q) => sp[q] - sp[p]);
+  let resolved = false;
+  if (mx.length >= 2) { const [pa, pb] = [Math.min(mx[0], mx[1]), Math.max(mx[0], mx[1])]; let dip = 1; for (let k = pa; k <= pb; k++) dip = Math.min(dip, sp[k]); resolved = dip < 0.8 * Math.min(sp[pa], sp[pb]) && Math.abs(sg[pb] - sg[pa]) > 0.5 * ds; }
+  cards('e3cards', [['Line separation Δσ', fmt(ds / 100, 3) + ' cm⁻¹'], ['Resolution 1/x_max', fmt(1 / xmax / 100, 3) + ' cm⁻¹', 'th'], ['Needed x_max = 1/Δσ', lenStr(1 / ds)], ['Resolving power σx_max', fmt(sm * xmax, 0)], ['Lines resolved?', resolved ? 'yes' : 'no', 'ok']]);
+  const step = Math.max(1, Math.floor(Nx / 3000)), xi = [], yi = [];
+  for (let i = 0; i < Nx; i += step) { xi.push(xs[i] * 1e3); yi.push((1 + ac[i]) / 2); }
+  $('e3t1').textContent = 'Interferogram I(x), AC part normalised' + (Nx / step < Nx ? ' (every ' + step + 'th sample drawn; fringes alias at this scale — the envelope shows the beats)' : '');
+  plot($('e3ig'), [{ x: xi, y: yi, color: C.teal, width: 0.8 }], { xmin: 0, xmax: xmax * 1e3, ymin: 0, ymax: 1, xlabel: 'Optical path difference x  [mm]', ylabel: 'I(x)' });
+  const toNm = s => 1e9 / s;
+  plot($('e3sp'), [{ x: Array.from(sg, s => s / 100), y: Array.from(sp), color: C.navy, width: 1.8 }, { x: [s1 / 100, s1 / 100], y: [0, 1.05], color: C.coral, dash: [4, 4], width: 1 }, { x: [s2 / 100, s2 / 100], y: [0, 1.05], color: C.coral, dash: [4, 4], width: 1 }],
+    { xmin: (sm - half) / 100, xmax: (sm + half) / 100, ymin: 0, ymax: 1.05, xlabel: 'Wavenumber σ  [cm⁻¹]', ylabel: '|S(σ)| (norm.)' });
+}
+document.querySelectorAll('#e3 .presets button[data-s]').forEach(b => b.onclick = () => { const [a, c, x] = b.dataset.s.split(','); $('e3l1').value = a; $('e3l2').value = c; $('e3x').value = Math.log10(+x); draw(); });
+
+function draw() { const t = document.querySelector('.exp.on').id; if (t === 'e1') e1(); else if (t === 'e2') e2(); else e3(); }
+document.querySelectorAll('input[type=range]').forEach(r => r.oninput = draw);
+window.addEventListener('resize', draw);
+draw();
+</script>
+<script>(function(){var b=document.querySelector('nav button[data-t="e2"]'); if(b) b.click();})();</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f3"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

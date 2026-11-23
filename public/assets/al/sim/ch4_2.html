@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Focusing a Gaussian beam: the q-law against geometric optics · ALP Ch4</title>
+<style>:root{--ink:#111315;--paper:#F2F4F3;--green:#1E8E4E;--neon:#3DDC84;--mint:#DDF3E6;--deep:#0F5C32;--grey:#5B6360;--line:#C9D1CD;--orange:#D9541A}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--paper);color:var(--ink)}
+header{background:var(--ink);color:#F2F4F3;padding:14px 18px;border-bottom:3px solid var(--neon)}header small{color:var(--neon);font-weight:bold;letter-spacing:.5px}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px;font-weight:normal}
+.wrap{max-width:1060px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:16px}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block;margin-bottom:8px}
+label{display:block;font-size:14px;color:var(--grey);margin-top:9px}
+input[type=range]{width:100%;accent-color:var(--green)}
+.val{font-family:Cambria,serif;font-size:18px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--green);background:#fff;color:var(--green);border-radius:8px;padding:6px 12px;cursor:pointer;margin:8px 6px 0 0}
+button.main{background:var(--green);color:#fff}button:hover{opacity:.85}
+select{font:inherit;padding:4px;border:1px solid var(--line);border-radius:6px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--paper);border-radius:8px;padding:7px 9px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:17px;font-weight:normal}
+.eq{font-family:Cambria,serif;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:4px 0 8px;line-height:1.6}
+.ar{direction:rtl;text-align:right;background:var(--mint);color:var(--deep);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.7}
+.task{font-size:14px;color:var(--grey);border-top:1px solid var(--line);margin-top:12px;padding-top:8px}.task b{color:var(--green)}
+footer{text-align:center;color:var(--grey);font-size:12px;padding:6px 0 14px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>ADVANCED LASER PHYSICS 203670-3 · CHAPTER 4 · SIMULATOR 2</small><h1>Focusing a Gaussian beam: the q-law against geometric optics</h1></header>
+<div class="wrap"><div class="grid"><div class="card">
+ <div class="eq">q<sub>2</sub> = (Aq<sub>1</sub> + B)/(Cq<sub>1</sub> + D) ,  lens: 1/q′ = 1/q − 1/f<br>z<sub>2</sub> = f + (d<sub>1</sub> − f)f<sup>2</sup>/[(d<sub>1</sub> − f)<sup>2</sup> + z<sub>R</sub><sup>2</sup>] ,  w<sub>2</sub> = w<sub>0</sub>f/[(d<sub>1</sub> − f)<sup>2</sup> + z<sub>R</sub><sup>2</sup>]<sup>1/2</sup></div>
+ <label>Input waist w<sub>0</sub> (mm): <span class="val" id="v1"></span></label><input type="range" id="w0" min="0.05" max="3" step="0.01" value="0.3">
+ <label>Distance waist → lens d<sub>1</sub> (mm): <span class="val" id="v2"></span></label><input type="range" id="d1" min="0" max="2000" step="5" value="500">
+ <label>Lens focal length f (mm): <span class="val" id="v3"></span></label><input type="range" id="f" min="10" max="500" step="1" value="100">
+ <label>Wavelength λ (nm): <span class="val" id="v4"></span></label><input type="range" id="lam" min="400" max="2000" step="1" value="1064">
+ <div class="stats"><div class="s"><span>input z<sub>R</sub></span><b id="s1">—</b></div><div class="s"><span>new waist w<sub>2</sub>: q-law / formula</span><b id="s2">—</b></div>
+ <div class="s"><span>waist position z<sub>2</sub>: q-law / formula</span><b id="s3">—</b></div><div class="s"><span>geometric image distance</span><b id="s4">—</b></div></div>
+ <div class="ar">الحزمة الغاوسية لا تتبع قانون العدسة الهندسي دائماً: إذا كانت مسافة رايلي كبيرة مقارنة بالبعد البؤري فإن الخصر الجديد يقع قرب البؤرة لا عند موضع الصورة الهندسية. ويقترب السلوك من البصريات الهندسية فقط عندما z<sub>R</sub> ≪ |d₁ − f|.</div>
+ <div class="task"><b>Try:</b> (1) Put the input waist at the lens (d<sub>1</sub> = 0): where is the new waist? (2) Find d<sub>1</sub> that gives the largest output waist distance.</div>
+</div>
+<div class="card"><canvas id="p1" width="800" height="300"></canvas><canvas id="p2" width="800" height="250"></canvas></div></div></div>
+<footer>Prof. Najm Al-Hosiny · companion of MATLAB Lab 4.2</footer>
+<script>const $=id=>document.getElementById(id);
+const C={ink:'#111315',green:'#1E8E4E',neon:'#3DDC84',orange:'#D9541A',grey:'#5B6360',line:'#C9D1CD',blue:'#2E6F8E',plum:'#7A3E8E'};
+function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r)));const f=r/p;return (f<1.5?1:f<3?2:f<7?5:10)*p}
+function fmt(v){const a=Math.abs(v);if(v===0)return'0';if(a>=1e4||a<1e-2)return v.toExponential(0).replace('e+','e');return +v.toPrecision(3)+''}
+function Plot(id,o){const cv=$(id),c=cv.getContext('2d'),W=cv.width,H=cv.height,L=o.left||66,R=16,T=26,B=40;
+ const P={c,W,H};
+ P.axes=function(x0,x1,y0,y1){if(P.clipped){c.restore();P.clipped=false}Object.assign(P,{x0,x1,y0,y1});c.clearRect(0,0,W,H);c.fillStyle='#fff';c.fillRect(0,0,W,H);
+  const lx=o.xlog,ly=o.ylog;P.X=x=>L+((lx?Math.log10(x):x)-(lx?Math.log10(x0):x0))/((lx?Math.log10(x1):x1)-(lx?Math.log10(x0):x0))*(W-L-R);
+  P.Y=y=>H-B-((ly?Math.log10(Math.max(y,1e-300)):y)-(ly?Math.log10(y0):y0))/((ly?Math.log10(y1):y1)-(ly?Math.log10(y0):y0))*(H-B-T);
+  c.font='15px Calibri,Arial';c.lineWidth=1;c.strokeStyle='#E6EAE8';c.fillStyle=C.grey;
+  const ticks=(a,b,log)=>{const t=[];if(log){for(let e=Math.ceil(Math.log10(a)-1e-9);e<=Math.log10(b)+1e-9;e++)t.push(Math.pow(10,e));if(t.length>8){return t.filter((v,i)=>i%2==0)}return t}const s=niceStep((b-a)/6);for(let v=Math.ceil(a/s)*s;v<=b+s*1e-6;v+=s)t.push(Math.abs(v)<s*1e-9?0:v);return t};
+  ticks(x0,x1,lx).forEach(v=>{const X=P.X(v);c.beginPath();c.moveTo(X,T);c.lineTo(X,H-B);c.stroke();c.textAlign='center';c.fillText(lx?'1e'+Math.round(Math.log10(v)):fmt(v),X,H-B+15)});
+  ticks(y0,y1,ly).forEach(v=>{const Y=P.Y(v);c.beginPath();c.moveTo(L,Y);c.lineTo(W-R,Y);c.stroke();c.textAlign='right';c.fillText(ly?'1e'+Math.round(Math.log10(v)):fmt(v),L-5,Y+4)});
+  c.strokeStyle=C.ink;c.beginPath();c.moveTo(L,T);c.lineTo(L,H-B);c.lineTo(W-R,H-B);c.stroke();
+  c.textAlign='center';c.fillStyle=C.ink;c.fillText(o.xlab||'',L+(W-L-R)/2,H-6);
+  c.save();c.translate(13,T+(H-B-T)/2);c.rotate(-Math.PI/2);c.fillText(o.ylab||'',0,0);c.restore();
+  if(o.title){c.textAlign='left';c.font='bold 15px Calibri,Arial';c.fillText(o.title,L,16);c.font='15px Calibri,Arial'}
+  c.save();c.beginPath();c.rect(L,T,W-L-R,H-B-T);c.clip();P.clipped=true;return P};
+ P.line=function(xs,ys,col,w,dash){c.strokeStyle=col||C.green;c.lineWidth=w||2.2;c.setLineDash(dash||[]);c.beginPath();let s=false;
+  for(let i=0;i<xs.length;i++){const y=ys[i];if(!isFinite(y)||(o.ylog&&y<=0)){s=false;continue}const X=P.X(xs[i]),Y=P.Y(y);s?c.lineTo(X,Y):c.moveTo(X,Y);s=true}c.stroke();c.setLineDash([]);return P};
+ P.dots=function(xs,ys,col,r){c.fillStyle=col||C.orange;r=r||2.5;for(let i=0;i<xs.length;i++){if(!isFinite(ys[i]))continue;c.beginPath();c.arc(P.X(xs[i]),P.Y(ys[i]),r,0,7);c.fill()}return P};
+ P.vline=function(x,col,dash){c.strokeStyle=col||C.grey;c.lineWidth=1.5;c.setLineDash(dash||[5,4]);c.beginPath();c.moveTo(P.X(x),T);c.lineTo(P.X(x),H-B);c.stroke();c.setLineDash([]);return P};
+ P.hline=function(y,col,dash){c.strokeStyle=col||C.grey;c.lineWidth=1.5;c.setLineDash(dash||[5,4]);c.beginPath();c.moveTo(L,P.Y(y));c.lineTo(W-R,P.Y(y));c.stroke();c.setLineDash([]);return P};
+ P.bars=function(xs,ys,w,col){c.fillStyle=col||'rgba(30,142,78,.35)';for(let i=0;i<xs.length;i++){const a=P.X(xs[i]-w/2),b=P.X(xs[i]+w/2);c.fillRect(a,P.Y(ys[i]),b-a,P.Y(o.ylog?P.y0:0)-P.Y(ys[i]))}return P};
+ P.legend=function(items){if(P.clipped){c.restore();P.clipped=false}c.font='15px Calibri,Arial';let y=T+14;items.forEach(([t,col,d])=>{c.strokeStyle=col;c.lineWidth=2.5;c.setLineDash(d||[]);c.beginPath();c.moveTo(W-R-170,y-4);c.lineTo(W-R-145,y-4);c.stroke();c.setLineDash([]);c.fillStyle=C.ink;c.textAlign='left';c.fillText(t,W-R-140,y);y+=17});return P};
+ P.text=function(t,x,y,col){c.fillStyle=col||C.ink;c.textAlign='left';c.fillText(t,P.X(x),P.Y(y));return P};
+ return P}
+function lin(a,b,n){const r=[];for(let i=0;i<n;i++)r.push(a+(b-a)*i/(n-1));return r}
+function logsp(a,b,n){return lin(Math.log10(a),Math.log10(b),n).map(v=>Math.pow(10,v))}
+let _s=12345;function rnd(){_s=(_s*16807)%2147483647;return _s/2147483647}function gauss(){return Math.sqrt(-2*Math.log(rnd()+1e-15))*Math.cos(2*Math.PI*rnd())}
+function fwhm(xs,ys){let m=0,k=0;ys.forEach((v,i)=>{if(v>m){m=v;k=i}});let i=k,j=k;while(i>0&&ys[i]>m/2)i--;while(j<ys.length-1&&ys[j]>m/2)j++;
+ const xl=xs[i]+(m/2-ys[i])*(xs[i+1]-xs[i])/(ys[i+1]-ys[i]),xr=xs[j-1]+(m/2-ys[j-1])*(xs[j]-xs[j-1])/(ys[j]-ys[j-1]);return xr-xl}
+function bind(ids,f){ids.forEach(id=>{const e=$(id);if(e)e.addEventListener('input',f)});f()}
+function setv(id,t){$(id).textContent=t}
+const K={h:6.62607015e-34,c:299792458,kB:1.380649e-23,u:1.66053907e-27,e:1.602176634e-19};K.hb=K.h/2/Math.PI;
+
+const P1=Plot('p1',{xlab:'z from the lens (mm)',ylab:'± w (mm)',title:'Beam radius before and after the lens'}),P2=Plot('p2',{xlab:'d₁ (mm)',ylab:'z₂ (mm)',title:'Output waist position: Gaussian (green) vs geometric image (orange)'});
+const cdiv=(a,b,c,d)=>{const m=c*c+d*d;return[(a*c+b*d)/m,(b*c-a*d)/m]};
+function after(w0,d1,f,lam){const zR=Math.PI*w0*w0/lam;let q=[d1,zR];let iq=cdiv(1,0,q[0],q[1]);iq=[iq[0]-1/f,iq[1]];q=cdiv(1,0,iq[0],iq[1]);return{z2:-q[0],zR2:q[1],w2:Math.sqrt(q[1]*lam/Math.PI),zR}}
+function draw(){const w0=+$('w0').value,d1=+$('d1').value,f=+$('f').value,lam=$('lam').value*1e-6;setv('v1',w0.toFixed(2));setv('v2',d1);setv('v3',f);setv('v4',$('lam').value);
+ const A=after(w0,d1,f,lam),zR=A.zR,den=Math.sqrt((d1-f)**2+zR*zR),z2f=f+(d1-f)*f*f/((d1-f)**2+zR*zR),w2f=w0*f/den,geo=1/(1/f-1/d1);
+ setv('s1',zR.toFixed(1)+' mm');setv('s2',(A.w2*1e3).toFixed(2)+' / '+(w2f*1e3).toFixed(2)+' µm');setv('s3',A.z2.toFixed(2)+' / '+z2f.toFixed(2)+' mm');setv('s4',d1>f?geo.toFixed(1)+' mm':'virtual');
+ const zmax=Math.max(A.z2*1.8,f*2),zs1=lin(-d1-zR*0.5,0,200),zs2=lin(0,zmax,300),wb=z=>w0*Math.sqrt(1+((z+d1)/zR)**2),wa=z=>A.w2*Math.sqrt(1+((z-A.z2)/A.zR2)**2);
+ const ym=Math.max(wb(0),wa(zmax))*1.1;P1.axes(-d1-zR*0.5,zmax,-ym,ym).hline(0,C.grey,[]).line(zs1,zs1.map(wb),C.green).line(zs1,zs1.map(z=>-wb(z)),C.green).line(zs2,zs2.map(wa),C.orange).line(zs2,zs2.map(z=>-wa(z)),C.orange).vline(0,C.ink,[]).vline(A.z2,C.orange).vline(f,C.grey);
+ const ds=lin(0,2000,400);P2.axes(0,2000,0,f*3).line(ds,ds.map(d=>after(w0,d,f,lam).z2),C.green).line(ds.filter(d=>d>f*1.05),ds.filter(d=>d>f*1.05).map(d=>1/(1/f-1/d)),C.orange,1.8,[6,4]).vline(d1,C.ink).hline(f,C.grey);
+ window.CHECK={dz2:Math.abs(A.z2-z2f),dw2:Math.abs(A.w2-w2f)/w2f}}
+bind(['w0','d1','f','lam'],draw);
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f3"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

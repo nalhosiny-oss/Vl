@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الأطياف الإلكترونية الجزيئية وتقنيات القياس</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#FBF8F1;--panel:#FFFFFF;--ink:#2A2623;--muted:#6F6553;--line:#E2DACB;--gold:#B8862B;--golddk:#8C6414;--chip:#F4EEE2;--plot:#FFFDF8;--grid:#EEE6D6;--dark:#1A1714;--blue:#3D4E8C;--ok:#2E7D4F;--bad:#B23A2E}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 44px}
+.fstrip{height:14px;border-radius:7px;margin:0 0 14px;direction:ltr;background:
+ linear-gradient(90deg,transparent 0 21%,#1A1714 21% 21.4%,transparent 21.4% 45%,#1A1714 45% 45.3%,transparent 45.3% 62.6%,#1A1714 62.6% 63.2%,transparent 63.2% 86%,#1A1714 86% 86.4%,transparent 86.4%),
+ linear-gradient(90deg,#6B3FB0,#3D5BD9 16%,#2BA5D9 32%,#3BB55A 48%,#E3D332 64%,#F29A2E 80%,#E0402F)}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--golddk);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:66ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}
+@media (max-width:840px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border:1px solid var(--grid);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:11px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.08rem;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--chip);color:var(--ink);width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 11px;border-radius:8px;cursor:pointer;min-height:36px}
+.btn.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.readout{background:var(--chip);border-radius:10px;padding:10px 13px;font-size:.95rem}
+.readout .eq{display:block}
+.eq{font-family:'STIX Two Text',serif;font-size:1.06rem;direction:ltr;unicode-bidi:isolate;text-align:left}
+.note{font-size:.92rem;margin-top:4px}
+.good{color:var(--ok);font-weight:700}.badx{color:var(--bad);font-weight:700}
+.task{border-top:1px solid var(--line);padding-top:10px;font-size:.93rem}
+.task h3{margin:0 0 4px;font-size:1rem;color:var(--golddk)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.93rem;color:var(--ink)}
+.chk input{width:18px;height:18px;accent-color:var(--gold)}
+footer{margin-top:20px;color:var(--muted);font-size:.85rem}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fstrip" aria-hidden="true"></div>
+<header>
+  <span class="badge">الأطياف الذرية والجزيئية · <bdi dir="ltr">2037003-4</bdi></span>
+  <h1>معمل الأطياف الإلكترونية الجزيئية وتقنيات القياس</h1>
+  <p>الفصل السابع. غيّر القيم وراقب النتيجة، وأجب عن السؤال في أسفل كل تجربة.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" aria-selected="true" data-t="t1">١. مبدأ فرانك-كوندون</button><button role="tab" aria-selected="false" data-t="t2">٢. الطيف الإلكتروني لليود I₂</button><button role="tab" aria-selected="false" data-t="t3">٣. الأنماط الاهتزازية: IR ورامان</button><button role="tab" aria-selected="false" data-t="t4">٤. مطياف رامان</button></nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="620" aria-label="الانتقال العمودي بين منحنيي طاقة جزيء"></canvas>
+  <div class="ctrl">
+    <label>إزاحة منحنى الحالة المثارة Δr (نسبية) <b id="o1d"></b></label><input id="i1d" type="range" min="0" max="3.5" step="0.05" value="1.6">
+    <div class="row"><button class="btn" type="button" data-d="0.3">إزاحة صغيرة</button><button class="btn" type="button" data-d="1.6">متوسطة</button><button class="btn" type="button" data-d="3.2">كبيرة (مثل I₂)</button></div>
+    <div class="readout" id="r1"></div>
+    <div class="task"><h3>سؤال</h3>لماذا يكون الانتقال 0 → 0 الأقوى عندما تكون الإزاحة صغيرة، بينما ينتقل الحد الأقصى للشدة إلى v′ أعلى عندما تكبر الإزاحة؟</div>
+  </div>
+</section>
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="620" aria-label="سلسلة خطوط امتصاص اليود وتقاربها"></canvas>
+  <div class="ctrl">
+    <label>درجة حرارة البخار T (K) <b id="o2t"></b></label><input id="i2t" type="range" min="200" max="900" step="10" value="300">
+    <label class="chk"><input type="checkbox" id="k2b" checked> إظهار مخطط بيرج-سبونر</label>
+    <div class="readout" id="r2"></div>
+    <div class="task"><h3>سؤال</h3>لماذا تتقارب خطوط السلسلة نحو الأطوال الموجية القصيرة؟ وكيف نقدّر طاقة تفكك الحالة المثارة من مخطط بيرج-سبونر؟ وما سبب ظهور خطوط إضافية عند رفع درجة الحرارة؟</div>
+  </div>
+</section>
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="620" aria-label="حركة الذرات في الأنماط الاهتزازية"></canvas>
+  <div class="ctrl">
+    <label for="s3m">الجزيء</label><select id="s3m"><option value="CO2">CO₂ (خطي ومتماثل)</option><option value="H2O">H₂O (منحنٍ)</option></select>
+    <div class="row" id="m3"><button class="btn sel" type="button" data-m="0">النمط ν₁</button><button class="btn" type="button" data-m="1">النمط ν₂</button><button class="btn" type="button" data-m="2">النمط ν₃</button></div>
+    <div class="readout" id="r3"></div>
+    <div class="task"><h3>سؤال</h3>أي أنماط CO₂ نشط في الأشعة تحت الحمراء وأيها نشط في رامان؟ اذكر قاعدة الاستبعاد المتبادل، ولماذا لا تنطبق على H₂O؟</div>
+  </div>
+</section>
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="620" aria-label="خطوط ستوكس وضد ستوكس حول خط رايلي"></canvas>
+  <div class="ctrl">
+    <label for="s4s">العينة</label><select id="s4s"><option value="CCl4">رابع كلوريد الكربون CCl₄</option><option value="C6H6">البنزين C₆H₆</option><option value="N2">النيتروجين N₂ (غاز)</option></select>
+    <label for="s4l">الليزر</label><select id="s4l"><option value="532">532 nm (أخضر)</option><option value="633">632.8 nm (هيليوم-نيون)</option><option value="785">785 nm (تحت الحمراء القريبة)</option></select>
+    <label>درجة الحرارة T (K) <b id="o4t"></b></label><input id="i4t" type="range" min="80" max="900" step="10" value="300">
+    <div class="readout" id="r4"></div>
+    <div class="task"><h3>سؤال</h3>لماذا تكون خطوط ضد ستوكس أضعف من خطوط ستوكس؟ وكيف تتغير النسبة بينهما مع درجة الحرارة؟ وهل تتغير إزاحة رامان إذا غيّرنا الليزر؟</div>
+  </div>
+</section>
+<footer>أ.د. نجم الحصيني – الأطياف الذرية والجزيئية، الفصل السابع. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+const h=6.62607015e-34,c=2.99792458e8,kB=1.380649e-23,eV=1.602176634e-19;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let active='t1',dirty=true;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;dirty=true;}));
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>dirty=true);e.addEventListener('change',()=>dirty=true);});
+
+/* number formatting with real superscripts */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sciParts(v,d){const e=Math.floor(Math.log10(Math.abs(v)));let m=v/Math.pow(10,e);if(+m.toFixed(d)>=10){return [(m/10).toFixed(d),e+1];}return [m.toFixed(d),e];}
+function H(v,d=3){return H0(v,d).replace(/-/g,'−');}
+function H0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10<sup>'+e+'</sup>';}
+function U(v,d=3){return U0(v,d).replace(/-/g,'−');}
+function U0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10'+String(e).split('').map(ch=>SUP[ch]).join('');}
+
+/* colour of a wavelength (nm) */
+function rgbOf(l){let r=0,g=0,b=0;
+ if(l>=380&&l<440){r=-(l-440)/60;b=1;}else if(l<490){g=(l-440)/50;b=1;}else if(l<510){g=1;b=-(l-510)/20;}else if(l<580){r=(l-510)/70;g=1;}else if(l<645){r=1;g=-(l-645)/65;}else if(l<=750){r=1;}
+ let f=0;if(l>=380&&l<420)f=0.3+0.7*(l-380)/40;else if(l>=420&&l<=700)f=1;else if(l>700&&l<=750)f=0.3+0.7*(750-l)/50;
+ return [r*f,g*f,b*f];}
+function colStr(l,I){const v=l>=380&&l<=750?rgbOf(l):[0.62,0.6,0.58];const k=Math.pow(Math.max(0,Math.min(1,I)),0.55);return 'rgb('+v.map(x=>Math.round(255*x*k)).join(',')+')';}
+function planck(lnm,T){const l=lnm*1e-9;const x=h*c/(l*kB*T);if(x>700)return 0;return 2*h*c*c/Math.pow(l,5)/(Math.expm1(x));}
+
+/* drawing helpers */
+function txt(g,s,x,y,col,al,sz,rtl,bold){g.font=(bold?'700 ':'')+(sz||22)+'px "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function poly(g,pts,col,w){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function strip(g,x,y,w,hh,l0,l1,If){g.fillStyle='#0D0B09';g.fillRect(x,y,w,hh);for(let i=0;i<w;i++){const l=l0+(l1-l0)*i/w;const I=If(l);if(I<=0.003)continue;g.fillStyle=colStr(l,I);g.fillRect(x+i,y,1.2,hh);}g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(x,y,w,hh);}
+function axisNm(g,x,y,w,l0,l1,step){seg(g,x,y,x+w,y,css('--muted'),1.5);for(let l=Math.ceil(l0/step)*step;l<=l1+1e-9;l+=step){const px=x+(l-l0)/(l1-l0)*w;seg(g,px,y,px,y+8,css('--muted'),1.5);txt(g,String(Math.round(l)),px,y+30,css('--muted'),'center',18);}txt(g,'λ (nm)',x+w,y+56,css('--muted'),'right',18);}
+
+/* atomic line data: air wavelengths (nm) and relative intensities */
+const LINES={
+ H:[[656.28,1],[486.13,.55],[434.05,.32],[410.17,.22],[397.01,.14]],
+ He:[[447.15,.45],[471.31,.22],[492.19,.25],[501.57,.55],[587.56,1],[667.82,.45],[706.52,.4]],
+ Na:[[588.995,1],[589.592,.55],[568.82,.08],[615.42,.07],[497.85,.04]],
+ Hg:[[253.65,1],[365.02,.55],[404.66,.45],[435.83,.85],[546.07,1],[576.96,.5],[579.07,.5]],
+ Ne:[[585.25,.6],[588.19,.3],[594.48,.4],[609.61,.4],[614.31,.5],[626.65,.4],[633.44,.45],[640.22,.9],[650.65,.5],[659.90,.3],[692.95,.4],[703.24,.55]]};
+const NAME={H:'الهيدروجين',He:'الهيليوم',Na:'الصوديوم',Hg:'الزئبق',Ne:'النيون'};
+function lineSpec(el,w){const L=LINES[el];return l=>{let s=0;for(const [l0,a] of L){const d=(l-l0)/w;if(Math.abs(d)<6)s+=a*Math.exp(-d*d/2);}return s;};}
+
+
+
+const kBc=0.69503476;
+function fact(n){let f=1;for(let i=2;i<=n;i++)f*=i;return f;}
+function herm(n,x){if(n===0)return 1;let h0=1,h1=2*x;for(let k=1;k<n;k++){const h2=2*x*h1-2*k*h0;h0=h1;h1=h2;}return h1;}
+function psi(n,x){return herm(n,x)*Math.exp(-x*x/2)/Math.sqrt(Math.pow(2,n)*fact(n)*Math.sqrt(Math.PI));}
+/* 1. Franck-Condon (displaced harmonic oscillators, equal frequency) */
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{$('i1d').value=b.dataset.d;dirty=true;});
+function lab1(){const g=$('c1').getContext('2d');g.clearRect(0,0,1200,620);const d=+$('i1d').value,S=d*d/2;$('o1d').textContent=d.toFixed(2);
+ const X=60,W=560,xr=x=>X+W*(x+4)/10,E0=0,Ee=9,top=40,bot=580,yy=E=>bot-(bot-top)*E/17;
+ const curve=(c,off,col)=>{const pts=[];for(let i=0;i<=400;i++){const x=-4+10*i/400,V=off+0.5*(x-c)*(x-c);if(V<off+7.5)pts.push([xr(x),yy(V)]);}poly(g,pts,col,3);};
+ curve(0,E0,css('--ink'));curve(d,Ee,'#3D4E8C');
+ /* ground v=0 wavefunction */
+ seg(g,xr(-1),yy(0.5),xr(1),yy(0.5),css('--ink'),1.5);const p0=[];for(let i=0;i<=200;i++){const x=-3+6*i/200;p0.push([xr(x),yy(0.5)-90*psi(0,x)*psi(0,x)*1.77]);}poly(g,p0,css('--golddk'),2);
+ /* excited levels with FC factors */
+ let best=0,bv=0;const F=[];for(let v=0;v<=14;v++){const f=Math.exp(-S)*Math.pow(S,v)/fact(v);F.push(f);if(f>best){best=f;bv=v;}}
+ for(let v=0;v<=12;v++){const E=Ee+v+0.5;if(E>Ee+7.4)break;const a=Math.sqrt(2*(v+0.5));seg(g,xr(d-a),yy(E),xr(d+a),yy(E),v===bv?css('--golddk'):'#9AA3C7',v===bv?3:1.4);}
+ const bvE=Ee+bv+0.5,pv=[];for(let i=0;i<=300;i++){const x=d-5+10*i/300,q=psi(bv,x-d);pv.push([xr(x),yy(bvE)-40*q*q*1.77]);}if(bvE<Ee+7.4)poly(g,pv,'#3D4E8C',2);
+ seg(g,xr(0),yy(0.5),xr(0),yy(bvE),'#B23A2E',3,[8,6]);txt(g,'انتقال عمودي',xr(0)-10,yy((0.5+bvE)/2),'#B23A2E','right',17,1);
+ txt(g,'الحالة الأرضية',xr(-3.2),yy(6),css('--ink'),'center',16,1);txt(g,'الحالة المثارة',xr(d+3.2),yy(Ee+6.5),'#3D4E8C','center',16,1);txt(g,'r',X+W,bot+20,css('--muted'),'right',18);
+ /* FC bars */
+ const BX=700,BW=440,by=520,bh=380;seg(g,BX,by,BX+BW,by,css('--muted'),1.5);F.forEach((f,v)=>{const x=BX+v*(BW/15)+6;g.fillStyle=v===bv?css('--golddk'):css('--gold');g.fillRect(x,by-bh*f/Math.max(...F),BW/15-10,bh*f/Math.max(...F));txt(g,String(v),x+(BW/15-10)/2,by+24,css('--muted'),'center',15);});
+ txt(g,'شدة الخطوط (عوامل فرانك-كوندون) لكل v′',BX+BW,100,css('--muted'),'right',17,1);txt(g,'v′',BX+BW,by+48,css('--muted'),'right',17);
+ $('r1').innerHTML='<span class="eq">|⟨v′|0⟩|² = e<sup>−S</sup> S<sup>v′</sup>/v′! ,  S = Δr²/2 = '+H(S,3)+'</span><div class="note">أقوى خط: <b>0 → '+bv+'</b>. حركة الإلكترون أسرع بكثير من حركة النوى، فلا تتغير المسافة بين النوى أثناء الانتقال (انتقال عمودي)، ويُفضَّل المستوى الذي تتداخل دالته الموجية أكثر مع دالة v = 0.</div>';}
+/* 2. I2 B<-X */
+const Te=15769.01,we1=125.69,wx1=0.7642,we0=214.50,wx0=0.614;const G1=v=>we1*(v+0.5)-wx1*(v+0.5)**2,G0=v=>we0*(v+0.5)-wx0*(v+0.5)**2;
+function lab2(){const g=$('c2').getContext('2d');g.clearRect(0,0,1200,620);const T=+$('i2t').value,bs=$('k2b').checked;$('o2t').textContent=T;
+ const lo=480,hi=650,X=60,W=1080,sy=bs?260:470,sh=bs?190:380,xs=l=>X+W*(l-lo)/(hi-lo);
+ g.fillStyle='#FFF8E8';g.fillRect(X,sy-sh,W,sh);
+ const pops=[0,1,2,3].map(v=>Math.exp(-(G0(v)-G0(0))/(kBc*T)));const Z=pops.reduce((a,b)=>a+b,0);
+ const vmax=Math.floor(we1/(2*wx1)-0.5);let mx=0;const lines=[];
+ for(let vv=0;vv<=3;vv++)for(let v=0;v<=vmax;v++){const nu=Te+G1(v)-G0(vv);const env=Math.exp(-Math.pow((v-(28-6*vv))/(8+vv),2)/2);const I=pops[vv]/Z*env;if(I>1e-4){lines.push([1e7/nu,I,vv]);mx=Math.max(mx,I);}}
+ lines.forEach(([l,I,vv])=>{if(l<lo||l>hi)return;seg(g,xs(l),sy,xs(l),sy-sh*0.95*I/mx,vv===0?css('--ink'):(vv===1?'#3D4E8C':'#B23A2E'),1.4);});
+ const nlim=Te+we1*we1/(4*wx1)-G0(0),llim=1e7/nlim;seg(g,xs(llim),sy,xs(llim),sy-sh,css('--gold'),2,[6,5]);txt(g,'حد التقارب',xs(llim)+6,sy-sh+18,css('--golddk'),'left',16,1);
+ for(let l=480;l<=650;l+=20){seg(g,xs(l),sy,xs(l),sy+8,css('--muted'),1.5);txt(g,String(l),xs(l),sy+28,css('--muted'),'center',15);}txt(g,'λ (nm)',X+W,sy+50,css('--muted'),'right',16);
+ txt(g,"من v″ = 0",X+W,sy-sh-10,css('--ink'),'right',15,1);txt(g,"من v″ = 1 (أحمر داكن: v″ = 2)",X+W-110,sy-sh-10,'#3D4E8C','right',15,1);
+ if(bs){const BX=X,BW=W,by=590,bh=230,vm=vmax+3,xb=v=>BX+BW*v/vm;seg(g,BX,by,BX+BW,by,css('--muted'),1.5);
+  const pts=[];for(let v=0;v<=vmax;v++){const dG=G1(v+1)-G1(v);pts.push([xb(v+0.5),by-bh*dG/we1]);g.fillStyle=css('--golddk');g.beginPath();g.arc(xb(v+0.5),by-bh*dG/we1,3,0,7);g.fill();}
+  g.fillStyle='rgba(184,134,43,.15)';g.beginPath();g.moveTo(xb(0),by);pts.forEach(p=>g.lineTo(p[0],p[1]));g.lineTo(xb(vmax+1),by);g.closePath();g.fill();
+  txt(g,"ΔG(v′+½)",BX+6,by-bh-6,css('--muted'),'left',15);txt(g,"v′",BX+BW,by+22,css('--muted'),'right',15);txt(g,'المساحة تحت الخط = D₀ للحالة المثارة',BX+BW,by-bh+10,css('--golddk'),'right',16,1);}
+ const D0e=we1*we1/(4*wx1)-G1(0);
+ $('r2').innerHTML='<span class="eq">ν = T<sub>e</sub> + G′(v′) − G″(v″)</span><span class="eq">ΔG′ = ω′<sub>e</sub> − 2ω′<sub>e</sub>x′<sub>e</sub>(v′+1)</span><span class="eq">D₀′ ≈ Σ ΔG′ = '+H(D0e,4)+' cm<sup>−1</sup> ≈ '+H(D0e/8065.54,3)+' eV</span><div class="note">حد التقارب المتوقع ≈ '+H(llim,4)+' nm (المقيس نحو 499.5 nm؛ الاستكمال الخطي يبالغ قليلًا).<br>نسبة الجزيئات في v″ = 1 عند '+T+' K: '+H(100*pops[1]/Z,3)+'%، ومنها «الخطوط الساخنة».</div>';}
+/* 3. normal modes */
+let mode3=0;document.querySelectorAll('#m3 .btn').forEach(b=>b.onclick=()=>{mode3=+b.dataset.m;document.querySelectorAll('#m3 .btn').forEach(x=>x.classList.toggle('sel',x===b));dirty=true;});
+const MODES={CO2:[{n:'تمدد متماثل',w:1388,ir:0,ra:1},{n:'انحناء (مزدوج الانحلال)',w:667,ir:1,ra:0},{n:'تمدد غير متماثل',w:2349,ir:1,ra:0}],H2O:[{n:'تمدد متماثل',w:3657,ir:1,ra:1},{n:'انحناء',w:1595,ir:1,ra:1},{n:'تمدد غير متماثل',w:3756,ir:1,ra:1}]};
+function lab3(t){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,620);const mol=$('s3m').value,M=MODES[mol][mode3],s=Math.sin(t*3),cx=420,cy=330,A=34;
+ let at;if(mol==='CO2'){const L=150;if(mode3===0)at=[[cx-L-A*s,cy,'O'],[cx,cy,'C'],[cx+L+A*s,cy,'O']];else if(mode3===1)at=[[cx-L,cy+A*s*0.8,'O'],[cx,cy-A*s*1.6,'C'],[cx+L,cy+A*s*0.8,'O']];else at=[[cx-L+A*s,cy,'O'],[cx-A*s*1.3,cy,'C'],[cx+L+A*s,cy,'O']];}
+ else{const L=140,an=52*Math.PI/180;const base=[[cx-L*Math.sin(an),cy+L*Math.cos(an)*0.9,'H'],[cx,cy-60,'O'],[cx+L*Math.sin(an),cy+L*Math.cos(an)*0.9,'H']];
+  if(mode3===0)at=[[base[0][0]-A*s*0.8,base[0][1]+A*s*0.6,'H'],[cx,cy-60-A*s*0.15,'O'],[base[2][0]+A*s*0.8,base[2][1]+A*s*0.6,'H']];
+  else if(mode3===1)at=[[base[0][0]+A*s*0.8,base[0][1]+A*s*0.3,'H'],[cx,cy-60-A*s*0.1,'O'],[base[2][0]-A*s*0.8,base[2][1]+A*s*0.3,'H']];
+  else at=[[base[0][0]-A*s*0.8,base[0][1]+A*s*0.6,'H'],[cx-A*s*0.15,cy-60,'O'],[base[2][0]-A*s*0.8,base[2][1]-A*s*0.6,'H']];}
+ const mid=at[1];seg(g,at[0][0],at[0][1],mid[0],mid[1],css('--muted'),6);seg(g,mid[0],mid[1],at[2][0],at[2][1],css('--muted'),6);
+ at.forEach(([x,y,e])=>{g.fillStyle=e==='O'?'#B23A2E':(e==='C'?'#2A2623':'#D8D2C4');g.beginPath();g.arc(x,y,e==='H'?22:34,0,7);g.fill();txt(g,e,x,y+8,e==='H'?css('--ink'):'#fff','center',22,0,1);});
+ /* dipole indicator */
+ let dip=0;if(mol==='CO2'){dip=mode3===0?0:(mode3===1?1.6*s:1.3*s);}else dip=(mode3===0?0.8+0.4*s:(mode3===1?0.8+0.3*s:0.8))+(mode3===2?0:0);
+ const dx=mol==='H2O'&&mode3===2?60*s:0;if(Math.abs(dip)>0.05||dx){const L2=mol==='CO2'&&mode3===2?0:1;const vx=mol==='CO2'?(mode3===2?90*dip:0):dx,vy=mol==='CO2'?(mode3===1?-90*dip:0):-90*dip;seg(g,cx,500,cx+vx,500+vy,'#3D4E8C',4);txt(g,'μ',cx+vx+10,500+vy,'#3D4E8C','left',22);}
+ txt(g,'عزم ثنائي القطب '+(M.ir?'يتغير ⇐ نشط في IR':'لا يتغير ⇐ غير نشط في IR'),cx,590,M.ir?'#2E7D4F':'#B23A2E','center',19,1,1);
+ /* polarizability ellipse */
+ const pa=mol==='CO2'?(mode3===0?1+0.3*s:1):(1+0.15*s);g.strokeStyle='#8C6414';g.lineWidth=2.5;g.beginPath();g.ellipse(940,300,110*pa,60/pa,0,0,7);g.stroke();txt(g,'قابلية الاستقطاب',940,200,css('--muted'),'center',18,1);
+ txt(g,(M.ra?'تتغير ⇐ نشط في رامان':'لا يتغير تغيرًا خطيًا ⇐ غير نشط في رامان'),940,420,M.ra?'#2E7D4F':'#B23A2E','center',18,1,1);
+ const ck=(b,t)=>(b?'<span class="good">✔</span> ':'<span class="badx">✘</span> ')+t;
+ $('r3').innerHTML='<b>'+M.n+'</b><span class="eq">ν̃ = '+M.w+' cm<sup>−1</sup></span><div class="note">'+ck(M.ir,'نشط في الأشعة تحت الحمراء')+'<br>'+ck(M.ra,'نشط في رامان')+(mol==='CO2'?'<br><b>قاعدة الاستبعاد المتبادل:</b> في الجزيء ذي مركز التماثل لا يكون النمط نشطًا في IR ورامان معًا.':'<br>H₂O ليس له مركز تماثل، فكل أنماطه نشطة في الطريقتين.')+'</div>';}
+/* 4. Raman */
+const SMP={CCl4:[[218,0.55],[314,0.6],[459,1],[762,0.18],[790,0.2]],C6H6:[[606,0.25],[992,1],[1178,0.25],[1586,0.2],[3062,0.45]],N2:[[2331,1]]};
+function lab4(){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,620);const smp=SMP[$('s4s').value],lam=+$('s4l').value,T=+$('i4t').value;$('o4t').textContent=T;
+ const n0=1e7/lam,X=60,W=1080,sy=470,sh=330,span=Math.max(...smp.map(x=>x[0]))*1.25,xs=v=>X+W/2+(v/span)*(W/2);
+ seg(g,X,sy,X+W,sy,css('--muted'),1.5);
+ seg(g,xs(0),sy,xs(0),sy-sh-40,colStr(lam,1)==='rgb(0,0,0)'?css('--ink'):colStr(lam,1),8);txt(g,'رايلي (أقوى بنحو مليون مرة)',xs(0),sy-sh-50,css('--ink'),'center',16,1);
+ let st=null;smp.forEach(([d,a])=>{const IS=a*Math.pow(n0-d,4)/Math.pow(n0,4),IA=a*Math.pow(n0+d,4)/Math.pow(n0,4)*Math.exp(-d/(kBc*T));const ls=1e7/(n0-d),la=1e7/(n0+d);
+  seg(g,xs(-d),sy,xs(-d),sy-sh*IS,ls<=750?colStr(ls,1):'#8C6414',5);seg(g,xs(d),sy,xs(d),sy-sh*IA,la>=380&&la<=750?colStr(la,1):'#3D4E8C',5);txt(g,String(d),xs(-d),sy-sh*IS-8,css('--ink'),'center',14);
+  if(!st||a>st[1])st=[d,a,ls,la,IA/IS];});
+ txt(g,'ستوكس (طاقة أقل)',xs(-span*0.55),110,css('--golddk'),'center',19,1,1);txt(g,'ضد ستوكس (طاقة أعلى)',xs(span*0.55),110,'#3D4E8C','center',19,1,1);
+ const stp=span>2000?500:(span>800?200:100);for(let v=-Math.floor(span/stp)*stp;v<=span;v+=stp){seg(g,xs(v),sy,xs(v),sy+8,css('--muted'),1.5);txt(g,String(-v),xs(v),sy+28,css('--muted'),'center',14);}
+ txt(g,'إزاحة رامان (cm⁻¹)',X+W,sy+54,css('--muted'),'right',16,1);
+ $('r4').innerHTML='<span class="eq">ν̃<sub>S</sub> = ν̃₀ − Δν̃ ,  ν̃<sub>AS</sub> = ν̃₀ + Δν̃</span><span class="eq">I<sub>AS</sub>/I<sub>S</sub> = ((ν̃₀+Δν̃)/(ν̃₀−Δν̃))⁴ e<sup>−hcΔν̃/kT</sup></span><div class="note">أقوى خط: Δν̃ = '+st[0]+' cm<sup>−1</sup>: ستوكس عند <b>'+st[2].toFixed(1)+' nm</b>، وضد ستوكس عند <b>'+st[3].toFixed(1)+' nm</b>.<br>نسبة ضد ستوكس إلى ستوكس عند '+T+' K: <b>'+H(st[4],3)+'</b>.<br>إزاحة رامان صفة للجزيء ولا تتغير بتغيير الليزر، أما الطول الموجي المطلق للخطوط فيتغير.</div>';}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4};const ANIM=new Set(["t3"]);let T0=performance.now();
+function loop(t){if(dirty||ANIM.has(active)){dirty=false;LABS[active]((t-T0)/1000);}requestAnimationFrame(loop);}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>dirty=true);
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

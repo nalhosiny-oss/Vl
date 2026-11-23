@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 5 — Interferogram Analysis and Image Processing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&family=Source+Serif+4:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0B1E3A; --teal:#0E8C9A; --coral:#E8604C; --tint:#E3F4F6; --bg:#F4F8FA; --grey:#5A6B7F; --line:#C9D6E0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--navy); font-family:"Source Sans 3", Calibri, "Segoe UI", Arial, sans-serif; font-size:16px; }
+  header { background:var(--navy); color:#fff; padding:18px 22px 14px; position:relative; overflow:hidden; }
+  header .rings { position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%;
+    background: repeating-radial-gradient(circle, rgba(70,200,215,.55) 0 3px, transparent 3px 14px); opacity:.55; }
+  header h1 { font-family:"Source Serif 4", Cambria, Georgia, serif; margin:0; font-size:23px; }
+  header p { margin:4px 0 0; color:#BFE6EA; font-size:14.5px; }
+  nav { display:flex; gap:6px; flex-wrap:wrap; padding:12px 22px 0; }
+  nav button { border:1px solid var(--line); background:#fff; color:var(--navy); padding:9px 14px; border-radius:10px 10px 0 0; font:inherit; font-weight:600; cursor:pointer; }
+  nav button.on { background:var(--teal); color:#fff; border-color:var(--teal); }
+  main { padding:0 22px 26px; }
+  .exp { display:none; background:#fff; border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; }
+  .exp.on { display:block; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap:16px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  nav { display:none; } .exp { border-radius:12px; margin-top:12px; } header { padding:12px 18px 10px; } header h1 { font-size:19px; } main { padding:0 12px 14px; } footer { display:none; }
+  h2 { font-family:"Source Serif 4", Cambria, Georgia, serif; font-size:19px; margin:0 0 6px; }
+  .lead { color:var(--grey); margin:0 0 12px; font-size:14.5px; }
+  .panel { background:var(--tint); border-radius:10px; padding:12px; }
+  .ctl { margin-bottom:11px; }
+  .ctl label { display:flex; justify-content:space-between; font-size:14px; font-weight:600; }
+  .ctl label span { color:var(--teal); font-variant-numeric: tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--teal); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 10px; }
+  .presets button, .seg button { border:1px solid var(--teal); background:#fff; color:var(--teal); border-radius:16px; padding:4px 11px; font:inherit; font-size:13.5px; cursor:pointer; }
+  .presets button:hover, .seg button.on { background:var(--teal); color:#fff; }
+  .seg { display:flex; gap:6px; margin-bottom:10px; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(135px,1fr)); gap:8px; margin:10px 0; }
+  .card { border:1px solid var(--line); border-radius:9px; padding:7px 9px; background:#fff; }
+  .card b { display:block; font-size:12.5px; color:var(--grey); font-weight:600; }
+  .card span { font-size:18px; font-weight:600; font-variant-numeric: tabular-nums; }
+  .card.ok span { color:var(--teal); } .card.th span { color:var(--coral); }
+  canvas { width:100%; display:block; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .cv-title { font-size:13.5px; font-weight:600; color:var(--grey); margin:10px 0 4px; }
+  .eq { font-family:"Source Serif 4", Cambria, Georgia, serif; background:#fff; border-left:3px solid var(--teal); padding:6px 10px; margin:8px 0; font-size:15px; }
+  .tasks { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .tasks h3 { font-size:15.5px; margin:0 0 4px; }
+  .tasks ol { margin:0; padding-left:20px; font-size:14.5px; } .tasks li { margin:3px 0; }
+  .ar { direction:rtl; text-align:right; font-family:"Noto Naskh Arabic", "Traditional Arabic", Tahoma, serif; background:#FFF6F3; border-right:4px solid var(--coral); border-radius:8px; padding:9px 12px; margin-top:12px; font-size:15.5px; line-height:1.8; }
+  .ar b { color:var(--coral); }
+  footer { color:var(--grey); font-size:13px; padding:0 22px 18px; }
+  .note { font-size:13px; color:var(--grey); }
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header><div class="rings"></div>
+  <h1>Virtual Lab · Chapter 5 — Interferogram Analysis and Image Processing</h1>
+  <p>Interferometric Systems and Their Applications (203673-3) · MSc in Physics · Prof. Najm Al-Hosiny</p>
+</header>
+<nav>
+  <button class="on" data-t="e1">1 · Fourier series, FFT, convolution</button>
+  <button data-t="e2">2 · Image processing</button>
+  <button data-t="e3">3 · Takeda and phase shifting</button>
+</nav>
+<main>
+<!-- ================= Experiment 1 ================= -->
+<section class="exp on" id="e1">
+  <h2>Experiment 1 — Fourier series, the FFT and convolution</h2>
+  <p class="lead">Binary (square-wave) fringes are built from odd harmonics; a sampled carrier line has a discrete spectrum with step 1/L; smoothing by a moving average multiplies the spectrum by H(f) = sinc(fw) — the convolution theorem.</p>
+  <div class="seg" id="e1seg"><button class="on" data-m="s">Fourier series</button><button data-m="f">FFT and convolution</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div id="e1cs"><div class="ctl"><label>Highest harmonic n_max <span id="e1hv"></span></label><input type="range" id="e1h" min="1" max="99" step="2" value="9"></div>
+        <div class="eq">square(x) = ½ + Σ c_n cos(2πnx/p)<br>c_n = (2/nπ) sin(nπ/2)</div></div>
+      <div id="e1cf" style="display:none">
+        <div class="ctl"><label>Fringes in the line f₀L <span id="e1fv"></span></label><input type="range" id="e1f" min="5" max="80" step="0.05" value="30.5"></div>
+        <div class="ctl"><label>Moving-average width w (samples) <span id="e1wv"></span></label><input type="range" id="e1w" min="1" max="40" step="1" value="8"></div>
+        <div class="presets"><button id="e1win">Hann window: off</button></div>
+        <div class="eq">N = 1024 samples over L; frequency step 1/L<br>H(f) = sin(πfw)/(w sin πf) ≈ sinc(fw), f in cycles/sample</div>
+      </div>
+    </div>
+    <div>
+      <div class="cards" id="e1cards"></div>
+      <div class="cv-title" id="e1t1"></div>
+      <canvas id="e1a" height="230"></canvas>
+      <div class="cv-title" id="e1t2"></div>
+      <canvas id="e1b" height="230"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Series: increase n_max from 9 to 99. Does the overshoot at the edges disappear? Read its value (Gibbs ≈ 9 % of the jump).</li>
+    <li>FFT: set 30.0 and then 30.5 fringes. Why does the peak spread over many bins (leakage) in the second case? What does the Hann window change?</li>
+    <li>Convolution: choose w so that the first zero of H(f) falls on the carrier. What happens to the fringes?</li>
+    <li>Check that the FFT ratio of the smoothed and original spectra follows H(f).</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> كل نمط هدب هو مجموع موجات جيبية، وتحويل فورييه يبيّن مقدار كل منها. والتنعيم بالمتوسط المتحرك ليس إلا ضرباً للطيف في دالة sinc، فيقتل الترددات العالية ومعها الضجيج.</div>
+</section>
+
+<!-- ================= Experiment 2 ================= -->
+<section class="exp" id="e2">
+  <h2>Experiment 2 — Digital image processing of an interferogram</h2>
+  <p class="lead">A simulated 8-bit interferogram (circular fringes) with uneven illumination, low contrast, Gaussian noise and dead/hot pixels. Improve it step by step and compare with the clean image.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Gaussian noise σ <span id="e2nv"></span></label><input type="range" id="e2n" min="0" max="0.2" step="0.005" value="0.06"></div>
+      <div class="ctl"><label>Dead/hot pixels <span id="e2pv"></span></label><input type="range" id="e2p" min="0" max="0.1" step="0.005" value="0.02"></div>
+      <div class="ctl"><label>Grey-level step</label>
+        <div class="seg" id="e2g"><button class="on" data-m="n">None</button><button data-m="s">Stretch</button><button data-m="e">Equalize</button></div></div>
+      <div class="ctl"><label>Spatial filter</label>
+        <div class="seg" id="e2f"><button class="on" data-m="n">None</button><button data-m="m">Mean</button><button data-m="g">Gaussian</button><button data-m="d">Median</button></div></div>
+      <div class="ctl"><label>Filter size (pixels) <span id="e2sv"></span></label><input type="range" id="e2s" min="1" max="4" step="0.5" value="1"></div>
+      <div class="presets"><button id="e2hp">Background removal (high-pass): off</button></div>
+      <div class="eq">Equalization maps grey level g to the cumulative histogram CDF(g)<br>Median: best against dead/hot pixels</div>
+    </div>
+    <div>
+      <div class="cards" id="e2cards"></div>
+      <div class="cv-title">Raw (left) and processed (right)</div>
+      <canvas id="e2img" height="300"></canvas>
+      <div class="cv-title">Grey-level histograms: raw (bars) and processed (line)</div>
+      <canvas id="e2hist" height="190"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Compare the mean, Gaussian and median filters with 5 % dead/hot pixels. Which gives the smallest error, and why?</li>
+    <li>Increase the filter size. When does the filter start to wash out the fine fringes near the edge?</li>
+    <li>Equalize the histogram. Does it change the error or only the look? Is it useful before phase measurement?</li>
+    <li>Switch on background removal. What does the high-pass filter take away?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> المرشح الوسيط يأخذ القيمة الوسطى بين الجيران، فيتجاهل البكسل الشاذ تماماً. أما مرشح المتوسط فيوزّع خطأ ذلك البكسل على جيرانه.</div>
+</section>
+
+<!-- ================= Experiment 3 ================= -->
+<section class="exp" id="e3">
+  <h2>Experiment 3 — Fourier-transform (Takeda) analysis and phase shifting</h2>
+  <p class="lead">I = a + b cos(2πf₀x + φ(x, y)) + noise. Takeda: FFT → keep one sideband → shift to the origin → inverse FFT → wrapped phase → unwrap. Four-step phase shifting uses four frames and no carrier.</p>
+  <div class="seg" id="e3seg"><button class="on" data-m="t">Takeda (one frame)</button><button data-m="p">Four-step phase shifting</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Phase amplitude (peak) <span id="e3av"></span></label><input type="range" id="e3a" min="1" max="30" step="0.5" value="12"></div>
+      <div class="ctl"><label>Noise σ (grey levels, b = 80) <span id="e3nv"></span></label><input type="range" id="e3n" min="0" max="40" step="0.5" value="6"></div>
+      <div id="e3ct"><div class="ctl"><label>Carrier period <span id="e3cv"></span></label><input type="range" id="e3c" min="3" max="12" step="0.1" value="5"></div>
+        <div class="ctl"><label>Filter radius (cycles/pixel) <span id="e3rv"></span></label><input type="range" id="e3r" min="0.02" max="0.3" step="0.005" value="0.15"></div></div>
+      <div class="eq">Takeda: φ_w = arg c(x, y)<br>4-step: φ = atan2(I₄ − I₂, I₁ − I₃), σ_φ ≈ σ/(b√2)</div>
+    </div>
+    <div>
+      <div class="cards" id="e3cards"></div>
+      <div class="cv-title" id="e3t1"></div>
+      <canvas id="e3img" height="300"></canvas>
+      <div class="cv-title">Central row: true phase (dashed) and recovered phase</div>
+      <canvas id="e3plot" height="190"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Takeda: shrink the filter radius to 0.03. Why does the phase lose detail? Enlarge it to 0.25 or more: why does the error rise again?</li>
+    <li>Increase the phase amplitude until the recovered phase breaks. Relate the limit to the carrier frequency (the sideband must not overlap the DC lobe).</li>
+    <li>Phase shifting: check that the error follows σ/(b√2). Why does phase shifting need no carrier?</li>
+    <li>Raise the noise to 35 grey levels. Where does simple unwrapping fail first?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الحامل يرفع معلومات الطور إلى ترددات بعيدة عن الخلفية، فيمكن فصلها بمرشح. لكن إذا تغيّر الطور بسرعة اتسع الفص الجانبي حتى يلامس الخلفية، فيفسد القياس.</div>
+</section>
+</main>
+
+<footer>All results are computed in your browser from the equations of Chapter 5 (Malacara & Servín, Interferogram Analysis for Optical Testing, 2nd ed.). The MATLAB versions of these experiments are Labs 5.1–5.3.</footer>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const C = { navy:'#0B1E3A', teal:'#0E8C9A', coral:'#E8604C', grey:'#5A6B7F', line:'#C9D6E0', gold:'#D99A1E' };
+const fmt = (v, d = 3) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : (+v.toFixed(d)).toString();
+function lenStr(m) { const a = Math.abs(m); if (a >= 1) return fmt(m, 3) + ' m'; if (a >= 1e-3) return fmt(m * 1e3, 3) + ' mm'; if (a >= 1e-6) return fmt(m * 1e6, 3) + ' µm'; return fmt(m * 1e9, 3) + ' nm'; }
+
+// ---- canvas helpers ----
+function prep(cv) {
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.getAttribute('height');
+  if (cv.width !== Math.round(w * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.clearRect(0, 0, w, h); return { g, w, h };
+}
+function nice(span) { const p = Math.pow(10, Math.floor(Math.log10(span / 5))); const m = span / 5 / p; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; }
+function plot(cv, series, o) {
+  const { g, w, h } = prep(cv); const L = 56, R = 12, T = 10, B = 38;
+  const x0 = o.xmin, x1 = o.xmax, y0 = o.ymin, y1 = o.ymax;
+  const X = x => L + (x - x0) / (x1 - x0) * (w - L - R), Y = y => h - B - (y - y0) / (y1 - y0) * (h - T - B);
+  g.font = '12px "Source Sans 3", Arial'; g.fillStyle = C.grey; g.strokeStyle = '#E6EDF2'; g.lineWidth = 1;
+  const dx = nice(x1 - x0), dy = nice(y1 - y0);
+  for (let t = Math.ceil(x0 / dx) * dx; t <= x1 + 1e-12; t += dx) { g.beginPath(); g.moveTo(X(t), T); g.lineTo(X(t), h - B); g.stroke(); g.textAlign = 'center'; g.fillText(+t.toPrecision(6), X(t), h - B + 15); }
+  for (let t = Math.ceil(y0 / dy) * dy; t <= y1 + 1e-12; t += dy) { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(w - R, Y(t)); g.stroke(); g.textAlign = 'right'; g.fillText(+t.toPrecision(6), L - 5, Y(t) + 4); }
+  g.strokeStyle = C.grey; g.strokeRect(L, T, w - L - R, h - T - B);
+  g.fillStyle = C.navy; g.textAlign = 'center'; g.fillText(o.xlabel || '', L + (w - L - R) / 2, h - 6);
+  g.save(); g.translate(13, T + (h - T - B) / 2); g.rotate(-Math.PI / 2); g.fillText(o.ylabel || '', 0, 0); g.restore();
+  g.save(); g.beginPath(); g.rect(L, T, w - L - R, h - T - B); g.clip();
+  for (const s of series) {
+    g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = s.width || 1.6; g.setLineDash(s.dash || []);
+    if (s.points) { for (let i = 0; i < s.x.length; i++) { g.beginPath(); g.arc(X(s.x[i]), Y(s.y[i]), s.r || 3.5, 0, 7); s.hollow ? g.stroke() : g.fill(); } }
+    else { g.beginPath(); for (let i = 0; i < s.x.length; i++) { const px = X(s.x[i]), py = Y(s.y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+  }
+  g.restore(); g.setLineDash([]);
+  if (o.legend) { let ly = o.legendBottom ? h - B - 10 - 16 * (series.filter(s => s.label).length - 1) : T + 8; g.textAlign = 'left'; for (const s of series) { if (!s.label) continue; g.fillStyle = s.color; g.fillRect(w - R - 190, ly - 5, 14, 3); g.fillStyle = C.navy; g.fillText(s.label, w - R - 170, ly); ly += 16; } }
+}
+function wl2rgb(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = -(nm - 440) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = -(nm - 510) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = -(nm - 645) / 65; } else r = 1;
+  const f = nm < 420 ? 0.3 + 0.7 * (nm - 380) / 40 : nm > 700 ? 0.3 + 0.7 * (780 - nm) / 80 : 1;
+  return [r * f, g * f, b * f];
+}
+function image(cv, nx, ny, fn, rgb) {   // fn(i,j) in [0,1]
+  const { g, w, h } = prep(cv); const im = g.createImageData(nx, ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const v = Math.max(0, Math.min(1, fn(i, j))), k = 4 * (j * nx + i);
+    im.data[k] = 255 * v * rgb[0]; im.data[k + 1] = 255 * v * rgb[1]; im.data[k + 2] = 255 * v * rgb[2]; im.data[k + 3] = 255; }
+  const tmp = document.createElement('canvas'); tmp.width = nx; tmp.height = ny; tmp.getContext('2d').putImageData(im, 0, 0);
+  g.imageSmoothingEnabled = true; return { g, w, h, tmp };
+}
+const linspace = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * i / (n - 1));
+
+// ---- tabs ----
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.exp').forEach(s => s.classList.toggle('on', s.id === b.dataset.t));
+  draw();
+});
+function cards(id, list) { $(id).innerHTML = list.map(c => '<div class="card ' + (c[2] || '') + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join(''); }
+function segs(id, cb) { document.querySelectorAll('#' + id + ' button').forEach(b => b.onclick = () => { document.querySelectorAll('#' + id + ' button').forEach(x => x.classList.toggle('on', x === b)); cb(b.dataset.m); draw(); }); }
+let seed = 7; const rnd = () => { seed = (seed + 0x6D2B79F5) | 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return (((t ^ (t >>> 14)) >>> 0) + 0.5) / 4294967296; };
+const randn = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+// ---- FFT (radix 2, in place) ----
+function fft(re, im, inv) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) { let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+  for (let len = 2; len <= n; len <<= 1) { const a = (inv ? 2 : -2) * Math.PI / len, wr = Math.cos(a), wi = Math.sin(a);
+    for (let i = 0; i < n; i += len) { let cr = 1, ci = 0; for (let k = 0; k < len / 2; k++) { const ur = re[i + k], ui = im[i + k], vr = re[i + k + len / 2] * cr - im[i + k + len / 2] * ci, vi = re[i + k + len / 2] * ci + im[i + k + len / 2] * cr;
+      re[i + k] = ur + vr; im[i + k] = ui + vi; re[i + k + len / 2] = ur - vr; im[i + k + len / 2] = ui - vi; const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t; } } }
+  if (inv) for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+}
+function fft2(re, im, n, inv) {
+  const r = new Float64Array(n), q = new Float64Array(n);
+  for (let y = 0; y < n; y++) { for (let x = 0; x < n; x++) { r[x] = re[y * n + x]; q[x] = im[y * n + x]; } fft(r, q, inv); for (let x = 0; x < n; x++) { re[y * n + x] = r[x]; im[y * n + x] = q[x]; } }
+  for (let x = 0; x < n; x++) { for (let y = 0; y < n; y++) { r[y] = re[y * n + x]; q[y] = im[y * n + x]; } fft(r, q, inv); for (let y = 0; y < n; y++) { re[y * n + x] = r[y]; im[y * n + x] = q[y]; } }
+}
+// colour maps and multi-panel images
+function jet(v) { v = Math.max(0, Math.min(1, v)); return [Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 3))), Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 2))), Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 1)))]; }
+function panels(cv, list) {   // list of {data, n, min, max, map:'gray'|'jet', title, circle:{cx,cy,r}}
+  const { g, w, h } = prep(cv); const k = list.length, gap = 10, top = 20, s = Math.min((w - gap * (k - 1)) / k, h - top);
+  const x0 = (w - (k * s + gap * (k - 1))) / 2;
+  list.forEach((p, i) => {
+    const tmp = document.createElement('canvas'); tmp.width = p.n; tmp.height = p.n; const c = tmp.getContext('2d'), im = c.createImageData(p.n, p.n);
+    for (let j = 0; j < p.n * p.n; j++) { const v = (p.data[j] - p.min) / (p.max - p.min || 1); const col = p.map === 'jet' ? jet(v) : [v, v, v].map(z => Math.max(0, Math.min(1, z))); im.data[4 * j] = 255 * col[0]; im.data[4 * j + 1] = 255 * col[1]; im.data[4 * j + 2] = 255 * col[2]; im.data[4 * j + 3] = 255; }
+    c.putImageData(im, 0, 0); const xx = x0 + i * (s + gap); g.imageSmoothingEnabled = false; g.drawImage(tmp, xx, top, s, s);
+    g.fillStyle = C.navy; g.font = '12.5px "Source Sans 3", Arial'; g.textAlign = 'center'; g.fillText(p.title, xx + s / 2, 14);
+    if (p.circle) { g.strokeStyle = '#FFD24D'; g.lineWidth = 1.5; g.beginPath(); g.arc(xx + p.circle.cx * s, top + p.circle.cy * s, p.circle.r * s, 0, 7); g.stroke(); }
+  });
+}
+
+// ================= Experiment 1 =================
+let m1 = 's', hann = false;
+segs('e1seg', m => { m1 = m; $('e1cs').style.display = m === 's' ? '' : 'none'; $('e1cf').style.display = m === 'f' ? '' : 'none'; });
+$('e1win').onclick = () => { hann = !hann; $('e1win').textContent = 'Hann window: ' + (hann ? 'on' : 'off'); draw(); };
+function e1() {
+  if (m1 === 's') {
+    const nm = +$('e1h').value; $('e1hv').textContent = String(nm);
+    const x = linspace(-1, 1, 3000), sq = x.map(v => (Math.abs(((v % 1) + 1) % 1 - 0.5) > 0.25 ? 1 : 0));
+    const ser = x.map(v => { let s = 0.5; for (let n = 1; n <= nm; n += 2) s += 2 / (n * Math.PI) * Math.sin(n * Math.PI / 2) * Math.cos(2 * Math.PI * n * v); return s; });
+    const over = (Math.max(...ser) - 1) * 100;
+    cards('e1cards', [['Harmonics used', String((nm + 1) / 2) + ' odd terms'], ['Overshoot', over.toFixed(2) + ' % of the jump', 'ok'], ['Gibbs limit', '8.95 %', 'th']]);
+    $('e1t1').textContent = 'Square-wave fringes (grey) and the partial Fourier sum'; $('e1t2').textContent = 'Fourier coefficients c_n';
+    plot($('e1a'), [{ x, y: sq, color: C.grey, width: 1 }, { x, y: ser, color: C.teal, width: 1.8 }], { xmin: -1, xmax: 1, ymin: -0.2, ymax: 1.2, xlabel: 'x / p', ylabel: 'Irradiance' });
+    const nn = [], cc = []; for (let n = 1; n <= 99; n++) { nn.push(n); cc.push(n % 2 ? 2 / (n * Math.PI) * Math.sin(n * Math.PI / 2) : 0); }
+    plot($('e1b'), [{ x: nn.filter(n => n <= nm), y: cc.filter((_, i) => nn[i] <= nm), color: C.coral, points: true, r: 4 }, { x: nn, y: cc, color: C.grey, points: true, r: 2, hollow: true }], { xmin: 0, xmax: 100, ymin: -0.3, ymax: 0.7, xlabel: 'Harmonic n', ylabel: 'c_n' });
+  } else {
+    const F = +$('e1f').value, w = +$('e1w').value, N = 1024; $('e1fv').textContent = F.toFixed(2); $('e1wv').textContent = String(w);
+    seed = 3; const x = Array.from({ length: N }, (_, i) => i), I = x.map(i => 1 + 0.8 * Math.cos(2 * Math.PI * F * i / N + 1.5 * Math.exp(-(((i - 600) / 120) ** 2))) + 0.15 * randn());
+    // circular moving average
+    const S = I.map((_, i) => { let s = 0; for (let k = 0; k < w; k++) s += I[(i - Math.floor(w / 2) + k + N) % N]; return s / w; });
+    const spec = arr => { const re = Float64Array.from(arr.map((v, i) => (v - 1) * (hann ? 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N) : 1))), im = new Float64Array(N); fft(re, im); return Array.from({ length: N / 2 }, (_, k) => Math.hypot(re[k], im[k]) / N * 2); };
+    const P = spec(I), Ps = spec(S); const kk = Array.from({ length: N / 2 }, (_, k) => k);
+    const H = kk.map(k => k === 0 ? 1 : Math.abs(Math.sin(Math.PI * k * w / N) / (w * Math.sin(Math.PI * k / N))));
+    const kp = P.indexOf(Math.max(...P.slice(2)));
+    const cnt = P.filter(v => v > 0.05 * P[kp]).length;
+    cards('e1cards', [['Frequency step 1/L', '1 fringe per line'], ['Peak bin', String(kp), 'ok'], ['Bins above 5 % of the peak', String(cnt), 'th'], ['H at the carrier', H[Math.round(F)].toFixed(3)], ['First zero of H', 'f = N/w = ' + fmt(N / w, 3) + ' fringes']]);
+    $('e1t1').textContent = 'Fringe line (grey), smoothed by the moving average (teal)'; $('e1t2').textContent = 'Spectrum magnitude: original (navy), smoothed (teal), |H(f)| (dashed, scaled to the peak)';
+    plot($('e1a'), [{ x, y: I, color: C.grey, width: 0.8 }, { x, y: S, color: C.teal, width: 1.6 }], { xmin: 0, xmax: N - 1, ymin: -0.5, ymax: 2.5, xlabel: 'Sample', ylabel: 'I' });
+    const pk = Math.max(...P.slice(2));
+    plot($('e1b'), [{ x: kk, y: P, color: C.navy, width: 1.4 }, { x: kk, y: Ps, color: C.teal, width: 1.4 }, { x: kk, y: H.map(v => v * pk), color: C.coral, dash: [5, 4], width: 1.2 }], { xmin: 0, xmax: Math.min(512, Math.max(120, 3 * F)), ymin: 0, ymax: pk * 1.1, xlabel: 'Frequency  [fringes per line]', ylabel: '|FFT|' });
+  }
+}
+
+// ================= Experiment 2 =================
+let gmode = 'n', fmode = 'n', hp = false;
+segs('e2g', m => gmode = m); segs('e2f', m => fmode = m);
+$('e2hp').onclick = () => { hp = !hp; $('e2hp').textContent = 'Background removal (high-pass): ' + (hp ? 'on' : 'off'); draw(); };
+function conv2(src, n, ker, kr) { const out = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { let s = 0, ws = 0; for (let j = -kr; j <= kr; j++) for (let i = -kr; i <= kr; i++) { const xx = x + i, yy = y + j; if (xx < 0 || yy < 0 || xx >= n || yy >= n) continue; const k = ker(i, j); s += k * src[yy * n + xx]; ws += k; } out[y * n + x] = s / ws; } return out; }
+function e2() {
+  const n = 160, sn = +$('e2n').value, pi = +$('e2p').value, sz = +$('e2s').value;
+  $('e2nv').textContent = sn.toFixed(3); $('e2pv').textContent = (pi * 100).toFixed(1) + ' %'; $('e2sv').textContent = sz.toFixed(1);
+  seed = 11; const clean = new Float64Array(n * n), bg = new Float64Array(n * n), raw = new Float64Array(n * n);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const u = (x - n / 2) / (n / 2), v = (y - n / 2) / (n / 2), r2 = u * u + v * v;
+    const b0 = 0.35 + 0.15 * u, fr = 0.5 + 0.5 * Math.cos(2 * Math.PI * 6 * r2); bg[y * n + x] = b0;
+    clean[y * n + x] = b0 + 0.25 * fr; let val = clean[y * n + x] + sn * randn(); const q = rnd(); if (q < pi / 2) val = 0; else if (q < pi) val = 1; raw[y * n + x] = Math.round(Math.max(0, Math.min(1, val)) * 255) / 255; }
+  let img = Float64Array.from(raw); const kr = Math.ceil(2 * sz);
+  if (fmode === 'm') img = conv2(img, n, () => 1, Math.round(sz));
+  else if (fmode === 'g') img = conv2(img, n, (i, j) => Math.exp(-(i * i + j * j) / (2 * sz * sz)), kr);
+  else if (fmode === 'd') { const r = Math.round(sz), out = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const a = []; for (let j = -r; j <= r; j++) for (let i = -r; i <= r; i++) { const xx = Math.min(n - 1, Math.max(0, x + i)), yy = Math.min(n - 1, Math.max(0, y + j)); a.push(img[yy * n + xx]); } a.sort((p, q) => p - q); out[y * n + x] = a[a.length >> 1]; } img = out; }
+  let ref = clean;
+  if (hp) { const low = conv2(img, n, (i, j) => Math.exp(-(i * i + j * j) / (2 * 64)), 16); img = img.map((v, i) => v - low[i] + 0.5); const lowc = conv2(clean, n, (i, j) => Math.exp(-(i * i + j * j) / (2 * 64)), 16); ref = clean.map((v, i) => v - lowc[i] + 0.5); }
+  const err = Math.sqrt(img.reduce((a, v, i) => a + (v - ref[i]) ** 2, 0) / (n * n));
+  const errRaw = Math.sqrt(raw.reduce((a, v, i) => a + (v - clean[i]) ** 2, 0) / (n * n));
+  let disp = Float64Array.from(img);
+  const sorted = Array.from(disp).sort((a, b) => a - b);
+  if (gmode === 's') { const lo = sorted[Math.floor(0.01 * sorted.length)], hi = sorted[Math.floor(0.99 * sorted.length)]; disp = disp.map(v => (v - lo) / (hi - lo)); }
+  else if (gmode === 'e') { disp = disp.map(v => { let lo = 0, hi = sorted.length; while (lo < hi) { const m = (lo + hi) >> 1; if (sorted[m] <= v) lo = m + 1; else hi = m; } return lo / sorted.length; }); }
+  panels($('e2img'), [{ data: raw, n, min: 0, max: 1, title: 'raw' }, { data: disp, n, min: 0, max: 1, title: 'processed' }]);
+  const hist = arr => { const h = new Array(64).fill(0); arr.forEach(v => h[Math.max(0, Math.min(63, Math.floor(v * 64)))]++); return h.map(c => c / arr.length); };
+  const hr = hist(raw), hd = hist(disp.map(v => Math.max(0, Math.min(0.9999, v)))); const cx = Array.from({ length: 64 }, (_, i) => (i + 0.5) / 64);
+  cards('e2cards', [['RMS error raw', errRaw.toFixed(4)], ['RMS error after filter', err.toFixed(4), 'ok'], ['Improvement', (errRaw / err).toFixed(2) + ' ×', 'th']]);
+  plot($('e2hist'), [{ x: cx, y: hd, color: C.coral, width: 2 }], { xmin: 0, xmax: 1, ymin: 0, ymax: Math.max(...hr, ...hd) * 1.1, xlabel: 'Grey level (0 … 1)', ylabel: 'Fraction of pixels' });
+  const g = $('e2hist').getContext('2d'), rr = window.devicePixelRatio || 1, w = $('e2hist').width / rr, h = $('e2hist').height / rr; const L = 56, R = 12, T = 10, B = 38, ym = Math.max(...hr, ...hd) * 1.1;
+  g.fillStyle = 'rgba(14,140,154,0.4)'; hr.forEach((v, i) => { const x0 = L + i / 64 * (w - L - R), bw = (w - L - R) / 64 * 0.9, y = h - B - v / ym * (h - T - B); g.fillRect(x0, y, bw, h - B - y); });
+}
+
+// ================= Experiment 3 =================
+let m3 = 't'; segs('e3seg', m => { m3 = m; $('e3ct').style.display = m === 't' ? '' : 'none'; });
+function unwrapRow(a) { const o = [a[0]]; for (let i = 1; i < a.length; i++) { let d = a[i] - a[i - 1]; d -= 2 * Math.PI * Math.round(d / (2 * Math.PI)); o.push(o[i - 1] + d); } return o; }
+function unwrap2(w, n) { // centre-out: centre column first, then each row from the centre to both edges
+  const c = n >> 1, wrap = d => d - 2 * Math.PI * Math.round(d / (2 * Math.PI)), out = new Float64Array(n * n);
+  out[c * n + c] = w[c * n + c];
+  for (let y = c + 1; y < n; y++) out[y * n + c] = out[(y - 1) * n + c] + wrap(w[y * n + c] - w[(y - 1) * n + c]);
+  for (let y = c - 1; y >= 0; y--) out[y * n + c] = out[(y + 1) * n + c] + wrap(w[y * n + c] - w[(y + 1) * n + c]);
+  for (let y = 0; y < n; y++) {
+    for (let x = c + 1; x < n; x++) out[y * n + x] = out[y * n + x - 1] + wrap(w[y * n + x] - w[y * n + x - 1]);
+    for (let x = c - 1; x >= 0; x--) out[y * n + x] = out[y * n + x + 1] + wrap(w[y * n + x] - w[y * n + x + 1]);
+  }
+  return out;
+}
+function e3() {
+  const n = 128, A = +$('e3a').value, sg = +$('e3n').value, per = +$('e3c').value, rad = +$('e3r').value, a = 100, b = 80;
+  $('e3av').textContent = A.toFixed(1) + ' rad'; $('e3nv').textContent = sg.toFixed(1); $('e3cv').textContent = per.toFixed(1) + ' px'; $('e3rv').textContent = rad.toFixed(3);
+  const phi = new Float64Array(n * n);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const u = 3 * (x - n / 2) / (n / 2), v = 3 * (y - n / 2) / (n / 2);
+    phi[y * n + x] = A / 8 * (3 * (1 - u) ** 2 * Math.exp(-u * u - (v + 1) ** 2) - 10 * (u / 5 - u ** 3 - v ** 5) * Math.exp(-u * u - v * v) - 1 / 3 * Math.exp(-((u + 1) ** 2) - v * v)); }
+  seed = 21; let rec, wr, I0, specImg = null, circle = null;
+  if (m3 === 't') {
+    const f0 = 1 / per; I0 = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) I0[y * n + x] = a + b * Math.cos(2 * Math.PI * f0 * x + phi[y * n + x]) + sg * randn();
+    const re = Float64Array.from(I0), im = new Float64Array(n * n); fft2(re, im, n, false);
+    specImg = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const ys = (y + n / 2) % n, xs = (x + n / 2) % n; specImg[ys * n + xs] = Math.log10(1 + Math.hypot(re[y * n + x], im[y * n + x])); }
+    // keep sideband at +f0, shift to origin
+    const kx0 = Math.round(f0 * n), R2 = (rad * n) ** 2, re2 = new Float64Array(n * n), im2 = new Float64Array(n * n);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const fy = y < n / 2 ? y : y - n, fx = x < n / 2 ? x : x - n; if ((fx - kx0) ** 2 + fy * fy <= R2) { const xn = ((fx - kx0) + n) % n; re2[y * n + xn] = re[y * n + x]; im2[y * n + xn] = im[y * n + x]; } }
+    fft2(re2, im2, n, true);
+    // remove the residual carrier error (kx0 vs f0*n)
+    wr = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { let p = Math.atan2(im2[y * n + x], re2[y * n + x]) + 2 * Math.PI * (kx0 - f0 * n) * x / n; wr[y * n + x] = Math.atan2(Math.sin(p), Math.cos(p)); }
+    circle = { cx: (kx0 + n / 2) / n, cy: 0.5, r: rad };
+  } else {
+    const fr = [0, 1, 2, 3].map(k => Float64Array.from(phi, (p, i) => a + b * Math.cos(p + k * Math.PI / 2) + sg * randn()));
+    I0 = fr[0]; wr = new Float64Array(n * n); for (let i = 0; i < n * n; i++) wr[i] = Math.atan2(fr[3][i] - fr[1][i], fr[0][i] - fr[2][i]);
+  }
+  rec = unwrap2(wr, n);
+  // remove piston and compare within the central 80 %
+  let num = 0, cnt = 0, off = 0; const inside = (x, y) => x > 0.1 * n && x < 0.9 * n && y > 0.1 * n && y < 0.9 * n;
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (inside(x, y)) { off += rec[y * n + x] - phi[y * n + x]; cnt++; } off /= cnt;
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (inside(x, y)) num += (rec[y * n + x] - off - phi[y * n + x]) ** 2;
+  const rms = Math.sqrt(num / cnt);
+  const pmin = Math.min(...phi), pmax = Math.max(...phi);
+  const list = [{ data: I0, n, min: a - b - 2 * sg, max: a + b + 2 * sg, title: m3 === 't' ? 'interferogram' : 'frame 1 of 4' }];
+  if (specImg) list.push({ data: specImg, n, min: Math.min(...specImg), max: Math.max(...specImg), title: 'log |FFT| + filter', circle });
+  list.push({ data: wr, n, min: -Math.PI, max: Math.PI, title: 'wrapped phase' }, { data: rec.map(v => v - off), n, min: pmin, max: pmax, map: 'jet', title: 'unwrapped phase' });
+  panels($('e3img'), list);
+  $('e3t1').textContent = m3 === 't' ? 'Interferogram → spectrum and sideband filter → wrapped → unwrapped phase' : 'Phase shifting: one of the four frames → wrapped → unwrapped phase';
+  const extra = m3 === 'p' ? [['σ/(b√2)', (sg / (b * Math.SQRT2)).toFixed(4) + ' rad', 'th']] : [['Carrier frequency', (1 / per).toFixed(3) + ' cycles/px'], ['Max local phase frequency', fmt(maxGrad(phi, n) / (2 * Math.PI), 3) + ' cycles/px']];
+  cards('e3cards', [['RMS phase error', rms.toFixed(4) + ' rad', 'ok'], ...extra]);
+  const yc = n / 2, xr = Array.from({ length: n }, (_, x) => x);
+  plot($('e3plot'), [{ x: xr, y: xr.map(x => phi[yc * n + x]), color: C.navy, dash: [6, 4], width: 1.5 }, { x: xr, y: xr.map(x => rec[yc * n + x] - off), color: C.coral, width: 1.5 }], { xmin: 0, xmax: n - 1, ymin: Math.min(pmin, ...xr.map(x => rec[yc * n + x] - off)) - 0.5, ymax: Math.max(pmax, ...xr.map(x => rec[yc * n + x] - off)) + 0.5, xlabel: 'x  [pixels]', ylabel: 'φ  [rad]' });
+}
+function maxGrad(p, n) { let m = 0; for (let y = 1; y < n; y++) for (let x = 1; x < n; x++) m = Math.max(m, Math.hypot(p[y * n + x] - p[y * n + x - 1], p[y * n + x] - p[(y - 1) * n + x])); return m; }
+
+function draw() { const t = document.querySelector('.exp.on').id; if (t === 'e1') e1(); else if (t === 'e2') e2(); else e3(); }
+document.querySelectorAll('input[type=range]').forEach(r => r.oninput = draw);
+window.addEventListener('resize', draw);
+draw();
+</script>
+<script>(function(){var b=document.querySelector('nav button[data-t="e1"]'); if(b) b.click();})();</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

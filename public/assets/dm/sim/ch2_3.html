@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Queue explorer · DMP Ch2</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 2 · SIMULATOR 3</small><h1>Queue explorer: an optical switch output port</h1></header>
+<div class="wrap">
+<div class="grid">
+ <div class="card">
+  <canvas id="tr" width="800" height="300"></canvas>
+  <div class="eq">W<sub>Q,n+1</sub> = max(0, W<sub>Q,n</sub> + S<sub>n</sub> − A<sub>n+1</sub>)   ·   P–K: W<sub>Q</sub> = ρ(1 + c<sub>s</sub><sup>2</sup>) / [2μ(1 − ρ)]</div>
+  <label>Utilization ρ = λ/μ: <span class="val" id="rv"></span></label><input type="range" id="rho" min="0.1" max="0.97" step="0.01" value="0.8">
+  <label>Service-time distribution</label>
+  <button data-s="D" class="main">Constant (D), c<sub>s</sub><sup>2</sup> = 0</button><button data-s="M">Exponential (M), c<sub>s</sub><sup>2</sup> = 1</button><button data-s="H">Bursty (H<sub>2</sub>), c<sub>s</sub><sup>2</sup> = 4</button>
+  <label>Packets simulated: <span class="val" id="nv"></span></label><input type="range" id="n" min="3" max="6" step="0.5" value="5">
+  <button class="main" id="go">Simulate</button>
+  <div class="stats">
+   <div class="s"><span>Simulated W<sub>Q</sub></span><b id="q1">—</b></div>
+   <div class="s"><span>Theory W<sub>Q</sub></span><b id="q2">—</b></div>
+   <div class="s"><span>Max wait seen</span><b id="q3">—</b></div>
+  </div>
+  <div class="eq" style="font-size:14px">Time unit: mean service time 1/μ. Example: 1/μ = 1.2 ms and ρ = 0.96 is the lecture switch port.</div>
+ </div>
+ <div class="card">
+  <canvas id="th" width="800" height="420"></canvas>
+  <div class="ar">لاحظ أن الانتظار ينفجر عندما يقترب ρ من الواحد رغم أن الخادم ليس محمّلاً فوق طاقته في المتوسط. وعند الحمل نفسه يقلّ الانتظار إلى النصف عندما تكون الرزم متساوية الطول، ويتضاعف تقريباً مع الحركة المتفجرة.</div>
+ </div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let sv='D',last=null;
+const cs2={D:0,M:1,H:4};
+const exp1=()=>-Math.log(1-Math.random());
+function serv(){if(sv==='D')return 1;if(sv==='M')return exp1();
+ // H2 with mean 1 and cs2 = 4 (balanced means): p = 0.5(1 + sqrt((c2-1)/(c2+1)))
+ const p=0.5*(1+Math.sqrt(3/5));return Math.random()<p?exp1()/(2*p):exp1()/(2*(1-p))}
+const theo=(r,c2)=>r*(1+c2)/(2*(1-r));
+document.querySelectorAll('button[data-s]').forEach(b=>b.onclick=()=>{sv=b.dataset.s;document.querySelectorAll('button[data-s]').forEach(x=>x.classList.toggle('main',x===b));run()});
+$('rho').oninput=()=>{$('rv').textContent=(+$('rho').value).toFixed(2);drawT()};
+$('n').oninput=()=>$('nv').textContent=Math.round(10**+$('n').value).toLocaleString();
+function run(){const r=+$('rho').value,N=Math.round(10**+$('n').value),lam=r;let w=0,sum=0,mx=0;const keep=Math.min(N,600),tr=[];const run=[];
+ for(let i=0;i<N;i++){const S=serv(),A=exp1()/lam;if(i<keep)tr.push(w);sum+=w;mx=Math.max(mx,w);if(i%Math.max(1,Math.floor(N/300))===0)run.push([i+1,sum/(i+1)]);w=Math.max(0,w+S-A)}
+ last={r,sim:sum/N,s:sv};$('q1').textContent=(sum/N).toFixed(2);$('q2').textContent=theo(r,cs2[sv]).toFixed(2);$('q3').textContent=mx.toFixed(1);
+ const g=$('tr').getContext('2d');g.clearRect(0,0,800,300);const ym=Math.max(...tr,1)*1.1;g.strokeStyle='#5A5650';g.beginPath();g.moveTo(50,10);g.lineTo(50,270);g.lineTo(790,270);g.stroke();
+ g.strokeStyle='#E07B1A';g.lineWidth=1.5;g.beginPath();tr.forEach((v,i)=>{const x=50+i/keep*740,y=270-v/ym*255;i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke();g.lineWidth=1;
+ g.fillStyle='#5A5650';g.font='14px Calibri';g.fillText('waiting time of the first '+keep+' packets (units of 1/μ)',60,22);g.fillText(ym.toFixed(1),8,18);g.fillText('0',30,272);
+ const t=theo(r,cs2[sv]);g.strokeStyle='#2E6F8E';g.setLineDash([6,4]);g.beginPath();g.moveTo(50,270-t/ym*255);g.lineTo(790,270-t/ym*255);g.stroke();g.setLineDash([]);
+ drawT()}
+function drawT(){const c=$('th').getContext('2d'),W=800,H=420;c.clearRect(0,0,W,H);const x0=60,y0=H-40,ymax=20;
+ c.strokeStyle='#5A5650';c.beginPath();c.moveTo(x0,10);c.lineTo(x0,y0);c.lineTo(W-10,y0);c.stroke();c.fillStyle='#5A5650';c.font='14px Calibri';
+ const X=r=>x0+r*(W-x0-20),Y=w=>y0-Math.min(w,ymax)/ymax*(y0-15);
+ for(let w=0;w<=ymax;w+=5)c.fillText(w,30,Y(w)+5);for(let r=0;r<=1.001;r+=0.2)c.fillText(r.toFixed(1),X(r)-8,y0+18);c.fillText('utilization ρ',W/2-30,H-5);
+ const col={D:'#2E6F8E',M:'#1E1E22',H:'#E07B1A'},nm={D:'M/D/1',M:'M/M/1',H:'M/H₂/1'};
+ Object.keys(cs2).forEach((k,j)=>{c.strokeStyle=col[k];c.lineWidth=2.5;c.beginPath();let st=false;for(let r=0.01;r<0.995;r+=0.005){const w=theo(r,cs2[k]);if(w>ymax)break;st?c.lineTo(X(r),Y(w)):c.moveTo(X(r),Y(w));st=true}c.stroke();c.fillStyle=col[k];c.fillText(nm[k],x0+20,30+j*20)});c.lineWidth=1;
+ const r=+$('rho').value;c.strokeStyle='#8C8C84';c.setLineDash([4,4]);c.beginPath();c.moveTo(X(r),10);c.lineTo(X(r),y0);c.stroke();c.setLineDash([]);
+ if(last){c.fillStyle=col[last.s];c.beginPath();c.arc(X(last.r),Y(last.sim),7,0,7);c.fill();c.strokeStyle='#fff';c.stroke()}
+ c.fillStyle='#1E1E22';c.fillText('mean wait W_Q (units of 1/μ) — lines: theory, dot: your simulation',x0+150,30)}
+$('go').onclick=run;$('rho').oninput();$('n').oninput();run();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f4"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

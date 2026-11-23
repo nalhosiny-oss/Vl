@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 4 — Optical Detection</title><style>
+:root{--mid:#101634;--mag:#C2185B;--pink:#E7B3C8;--pk2:#FBEAF0;--lt:#F6F6F9;--sl:#5B6380;--line:#D6D8E4;--teal:#1F8A9E;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--lt);color:var(--mid);font-family:Calibri,"Source Sans 3","Segoe UI",Arial,sans-serif;font-size:16px}
+header{background:var(--mid);color:#fff;padding:18px 22px 14px;position:relative;overflow:hidden}
+header .lat{position:absolute;right:-10px;top:-10px;width:260px;height:120px;opacity:.55;
+ background-image:radial-gradient(circle,rgba(231,179,200,.9) 0 4px,transparent 5px);background-size:22px 22px}
+header h1{font-family:Cambria,Georgia,serif;margin:0;font-size:23px;position:relative}
+header p{margin:4px 0 0;color:#E7B3C8;font-size:14.5px;position:relative}
+nav{display:flex;gap:6px;flex-wrap:wrap;padding:12px 22px 0}
+nav button{border:1px solid var(--line);background:#fff;color:var(--mid);padding:9px 14px;border-radius:10px 10px 0 0;font:inherit;font-weight:600;cursor:pointer}
+nav button.on{background:var(--mag);color:#fff;border-color:var(--mag)}
+main{padding:0 22px 26px}
+.exp{display:none;background:#fff;border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:16px}
+.exp.on{display:block}
+.grid{display:grid;grid-template-columns:310px 1fr;gap:16px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+h2{font-family:Cambria,Georgia,serif;font-size:19px;margin:0 0 6px}
+.lead{color:var(--sl);margin:0 0 12px;font-size:14.5px}
+.panel{background:var(--pk2);border-radius:10px;padding:12px}
+.ctl{margin-bottom:11px}
+.ctl label{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600}
+.ctl label i{font-style:normal}
+.ctl label span{color:var(--mag);font-variant-numeric:tabular-nums;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--mag)}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.btns button{border:1px solid var(--mag);background:#fff;color:var(--mag);border-radius:16px;padding:4px 11px;font:inherit;font-size:13.5px;cursor:pointer}
+.btns button:hover,.btns button.on{background:var(--mag);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:0 0 10px}
+.card{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:#fff}
+.card b{display:block;font-size:12.5px;color:var(--sl);font-weight:600}
+.card span{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.card.ok span{color:var(--teal)} .card.th span{color:var(--mag)}
+canvas{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:8px}
+.cv-title{font-size:13.5px;font-weight:600;color:var(--sl);margin:10px 0 4px}
+.eq{font-family:Cambria,Georgia,serif;background:#fff;border-left:3px solid var(--mag);padding:6px 10px;margin:8px 0;font-size:15px;line-height:1.55}
+.tasks{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.tasks h3{font-size:15.5px;margin:0 0 4px}
+.tasks ol{margin:0;padding-left:20px;font-size:14.5px}.tasks li{margin:3px 0}
+.ar{direction:rtl;text-align:right;font-family:"Traditional Arabic","Noto Naskh Arabic",Tahoma,Arial,serif;background:#FFF5F9;border-right:4px solid var(--mag);border-radius:8px;padding:9px 12px;margin-top:12px;font-size:16px;line-height:1.8}
+.ar b{color:var(--mag)}
+footer{color:var(--sl);font-size:13px;padding:0 22px 18px}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><div class="lat"></div><h1>Virtual Lab · Chapter 4 — Optical Detection</h1>
+<p>Optoelectronics (203675-3) · MSc in Physics · Prof. Najm Al-Hosiny</p></header>
+<nav><button class="on" data-t="e1">1 · Absorption and p-i-n bandwidth</button><button data-t="e2">2 · Noise, SNR and APD gain</button><button data-t="e3">3 · BER and sensitivity</button></nav><main><section class="exp on" id="e1">
+<h2>Experiment 1 — Absorption, quantum efficiency and the p-i-n bandwidth trade-off</h2><p class="lead">A thicker absorber collects more light but carriers take longer to cross it; a thinner one has more capacitance. The best width balances the transit-time and RC limits.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Absorber thickness W [µm]</i> <span id="e1Wv"></span></label><input type="range" id="e1W" min="0.2" max="5" step="0.01" value="1"></div><div class="ctl"><label><i>Diode diameter D [µm]</i> <span id="e1Dv"></span></label><input type="range" id="e1D" min="5" max="100" step="0.5" value="20"></div><div class="ctl"><label><i>Load resistance R<sub>L</sub> [Ω]</i> <span id="e1Rv"></span></label><input type="range" id="e1R" min="10" max="200" step="1" value="50"></div><div class="ctl"><label><i>Wavelength λ [µm]</i> <span id="e1lv"></span></label><input type="range" id="e1l" min="0.9" max="1.7" step="0.005" value="1.55"></div><div class="eq">InGaAs: E<sub>g</sub> = 0.75 eV, α(1.55 µm) = 0.8 µm⁻¹, v<sub>sat</sub> = 5×10⁴ m/s, ε<sub>r</sub> = 13.9<br>η = 1 − e<sup>−αW</sup>, R = ηλ[µm]/1.24<br>f<sub>tr</sub> = 0.45v<sub>sat</sub>/W, f<sub>RC</sub> = 1/(2πR<sub>L</sub>C), C = εA/W<br>W<sub>opt</sub> = √(0.45v<sub>sat</sub>·2πR<sub>L</sub>εA)</div></div>
+<div><div class="cards" id="e1cards"></div><div class="cv-title" id="e1st">Responsivity spectrum for the current W (dashed: η = 1)</div><canvas id="e1s" height="210"></canvas><div class="cv-title" id="e1bt">Bandwidth versus absorber thickness (dot: current W)</div><canvas id="e1b" height="220"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>For W = 1, 2 and 3 µm, read η and R at 1.55 µm. Why does R saturate?</li><li>Find the cut-off wavelength. Why does InGaAs not respond at 1.7 µm?</li><li>Compare the numerical optimum W with W<sub>opt</sub>. What is the maximum bandwidth for D = 20 µm?</li><li>Halve the diameter. How do W<sub>opt</sub> and the maximum bandwidth change? Why do fast photodiodes have tiny areas?</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> الطبقة الماصّة السميكة تلتقط فوتونات أكثر، لكن الإلكترونات والفجوات تحتاج وقتاً أطول لعبورها. والطبقة الرقيقة سريعة العبور لكن سعتها كبيرة فتُبطئ الدائرة. والسُّمك الأمثل هو الذي يتساوى عنده الحدّان.</div></section><section class="exp" id="e2">
+<h2>Experiment 2 — Receiver noise, SNR and the optimum avalanche gain</h2><p class="lead">A p-i-n receiver is thermal-limited at low power (SNR ∝ P²) and shot-limited at high power (SNR ∝ P). Avalanche gain helps until the multiplied shot noise, enlarged by the excess factor F(M), takes over.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Optical power log₁₀(P/W)</i> <span id="e2Pv"></span></label><input type="range" id="e2P" min="-8" max="-2" step="0.01" value="-6"></div><div class="ctl"><label><i>Ionisation ratio k</i> <span id="e2kv"></span></label><input type="range" id="e2k" min="0.01" max="0.6" step="0.005" value="0.1"></div><div class="ctl"><label><i>APD gain M</i> <span id="e2Mv"></span></label><input type="range" id="e2M" min="1" max="100" step="0.5" value="10"></div><div class="eq">R = 0.9 A/W, I<sub>d</sub> = 10 nA, B = 10 GHz, R<sub>f</sub> = 1 kΩ, F<sub>n</sub> = 2<br>SNR = (MRP)²/[2q(RP + I<sub>d</sub>)M²F(M)B + 4k<sub>B</sub>TBF<sub>n</sub>/R<sub>f</sub>]<br>F(M) = kM + (1 − k)(2 − 1/M)<br>M<sub>opt</sub> ≈ [4k<sub>B</sub>TF<sub>n</sub>/(kqR<sub>f</sub>(RP + I<sub>d</sub>))]<sup>1/3</sup></div></div>
+<div><div class="cards" id="e2cards"></div><div class="cv-title" id="e2at">p-i-n SNR versus power (dot: current P)</div><canvas id="e2a" height="220"></canvas><div class="cv-title" id="e2bt">APD SNR versus gain at the current P and k (dot: current M)</div><canvas id="e2b" height="220"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>At P = 10 µW, is the p-i-n receiver thermal- or shot-limited? Where do the two asymptotes cross?</li><li>At P = 1 µW, compare the optimum gain for k = 0.02 (Si), 0.1 and 0.5 (InGaAs/InP). Why does a small k help?</li><li>Check the numerical M<sub>opt</sub> against the cube-root formula.</li><li>At P = 1 mW, does the APD still improve the SNR? Explain.</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> الضجيج الحراري ثابت لا يتغير مع الإشارة، فإذا كبّر الثنائي الانهياري الإشارة تجاوزتْه. لكن التضخيم نفسه عشوائي فيكبّر ضجيج الطلقات أكثر من الإشارة، فهناك كسب أمثل لا ينفع تجاوزه.</div></section><section class="exp" id="e3">
+<h2>Experiment 3 — Bit-error ratio, Q factor and receiver sensitivity</h2><p class="lead">For on-off keying with Gaussian noise, BER = ½ erfc(Q/√2) with Q = (I₁ − I₀)/(σ₁ + σ₀). The sensitivity is the average power that gives Q = 6 (BER = 10⁻⁹).</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Q factor</i> <span id="e3qv"></span></label><input type="range" id="e3q" min="1" max="8" step="0.01" value="4"></div><div class="ctl"><label><i>Bit rate log₁₀(R<sub>b</sub> / bit s⁻¹)</i> <span id="e3bv"></span></label><input type="range" id="e3b" min="9" max="11" step="0.01" value="10"></div><div class="eq">BER = ½ erfc(Q/√2)<br>σ<sub>T</sub>² = 4k<sub>B</sub>TBF<sub>n</sub>/R<sub>f</sub>, B = R<sub>b</sub>/2<br>σ₁² = 2qM²F(M)(2RP̄)B + σ<sub>T</sub>²<br>APD: k = 0.1, M optimised at each bit rate</div></div>
+<div><div class="cards" id="e3cards"></div><div class="cv-title" id="e3et">Noisy NRZ eye diagram at the current Q</div><canvas id="e3e" height="220"></canvas><div class="cv-title" id="e3st">Sensitivity (Q = 6) versus bit rate: p-i-n and optimised APD (dot: current R_b)</div><canvas id="e3s" height="220"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Monte Carlo: at Q = 3 and Q = 4 compare the counted BER with theory.</li><li>Which Q gives BER = 10⁻¹²? How many dB more SNR is this than Q = 6?</li><li>At 10 Gb/s, how many dB better is the APD receiver than the p-i-n? What is the optimum gain?</li><li>How does the p-i-n sensitivity scale with bit rate (dB per decade)? Explain from σ<sub>T</sub> ∝ √B.</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> معامل Q هو المسافة بين مستويي الواحد والصفر مقيسة بوحدات الضجيج. وبما أن ذيل التوزيع الغاوسي يتلاشى بسرعة هائلة، فإن زيادة Q قليلاً تخفض معدل الخطأ آلاف المرات.</div></section></main>
+<footer>All results are computed in your browser from the equations of Chapter 4 (Agrawal, Fiber-Optic Communication Systems; Saleh &amp; Teich). The MATLAB versions of these experiments are Labs 4.1–4.3.</footer>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const C={mid:'#101634',mag:'#C2185B',sl:'#5B6380',pink:'#E7B3C8',teal:'#1F8A9E',gold:'#D99A1E',green:'#3E8E41',grey:'#9AA0B5'};
+const PAL=[C.mag,C.teal,C.gold,C.mid,C.green,C.sl];
+const fmt=(v,d=3)=>{if(!isFinite(v))return '—';const a=Math.abs(v);return (a>=1e4||(a<1e-3&&v!==0))?v.toExponential(2).replace('e','×10^').replace(/\^\+?(-?\d+)/,(m,e)=>sup(e)):(+v.toPrecision(d)).toString()};
+function sup(e){const m={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};return String(e).split('').map(c=>m[c]||c).join('')}
+const linspace=(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+const logspace=(a,b,n)=>linspace(a,b,n).map(v=>Math.pow(10,v));
+const val=id=>+$(id).value;
+function show(id,t){$(id+'v').textContent=t}
+const subs=t=>String(t).replace(/_\{([^}]+)\}|_([A-Za-z0-9α-ωΑ-Ω]+)/g,(m,a,b)=>'<sub>'+(a||b)+'</sub>');
+function cards(id,list){$(id).innerHTML=list.map(c=>'<div class="card '+(c[2]||'')+'"><b>'+subs(c[0])+'</b><span>'+subs(c[1])+'</span></div>').join('')}
+function prep(cv){const r=window.devicePixelRatio||1,w=cv.clientWidth||600,h=+cv.getAttribute('height');
+ if(cv.width!==Math.round(w*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r);cv.style.height=h+'px'}
+ const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,w,h);return{g,w,h}}
+function nice(span){const p=Math.pow(10,Math.floor(Math.log10(span/5)));const m=span/5/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p}
+// series: {x,y,color,width,dash,label,points,r,fill}; o: xmin..ymax, xlabel, ylabel, logx, logy, legend
+function plot(cv,series,o){const {g,w,h}=prep(cv);const L=60,R=12,T=10,B=38;
+ const tx=v=>o.logx?Math.log10(v):v, ty=v=>o.logy?Math.log10(v):v;
+ const x0=tx(o.xmin),x1=tx(o.xmax),y0=ty(o.ymin),y1=ty(o.ymax);
+ const X=x=>L+(tx(x)-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(ty(y)-y0)/(y1-y0)*(h-T-B);
+ g.font='12px Calibri,Arial';g.fillStyle=C.sl;g.strokeStyle='#ECEDF3';g.lineWidth=1;
+ const tick=(lo,hi,lg)=>{const t=[];if(lg){const st=(hi-lo)>10?2:1;for(let k=Math.ceil(lo-1e-9);k<=hi+1e-9;k+=st)t.push(k)}else{const d=nice(hi-lo);for(let v=Math.ceil(lo/d)*d;v<=hi+d*1e-6;v+=d)t.push(+v.toPrecision(10))}return t};
+ const lab=(v,lg)=>lg?('10'+sup(Math.round(v))):(+v.toPrecision(6)).toString();
+ for(const t of tick(x0,x1,o.logx)){const px=L+(t-x0)/(x1-x0)*(w-L-R);g.beginPath();g.moveTo(px,T);g.lineTo(px,h-B);g.stroke();g.textAlign='center';g.fillText(lab(t,o.logx),px,h-B+15)}
+ for(const t of tick(y0,y1,o.logy)){const py=h-B-(t-y0)/(y1-y0)*(h-T-B);g.beginPath();g.moveTo(L,py);g.lineTo(w-R,py);g.stroke();g.textAlign='right';g.fillText(lab(t,o.logy),L-5,py+4)}
+ g.strokeStyle=C.sl;g.strokeRect(L,T,w-L-R,h-T-B);
+ const U=t=>(t||'').replace(/_/g,'');g.fillStyle=C.mid;g.textAlign='center';g.fillText(U(o.xlabel),L+(w-L-R)/2,h-6);
+ g.save();g.translate(14,T+(h-T-B)/2);g.rotate(-Math.PI/2);g.fillText(U(o.ylabel),0,0);g.restore();
+ g.save();g.beginPath();g.rect(L,T,w-L-R,h-T-B);g.clip();
+ if(o.bands)for(const b of o.bands){g.fillStyle=b.color||'rgba(231,179,200,.45)';if(b.y){g.fillRect(L,Y(b.y[1]),w-L-R,Y(b.y[0])-Y(b.y[1]))}else{g.fillRect(X(b.x[0]),T,X(b.x[1])-X(b.x[0]),h-T-B)}}
+ for(const s of series){g.strokeStyle=s.color;g.fillStyle=s.color;g.lineWidth=s.width||1.8;g.setLineDash(s.dash||[]);
+  if(s.points){for(let i=0;i<s.x.length;i++){if(!isFinite(s.y[i]))continue;g.beginPath();g.arc(X(s.x[i]),Y(s.y[i]),s.r||3.5,0,7);s.hollow?g.stroke():g.fill()}}
+  else{g.beginPath();let pen=false;for(let i=0;i<s.x.length;i++){const yy=s.y[i];if(!isFinite(yy)||!isFinite(s.x[i])||(o.logy&&yy<=0)){pen=false;continue}const px=X(s.x[i]),py=Y(yy);pen?g.lineTo(px,py):g.moveTo(px,py);pen=true}g.stroke()}}
+ g.restore();g.setLineDash([]);
+ if(o.legend){const ls=series.filter(s=>s.label);let ly=o.legendBottom?h-B-10-16*(ls.length-1):T+12;const lx=o.legendLeft?L+10:w-R-(o.legendW||200);g.textAlign='left';
+  for(const s of ls){g.fillStyle='rgba(255,255,255,.85)';g.fillRect(lx-4,ly-11,(o.legendW||200)-4,15);g.fillStyle=s.color;if(s.points){g.beginPath();g.arc(lx+7,ly-4,3.5,0,7);g.fill()}else g.fillRect(lx,ly-5,14,3);g.fillStyle=C.mid;g.fillText(U(s.label),lx+20,ly);ly+=16}}
+ return {X,Y,g,w,h};}
+let seed=12345;const rnd=()=>{seed=(seed+0x6D2B79F5)|0;let t=seed;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return(((t^(t>>>14))>>>0)+0.5)/4294967296};
+const randn=()=>Math.sqrt(-2*Math.log(rnd()))*Math.cos(2*Math.PI*rnd());
+function erfc(x){const z=Math.abs(x),t=1/(1+0.5*z);const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return x>=0?r:2-r}
+function besselJ(n,x){let s=0;const N=60;for(let k=0;k<N;k++){const th=Math.PI*(k+0.5)/N;s+=Math.cos(n*th-x*Math.sin(th))}return s/N}
+function bisect(f,a,b,it=80){let fa=f(a);for(let i=0;i<it;i++){const m=(a+b)/2,fm=f(m);if(fa*fm<=0)b=m;else{a=m;fa=fm}}return(a+b)/2}
+// complex helpers
+const cx=(re,im=0)=>({re,im});const cadd=(a,b)=>cx(a.re+b.re,a.im+b.im);const cmul=(a,b)=>cx(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const cexp=t=>cx(Math.cos(t),Math.sin(t));const cabs2=a=>a.re*a.re+a.im*a.im;const cscale=(a,s)=>cx(a.re*s,a.im*s);
+const cdiv=(a,b)=>{const d=b.re*b.re+b.im*b.im;return cx((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d)};
+function setupTabs(draw){document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.exp').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));draw()});
+ document.querySelectorAll('input[type=range],select').forEach(r=>r.oninput=draw);window.addEventListener('resize',draw);}
+
+
+const q=1.602e-19,kB=1.381e-23,Tk=300;
+function e1(){const W=val('e1W'),D=val('e1D')*1e-6,RL=val('e1R'),lam=val('e1l');show('e1W',W.toFixed(2)+' µm');show('e1D',(D*1e6).toFixed(1)+' µm');show('e1R',RL.toFixed(0)+' Ω');show('e1l',lam.toFixed(3)+' µm');
+ const Eg=0.75,a0=0.8,E0=1.24/1.55,vs=5e4,eps=13.9*8.854e-12,A=Math.PI*(D/2)**2;
+ const alpha=l=>{const E=1.24/l;return E>Eg?a0*Math.sqrt((E-Eg)/(E0-Eg)):0};
+ const eta=1-Math.exp(-alpha(lam)*W),R=eta*lam/1.24;
+ const ftr=w=>0.45*vs/(w*1e-6),frc=w=>1/(2*Math.PI*RL*eps*A/(w*1e-6)),ft=w=>1/Math.sqrt(1/ftr(w)**2+1/frc(w)**2);
+ const Wa=Math.sqrt(0.45*vs*2*Math.PI*RL*eps*A)*1e6;const WW=linspace(0.05,8,4000);let best=0,wb=0;WW.forEach(w=>{const f=ft(w);if(f>best){best=f;wb=w}});
+ cards('e1cards',[['η at λ',eta.toFixed(3)],['Responsivity',R.toFixed(3)+' A/W','th'],['Cut-off λ_c',(1.24/Eg).toFixed(2)+' µm'],['f_tr / f_RC',fmt(ftr(W)/1e9,3)+' / '+fmt(frc(W)/1e9,3)+' GHz'],['f_3dB',fmt(ft(W)/1e9,3)+' GHz','th'],['W_opt numerical / formula',wb.toFixed(3)+' / '+Wa.toFixed(3)+' µm','ok'],['Maximum f_3dB',fmt(best/1e9,3)+' GHz']]);
+ const L=linspace(0.9,1.75,300);plot($('e1s'),[{x:L,y:L.map(l=>(1-Math.exp(-alpha(l)*W))*l/1.24),color:C.mag,width:2.2,label:'W = '+W.toFixed(2)+' µm'},{x:L,y:L.map(l=>l/1.24),color:C.grey,width:1.2,dash:[6,4],label:'ideal η = 1'},{x:[lam],y:[R],color:C.mid,points:true,r:6}],{xmin:0.9,xmax:1.75,ymin:0,ymax:1.45,xlabel:'Wavelength [µm]',ylabel:'Responsivity [A/W]',legend:true,legendW:140,legendLeft:true});
+ const X=linspace(0.1,6,300);plot($('e1b'),[{x:X,y:X.map(w=>ftr(w)/1e9),color:C.teal,width:1.5,dash:[6,4],label:'transit-time limit'},{x:X,y:X.map(w=>frc(w)/1e9),color:C.gold,width:1.5,dash:[6,4],label:'RC limit'},{x:X,y:X.map(w=>ft(w)/1e9),color:C.mag,width:2.4,label:'total'},{x:[W],y:[ft(W)/1e9],color:C.mid,points:true,r:6}],{xmin:0.1,xmax:6,ymin:1,ymax:1000,logy:true,xlabel:'Absorber thickness W [µm]',ylabel:'Bandwidth [GHz]',legend:true,legendW:150});}
+const Rr=0.9,Id=10e-9,Bw=10e9,Rf=1e3,Fn=2,th=4*kB*Tk*Bw*Fn/Rf;
+const Fm=(M,k)=>k*M+(1-k)*(2-1/M);const snr=(M,k,P)=>(M*Rr*P)**2/(2*q*(Rr*P+Id)*M*M*Fm(M,k)*Bw+th);
+function e2(){const P=Math.pow(10,val('e2P')),k=val('e2k'),M=val('e2M');show('e2P',fmt(P*1e6,3)+' µW');show('e2k',k.toFixed(3));show('e2M',M.toFixed(1));
+ const MM=linspace(1,300,6000);let sb=0,mb=1;MM.forEach(m=>{const s=snr(m,k,P);if(s>sb){sb=s;mb=m}});const Ma=Math.cbrt(4*kB*Tk*Fn/(k*q*Rf*(Rr*P+Id)));
+ const sp=snr(1,0,P),sa=snr(M,k,P);
+ cards('e2cards',[['p-i-n SNR',(10*Math.log10(sp)).toFixed(1)+' dB'],['APD SNR at M',(10*Math.log10(sa)).toFixed(1)+' dB','th'],['F(M)',Fm(M,k).toFixed(2)],['M_opt numerical',mb.toFixed(1),'ok'],['M_opt formula',Ma.toFixed(1),'th'],['Best APD gain over p-i-n',(10*Math.log10(sb/sp)).toFixed(1)+' dB']]);
+ const PP=logspace(-8,-2,300);plot($('e2a'),[{x:PP,y:PP.map(p=>snr(1,0,p)),color:C.mag,width:2.4,label:'total'},{x:PP,y:PP.map(p=>(Rr*p)**2/th),color:C.teal,width:1.4,dash:[6,4],label:'thermal-limited ∝ P²'},{x:PP,y:PP.map(p=>Rr*p/(2*q*Bw)),color:C.gold,width:1.4,dash:[6,4],label:'shot-limited ∝ P'},{x:[P],y:[sp],color:C.mid,points:true,r:6}],{xmin:1e-8,xmax:1e-2,ymin:1e-2,ymax:1e8,logx:true,logy:true,xlabel:'Optical power [W]',ylabel:'SNR',legend:true,legendW:180,legendLeft:true});
+ const Mx=logspace(0,2.3,300);plot($('e2b'),[{x:Mx,y:Mx.map(m=>10*Math.log10(snr(m,k,P))),color:C.mag,width:2.2,label:'k = '+k.toFixed(3)},{x:Mx,y:Mx.map(m=>10*Math.log10(snr(m,0.02,P))),color:C.teal,width:1.2,dash:[5,4],label:'k = 0.02 (Si)'},{x:Mx,y:Mx.map(m=>10*Math.log10(snr(m,0.5,P))),color:C.gold,width:1.2,dash:[5,4],label:'k = 0.5'},{x:[M],y:[10*Math.log10(sa)],color:C.mid,points:true,r:6},{x:[mb],y:[10*Math.log10(sb)],color:C.mag,points:true,r:4,hollow:true}],
+  {xmin:1,xmax:200,ymin:Math.floor(10*Math.log10(sp))-3,ymax:Math.ceil(10*Math.log10(Math.max(sb,snr(mb,0.02,P))))+5,logx:true,xlabel:'Gain M',ylabel:'SNR [dB]',legend:true,legendW:130,legendBottom:true});}
+let s3=1;
+function sens(Rb,M,k){const B=Rb/2,sT2=4*kB*Tk*B*Fn/Rf;const Qf=P=>{const I1=2*Rr*P*M,s1=Math.sqrt(2*q*M*M*Fm(M,k)*(2*Rr*P+Id)*B+sT2),s0=Math.sqrt(2*q*M*M*Fm(M,k)*Id*B+sT2);return I1/(s1+s0)};
+ let lo=-12,hi=-1;for(let i=0;i<60;i++){const m=(lo+hi)/2;if(Qf(Math.pow(10,m))<6)lo=m;else hi=m}return Math.pow(10,(lo+hi)/2)}
+function apdBest(Rb){let b=1,mb=1;for(let M=1;M<=60;M+=0.5){const s=sens(Rb,M,0.1);if(s<b){b=s;mb=M}}return[b,mb]}
+function e3(){const Q=val('e3q'),Rb=Math.pow(10,val('e3b'));show('e3q',Q.toFixed(2));show('e3b',fmt(Rb/1e9,3)+' Gb/s');
+ seed=900+s3;const n=1000000,sg=0.5/Q;let err=0;for(let i=0;i<n;i++){const b=rnd()>0.5?1:0;const r=b+sg*randn();if((r>0.5)!==(b===1))err++}
+ const ber=0.5*erfc(Q/Math.SQRT2),sp=sens(Rb,1,0),[sa,ma]=apdBest(Rb);
+ cards('e3cards',[['BER theory',fmt(ber,3),'th'],['BER Monte Carlo (10⁶ bits)',err?fmt(err/n,3)+' ('+err+' errors)':'0 errors (< 10⁻⁶)','ok'],['p-i-n sensitivity',(10*Math.log10(sp/1e-3)).toFixed(1)+' dBm'],['APD sensitivity',(10*Math.log10(sa/1e-3)).toFixed(1)+' dBm','th'],['APD optimum M',ma.toFixed(1)],['APD advantage',(10*Math.log10(sp/sa)).toFixed(1)+' dB']]);
+ // eye
+ const ns=32,nb=160;const bits=[];seed=77;for(let i=0;i<nb;i++)bits.push(rnd()>0.5?1:0);const x=[];bits.forEach(b=>{for(let j=0;j<ns;j++)x.push(b)});
+ const hk=[];for(let j=-12;j<=12;j++)hk.push(Math.exp(-((j/5)**2)));const hs=hk.reduce((a,b)=>a+b);const y=x.map((_,i)=>{let s=0;for(let j=-12;j<=12;j++){const t=i+j;s+=(t>=0&&t<x.length?x[t]:0)*hk[j+12]}return s/hs+sg*randn()});
+ const r=plot($('e3e'),[],{xmin:0,xmax:2,ymin:-0.6,ymax:1.6,xlabel:'Time [bit periods]',ylabel:'Signal'});r.g.strokeStyle='rgba(194,24,91,.18)';r.g.lineWidth=1;
+ for(let b=2;b<nb-2;b++){r.g.beginPath();for(let j=0;j<2*ns;j++){const px=r.X(j/ns),py=r.Y(y[(b-1)*ns+j]);j?r.g.lineTo(px,py):r.g.moveTo(px,py)}r.g.stroke()}
+ r.g.strokeStyle=C.mid;r.g.setLineDash([5,4]);r.g.beginPath();r.g.moveTo(r.X(0),r.Y(0.5));r.g.lineTo(r.X(2),r.Y(0.5));r.g.stroke();r.g.setLineDash([]);
+ const RB=logspace(9,11,25);const ps=RB.map(b=>10*Math.log10(sens(b,1,0)/1e-3)),pa=RB.map(b=>10*Math.log10(apdBest(b)[0]/1e-3));
+ plot($('e3s'),[{x:RB,y:ps,color:C.teal,width:2.2,label:'p-i-n'},{x:RB,y:pa,color:C.mag,width:2.2,label:'APD (k = 0.1, optimum M)'},{x:[Rb,Rb],y:[10*Math.log10(sp/1e-3),10*Math.log10(sa/1e-3)],color:C.mid,points:true,r:6}],{xmin:1e9,xmax:1e11,ymin:Math.floor(Math.min(...pa))-2,ymax:Math.ceil(Math.max(...ps))+2,logx:true,xlabel:'Bit rate [bit/s]',ylabel:'Sensitivity [dBm]',legend:true,legendW:200,legendLeft:true});}
+
+const FN=[e1,e2,e3];
+function draw(){const id=document.querySelector('.exp.on').id;FN[+id.slice(1)-1]();}
+setupTabs(draw);draw();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

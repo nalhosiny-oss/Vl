@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1D FDTD · DMP Ch6</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+select{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 6 · SIMULATOR 2</small><h1>One-dimensional FDTD: Courant number, PML and a Fabry–Pérot film</h1></header>
+<div class="wrap"><div class="grid">
+<div class="card">
+ <div class="eq">Ĥ<sub>k+½</sub> += S(E<sub>k+1</sub> − E<sub>k</sub>) ,  E<sub>k</sub> += (S/ε<sub>r</sub>)(Ĥ<sub>k+½</sub> − Ĥ<sub>k−½</sub>)<br>S = cΔt/Δx ≤ 1 (stable in 1D)</div>
+ <label>Courant number S: <span class="val" id="v1"></span></label><input type="range" id="S" min="0.3" max="1.05" step="0.01" value="0.5">
+ <label>Film index n: <span class="val" id="v2"></span></label><input type="range" id="n" min="1" max="3.6" step="0.01" value="2">
+ <label>Film thickness d (μm): <span class="val" id="v3"></span></label><input type="range" id="d" min="0" max="2" step="0.02" value="0.78">
+ <label>PML thickness (cells, Δx = 20 nm): <select id="np"><option value="0">0 (hard wall)</option><option value="10">10</option><option value="30">30</option><option value="80" selected>80</option></select></label>
+ <button class="main" id="go">Run</button><button id="pause">Pause</button>
+ <div class="stats"><div class="s"><span>Step · max |E|</span><b id="s1">—</b></div><div class="s"><span>Field left in box</span><b id="s2">—</b></div><div class="s"><span>max |T<sub>FDTD</sub> − T<sub>Airy</sub>|</span><b id="s3">—</b></div></div>
+ <div class="ar">اجعل S أكبر من 1 لترى انفجار الحل العددي. ثم أزل طبقة PML لترى النبضة ترتد من الجدار وتفسد الطيف. مع S ≤ 1 وطبقة سميكة يطابق طيف النفاذ صيغة Airy.</div>
+</div>
+<div class="card"><canvas id="c" width="800" height="300"></canvas><canvas id="p" width="800" height="300"></canvas></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);const N=1200,dx=0.02,c0=0.299792458; // μm, μm/fs
+const LS=[];for(let l=1.2;l<=2.1001;l+=0.0125)LS.push(l);
+let st=null,ref=null,anim=0,running=false;
+function setup(S,n,d,np,film){const E=new Float64Array(N),Hh=new Float64Array(N),er=new Float64Array(N).fill(1),ls=new Float64Array(N);
+ const f0=600,f1=f0+Math.round(d/dx);if(film)for(let k=f0;k<f1;k++)er[k]=n*n;
+ for(let k=0;k<np;k++){const v=0.3*Math.pow((np-k)/np,3);ls[k]=v;ls[N-1-k]=v}
+ const dt=S*dx/c0,nT=Math.ceil(320/dt),pr=Math.min(f1+60,N-np-20);
+ return {E,Hh,er,ls,S,dt,nT,t:0,src:np+60,pr,f0,f1,re:new Float64Array(LS.length),im:new Float64Array(LS.length),mx:0,np}}
+function step(o){const {E,Hh,er,ls,S}=o;
+ for(let k=0;k<N-1;k++){const l=(ls[k]+ls[k+1])/2;Hh[k]=((1-l)*Hh[k]+S*(E[k+1]-E[k]))/(1+l)}
+ for(let k=1;k<N;k++){const l=ls[k];E[k]=((1-l)*E[k]+S/er[k]*(Hh[k]-Hh[k-1]))/(1+l)}
+ E[0]=0;const tt=o.t*o.dt;E[o.src]+=Math.exp(-Math.pow((tt-7)/1.8,2))*S;
+ const v=E[o.pr];if(v!==0)for(let j=0;j<LS.length;j++){const w=2*Math.PI*c0/LS[j]*tt;o.re[j]+=v*Math.cos(w);o.im[j]-=v*Math.sin(w)}
+ o.t++;}
+function airy(n,d,l){const R=Math.pow((n-1)/(n+1),2),F=4*R/Math.pow(1-R,2);return 1/(1+F*Math.pow(Math.sin(2*Math.PI*n*d/l),2))}
+function read(){const S=+$('S').value,n=+$('n').value,d=+$('d').value,np=+$('np').value;$('v1').textContent=S.toFixed(2);$('v2').textContent=n.toFixed(2);$('v3').textContent=d.toFixed(2);return {S,n,d,np}}
+function start(){cancelAnimationFrame(anim);const q=read();st=setup(q.S,q.n,q.d,q.np,true);ref=setup(q.S,q.n,q.d,q.np,false);
+ for(let i=0;i<ref.nT;i++){step(ref);if(!isFinite(ref.E[ref.src])||Math.abs(ref.E[ref.src])>1e8)break}
+ st.q=q;running=true;loop()}
+function loop(){if(!running)return;const per=Math.max(4,Math.round(st.nT/400));let bad=false;
+ for(let i=0;i<per&&st.t<st.nT;i++){step(st);}
+ let m=0,e2=0;for(let k=0;k<N;k++){const a=Math.abs(st.E[k]);if(!(a<1e30)){m=Infinity;break}m=Math.max(m,a);if(k>=st.np&&k<N-st.np)e2+=st.E[k]*st.E[k]}
+ st.mx=Math.max(st.mx,m);if(!(m<1e6))bad=true;drawField(m,e2,bad);
+ if(bad){running=false;$('s3').textContent='unstable';drawSpec(true);return}
+ if(st.t<st.nT)anim=requestAnimationFrame(loop);else{running=false;drawSpec(false)}}
+function drawField(m,e2,bad){const c=$('c').getContext('2d'),W=800,H=300;c.clearRect(0,0,W,H);c.font='14px Calibri';const X=k=>20+k/(N-1)*(W-40),Y=v=>H/2-Math.max(-1.3,Math.min(1.3,v))*(H/2-30)/1.1;
+ c.fillStyle='#E9E4D8';c.fillRect(X(0),20,X(st.np)-X(0),H-40);c.fillRect(X(N-st.np),20,X(N)-X(N-st.np),H-40);
+ c.fillStyle='#FCEBD3';c.fillRect(X(st.f0),20,Math.max(2,X(st.f1)-X(st.f0)),H-40);
+ c.strokeStyle='#E2DCCF';c.beginPath();c.moveTo(20,H/2);c.lineTo(W-20,H/2);c.stroke();
+ c.strokeStyle='#2E6F8E';c.lineWidth=1;c.beginPath();c.moveTo(X(st.pr),25);c.lineTo(X(st.pr),H-25);c.stroke();
+ c.strokeStyle='#E07B1A';c.lineWidth=2;c.beginPath();for(let k=0;k<N;k++){const v=st.E[k]/0.5;k?c.lineTo(X(k),Y(v)):c.moveTo(X(k),Y(v))}c.stroke();
+ c.fillStyle='#5A5650';c.fillText('E(x) at t = '+(st.t*st.dt).toFixed(1)+' fs   (grey: PML, cream: film, blue line: probe)',20,15);
+ if(bad){c.fillStyle='#B3261E';c.font='bold 22px Calibri';c.fillText('Unstable: S > 1 makes the field grow without limit',150,H/2-40)}
+ $('s1').textContent=st.t+' · '+(m<1e6?m.toFixed(3):'∞');$('s2').textContent=bad?'—':Math.sqrt(e2).toExponential(1)}
+function drawSpec(bad){const p=$('p').getContext('2d'),W=800,H=300,L=60,B=36;p.clearRect(0,0,W,H);p.font='14px Calibri';
+ const X=l=>L+(l-1.2)/0.9*(W-L-20),Y=v=>H-B-v*(H-B-25);p.strokeStyle='#E2DCCF';p.beginPath();p.moveTo(L,H-B);p.lineTo(W-20,H-B);p.moveTo(L,H-B);p.lineTo(L,10);p.stroke();
+ p.fillStyle='#5A5650';for(let v=0;v<=1.001;v+=0.25)p.fillText(v.toFixed(2),L-38,Y(v)+5);for(let l=1.2;l<=2.11;l+=0.1)p.fillText(l.toFixed(1),X(l)-10,H-B+16);p.fillText('wavelength (μm)',W-130,H-4);p.fillText('transmission T',L+6,18);
+ if(bad){p.fillText('No spectrum: the run was unstable',L+150,H/2);return}
+ const q=st.q;p.strokeStyle='#1E1E22';p.lineWidth=2;p.beginPath();for(let l=1.2;l<=2.1;l+=0.002){const v=airy(q.n,q.d,l);l===1.2?p.moveTo(X(l),Y(v)):p.lineTo(X(l),Y(v))}p.stroke();
+ let me=0;p.fillStyle='#E07B1A';LS.forEach((l,j)=>{const T=(st.re[j]**2+st.im[j]**2)/(ref.re[j]**2+ref.im[j]**2);me=Math.max(me,Math.abs(T-airy(q.n,q.d,l)));p.beginPath();p.arc(X(l),Y(Math.min(T,1.25)),4,0,7);p.fill()});
+ $('s3').textContent=me.toExponential(1);p.fillStyle='#5A5650';p.fillText('Airy formula (line), FDTD (dots)',W-250,18)}
+$('go').onclick=start;$('pause').onclick=()=>{if(running){running=false}else if(st&&st.t<st.nT){running=true;loop()}};
+['S','n','d','np'].forEach(id=>$(id).oninput=()=>{read();start()});read();start();
+</script>
+
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f3"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

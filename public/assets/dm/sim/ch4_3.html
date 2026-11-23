@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Validation test · DMP Ch4</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+select{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 4 · SIMULATOR 3</small><h1>Validating a switch-port model against the real system</h1></header>
+<div class="wrap"><div class="grid">
+<div class="card">
+ <div class="eq">t<sub>0</sub> = (Ȳ − Z)/(S/√n)  ·  power ≈ Φ(|Δ|√n/S − 1.96)  ·  real port: Z = 2.00 at ρ = 0.8</div>
+ <label>Service time assumed by the model: <select id="sv"><option value="0">Deterministic (M/D/1)</option><option value="0.25">Erlang-4</option><option value="0.5">Erlang-2</option><option value="1">Exponential (M/M/1)</option></select></label>
+ <label>Replications n: <span class="val" id="nv"></span></label><input type="range" id="n" min="2" max="30" step="1" value="6">
+ <label>Tolerance ε: <span class="val" id="ev"></span></label><input type="range" id="eps" min="0.02" max="0.5" step="0.01" value="0.2">
+ <label>Difference Δ to detect (power): <span class="val" id="dv"></span></label><input type="range" id="del" min="0.01" max="0.3" step="0.01" value="0.05">
+ <button class="main" id="go">Run n replications (20 000 cells each)</button>
+ <div class="stats"><div class="s"><span>Ȳ ± half-width</span><b id="s1">—</b></div><div class="s"><span>t₀ (critical)</span><b id="s2">—</b></div><div class="s"><span>Power for Δ</span><b id="s3">—</b></div></div>
+ <p id="dec" style="font-size:15px;font-weight:bold;margin:10px 0 0"></p>
+ <div class="ar">ابدأ بالنموذج الأسي (M/M/1) وسترى رفضاً قاطعاً، ثم اختر الخدمة الثابتة. وعندما لا يُرفض النموذج، انظر إلى القوة: هل كان الاختبار قادراً أصلاً على كشف فرق صغير؟</div>
+</div>
+<div class="card"><canvas id="c" width="800" height="400"></canvas><canvas id="p" width="800" height="250"></canvas></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);const Z=2.0,rho=0.8;let Ys=[];
+const Phi=z=>{const t=1/(1+0.2316419*Math.abs(z)),d=0.3989423*Math.exp(-z*z/2),p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p};
+function tq(df){const z=1.96,g1=(z**3+z)/4,g2=(5*z**5+16*z**3+3*z)/96,g3=(3*z**7+19*z**5+17*z**3-15*z)/384;return z+g1/df+g2/df**2+g3/df**3}
+function rep(cv2){const k=cv2>0?Math.round(1/cv2):0,N=20000,d=2000;let w=0,s=0,sv=svc();function svc(){if(!k)return 1;let x=0;for(let j=0;j<k;j++)x+=-Math.log(1-Math.random())/k;return x}
+ for(let i=1;i<N+d;i++){const a=-Math.log(1-Math.random())/rho;w=Math.max(0,w+sv-a);sv=svc();if(i>=d)s+=w}return s/N}
+function stats(){const n=Ys.length,m=Ys.reduce((a,b)=>a+b,0)/n,S=Math.sqrt(Ys.reduce((a,b)=>a+(b-m)**2,0)/(n-1));return{n,m,S}}
+function draw(){const eps=+$('eps').value,del=+$('del').value;$('nv').textContent=$('n').value;$('ev').textContent=eps.toFixed(2);$('dv').textContent=del.toFixed(2);
+ const c=$('c').getContext('2d'),W=800,H=400,L=60,B=40;c.clearRect(0,0,W,H);const Yp=v=>H-B-(v-1)/3.5*(H-B-20);
+ c.strokeStyle='#E2DCCF';c.beginPath();c.moveTo(L,H-B);c.lineTo(W-20,H-B);c.moveTo(L,H-B);c.lineTo(L,10);c.stroke();
+ c.fillStyle='#5A5650';c.font='15px Calibri';for(let v=1;v<=4.5;v+=0.5)c.fillText(v.toFixed(1),L-32,Yp(v)+5);c.fillText('replication (CI on the right)',W-200,H-10);c.fillText('mean wait W_Q',8,22);
+ c.fillStyle='rgba(46,111,142,0.13)';c.fillRect(L,Yp(Z+eps),W-L-20,Yp(Z-eps)-Yp(Z+eps));c.strokeStyle='#1E1E22';c.lineWidth=2;c.beginPath();c.moveTo(L,Yp(Z));c.lineTo(W-20,Yp(Z));c.stroke();
+ c.fillStyle='#1E1E22';c.fillText('system Z = 2.00  (band ± ε)',L+8,Yp(Z)-8);
+ const g=$('p').getContext('2d'),H2=250;g.clearRect(0,0,W,H2);
+ if(Ys.length<2){$('dec').textContent='Press the button to run the model.';return}
+ const {n,m,S}=stats(),tc=tq(n-1),hw=tc*S/Math.sqrt(n),t0=(m-Z)/(S/Math.sqrt(n));const xs=k=>L+30+k/(n)*(W-L-170);
+ c.fillStyle='#E07B1A';Ys.forEach((y,k)=>{c.beginPath();c.arc(xs(k),Yp(Math.min(4.5,y)),6,0,7);c.fill()});
+ const xc=W-80;c.strokeStyle='#E07B1A';c.lineWidth=3;c.beginPath();c.moveTo(xc,Yp(m-hw));c.lineTo(xc,Yp(m+hw));c.moveTo(xc-10,Yp(m-hw));c.lineTo(xc+10,Yp(m-hw));c.moveTo(xc-10,Yp(m+hw));c.lineTo(xc+10,Yp(m+hw));c.stroke();c.beginPath();c.arc(xc,Yp(m),6,0,7);c.fill();
+ $('s1').textContent=m.toFixed(3)+' ± '+hw.toFixed(3);$('s2').textContent=t0.toFixed(2)+' ('+tc.toFixed(3)+')';
+ const pw=d=>Phi(d*Math.sqrt(n)/S-1.96)+Phi(-d*Math.sqrt(n)/S-1.96);$('s3').textContent=pw(del).toFixed(2);
+ const a=m-hw,b=m+hw;let v;if(a<=Z&&Z<=b&&Math.max(Math.abs(a-Z),Math.abs(b-Z))<=eps)v='CI approach: contains Z and lies inside ±ε → accept for this purpose';
+ else if(Math.max(Math.abs(a-Z),Math.abs(b-Z))<=eps)v='CI approach: excludes Z but every value is within ε → difference too small to matter: accept';
+ else if((a-Z>eps)||(Z-b>eps))v='CI approach: every value is more than ε from Z → reject the model';else v='CI approach: interval too wide to decide → more replications';
+ $('dec').textContent=(Math.abs(t0)>tc?'t-test: reject H₀. ':'t-test: do not reject H₀. ')+v;$('dec').style.color=/reject the|reject H₀\. /.test($('dec').textContent)&&!/do not/.test($('dec').textContent)?'#B3332F':'#1F8A5B';
+ const Xq=d=>L+d/0.3*(W-L-20),Yq=p=>H2-35-p*(H2-55);g.strokeStyle='#E2DCCF';g.lineWidth=1;g.beginPath();g.moveTo(L,H2-35);g.lineTo(W-20,H2-35);g.moveTo(L,H2-35);g.lineTo(L,15);g.stroke();
+ g.fillStyle='#5A5650';g.font='14px Calibri';g.fillText('power',8,22);g.fillText('Δ',W-30,H2-10);for(let d=0;d<=0.3;d+=0.1)g.fillText(d.toFixed(1),Xq(d)-8,H2-18);g.fillText('1',L-14,Yq(1)+5);g.fillText('0.8',L-26,Yq(0.8)+5);
+ g.setLineDash([5,5]);g.strokeStyle='#5A5650';g.beginPath();g.moveTo(L,Yq(0.8));g.lineTo(W-20,Yq(0.8));g.stroke();g.setLineDash([]);
+ g.strokeStyle='#2E6F8E';g.lineWidth=2.5;g.beginPath();for(let k=0;k<=150;k++){const d=k/150*0.3;k?g.lineTo(Xq(d),Yq(pw(d))):g.moveTo(Xq(d),Yq(pw(d)))}g.stroke();
+ g.fillStyle='#E07B1A';g.beginPath();g.arc(Xq(del),Yq(pw(del)),6,0,7);g.fill()}
+$('go').onclick=()=>{const n=+$('n').value,cv=+$('sv').value;Ys=[];for(let r=0;r<n;r++)Ys.push(rep(cv));draw()};
+['eps','del'].forEach(id=>$(id).oninput=draw);$('n').oninput=()=>{$('nv').textContent=$('n').value};$('sv').onchange=()=>{Ys=[];draw()};$('sv').value='1';draw();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f4"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

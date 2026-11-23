@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CPU–memory explorer · DMP Ch5</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+select{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 5 · SIMULATOR 2</small><h1>CPU–memory explorer: electronic versus photonic memory link</h1></header>
+<div class="wrap"><div class="grid">
+<div class="card">
+ <div class="eq">AMAT = t<sub>L1</sub> + m<sub>1</sub>(t<sub>L2</sub> + m<sub>2</sub> t<sub>mem</sub>)  ·  CPI = CPI<sub>0</sub> + f (AMAT − t<sub>L1</sub>)</div>
+ <label>L1 miss ratio m<sub>1</sub>: <span class="val" id="v1"></span></label><input type="range" id="m1" min="0.005" max="0.2" step="0.005" value="0.04">
+ <label>L2 local miss ratio m<sub>2</sub>: <span class="val" id="v2"></span></label><input type="range" id="m2" min="0.05" max="0.8" step="0.05" value="0.25">
+ <label>L2 hit time t<sub>L2</sub> (cycles): <span class="val" id="v3"></span></label><input type="range" id="tl2" min="4" max="40" step="1" value="12">
+ <label>Electronic memory latency (cycles): <span class="val" id="v4"></span></label><input type="range" id="te" min="40" max="300" step="5" value="120">
+ <label>Photonic memory latency (cycles): <span class="val" id="v5"></span></label><input type="range" id="tp" min="10" max="300" step="5" value="70">
+ <label>References per instruction f: <span class="val" id="v6"></span></label><input type="range" id="f" min="1" max="2" step="0.05" value="1.4">
+ <div class="stats"><div class="s"><span>AMAT e / p (cycles)</span><b id="s1">—</b></div><div class="s"><span>CPI e / p</span><b id="s2">—</b></div><div class="s"><span>Speed-up (limit)</span><b id="s3">—</b></div></div>
+ <div class="ar">ارفع نسبة الإخفاق في المستوى الأول ولاحظ كيف تزداد فائدة الوصلة الضوئية؛ ثم خفّضها إلى 0.005 لترى أن تحسين الذاكرة لا يفيد برنامجاً يعمل معظمه داخل الذاكرة المخبئية.</div>
+</div>
+<div class="card"><canvas id="c" width="800" height="330"></canvas><canvas id="p" width="800" height="260"></canvas></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);const CPI0=1.1;
+function draw(){const m1=+$('m1').value,m2=+$('m2').value,tl2=+$('tl2').value,te=+$('te').value,tp=+$('tp').value,f=+$('f').value;
+ [['v1',m1.toFixed(3)],['v2',m2.toFixed(2)],['v3',tl2],['v4',te],['v5',tp],['v6',f.toFixed(2)]].forEach(a=>$(a[0]).textContent=a[1]);
+ const am=t=>1+m1*(tl2+m2*t),cpi=t=>CPI0+f*(am(t)-1);const ce=cpi(te),cp=cpi(tp),lim=ce/cpi(0);
+ $('s1').textContent=am(te).toFixed(2)+' / '+am(tp).toFixed(2);$('s2').textContent=ce.toFixed(3)+' / '+cp.toFixed(3);$('s3').textContent=(ce/cp).toFixed(2)+' ('+lim.toFixed(2)+')';
+ const c=$('c').getContext('2d'),W=800,H=330;c.clearRect(0,0,W,H);const mx=Math.max(ce,cp)*1.1,Yh=v=>v/mx*(W-260);
+ c.fillStyle='#5A5650';c.font='15px Calibri';c.fillText('CPI stack: base · L2 time · memory time',20,22);
+ [['Electronic',te,60],['Photonic',tp,170]].forEach(a=>{const t=a[1],y=a[2],parts=[CPI0,f*m1*tl2,f*m1*m2*t],cols=['#5A5650','#2E6F8E','#E07B1A'];let x=130;
+  c.fillStyle='#1E1E22';c.font='16px Calibri';c.fillText(a[0],20,y+35);parts.forEach((v,i)=>{c.fillStyle=cols[i];c.fillRect(x,y,Yh(v),60);x+=Yh(v)});c.fillStyle='#1E1E22';c.font='17px Cambria';c.fillText(cpi(t).toFixed(2),x+8,y+36)});
+ c.font='14px Calibri';[['base CPI₀','#5A5650'],['L2','#2E6F8E'],['memory','#E07B1A']].forEach((a,i)=>{c.fillStyle=a[1];c.fillRect(130+i*130,290,16,16);c.fillStyle='#1E1E22';c.fillText(a[0],152+i*130,303)});
+ const g=$('p').getContext('2d'),H2=260,L=60,B=35;g.clearRect(0,0,W,H2);const X=t=>L+t/300*(W-L-20),lo=Math.min(0.9,ce/cpi(300)),Y=v=>H2-B-(v-lo)/(Math.max(lim,1.05)-lo)*(H2-B-20);
+ g.strokeStyle='#E2DCCF';g.beginPath();g.moveTo(L,H2-B);g.lineTo(W-20,H2-B);g.moveTo(L,H2-B);g.lineTo(L,10);g.stroke();
+ g.fillStyle='#5A5650';g.font='14px Calibri';for(let t=0;t<=300;t+=50)g.fillText(t,X(t)-8,H2-B+16);g.fillText('photonic memory latency (cycles)',W-230,H2-4);g.fillText('speed-up over electronic',L+6,18);
+ g.setLineDash([5,5]);g.strokeStyle='#5A5650';g.beginPath();g.moveTo(L,Y(lim));g.lineTo(W-20,Y(lim));g.moveTo(L,Y(1));g.lineTo(W-20,Y(1));g.stroke();g.setLineDash([]);
+ g.strokeStyle='#E07B1A';g.lineWidth=2.5;g.beginPath();for(let t=0;t<=300;t+=2){const v=ce/cpi(t);t?g.lineTo(X(t),Y(v)):g.moveTo(X(t),Y(v))}g.stroke();
+ g.fillStyle='#E07B1A';g.beginPath();g.arc(X(tp),Y(ce/cp),6,0,7);g.fill();g.fillStyle='#1E1E22';g.fillText('limit',W-60,Y(lim)-5)}
+['m1','m2','tl2','te','tp','f'].forEach(id=>$(id).oninput=draw);draw();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f3"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

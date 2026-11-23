@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 8 — Recording of Digital Holograms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&family=Source+Serif+4:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0B1E3A; --teal:#0E8C9A; --coral:#E8604C; --tint:#E3F4F6; --bg:#F4F8FA; --grey:#5A6B7F; --line:#C9D6E0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--navy); font-family:"Source Sans 3", Calibri, "Segoe UI", Arial, sans-serif; font-size:16px; }
+  header { background:var(--navy); color:#fff; padding:18px 22px 14px; position:relative; overflow:hidden; }
+  header .rings { position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%;
+    background: repeating-radial-gradient(circle, rgba(70,200,215,.55) 0 3px, transparent 3px 14px); opacity:.55; }
+  header h1 { font-family:"Source Serif 4", Cambria, Georgia, serif; margin:0; font-size:23px; }
+  header p { margin:4px 0 0; color:#BFE6EA; font-size:14.5px; }
+  nav { display:flex; gap:6px; flex-wrap:wrap; padding:12px 22px 0; }
+  nav button { border:1px solid var(--line); background:#fff; color:var(--navy); padding:9px 14px; border-radius:10px 10px 0 0; font:inherit; font-weight:600; cursor:pointer; }
+  nav button.on { background:var(--teal); color:#fff; border-color:var(--teal); }
+  main { padding:0 22px 26px; }
+  .exp { display:none; background:#fff; border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; }
+  .exp.on { display:block; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap:16px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  nav { display:none; } .exp { border-radius:12px; margin-top:12px; } header { padding:12px 18px 10px; } header h1 { font-size:19px; } main { padding:0 12px 14px; } footer { display:none; }
+  h2 { font-family:"Source Serif 4", Cambria, Georgia, serif; font-size:19px; margin:0 0 6px; }
+  .lead { color:var(--grey); margin:0 0 12px; font-size:14.5px; }
+  .panel { background:var(--tint); border-radius:10px; padding:12px; }
+  .ctl { margin-bottom:11px; }
+  .ctl label { display:flex; justify-content:space-between; font-size:14px; font-weight:600; }
+  .ctl label span { color:var(--teal); font-variant-numeric: tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--teal); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 10px; }
+  .presets button, .seg button { border:1px solid var(--teal); background:#fff; color:var(--teal); border-radius:16px; padding:4px 11px; font:inherit; font-size:13.5px; cursor:pointer; }
+  .presets button:hover, .seg button.on { background:var(--teal); color:#fff; }
+  .seg { display:flex; gap:6px; margin-bottom:10px; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(135px,1fr)); gap:8px; margin:10px 0; }
+  .card { border:1px solid var(--line); border-radius:9px; padding:7px 9px; background:#fff; }
+  .card b { display:block; font-size:12.5px; color:var(--grey); font-weight:600; }
+  .card span { font-size:18px; font-weight:600; font-variant-numeric: tabular-nums; }
+  .card.ok span { color:var(--teal); } .card.th span { color:var(--coral); }
+  canvas { width:100%; display:block; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .cv-title { font-size:13.5px; font-weight:600; color:var(--grey); margin:10px 0 4px; }
+  .eq { font-family:"Source Serif 4", Cambria, Georgia, serif; background:#fff; border-left:3px solid var(--teal); padding:6px 10px; margin:8px 0; font-size:15px; }
+  .tasks { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .tasks h3 { font-size:15.5px; margin:0 0 4px; }
+  .tasks ol { margin:0; padding-left:20px; font-size:14.5px; } .tasks li { margin:3px 0; }
+  .ar { direction:rtl; text-align:right; font-family:"Noto Naskh Arabic", "Traditional Arabic", Tahoma, serif; background:#FFF6F3; border-right:4px solid var(--coral); border-radius:8px; padding:9px 12px; margin-top:12px; font-size:15.5px; line-height:1.8; }
+  .ar b { color:var(--coral); }
+  footer { color:var(--grey); font-size:13px; padding:0 22px 18px; }
+  .note { font-size:13px; color:var(--grey); }
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header><div class="rings"></div>
+  <h1>Virtual Lab · Chapter 8 — Recording of Digital Holograms</h1>
+  <p>Interferometric Systems and Their Applications (203673-3) · MSc in Physics · Prof. Najm Al-Hosiny</p>
+</header>
+<nav>
+  <button class="on" data-t="e1">1 · Maximum angle and aliasing</button>
+  <button data-t="e2">2 · Minimum distance</button>
+  <button data-t="e3">3 · Stability</button>
+</nav>
+<main>
+<!-- ================= Experiment 1 ================= -->
+<section class="exp on" id="e1">
+  <h2>Experiment 1 — Spatial-frequency requirements: maximum angle and aliasing</h2>
+  <p class="lead">Two waves at angle θ make fringes of frequency f = 2 sin(θ/2)/λ. A camera with pitch Δx records them correctly only if f ≤ f_N = 1/(2Δx); the pixels also reduce the modulation as |sinc(f·ff·Δx)|. Above the limit the carrier folds to |f − k/Δx| and the image appears in the wrong place.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="presets"><button data-s="2.2">2.2 µm</button><button data-s="3.45">3.45 µm</button><button data-s="6.45">6.45 µm</button></div>
+      <div class="ctl"><label>Pixel pitch Δx <span id="e1pv"></span></label><input type="range" id="e1p" min="1" max="10" step="0.05" value="3.45"></div>
+      <div class="ctl"><label>Fill factor ff <span id="e1fv"></span></label><input type="range" id="e1f" min="0.2" max="1" step="0.01" value="1"></div>
+      <div class="ctl"><label>Wavelength λ <span id="e1lv"></span></label><input type="range" id="e1l" min="400" max="1100" step="1" value="633"></div>
+      <div class="ctl"><label>Angle between the waves θ <span id="e1tv"></span></label><input type="range" id="e1t" min="0.1" max="15" step="0.01" value="4"></div>
+      <div class="eq">θ_max = 2 arcsin(λ/4Δx) ≈ λ/2Δx<br>f_seen = |f − k/Δx|, M = |sinc(f·ff·Δx)|</div>
+    </div>
+    <div>
+      <div class="cards" id="e1cards"></div>
+      <div class="cv-title">True fringes (thin) and recorded pixel values (steps) over 30 pixels</div>
+      <canvas id="e1sig" height="200"></canvas>
+      <div class="cv-title">Spectrum of the recorded line: the carrier peak (dot) and where the image will appear</div>
+      <canvas id="e1spec" height="190"></canvas>
+      <div class="cv-title">θ_max versus pixel pitch at this wavelength (dot: current camera)</div>
+      <canvas id="e1max" height="170"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>For each preset camera, find θ_max at 633 nm and at 532 nm. Check λ/(2Δx).</li>
+    <li>Increase θ above θ_max. Where does the carrier peak move? On which side will the image appear?</li>
+    <li>At the Nyquist limit, how much modulation is left for ff = 1 and ff = 0.5? Why do engineers keep the carrier near f_N/2?</li>
+    <li>Why can infrared (1064 nm) and long-wave holography use larger angles with the same camera?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الكاميرا لا ترى إلا هدباً أعرض من بكسلين. والهدب الأدق لا تختفي بل تتنكّر في تردد زائف أخفض، فتظهر الصورة في مكان خاطئ دون أي إنذار في الهولوغرام نفسه.</div>
+</section>
+
+<!-- ================= Experiment 2 ================= -->
+<section class="exp" id="e2">
+  <h2>Experiment 2 — Recording set-ups: minimum distance and resolution</h2>
+  <p class="lead">Every object point must reach every pixel within θ_max. In-line: the object (width W) is centred; off-axis: it is shifted by about 1.5W so that the image clears the |O|² halo, which needs about four times the distance.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Object width W <span id="e2wv"></span></label><input type="range" id="e2w" min="1" max="100" step="0.5" value="50"></div>
+      <div class="ctl"><label>Pixels N <span id="e2nv"></span></label><input type="range" id="e2n" min="512" max="4096" step="256" value="2048"></div>
+      <div class="ctl"><label>Pixel pitch Δx <span id="e2pv"></span></label><input type="range" id="e2p" min="1" max="10" step="0.05" value="3.45"></div>
+      <div class="ctl"><label>Distance d <span id="e2dv"></span></label><input type="range" id="e2d" min="0.05" max="3" step="0.01" value="1.2"></div>
+      <div class="seg" id="e2seg"><button class="on" data-m="o">Off-axis</button><button data-m="i">In-line</button></div>
+      <div class="eq">d_min (in-line) = Δx(W + NΔx)/λ<br>d_min (off-axis) ≈ Δx(4W + NΔx)/λ<br>Resolution δξ ≈ λd/(NΔx)</div>
+      <p class="note">λ = 633 nm.</p>
+    </div>
+    <div>
+      <div class="cards" id="e2cards"></div>
+      <div class="cv-title">Geometry to scale in the transverse direction (largest angle shown in coral)</div>
+      <canvas id="e2geo" height="230"></canvas>
+      <div class="cv-title">Highest fringe frequency at the camera versus distance, and the Nyquist limit</div>
+      <canvas id="e2plot" height="200"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>W = 50 mm, 2048 pixels of 3.45 µm: read d_min for in-line and off-axis recording.</li>
+    <li>What is the resolution at d_min in each case? What is the price of the off-axis geometry?</li>
+    <li>Replace the camera by 4096 pixels of 2.2 µm. By how much do d_min and the resolution improve?</li>
+    <li>Place d below d_min (the dot in the red region): which part of the object will alias?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الجسم الكبير القريب يرسل أشعة بزوايا واسعة لا تتحملها الكاميرا. لذلك نُبعده حتى تصغر الزوايا، لكن الصورة المعاد بناؤها تفقد من دقتها كلما ابتعد.</div>
+</section>
+
+<!-- ================= Experiment 3 ================= -->
+<section class="exp" id="e3">
+  <h2>Experiment 3 — Stability: motion during the exposure</h2>
+  <p class="lead">The camera integrates the fringes over the exposure. A mirror that drifts by Δ, vibrates with amplitude a, or jitters with rms phase σ washes them out. In reflection the path changes by twice the motion. The fringe visibility is simulated by averaging many instants and compared with theory; only the fringes carry the image, so the image energy falls as V².</p>
+  <div class="seg" id="e3seg"><button class="on" data-m="d">Drift</button><button data-m="v">Vibration</button><button data-m="j">Phase jitter</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Wavelength λ <span id="e3lv"></span></label><input type="range" id="e3l" min="400" max="700" step="1" value="532"></div>
+      <div id="e3cd">
+        <div class="ctl"><label>Drift speed v <span id="e3vv"></span></label><input type="range" id="e3v" min="0" max="50" step="0.1" value="10"></div>
+        <div class="ctl"><label>Exposure time t_exp <span id="e3ev"></span></label><input type="range" id="e3e" min="0.1" max="50" step="0.1" value="6.7"></div>
+        <div class="eq">Δ = v t_exp, V = |sinc(2Δ/λ)|<br>V ≥ 0.9 needs t_exp ≤ λ/(8v)</div>
+      </div>
+      <div id="e3cv" style="display:none">
+        <div class="ctl"><label>Vibration amplitude a <span id="e3av"></span></label><input type="range" id="e3a" min="0" max="200" step="1" value="27"></div>
+        <div class="eq">V = |J₀(4πa/λ)|<br>V = 0.9 at 4πa/λ = 0.641</div>
+      </div>
+      <div id="e3cj" style="display:none">
+        <div class="ctl"><label>Phase jitter σ (rms) <span id="e3jv"></span></label><input type="range" id="e3j" min="0" max="2.5" step="0.01" value="0.46"></div>
+        <div class="eq">V = exp(−σ²/2)<br>V = 0.9 at σ = 0.46 rad</div>
+      </div>
+    </div>
+    <div>
+      <div class="cards" id="e3cards"></div>
+      <div class="cv-title">Recorded fringes: still (top) and with motion during the exposure (bottom)</div>
+      <canvas id="e3img" height="140"></canvas>
+      <div class="cv-title" id="e3t2"></div>
+      <canvas id="e3plot" height="230"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Drift at 10 µm/s, λ = 532 nm: find the longest exposure for V ≥ 0.9 and check λ/(8v).</li>
+    <li>Which drift Δ makes the fringes vanish completely? Why does the visibility come back a little beyond it?</li>
+    <li>Vibration: which amplitude gives V = 0.9? Why is this only a few tens of nanometres?</li>
+    <li>For what visibility is the image energy only 1 %? Explain why a bright hologram can give an empty reconstruction.</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> إزاحة صغيرة جداً، بمقدار ثُمن طول موجة أثناء التعريض، تكفي لخفض تباين الهدب إلى 90%. لهذا تُسجَّل الهولوغرامات الرقمية بتعريض قصير أو بليزر نبضي، وعلى طاولة معزولة عن الاهتزاز.</div>
+</section>
+</main>
+
+<footer>All results are computed in your browser from the equations of Chapter 8 (Schnars et al., Digital Holography and Wavefront Sensing, 2nd ed.). The MATLAB versions of these experiments are Labs 8.1–8.2.</footer>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const C = { navy:'#0B1E3A', teal:'#0E8C9A', coral:'#E8604C', grey:'#5A6B7F', line:'#C9D6E0', gold:'#D99A1E' };
+const fmt = (v, d = 3) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : (+v.toFixed(d)).toString();
+function lenStr(m) { const a = Math.abs(m); if (a >= 1) return fmt(m, 3) + ' m'; if (a >= 1e-3) return fmt(m * 1e3, 3) + ' mm'; if (a >= 1e-6) return fmt(m * 1e6, 3) + ' µm'; return fmt(m * 1e9, 3) + ' nm'; }
+
+// ---- canvas helpers ----
+function prep(cv) {
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.getAttribute('height');
+  if (cv.width !== Math.round(w * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.clearRect(0, 0, w, h); return { g, w, h };
+}
+function nice(span) { const p = Math.pow(10, Math.floor(Math.log10(span / 5))); const m = span / 5 / p; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; }
+function plot(cv, series, o) {
+  const { g, w, h } = prep(cv); const L = 56, R = 12, T = 10, B = 38;
+  const x0 = o.xmin, x1 = o.xmax, y0 = o.ymin, y1 = o.ymax;
+  const X = x => L + (x - x0) / (x1 - x0) * (w - L - R), Y = y => h - B - (y - y0) / (y1 - y0) * (h - T - B);
+  g.font = '12px "Source Sans 3", Arial'; g.fillStyle = C.grey; g.strokeStyle = '#E6EDF2'; g.lineWidth = 1;
+  const dx = nice(x1 - x0), dy = nice(y1 - y0);
+  for (let t = Math.ceil(x0 / dx) * dx; t <= x1 + 1e-12; t += dx) { g.beginPath(); g.moveTo(X(t), T); g.lineTo(X(t), h - B); g.stroke(); g.textAlign = 'center'; g.fillText(+(Math.abs(t) < dx * 1e-6 ? 0 : t).toPrecision(6), X(t), h - B + 15); }
+  for (let t = Math.ceil(y0 / dy) * dy; t <= y1 + 1e-12; t += dy) { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(w - R, Y(t)); g.stroke(); g.textAlign = 'right'; g.fillText(+(Math.abs(t) < dy * 1e-6 ? 0 : t).toPrecision(6), L - 5, Y(t) + 4); }
+  g.strokeStyle = C.grey; g.strokeRect(L, T, w - L - R, h - T - B);
+  g.fillStyle = C.navy; g.textAlign = 'center'; g.fillText(o.xlabel || '', L + (w - L - R) / 2, h - 6);
+  g.save(); g.translate(13, T + (h - T - B) / 2); g.rotate(-Math.PI / 2); g.fillText(o.ylabel || '', 0, 0); g.restore();
+  g.save(); g.beginPath(); g.rect(L, T, w - L - R, h - T - B); g.clip();
+  for (const s of series) {
+    g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = s.width || 1.6; g.setLineDash(s.dash || []);
+    if (s.points) { for (let i = 0; i < s.x.length; i++) { g.beginPath(); g.arc(X(s.x[i]), Y(s.y[i]), s.r || 3.5, 0, 7); s.hollow ? g.stroke() : g.fill(); } }
+    else { g.beginPath(); for (let i = 0; i < s.x.length; i++) { const px = X(s.x[i]), py = Y(s.y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+  }
+  g.restore(); g.setLineDash([]);
+  if (o.legend) { let ly = o.legendBottom ? h - B - 10 - 16 * (series.filter(s => s.label).length - 1) : T + 8; g.textAlign = 'left'; for (const s of series) { if (!s.label) continue; g.fillStyle = s.color; g.fillRect(w - R - 190, ly - 5, 14, 3); g.fillStyle = C.navy; g.fillText(s.label, w - R - 170, ly); ly += 16; } }
+}
+function wl2rgb(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = -(nm - 440) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = -(nm - 510) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = -(nm - 645) / 65; } else r = 1;
+  const f = nm < 420 ? 0.3 + 0.7 * (nm - 380) / 40 : nm > 700 ? 0.3 + 0.7 * (780 - nm) / 80 : 1;
+  return [r * f, g * f, b * f];
+}
+function image(cv, nx, ny, fn, rgb) {   // fn(i,j) in [0,1]
+  const { g, w, h } = prep(cv); const im = g.createImageData(nx, ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const v = Math.max(0, Math.min(1, fn(i, j))), k = 4 * (j * nx + i);
+    im.data[k] = 255 * v * rgb[0]; im.data[k + 1] = 255 * v * rgb[1]; im.data[k + 2] = 255 * v * rgb[2]; im.data[k + 3] = 255; }
+  const tmp = document.createElement('canvas'); tmp.width = nx; tmp.height = ny; tmp.getContext('2d').putImageData(im, 0, 0);
+  g.imageSmoothingEnabled = true; return { g, w, h, tmp };
+}
+const linspace = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * i / (n - 1));
+
+// ---- tabs ----
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.exp').forEach(s => s.classList.toggle('on', s.id === b.dataset.t));
+  draw();
+});
+function cards(id, list) { $(id).innerHTML = list.map(c => '<div class="card ' + (c[2] || '') + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join(''); }
+function segs(id, cb) { document.querySelectorAll('#' + id + ' button').forEach(b => b.onclick = () => { document.querySelectorAll('#' + id + ' button').forEach(x => x.classList.toggle('on', x === b)); cb(b.dataset.m); draw(); }); }
+const sinc = u => u === 0 ? 1 : Math.sin(Math.PI * u) / (Math.PI * u);
+function J0(x) { x = Math.abs(x); if (x < 8) { const y = x * x; return (57568490574.0 + y * (-13362590354.0 + y * (651619640.7 + y * (-11214424.18 + y * (77392.33017 + y * (-184.9052456)))))) / (57568490411.0 + y * (1029532985.0 + y * (9494680.718 + y * (59272.64853 + y * (267.8532712 + y))))); }
+  const z = 8 / x, y = z * z, xx = x - 0.785398164; const p = 1 + y * (-0.1098628627e-2 + y * (0.2734510407e-4 + y * (-0.2073370639e-5 + y * 0.2093887211e-6))); const q = -0.1562499995e-1 + y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 - y * 0.934935152e-7)));
+  return Math.sqrt(0.636619772 / x) * (Math.cos(xx) * p - z * Math.sin(xx) * q); }
+let seed = 3; const rnd = () => { seed = (seed + 0x6D2B79F5) | 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return (((t ^ (t >>> 14)) >>> 0) + 0.5) / 4294967296; };
+const randn = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+
+// ================= Experiment 1 =================
+document.querySelectorAll('#e1 .presets button').forEach(b => b.onclick = () => { $('e1p').value = b.dataset.s; draw(); });
+function e1() {
+  const D = +$('e1p').value * 1e-6, ff = +$('e1f').value, lam = +$('e1l').value * 1e-9, th = +$('e1t').value * Math.PI / 180;
+  $('e1pv').textContent = (D * 1e6).toFixed(2) + ' µm'; $('e1fv').textContent = ff.toFixed(2); $('e1lv').textContent = $('e1l').value + ' nm'; $('e1tv').textContent = (+$('e1t').value).toFixed(2) + '°';
+  const f = 2 * Math.sin(th / 2) / lam, fN = 1 / (2 * D), thmax = 2 * Math.asin(Math.min(1, lam / (4 * D)));
+  const fs = 1 / D, fa = f - Math.round(f / fs) * fs;   // folded, signed
+  const M = Math.abs(sinc(f * ff * D));
+  const Np = 30, sub = 48, pix = [];
+  for (let j = 0; j < Np; j++) { let s = 0; for (let k = 0; k < sub; k++) { const x = (j + (1 - ff) / 2 + (k + 0.5) / sub * ff) * D; s += 1 + Math.cos(2 * Math.PI * f * x); } pix.push(s / sub); }
+  const xs = linspace(0, Np, 3000), stx = [], sty = []; pix.forEach((v, j) => { stx.push(j, j + 1); sty.push(v, v); });
+  plot($('e1sig'), [{ x: xs, y: xs.map(x => 1 + Math.cos(2 * Math.PI * f * x * D)), color: C.grey, width: 0.8 }, { x: stx, y: sty, color: C.teal, width: 2.2 }], { xmin: 0, xmax: Np, ymin: 0, ymax: 2.1, xlabel: 'Position  [pixels]', ylabel: 'Irradiance' });
+  // spectrum of the recorded line (DFT magnitude over -fN..fN)
+  const L = 512, line = []; for (let j = 0; j < L; j++) { let s = 0; for (let k = 0; k < 8; k++) { const x = (j + (1 - ff) / 2 + (k + 0.5) / 8 * ff) * D; s += Math.cos(2 * Math.PI * f * x); } line.push(s / 8 * (0.5 - 0.5 * Math.cos(2 * Math.PI * j / (L - 1)))); }
+  const F = linspace(-fN, fN, 400), Sp = F.map(q => { let r = 0, i = 0; for (let j = 0; j < L; j++) { r += line[j] * Math.cos(2 * Math.PI * q * j * D); i += line[j] * Math.sin(2 * Math.PI * q * j * D); } return Math.hypot(r, i) / L * 4; });
+  const sm = Math.max(...Sp, 0.01);
+  plot($('e1spec'), [{ x: F.map(v => v / 1000), y: Sp, color: C.navy, width: 1.6 }, { x: [-fa / 1000, fa / 1000], y: [M, M].map(v => Math.min(v, sm)), color: C.coral, points: true, r: 5 }, { x: [f / 1000, f / 1000], y: [0, sm * 1.05], color: C.gold, dash: [4, 4], width: 1.2 }],
+    { xmin: -fN / 1000, xmax: fN / 1000, ymin: 0, ymax: sm * 1.1, xlabel: 'Spatial frequency  [lines/mm]  (gold dashed: true carrier, if inside the band)', ylabel: '|spectrum|' });
+  const P = linspace(1, 10, 200);
+  plot($('e1max'), [{ x: P, y: P.map(p => 2 * Math.asin(Math.min(1, lam / (4 * p * 1e-6))) * 180 / Math.PI), color: C.teal, width: 2 }, { x: [D * 1e6], y: [thmax * 180 / Math.PI], color: C.coral, points: true, r: 5 }], { xmin: 1, xmax: 10, ymin: 0, ymax: Math.min(40, 2 * Math.asin(Math.min(1, lam / 4e-6)) * 180 / Math.PI * 1.1), xlabel: 'Pixel pitch  [µm]', ylabel: 'θ_max  [deg]' });
+  const ok = f <= fN;
+  cards('e1cards', [['Fringe frequency f', fmt(f / 1000, 4) + ' lines/mm'], ['Nyquist 1/(2Δx)', fmt(fN / 1000, 4) + ' lines/mm'], ['θ_max', (thmax * 180 / Math.PI).toFixed(2) + '°', 'th'], ['Recorded modulation M', M.toFixed(3), 'ok'], ['Carrier seen at', fmt(fa / 1000, 4) + ' lines/mm' + (ok ? '' : ' (aliased!)'), ok ? 'ok' : 'th']]);
+}
+
+// ================= Experiment 2 =================
+let m2 = 'o'; segs('e2seg', m => m2 = m);
+function e2() {
+  const lam = 633e-9, W = +$('e2w').value * 1e-3, N = +$('e2n').value, D = +$('e2p').value * 1e-6, d = +$('e2d').value;
+  $('e2wv').textContent = (W * 1e3).toFixed(1) + ' mm'; $('e2nv').textContent = String(N); $('e2pv').textContent = (D * 1e6).toFixed(2) + ' µm'; $('e2dv').textContent = d.toFixed(2) + ' m';
+  const A = N * D, dIn = D * (W + A) / lam, dOff = D * (4 * W + A) / lam, dmin = m2 === 'o' ? dOff : dIn;
+  // highest object-wave angle: from the far object edge to the far camera edge
+  const off = m2 === 'o' ? 1.5 * W : 0, edge = off + W / 2 + A / 2, fmax = z => 2 * Math.sin(Math.atan(edge / z) / 2) / lam;
+  // simpler, matching the d_min formula: largest angle between two rays (object width + camera aperture)
+  const fgeom = z => (m2 === 'o' ? (4 * W + A) : (W + A)) / (2 * lam * z);
+  cards('e2cards', [['Camera aperture NΔx', lenStr(A)], ['d_min in-line', lenStr(dIn), m2 === 'i' ? 'th' : ''], ['d_min off-axis', lenStr(dOff), m2 === 'o' ? 'th' : ''], ['Resolution λd/(NΔx)', lenStr(lam * d / A), 'ok'], ['At this d', d >= dmin ? 'sampled correctly' : 'aliasing!', d >= dmin ? 'ok' : 'th']]);
+  // geometry
+  const cv = $('e2geo'), { g, w, h } = prep(cv), sx = (w - 60) / Math.max(d, dmin * 1.05), Ymax = Math.max(off + W / 2, A / 2) * 1.15, sy = (h / 2 - 12) / Ymax;
+  const X = z => 30 + z * sx, Y = y => h / 2 - y * sy;
+  g.strokeStyle = C.line; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(0), Y(0)); g.lineTo(X(d), Y(0)); g.stroke(); g.setLineDash([]);
+  g.strokeStyle = C.teal; g.lineWidth = 5; g.beginPath(); g.moveTo(X(0), Y(off - W / 2)); g.lineTo(X(0), Y(off + W / 2)); g.stroke();
+  g.strokeStyle = C.navy; g.lineWidth = 6; g.beginPath(); g.moveTo(X(d), Y(-A / 2)); g.lineTo(X(d), Y(A / 2)); g.stroke();
+  g.strokeStyle = C.coral; g.lineWidth = 1.5; g.beginPath(); g.moveTo(X(0), Y(off + W / 2)); g.lineTo(X(d), Y(-A / 2)); g.stroke();
+  if (m2 === 'o') { g.beginPath(); g.moveTo(X(0), Y(off - W / 2)); g.lineTo(X(d), Y(A / 2)); g.strokeStyle = 'rgba(232,96,76,0.4)'; g.stroke(); }
+  g.fillStyle = C.navy; g.font = '12.5px "Source Sans 3", Arial'; g.fillText('object W', X(0) + 6, Y(off + W / 2) - 4); g.fillText('camera NΔx', X(d) - 70, Y(A / 2) - 6);
+  g.fillText('d = ' + d.toFixed(2) + ' m   (d_min = ' + lenStr(dmin) + ')', X(0) + 10, h - 8);
+  if (dmin < Math.max(d, dmin * 1.05)) { g.strokeStyle = C.coral; g.setLineDash([5, 4]); g.beginPath(); g.moveTo(X(dmin), 6); g.lineTo(X(dmin), h - 20); g.stroke(); g.setLineDash([]); g.fillStyle = C.coral; g.fillText('d_min', X(dmin) + 3, 16); }
+  const Z = linspace(0.05, 3, 300), fN = 1 / (2 * D);
+  plot($('e2plot'), [{ x: Z, y: Z.map(z => fgeom(z) / 1000), color: C.teal, width: 2 }, { x: [0.05, 3], y: [fN / 1000, fN / 1000], color: C.coral, dash: [6, 4], width: 1.4 }, { x: [d], y: [fgeom(d) / 1000], color: C.navy, points: true, r: 5 }],
+    { xmin: 0, xmax: 3, ymin: 0, ymax: Math.min(fgeom(0.2) / 1000, 4 * fN / 1000), xlabel: 'Distance d  [m]', ylabel: 'f_max  [lines/mm]' });
+}
+
+const tStr = t => t >= 1 ? fmt(t, 3) + ' s' : t >= 1e-3 ? fmt(t * 1e3, 3) + ' ms' : fmt(t * 1e6, 3) + ' µs';
+// ================= Experiment 3 =================
+let m3 = 'd'; segs('e3seg', m => { m3 = m; [['d', 'e3cd'], ['v', 'e3cv'], ['j', 'e3cj']].forEach(([k, id]) => $(id).style.display = k === m ? '' : 'none'); });
+function e3() {
+  const lamnm = +$('e3l').value, lam = lamnm * 1e-9; $('e3lv').textContent = lamnm + ' nm';
+  const K = 400; let phases, Vth, label, xs, ys, cur;
+  if (m3 === 'd') {
+    const v = +$('e3v').value * 1e-6, te = +$('e3e').value * 1e-3, Dl = v * te; $('e3vv').textContent = (v * 1e6).toFixed(1) + ' µm/s'; $('e3ev').textContent = (te * 1e3).toFixed(1) + ' ms';
+    phases = Array.from({ length: K }, (_, k) => 4 * Math.PI * Dl * (k + 0.5) / K / lam); Vth = Math.abs(sinc(2 * Dl / lam));
+    xs = linspace(0, 1.5, 300); ys = xs.map(q => Math.abs(sinc(2 * q))); cur = Dl / lam; label = 'Drift during the exposure Δ/λ  (theory |sinc(2Δ/λ)|)';
+    var extra = [['Drift Δ = v t_exp', lenStr(Dl)], ['Longest t_exp for V ≥ 0.9', v > 0 ? tStr(lam / (8 * v)) : '∞']];
+  } else if (m3 === 'v') {
+    const a = +$('e3a').value * 1e-9; $('e3av').textContent = (a * 1e9).toFixed(0) + ' nm';
+    phases = Array.from({ length: K }, (_, k) => 4 * Math.PI * a * Math.sin(2 * Math.PI * (k + 0.5) / K) / lam); Vth = Math.abs(J0(4 * Math.PI * a / lam));
+    xs = linspace(0, 0.5, 300); ys = xs.map(q => Math.abs(J0(4 * Math.PI * q))); cur = a / lam; label = 'Vibration amplitude a/λ  (theory |J₀(4πa/λ)|)';
+    var extra = [['4πa/λ', fmt(4 * Math.PI * a / lam, 3)], ['a for V = 0.9', lenStr(0.641 * lam / (4 * Math.PI))]];
+  } else {
+    const s = +$('e3j').value; $('e3jv').textContent = s.toFixed(2) + ' rad'; seed = 5;
+    phases = Array.from({ length: 4000 }, () => s * randn()); Vth = Math.exp(-s * s / 2);
+    xs = linspace(0, 2.5, 300); ys = xs.map(q => Math.exp(-q * q / 2)); cur = s; label = 'Phase jitter σ  [rad]  (theory exp(−σ²/2))';
+    var extra = [['Path jitter (reflection) σλ/4π', lenStr(s * lam / (4 * Math.PI))], ['σ for V = 0.9', '0.46 rad']];
+  }
+  // simulate: average fringes over the instants
+  const xp = linspace(0, 4, 400), I = xp.map(x => phases.reduce((t, p) => t + 1 + Math.cos(2 * Math.PI * x + p), 0) / phases.length);
+  const Vn = (Math.max(...I) - Math.min(...I)) / (Math.max(...I) + Math.min(...I));
+  const rgb = wl2rgb(lamnm), n = 400;
+  const { g, w, h, tmp } = image($('e3img'), n, 2, (i, j) => j === 0 ? (1 + Math.cos(2 * Math.PI * xp[i])) / 2 : I[i] / 2, rgb); g.drawImage(tmp, 0, 0, w, h);
+  g.fillStyle = '#fff'; g.font = '12px "Source Sans 3", Arial'; g.fillText('still', 6, 14); g.fillText('with motion', 6, h / 2 + 14);
+  cards('e3cards', [['V simulated', Vn.toFixed(3), 'ok'], ['V theory', Vth.toFixed(3), 'th'], ['Image energy ∝ V²', (Vn * Vn * 100).toFixed(1) + ' %'], ...extra]);
+  $('e3t2').textContent = 'Visibility versus motion — dot: simulated value at the current setting';
+  plot($('e3plot'), [{ x: xs, y: ys, color: C.teal, width: 2 }, { x: [0, xs[xs.length - 1]], y: [0.9, 0.9], color: C.grey, dash: [3, 3], width: 1 }, { x: [cur], y: [Vn], color: C.coral, points: true, r: 5 }], { xmin: 0, xmax: xs[xs.length - 1], ymin: 0, ymax: 1.05, xlabel: label, ylabel: 'Visibility V' });
+}
+
+function draw() { const t = document.querySelector('.exp.on').id; if (t === 'e1') e1(); else if (t === 'e2') e2(); else e3(); }
+document.querySelectorAll('input[type=range]').forEach(r => r.oninput = draw);
+window.addEventListener('resize', draw);
+draw();
+</script>
+<script>(function(){var b=document.querySelector('nav button[data-t="e3"]'); if(b) b.click();})();</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f4"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

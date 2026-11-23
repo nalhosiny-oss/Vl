@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Photon counting · DMP Ch2</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 2 · SIMULATOR 1</small><h1>Photon counting: Poisson statistics and the OOK receiver</h1></header>
+<div class="wrap">
+<div class="grid">
+ <div class="card">
+  <canvas id="tl" width="800" height="120"></canvas>
+  <canvas id="hist" width="800" height="380"></canvas>
+  <div class="eq">detected mean m<sub>d</sub> = η m + m<sub>dark</sub> ,  P(k) = e<sup>−m<sub>d</sub></sup> m<sub>d</sub><sup>k</sup>/k!</div>
+  <label>Mean photons per gate m: <span class="val" id="mv"></span></label><input type="range" id="m" min="0.5" max="30" step="0.5" value="10">
+  <label>Detector efficiency η: <span class="val" id="ev"></span></label><input type="range" id="eta" min="0.05" max="1" step="0.05" value="1">
+  <label>Dark counts per gate m<sub>dark</sub>: <span class="val" id="dv"></span></label><input type="range" id="dark" min="0" max="5" step="0.1" value="0">
+  <button data-n="100">+100 gates</button><button data-n="1000">+1 000</button><button class="main" data-n="10000">+10 000</button><button id="reset">Reset</button>
+  <div class="stats">
+   <div class="s"><span>Gates</span><b id="sG">0</b></div>
+   <div class="s"><span>Mean (theory)</span><b id="sM">—</b></div>
+   <div class="s"><span>Fano = var/mean</span><b id="sF">—</b></div>
+  </div>
+ </div>
+ <div class="card">
+  <canvas id="ber" width="800" height="420"></canvas>
+  <div class="eq">BER = ½ [ P(k &lt; k<sub>th</sub> | m<sub>1</sub>) + P(k ≥ k<sub>th</sub> | m<sub>0</sub>) ]</div>
+  <label>Mean counts for bit '1', m<sub>1</sub>: <span class="val" id="m1v"></span></label><input type="range" id="m1" min="2" max="40" step="1" value="20">
+  <label>Background counts for bit '0', m<sub>0</sub>: <span class="val" id="m0v"></span></label><input type="range" id="m0" min="0" max="5" step="0.1" value="0.5">
+  <label>Threshold k<sub>th</sub>: <span class="val" id="kv"></span></label><input type="range" id="kth" min="1" max="30" step="1" value="6">
+  <button id="opt">Use optimum k<sub>th</sub></button><button class="main" id="simb">Simulate 10<sup>6</sup> bits</button>
+  <div class="stats">
+   <div class="s"><span>BER at k<sub>th</sub> (theory)</span><b id="b1">—</b></div>
+   <div class="s"><span>Optimum k<sub>th</sub> / BER</span><b id="b2">—</b></div>
+   <div class="s"><span>Simulated BER</span><b id="b3">—</b></div>
+  </div>
+  <div class="ar">اجعل الضوء الخلفي صفراً، ثم ابحث عن متوسط عدد الفوتونات للبت «1» الذي يعطي خطأً واحداً في المليار: هذا هو حدّ الكم. بعد ذلك أضف ضوءاً خلفياً صغيراً ولاحظ كيف تتغير العتبة المثلى وكيف يرتفع معدل الخطأ.</div>
+ </div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+function lgam(n){let s=0;for(let i=2;i<=n;i++)s+=Math.log(i);return s}
+const pmf=(k,m)=>m===0?(k===0?1:0):Math.exp(k*Math.log(m)-m-lgam(k));
+const cdf=(k,m)=>{if(k<0)return 0;let s=0;for(let i=0;i<=k;i++)s+=pmf(i,m);return Math.min(s,1)};
+function pois(m){if(m<=0)return 0;let L=Math.exp(-m),k=0,p=1;if(m>40){return Math.max(0,Math.round(m+Math.sqrt(m)*gauss()))}do{k++;p*=Math.random()}while(p>L);return k-1}
+function gauss(){return Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random())}
+let counts=[],lastGate=[];
+function md(){return +$('eta').value*+$('m').value+ +$('dark').value}
+function gates(n){const m=+$('m').value,eta=+$('eta').value,d=+$('dark').value;
+ for(let i=0;i<n;i++){let t=0,k=0,ev=[];const T=1;while(true){t+=-Math.log(1-Math.random())/m;if(t>T)break;if(Math.random()<eta){k++;ev.push([t,1])}else ev.push([t,0])}
+  const nd=pois(d);for(let j=0;j<nd;j++)ev.push([Math.random(),2]);k+=nd;counts.push(k);if(i===n-1)lastGate=ev}
+ draw()}
+function draw(){const m=+$('m').value;$('mv').textContent=m;$('ev').textContent=$('eta').value;$('dv').textContent=$('dark').value;
+ const mm=md(),c=$('hist').getContext('2d'),W=800,H=380;c.clearRect(0,0,W,H);
+ const kmax=Math.max(10,Math.ceil(mm+5*Math.sqrt(mm)+3));const n=counts.length;const fr=new Array(kmax+1).fill(0);counts.forEach(k=>{if(k<=kmax)fr[k]++});
+ let ymax=0;for(let k=0;k<=kmax;k++)ymax=Math.max(ymax,pmf(k,mm),n?fr[k]/n:0);ymax*=1.15;
+ const x0=50,y0=H-40,bw=(W-70)/(kmax+1);c.strokeStyle='#5A5650';c.beginPath();c.moveTo(x0,10);c.lineTo(x0,y0);c.lineTo(W-10,y0);c.stroke();
+ c.fillStyle='#5A5650';c.font='14px Calibri';for(let k=0;k<=kmax;k+=Math.ceil(kmax/15))c.fillText(k,x0+k*bw+bw/3,y0+18);c.fillText('counts per gate k',W/2-50,H-5);
+ if(n)for(let k=0;k<=kmax;k++){const h=fr[k]/n/ymax*(y0-15);c.fillStyle='#BDB6A8';c.fillRect(x0+k*bw+2,y0-h,bw-4,h)}
+ c.strokeStyle='#E07B1A';c.lineWidth=2.5;c.beginPath();for(let k=0;k<=kmax;k++){const y=y0-pmf(k,mm)/ymax*(y0-15),x=x0+k*bw+bw/2;k?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();
+ c.fillStyle='#E07B1A';for(let k=0;k<=kmax;k++){c.beginPath();c.arc(x0+k*bw+bw/2,y0-pmf(k,mm)/ymax*(y0-15),3.5,0,7);c.fill()}
+ c.fillStyle='#1E1E22';c.font='15px Calibri';c.fillText('bars: simulation   line: Poisson, mean '+mm.toFixed(2),x0+10,24);c.lineWidth=1;
+ // timeline
+ const t=$('tl').getContext('2d');t.clearRect(0,0,800,120);t.strokeStyle='#5A5650';t.beginPath();t.moveTo(20,70);t.lineTo(780,70);t.stroke();
+ t.fillStyle='#5A5650';t.font='13px Calibri';t.fillText('last gate: ● detected photon   ○ lost photon   ◆ dark count',20,20);
+ lastGate.forEach(e=>{const x=20+e[0]*760;if(e[1]===1){t.fillStyle='#E07B1A';t.beginPath();t.arc(x,70,6,0,7);t.fill()}else if(e[1]===0){t.strokeStyle='#8C8C84';t.beginPath();t.arc(x,70,6,0,7);t.stroke()}else{t.fillStyle='#2E6F8E';t.fillRect(x-5,85,10,10)}});
+ $('sG').textContent=n;if(n>1){const mu=counts.reduce((a,b)=>a+b,0)/n;let v=0;counts.forEach(k=>v+=(k-mu)**2);v/=n-1;$('sM').textContent=mu.toFixed(3)+' ('+mm.toFixed(2)+')';$('sF').textContent=(v/mu).toFixed(3)}else{$('sM').textContent='—';$('sF').textContent='—'}}
+['m','eta','dark'].forEach(id=>$(id).oninput=()=>{counts=[];lastGate=[];draw()});
+document.querySelectorAll('button[data-n]').forEach(b=>b.onclick=()=>gates(+b.dataset.n));$('reset').onclick=()=>{counts=[];lastGate=[];draw()};
+const BER=(k,m1,m0)=>0.5*(cdf(k-1,m1)+(1-cdf(k-1,m0)));
+function opt(){const m1=+$('m1').value,m0=+$('m0').value;let best=1,kb=1;for(let k=1;k<=30;k++){const b=BER(k,m1,m0);if(b<best){best=b;kb=k}}return[kb,best]}
+function drawB(){const m1=+$('m1').value,m0=+$('m0').value,kt=+$('kth').value;$('m1v').textContent=m1;$('m0v').textContent=m0;$('kv').textContent=kt;
+ const c=$('ber').getContext('2d'),W=800,H=420;c.clearRect(0,0,W,H);const x0=70,y0=H-45,lo=-12;
+ c.strokeStyle='#5A5650';c.beginPath();c.moveTo(x0,10);c.lineTo(x0,y0);c.lineTo(W-10,y0);c.stroke();c.fillStyle='#5A5650';c.font='14px Calibri';
+ const X=k=>x0+(k-1)/29*(W-x0-20),Y=b=>{const l=Math.max(lo,Math.log10(Math.max(b,1e-30)));return 10+(0-l)/(0-lo)*(y0-10)};
+ for(let e=0;e>=lo;e-=2){c.fillText('1e'+e,15,Y(10**e)+5);c.strokeStyle='#EEE9DF';c.beginPath();c.moveTo(x0,Y(10**e));c.lineTo(W-10,Y(10**e));c.stroke()}
+ for(let k=1;k<=30;k+=3)c.fillText(k,X(k)-4,y0+18);c.fillText('decision threshold k_th',W/2-60,H-5);
+ c.strokeStyle='#1E1E22';c.lineWidth=2.5;c.beginPath();for(let k=1;k<=30;k++){const y=Y(BER(k,m1,m0));k>1?c.lineTo(X(k),y):c.moveTo(X(k),y)}c.stroke();c.lineWidth=1;
+ const [kb,bb]=opt();c.fillStyle='#2E6F8E';c.beginPath();c.arc(X(kb),Y(bb),7,0,7);c.fill();
+ c.fillStyle='#E07B1A';c.beginPath();c.arc(X(kt),Y(BER(kt,m1,m0)),6,0,7);c.fill();
+ c.fillStyle='#1E1E22';c.font='15px Calibri';c.fillText('line: theory   blue: optimum   orange: your threshold',x0+10,24);
+ $('b1').textContent=BER(kt,m1,m0).toExponential(2);$('b2').textContent=kb+' / '+bb.toExponential(2);}
+['m1','m0','kth'].forEach(id=>$(id).oninput=()=>{$('b3').textContent='—';drawB()});
+$('opt').onclick=()=>{$('kth').value=opt()[0];drawB()};
+$('simb').onclick=()=>{const m1=+$('m1').value,m0=+$('m0').value,kt=+$('kth').value,N=1e6;let e=0;
+ const c1=[],c0=[];for(let k=0;k<=80;k++){c1.push(cdf(k,m1));c0.push(cdf(k,m0))}
+ const inv=(cd,u)=>{let k=0;while(k<80&&cd[k]<u)k++;return k};
+ for(let i=0;i<N;i++){if(Math.random()<0.5){if(inv(c1,Math.random())<kt)e++}else{if(inv(c0,Math.random())>=kt)e++}}
+ const b=e/N;$('b3').textContent=(e?b.toExponential(2):'0')+' ('+e+' errors)'};
+draw();drawB();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificate of Achievement – Quantum Optics</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=STIX+Two+Text&family=Playfair+Display:wght@700&display=swap">
+<style>
+:root{--bg:#F4EFF6;--panel:#FFFFFF;--ink:#2B2230;--muted:#8C8594;--line:#E3DCE7;--acc:#5B2A6E;--acc2:#6E8F6A;--chip:#F4EFF6;--ok:#2E7D4F;--okbg:#E3F5EC;--bad:#C8322F;--badbg:#FBE6E6}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,'Segoe UI',Arial,sans-serif;line-height:1.65}
+.wrap{max-width:820px;margin:0 auto;padding:14px}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.15rem,3.4vw,1.5rem);margin:.35em 0 .2em}
+h1 span{color:var(--acc)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px}
+.muted{color:var(--muted);font-size:.92rem}
+ul.rules{margin:.4em 0;padding-inline-start:1.2em}
+ul.rules li{margin:.2em 0}
+.btn{font:inherit;font-weight:700;border:0;background:var(--acc);color:#fff;padding:10px 22px;border-radius:12px;cursor:pointer;min-height:46px}
+.btn.ghost{background:transparent;border:1px solid var(--acc2);color:var(--acc2);font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--acc2);width:0}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.q{margin:4px 0 8px;font-size:1.02rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:9px 12px;border-radius:10px;margin:6px 0;cursor:pointer;min-height:44px}
+.opt.sel{border-color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc2)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.big{font-size:2.2rem;font-weight:700;color:var(--acc2);text-align:center}
+.rev{border-top:1px solid var(--line);padding:8px 0;font-size:.92rem}
+.rev b{color:var(--bad)}
+.rev .ok{color:var(--ok)}
+input[type=text]{width:100%;font:inherit;font-size:1.05rem;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+#certImg{width:100%;height:auto;border-radius:8px;display:block;margin-top:10px;-webkit-touch-callout:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hide{display:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+code{font-family:Consolas,"Courier New",monospace;direction:ltr;unicode-bidi:isolate;background:var(--chip);border:1px solid var(--line);padding:0 5px;border-radius:5px;font-size:.92em}
+</style>
+</head>
+<body>
+<div class="wrap">
+<span class="badge">Quantum Optics · 203674-3</span>
+<h1>Certificate of Achievement · <span>Virtual Labs</span></h1>
+
+<section id="sIntro" class="card">
+<p>After you finish the labs of the five chapters, take the final quiz to earn a certificate in your name.</p>
+<ul class="rules">
+<li><b>20 multiple-choice questions</b> drawn at random from the five chapters on every attempt.</li>
+<li>The pass mark is <b>80%</b> (at least 16 correct answers).</li>
+<li>If you do not pass, review your answers and try again with new questions.</li>
+<li class="muted">Your answers are not saved or sent anywhere. This is a self-issued certificate of achievement, not an official university certificate.</li>
+</ul>
+<button class="btn" id="go">Start the quiz</button>
+</section>
+
+<section id="sQuiz" class="card hide">
+<div class="qn" id="qn"></div>
+<div class="bar"><i id="barI"></i></div>
+<div class="q" id="qt"></div>
+<div id="qo"></div>
+<div class="nav"><button class="btn ghost" id="prev">Previous</button><button class="btn" id="next">Next</button></div>
+</section>
+
+<section id="sRes" class="card hide">
+<div class="muted" style="text-align:center">Your score</div>
+<div class="big" id="pct"></div>
+<p id="msg" style="text-align:center"></p>
+<div id="passBox" class="hide">
+<label for="nm">Type your name as you want it to appear on the certificate:</label>
+<input type="text" id="nm" maxlength="40" autocomplete="name">
+<button class="btn" id="mk">Create my certificate</button>
+</div>
+<div id="failBox" class="hide"><button class="btn" id="again">Try again with new questions</button></div>
+<div id="review"></div>
+</section>
+
+<section id="sCert" class="card hide">
+<p class="muted" id="saveHint">On a phone: long-press the certificate and choose “Save image”. On a computer: use the download button.</p>
+<img id="certImg" alt="Certificate of achievement">
+<div class="row"><a class="btn" id="dl" download="Certificate_Quantum_Optics.png" href="#" style="text-decoration:none;display:inline-flex;align-items:center">Download certificate</a><button class="btn ghost" id="back">Back</button></div>
+<canvas id="cv" class="hide"></canvas>
+</section>
+</div>
+<script>
+const BANK=[{"c": 1, "q": "In the semiclassical model of atom-light interaction:", "o": ["Both atom and field are quantized", "The atom is quantized, the field is classical", "The field is quantized, the atom is classical", "Neither is quantized"], "a": 1, "e": "The semiclassical theory treats the atom quantum-mechanically and the field as a classical wave."}, {"c": 1, "q": "For a resonantly driven two-level atom (no damping), the excited-state population oscillates at:", "o": ["The optical frequency", "The Rabi frequency", "Twice the optical frequency", "The detuning only"], "a": 1, "e": "These are Rabi oscillations, <span class=\"eq\" dir=\"ltr\">P<sub>e</sub> = sin²(Ωt/2)</span>."}, {"c": 1, "q": "A resonant pulse that transfers the atom completely from ground to excited state is a:", "o": ["<span class=\"eq\" dir=\"ltr\">π/2</span> pulse", "<span class=\"eq\" dir=\"ltr\">π</span> pulse", "<span class=\"eq\" dir=\"ltr\">2π</span> pulse", "<span class=\"eq\" dir=\"ltr\">4π</span> pulse"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">Ωt = π ⇒ P<sub>e</sub> = 1</span>"}, {"c": 1, "q": "The rotating-wave approximation neglects terms oscillating at:", "o": ["<span class=\"eq\" dir=\"ltr\">ω − ω<sub>0</sub></span>", "<span class=\"eq\" dir=\"ltr\">ω + ω<sub>0</sub></span>", "<span class=\"eq\" dir=\"ltr\">Ω</span>", "<span class=\"eq\" dir=\"ltr\">0</span>"], "a": 1, "e": "Counter-rotating terms at the sum frequency average out near resonance."}, {"c": 1, "q": "The Rabi frequency is proportional to:", "o": ["The field amplitude and the dipole matrix element", "The square of the field intensity", "The atomic mass", "The detuning only"], "a": 0, "e": "<span class=\"eq\" dir=\"ltr\">Ω = d·E<sub>0</sub>/ħ</span>"}, {"c": 1, "q": "With detuning <span class=\"eq\" dir=\"ltr\">Δ</span>, the generalized Rabi frequency is:", "o": ["<span class=\"eq\" dir=\"ltr\">Ω + Δ</span>", "<span class=\"eq\" dir=\"ltr\">√(Ω² + Δ²)</span>", "<span class=\"eq\" dir=\"ltr\">Ω − Δ</span>", "<span class=\"eq\" dir=\"ltr\">ΩΔ</span>"], "a": 1, "e": "Detuning increases the oscillation rate but reduces the maximum transfer."}, {"c": 1, "q": "On the Bloch sphere, a pure state of a two-level atom lies:", "o": ["At the centre", "On the surface", "Inside the sphere", "Only at the poles"], "a": 1, "e": "Pure states have Bloch vector length 1; mixed states lie inside."}, {"c": 1, "q": "Under a strong, steady resonant drive with spontaneous decay, the excited-state population saturates at:", "o": ["0", "1/2", "1", "1/4"], "a": 1, "e": "Strong driving equalizes the two populations."}, {"c": 2, "q": "Each mode of the quantized electromagnetic field is equivalent to:", "o": ["A free particle", "A quantum harmonic oscillator", "A two-level atom", "A rigid rotor"], "a": 1, "e": "Field quantization maps each mode to an oscillator with <span class=\"eq\" dir=\"ltr\">[a, a<sup>†</sup>] = 1</span>."}, {"c": 2, "q": "The vacuum state of a field mode has energy:", "o": ["<span class=\"eq\" dir=\"ltr\">0</span>", "<span class=\"eq\" dir=\"ltr\">ħω/2</span>", "<span class=\"eq\" dir=\"ltr\">ħω</span>", "<span class=\"eq\" dir=\"ltr\">2ħω</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">E<sub>n</sub> = ħω(n + ½)</span> with <span class=\"eq\" dir=\"ltr\">n = 0</span>."}, {"c": 2, "q": "A coherent state <span class=\"eq\" dir=\"ltr\">|α⟩</span> is an eigenstate of:", "o": ["The number operator", "The annihilation operator", "The creation operator", "The Hamiltonian"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">a|α⟩ = α|α⟩</span>"}, {"c": 2, "q": "The photon-number distribution of a coherent state is:", "o": ["Uniform", "Poissonian", "Bose–Einstein (thermal)", "Single-valued"], "a": 1, "e": "Coherent states have Poisson statistics with mean <span class=\"eq\" dir=\"ltr\">|α|²</span>."}, {"c": 2, "q": "For a coherent state with mean photon number 100, the standard deviation of photon number is:", "o": ["1", "10", "50", "100"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">Δn = √⟨n⟩ = 10</span>"}, {"c": 2, "q": "The second-order coherence <span class=\"eq\" dir=\"ltr\">g<sup>(2)</sup>(0)</span> of a thermal (chaotic) light source equals:", "o": ["0", "1", "2", "1/2"], "a": 2, "e": "Thermal light shows photon bunching with <span class=\"eq\" dir=\"ltr\">g<sup>(2)</sup>(0) = 2</span>."}, {"c": 2, "q": "A squeezed state has:", "o": ["Both quadrature variances below vacuum", "One quadrature variance below the vacuum level", "Zero mean photon number always", "Poissonian statistics"], "a": 1, "e": "Noise is reduced in one quadrature at the expense of the other."}, {"c": 2, "q": "A measured <span class=\"eq\" dir=\"ltr\">g<sup>(2)</sup>(0) < 1</span> is a signature of:", "o": ["Thermal light", "Coherent laser light", "Non-classical (antibunched) light", "Classical noise"], "a": 2, "e": "No classical field can produce <span class=\"eq\" dir=\"ltr\">g<sup>(2)</sup>(0) < 1</span>."}, {"c": 3, "q": "The Jaynes–Cummings model describes:", "o": ["A many-atom gas in a thermal field", "A single two-level atom coupled to a single quantized field mode", "A classical dipole in free space", "A free electron laser"], "a": 1, "e": "It is the simplest fully quantum model of atom-field interaction."}, {"c": 3, "q": "Vacuum Rabi oscillations occur when an excited atom interacts with a cavity mode that is initially:", "o": ["In a coherent state", "In the vacuum state", "Thermal", "Highly squeezed"], "a": 1, "e": "Even the empty mode exchanges an excitation with the atom."}, {"c": 3, "q": "In the Jaynes–Cummings model with an initial coherent field, the Rabi oscillations show:", "o": ["Steady oscillation forever", "Collapse and revival", "Exponential growth", "No dynamics"], "a": 1, "e": "Different photon-number components dephase and later rephase."}, {"c": 3, "q": "The dressed states of the Jaynes–Cummings model for <span class=\"eq\" dir=\"ltr\">n</span> photons are split by:", "o": ["<span class=\"eq\" dir=\"ltr\">2g</span>", "<span class=\"eq\" dir=\"ltr\">2g√(n+1)</span>", "<span class=\"eq\" dir=\"ltr\">g/n</span>", "<span class=\"eq\" dir=\"ltr\">ħω</span>"], "a": 1, "e": "Resonant splitting <span class=\"eq\" dir=\"ltr\">2g√(n+1)</span> (in frequency units)."}, {"c": 3, "q": "The Purcell effect refers to:", "o": ["Change of the spontaneous emission rate by the cavity environment", "Doppler broadening", "Photon bunching", "Second-harmonic generation"], "a": 0, "e": "A resonant cavity can enhance (or suppress) the emission rate."}, {"c": 3, "q": "Spontaneous emission in the fully quantum theory is understood as emission stimulated by:", "o": ["Thermal phonons", "Vacuum field fluctuations", "The classical field", "Nuclear spin"], "a": 1, "e": "Vacuum fluctuations of the quantized field drive spontaneous decay."}, {"c": 3, "q": "The strong-coupling regime of cavity QED requires the coupling <span class=\"eq\" dir=\"ltr\">g</span> to be:", "o": ["Much smaller than the decay rates", "Larger than the cavity and atomic decay rates", "Equal to zero", "Equal to the optical frequency"], "a": 1, "e": "Coherent exchange must outpace losses."}, {"c": 3, "q": "The Mollow triplet appears in the fluorescence spectrum of:", "o": ["A weakly driven atom", "A strongly driven two-level atom", "A thermal source", "A free electron"], "a": 1, "e": "Strong driving splits the levels, producing a central peak and two sidebands."}, {"c": 4, "q": "Well above threshold, the photon statistics of an ideal laser approach:", "o": ["Thermal", "Poissonian", "Sub-Poissonian always", "Uniform"], "a": 1, "e": "Laser light becomes close to a coherent state."}, {"c": 4, "q": "Below threshold, laser output light has photon statistics close to:", "o": ["Poissonian", "Thermal", "Fock state", "Squeezed"], "a": 1, "e": "Below threshold the output is dominated by spontaneous (chaotic) emission."}, {"c": 4, "q": "The fundamental quantum limit of the laser linewidth is given by the:", "o": ["Rayleigh criterion", "Schawlow–Townes formula", "Beer–Lambert law", "Wiener–Khinchin theorem"], "a": 1, "e": "Phase diffusion from spontaneous emission sets the Schawlow–Townes linewidth."}, {"c": 4, "q": "In the Schawlow–Townes result, the linewidth decreases as the output power:", "o": ["Decreases", "Increases", "Stays constant", "Oscillates"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">Δν ∝ 1/P</span>"}, {"c": 4, "q": "In a laser, the phase of the field undergoes:", "o": ["No fluctuations", "Random diffusion due to spontaneous emission", "Periodic jumps only", "Exponential growth"], "a": 1, "e": "Amplitude is stabilized above threshold but phase diffuses."}, {"c": 4, "q": "At the laser threshold, the gain:", "o": ["Is zero", "Equals the total cavity losses", "Is infinite", "Is less than the losses"], "a": 1, "e": "Threshold is when round-trip gain balances loss."}, {"c": 4, "q": "The Scully–Lamb (or Fokker–Planck) laser theory shows that above threshold the photon-number distribution becomes:", "o": ["Broad and thermal", "Peaked around a mean value", "Flat", "Zero"], "a": 1, "e": "Saturation stabilizes the amplitude, giving a peaked distribution."}, {"c": 4, "q": "Amplitude squeezing below shot noise can be achieved in a semiconductor laser by:", "o": ["Pumping with a quiet (sub-Poissonian) current", "Increasing the temperature", "Using thermal pumping", "Adding cavity loss"], "a": 0, "e": "Regulating the pump noise suppresses intensity fluctuations."}, {"c": 5, "q": "A qubit differs from a classical bit because it can be:", "o": ["Only 0 or 1", "In a superposition of <span class=\"eq\" dir=\"ltr\">|0⟩</span> and <span class=\"eq\" dir=\"ltr\">|1⟩</span>", "Copied perfectly", "Measured without disturbance"], "a": 1, "e": "Superposition is the defining property of a qubit."}, {"c": 5, "q": "The no-cloning theorem states that:", "o": ["Classical bits cannot be copied", "An unknown quantum state cannot be copied perfectly", "Photons cannot be detected", "Entanglement is impossible"], "a": 1, "e": "Linearity of quantum mechanics forbids universal cloning."}, {"c": 5, "q": "In the BB84 protocol, eavesdropping is revealed because:", "o": ["Photons are too fast", "Measurement in the wrong basis disturbs the state, raising the error rate", "The key is encrypted twice", "The channel becomes dark"], "a": 1, "e": "Disturbance shows up as an increased quantum bit error rate."}, {"c": 5, "q": "The Bell state <span class=\"eq\" dir=\"ltr\">(|00⟩ + |11⟩)/√2</span> is:", "o": ["A product state", "A maximally entangled state", "A mixed state", "A coherent state"], "a": 1, "e": "It cannot be written as a product of single-qubit states."}, {"c": 5, "q": "A quantum non-demolition (QND) measurement:", "o": ["Destroys the measured observable", "Measures an observable without disturbing its future value", "Always gives zero", "Requires classical light"], "a": 1, "e": "The back-action is diverted into a conjugate variable."}, {"c": 5, "q": "Quantum teleportation requires shared entanglement and:", "o": ["Faster-than-light signalling", "Two bits of classical communication per qubit", "Cloning the state", "No communication"], "a": 1, "e": "The receiver needs the Bell-measurement result (two bits)."}, {"c": 5, "q": "The standard quantum limit for phase estimation with <span class=\"eq\" dir=\"ltr\">N</span> independent photons scales as:", "o": ["<span class=\"eq\" dir=\"ltr\">1/N</span>", "<span class=\"eq\" dir=\"ltr\">1/√N</span>", "<span class=\"eq\" dir=\"ltr\">N</span>", "<span class=\"eq\" dir=\"ltr\">1/N²</span>"], "a": 1, "e": "Shot-noise limit; entangled states can approach the Heisenberg limit <span class=\"eq\" dir=\"ltr\">1/N</span>."}, {"c": 5, "q": "In a Hong–Ou–Mandel experiment, two identical photons arriving at a 50:50 beam splitter:", "o": ["Exit through different ports", "Exit together from the same port", "Are absorbed", "Exit randomly with no correlation"], "a": 1, "e": "Two-photon interference suppresses coincidences (the HOM dip)."}];
+const N=20,PASS=16;
+const $=id=>document.getElementById(id);
+const show=id=>['sIntro','sQuiz','sRes','sCert'].forEach(s=>$(s).classList.toggle('hide',s!==id));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let Q=[],ans=[],k=0,score=0;
+function draw(){ // two per chapter + the rest random
+  const by={};BANK.forEach((x,i)=>{(by[x.c]=by[x.c]||[]).push(i);});
+  const per=Math.max(1,Math.min(2,Math.floor(N/Object.keys(by).length)));let pick=[];Object.values(by).forEach(l=>pick.push(...shuffle(l).slice(0,per)));pick=shuffle(pick).slice(0,N);
+  const rest=shuffle(BANK.map((_,i)=>i).filter(i=>!pick.includes(i)));
+  pick=pick.concat(rest.slice(0,N-pick.length));
+  Q=shuffle(pick).map(i=>{const x=BANK[i],ord=shuffle(x.o.map((_,j)=>j));return {q:x.q,o:ord.map(j=>x.o[j]),a:ord.indexOf(x.a),e:x.e,c:x.c};});
+  ans=Q.map(()=>-1);k=0;
+}
+function rQ(){
+  const it=Q[k];$('qn').textContent='Question '+(k+1)+' of '+N+' · Chapter '+it.c;$('barI').style.width=((k+1)/N*100)+'%';
+  $('qt').innerHTML=it.q;const box=$('qo');box.innerHTML='';
+  it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt'+(ans[k]===j?' sel':'');b.innerHTML=t;b.onclick=()=>{ans[k]=j;rQ();};box.appendChild(b);});
+  $('prev').disabled=k===0;$('next').disabled=ans[k]<0;$('next').textContent=k===N-1?'Finish':'Next';
+}
+function finish(){
+  score=Q.filter((x,i)=>ans[i]===x.a).length;const p=Math.round(score/N*100);
+  $('pct').innerHTML='<span class="eq">'+score+' / '+N+'</span> · <span class="eq">'+p+'%</span>';
+  const ok=score>=PASS;$('msg').textContent=ok?'Congratulations! You passed the final quiz.':'You have not reached 80% yet. Review the questions you missed, then try again.';
+  $('passBox').classList.toggle('hide',!ok);$('failBox').classList.toggle('hide',ok);
+  const wr=Q.map((x,i)=>({x,i})).filter(o=>ans[o.i]!==o.x.a);
+  $('review').innerHTML=wr.length?'<p class="muted" style="margin-top:14px">Questions you missed:</p>'+wr.map(o=>'<div class="rev"><div>'+o.x.q+'</div><div><b>Your answer:</b> '+o.x.o[ans[o.i]]+'</div><div><span class="ok">Correct:</span> '+o.x.o[o.x.a]+'</div><div class="muted">'+o.x.e+'</div></div>').join(''):'';
+  show('sRes');window.scrollTo(0,0);
+}
+$('go').onclick=()=>{draw();rQ();show('sQuiz');};
+$('prev').onclick=()=>{k--;rQ();};
+$('next').onclick=()=>{if(k<N-1){k++;rQ();}else finish();};
+$('again').onclick=()=>{draw();rQ();show('sQuiz');window.scrollTo(0,0);};
+$('back').onclick=()=>show('sRes');
+
+/* ---------- certificate (dark ruby theme) ---------- */
+const TH={"bg": "#2B2230", "frame": "#B5739A", "accent": "#B5739A", "title": "#E3B8D2", "text": "#F4EFF6", "muted": "#B9AEC0", "name": "#FFFFFF", "beam": "#9FC19A"};
+function mixLine(c,segs,cx,y){const ws=segs.map(s=>{c.direction=s.ltr?'ltr':'rtl';return c.measureText(s.t).width;});const tot=ws.reduce((a,b)=>a+b,0);let x=cx+tot/2;
+  segs.forEach((s,i)=>{x-=ws[i];c.direction=s.ltr?'ltr':'rtl';c.textAlign=s.ltr?'left':'right';c.fillText(s.t,s.ltr?x:x+ws[i],y);});c.direction='rtl';c.textAlign='center';}
+function fitFont(c,txt,weight,size,family,maxW){let s=size;do{c.font=weight+' '+s+'px '+family;s-=2;}while(c.measureText(txt).width>maxW&&s>30);}
+function drawCert(cv,d){const t=TH,W=1600,H=1131;cv.width=W;cv.height=H;const c=cv.getContext('2d');c.direction='ltr';c.textAlign='center';c.textBaseline='middle';
+  const SF="Inter, 'Segoe UI', Arial, sans-serif",TT="'Playfair Display', Georgia, serif";
+  c.fillStyle=t.bg;c.fillRect(0,0,W,H);c.strokeStyle=t.frame;c.lineWidth=6;c.strokeRect(40,40,W-80,H-80);c.strokeStyle=t.accent;c.lineWidth=2;c.strokeRect(58,58,W-116,H-116);
+  c.fillStyle=t.accent;[[58,58],[W-58,58],[58,H-58],[W-58,H-58]].forEach(([x,y])=>{c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();});
+  const cx=W/2;c.fillStyle=t.muted;c.font='400 30px '+SF;c.fillText('Virtual Labs · Prof. Najm Al-Hosiny',cx,150);
+  c.fillStyle=t.title;c.font='700 92px '+TT;c.fillText('Certificate of Achievement',cx,280);
+  const g=c.createLinearGradient(cx-260,0,cx+260,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,t.beam);g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(cx-260,360,520,5);
+  c.fillStyle=t.text;c.font='400 36px '+SF;c.fillText('This certifies that',cx,450);
+  c.fillStyle=t.name;fitFont(c,d.name,'700',76,SF,1250);c.fillText(d.name,cx,550);c.fillStyle=t.accent;c.fillRect(cx-300,610,600,2);
+  const L1='has completed the labs of “Quantum Optics” (203674-3)';c.fillStyle=t.text;fitFont(c,L1,'400',36,SF,1300);c.fillText(L1,cx,690);
+  c.font='400 36px '+SF;c.fillText('and passed the final quiz with a score of '+d.score+'%',cx,750);
+  c.font='400 28px '+SF;c.fillStyle=t.muted;const fy=920;c.fillText('Date',300,fy);c.fillText('Course instructor',W-300,fy);
+  c.fillStyle=t.text;c.font='700 34px '+SF;c.fillText(d.date,300,fy+50);c.fillText('Prof. Najm Al-Hosiny',W-300,fy+50);
+  c.save();c.translate(cx,955);c.fillStyle=t.accent;c.beginPath();c.arc(0,0,62,0,Math.PI*2);c.fill();c.strokeStyle=t.bg;c.lineWidth=3;c.beginPath();c.arc(0,0,50,0,Math.PI*2);c.stroke();
+  c.lineWidth=9;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-22,2);c.lineTo(-6,18);c.lineTo(24,-16);c.stroke();c.restore();}
+$('mk').onclick=async()=>{
+  const name=$('nm').value.replace(/\s+/g,' ').trim();if(name.length<3){$('nm').focus();return;}
+  $('mk').disabled=true;
+  try{await Promise.race([Promise.all([document.fonts.load("700 76px Inter",name),document.fonts.load("400 36px Inter","has"),document.fonts.load("700 92px 'Playfair Display'","Certificate")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  const d=new Date(),date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+  drawCert($('cv'),{name,score:Math.round(score/N*100),date});
+  const url=$('cv').toDataURL('image/png');$('certImg').src=url;$('dl').href=url;$('mk').disabled=false;show('sCert');window.scrollTo(0,0);
+};
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

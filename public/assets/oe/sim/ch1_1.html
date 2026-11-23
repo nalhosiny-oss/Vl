@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 1 — Coupled-Mode Theory and Waveguide Couplers</title><style>
+:root{--mid:#101634;--mag:#C2185B;--pink:#E7B3C8;--pk2:#FBEAF0;--lt:#F6F6F9;--sl:#5B6380;--line:#D6D8E4;--teal:#1F8A9E;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--lt);color:var(--mid);font-family:Calibri,"Source Sans 3","Segoe UI",Arial,sans-serif;font-size:16px}
+header{background:var(--mid);color:#fff;padding:18px 22px 14px;position:relative;overflow:hidden}
+header .lat{position:absolute;right:-10px;top:-10px;width:260px;height:120px;opacity:.55;
+ background-image:radial-gradient(circle,rgba(231,179,200,.9) 0 4px,transparent 5px);background-size:22px 22px}
+header h1{font-family:Cambria,Georgia,serif;margin:0;font-size:23px;position:relative}
+header p{margin:4px 0 0;color:#E7B3C8;font-size:14.5px;position:relative}
+nav{display:flex;gap:6px;flex-wrap:wrap;padding:12px 22px 0}
+nav button{border:1px solid var(--line);background:#fff;color:var(--mid);padding:9px 14px;border-radius:10px 10px 0 0;font:inherit;font-weight:600;cursor:pointer}
+nav button.on{background:var(--mag);color:#fff;border-color:var(--mag)}
+main{padding:0 22px 26px}
+.exp{display:none;background:#fff;border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:16px}
+.exp.on{display:block}
+.grid{display:grid;grid-template-columns:310px 1fr;gap:16px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+h2{font-family:Cambria,Georgia,serif;font-size:19px;margin:0 0 6px}
+.lead{color:var(--sl);margin:0 0 12px;font-size:14.5px}
+.panel{background:var(--pk2);border-radius:10px;padding:12px}
+.ctl{margin-bottom:11px}
+.ctl label{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600}
+.ctl label i{font-style:normal}
+.ctl label span{color:var(--mag);font-variant-numeric:tabular-nums;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--mag)}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.btns button{border:1px solid var(--mag);background:#fff;color:var(--mag);border-radius:16px;padding:4px 11px;font:inherit;font-size:13.5px;cursor:pointer}
+.btns button:hover,.btns button.on{background:var(--mag);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:0 0 10px}
+.card{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:#fff}
+.card b{display:block;font-size:12.5px;color:var(--sl);font-weight:600}
+.card span{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.card.ok span{color:var(--teal)} .card.th span{color:var(--mag)}
+canvas{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:8px}
+.cv-title{font-size:13.5px;font-weight:600;color:var(--sl);margin:10px 0 4px}
+.eq{font-family:Cambria,Georgia,serif;background:#fff;border-left:3px solid var(--mag);padding:6px 10px;margin:8px 0;font-size:15px;line-height:1.55}
+.tasks{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.tasks h3{font-size:15.5px;margin:0 0 4px}
+.tasks ol{margin:0;padding-left:20px;font-size:14.5px}.tasks li{margin:3px 0}
+.ar{direction:rtl;text-align:right;font-family:"Traditional Arabic","Noto Naskh Arabic",Tahoma,Arial,serif;background:#FFF5F9;border-right:4px solid var(--mag);border-radius:8px;padding:9px 12px;margin-top:12px;font-size:16px;line-height:1.8}
+.ar b{color:var(--mag)}
+footer{color:var(--sl);font-size:13px;padding:0 22px 18px}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><div class="lat"></div><h1>Virtual Lab · Chapter 1 — Coupled-Mode Theory and Waveguide Couplers</h1>
+<p>Optoelectronics (203675-3) · MSc in Physics · Prof. Najm Al-Hosiny</p></header>
+<nav><button class="on" data-t="e1">1 · Supermodes vs CMT</button><button data-t="e2">2 · Power exchange in a coupler</button><button data-t="e3">3 · Input and output couplers</button></nav><main><section class="exp on" id="e1">
+<h2>Experiment 1 — Coupling coefficient: exact supermodes vs coupled-mode theory</h2><p class="lead">Two identical TE slab guides (core n₁, width w) separated by a gap s in cladding n₂. The exact even and odd supermodes give κ = (β<sub>even</sub> − β<sub>odd</sub>)/2; coupled-mode theory gives a closed form built from the single-guide mode.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Core index n₁</i> <span id="e1nv"></span></label><input type="range" id="e1n" min="1.46" max="1.6" step="0.001" value="1.5"></div><div class="ctl"><label><i>Core width w [µm]</i> <span id="e1wv"></span></label><input type="range" id="e1w" min="1" max="4" step="0.05" value="2"></div><div class="ctl"><label><i>Gap s [µm]</i> <span id="e1sv"></span></label><input type="range" id="e1s" min="0.3" max="3" step="0.01" value="1"></div><div class="ctl"><label><i>Wavelength λ [µm]</i> <span id="e1lv"></span></label><input type="range" id="e1l" min="1.2" max="1.7" step="0.01" value="1.55"></div><div class="eq">Cladding n₂ = 1.45<br>κ<sub>SM</sub> = (β<sub>e</sub> − β<sub>o</sub>)/2<br>κ<sub>CMT</sub> = 2h²p e<sup>−ps</sup> / [β₀(w + 2/p)(h² + p²)]<br>L<sub>c</sub> = π/(2κ)</div></div>
+<div><div class="cards" id="e1cards"></div><div class="cv-title" id="e1kt">Coupling coefficient versus gap (log scale): exact supermodes and CMT</div><canvas id="e1k" height="230"></canvas><div class="cv-title" id="e1ft">Even and odd supermode fields at the chosen gap (cores shaded)</div><canvas id="e1f" height="220"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Increase the gap from 0.5 µm to 3 µm. Why does κ fall exponentially? Read the decay constant p from the slope.</li><li>At which gap does CMT differ from the exact result by more than 10 %? Explain why CMT fails for strongly coupled guides.</li><li>Raise n₁ to 1.58. The mode is more confined: what happens to κ and L<sub>c</sub>? Check whether the guide is still single-mode (V &lt; π).</li><li>Change λ from 1.3 to 1.6 µm at fixed geometry. Why is a directional coupler wavelength dependent?</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> الموجّهان المتجاوران يتبادلان الضوء عبر الذيل الخافت للمجال في الفجوة. كلما اتسعت الفجوة ضعف هذا الذيل أسّياً، فيقل معامل الاقتران ويطول طول الاقتران. والنمطان الفائقان الزوجي والفردي يسيران بسرعتين مختلفتين، وتداخلهما هو ما ينقل الطاقة بين الموجّهين.</div></section><section class="exp" id="e2">
+<h2>Experiment 2 — Power exchange in a directional coupler</h2><p class="lead">The coupled-mode equations are integrated numerically (RK4) and compared with the analytic solution P₂ = (κ²/ψ²) sin²ψz, ψ² = κ² + δ², δ = (β₁ − β₂)/2.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Coupling coefficient κ [µm⁻¹]</i> <span id="e2kv"></span></label><input type="range" id="e2k" min="0.002" max="0.03" step="0.0001" value="0.0119"></div><div class="ctl"><label><i>Mismatch δ/κ</i> <span id="e2dv"></span></label><input type="range" id="e2d" min="0" max="3" step="0.01" value="0"></div><div class="ctl"><label><i>Length shown [L<sub>c</sub>]</i> <span id="e2zv"></span></label><input type="range" id="e2z" min="1" max="6" step="0.1" value="3"></div><div class="eq">da₁/dz = −iκ a₂ e<sup>+2iδz</sup><br>da₂/dz = −iκ a₁ e<sup>−2iδz</sup><br>F = κ²/(κ² + δ²)</div></div>
+<div><div class="cards" id="e2cards"></div><div class="cv-title" id="e2pt">Power in each guide (lines: analytic; dots: RK4)</div><canvas id="e2p" height="240"></canvas><div class="cv-title" id="e2mt">Maximum transferable power versus mismatch (dot: current δ/κ)</div><canvas id="e2m" height="200"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>With δ = 0 read the coupling length and the 3-dB length. Compare with π/(2κ).</li><li>Set δ/κ = 1. What fraction of the power can reach guide 2? Is it consistent with F = κ²/(κ² + δ²)?</li><li>Check the card "max |P₁ + P₂ − 1|". Why must the sum stay equal to 1?</li><li>Find δ/κ that gives a period of exactly one L<sub>c</sub> for P₂. (Hint: ψ = 2κ.)</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> عدم التطابق في ثابت الانتشار يجعل الموجتين تخرجان عن الطور قبل أن تكتمل نقلة القدرة، فتعود القدرة إلى الموجّه الأول مبكراً. لذلك لا يحدث انتقال كامل إلا عندما يكون الموجّهان متطابقين.</div></section><section class="exp" id="e3">
+<h2>Experiment 3 — Grating, prism and butt couplers</h2><p class="lead">A grating supplies the missing momentum 2π/Λ; a prism matches β through its high index; a butt joint relies on the overlap of the fibre and waveguide modes.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Effective index N<sub>eff</sub></i> <span id="e3nv"></span></label><input type="range" id="e3n" min="1.6" max="3.2" step="0.01" value="2.8"></div><div class="ctl"><label><i>Cover index n<sub>c</sub></i> <span id="e3cv"></span></label><input type="range" id="e3c" min="1" max="1.6" step="0.001" value="1.444"></div><div class="ctl"><label><i>Coupling angle θ [deg]</i> <span id="e3tv"></span></label><input type="range" id="e3t" min="-10" max="25" step="0.1" value="8"></div><div class="ctl"><label><i>Fibre mode radius w₁ [µm]</i> <span id="e3w1v"></span></label><input type="range" id="e3w1" min="1" max="6" step="0.05" value="5.2"></div><div class="ctl"><label><i>Waveguide mode radius w₂ [µm]</i> <span id="e3w2v"></span></label><input type="range" id="e3w2" min="0.5" max="6" step="0.05" value="2"></div><div class="ctl"><label><i>Lateral offset d [µm]</i> <span id="e3ov"></span></label><input type="range" id="e3o" min="0" max="5" step="0.05" value="0"></div><div class="eq">Grating (λ = 1.55 µm): Λ = λ/(N<sub>eff</sub> − n<sub>c</sub> sin θ)<br>Prism (n<sub>p</sub> = 1.8): N<sub>eff</sub> = n<sub>p</sub> sin θ<sub>p</sub><br>η = [2w₁w₂/(w₁² + w₂²)]² exp[−2d²/(w₁² + w₂²)]</div></div>
+<div><div class="cards" id="e3cards"></div><div class="cv-title" id="e3gt">Grating period versus coupling angle (dot: current θ)</div><canvas id="e3g" height="210"></canvas><div class="cv-title" id="e3bt">Butt-coupling efficiency versus lateral offset</div><canvas id="e3b" height="210"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Find Λ for θ = 8° and θ = 10°. Why are grating couplers usually designed slightly off vertical (θ ≈ 8–10°)?</li><li>For a fixed period, how many degrees does the coupling angle move per nm of wavelength? What does this mean for bandwidth?</li><li>Set N<sub>eff</sub> above 1.8: why can the prism no longer couple light into the guide?</li><li>With w₁ = 5.2 µm (SMF) and w₂ = 0.5 µm, what is η? Explain why silicon chips need spot-size converters or grating couplers.</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> المحزوز يعوّض فرق كمية الحركة بين الشعاع القادم والنمط الموجّه بمقدار 2π/Λ. أما الاقتران الطرفي فيعتمد على مدى تشابه شكلي النمطين، فإذا اختلف حجماهما كثيراً ضاع معظم الضوء.</div></section></main>
+<footer>All results are computed in your browser from the equations of Chapter 1 (Hunsperger, Integrated Optics; Yariv &amp; Yeh, Photonics). The MATLAB versions of these experiments are Labs 1.1–1.3.</footer>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const C={mid:'#101634',mag:'#C2185B',sl:'#5B6380',pink:'#E7B3C8',teal:'#1F8A9E',gold:'#D99A1E',green:'#3E8E41',grey:'#9AA0B5'};
+const PAL=[C.mag,C.teal,C.gold,C.mid,C.green,C.sl];
+const fmt=(v,d=3)=>{if(!isFinite(v))return '—';const a=Math.abs(v);return (a>=1e4||(a<1e-3&&v!==0))?v.toExponential(2).replace('e','×10^').replace(/\^\+?(-?\d+)/,(m,e)=>sup(e)):(+v.toPrecision(d)).toString()};
+function sup(e){const m={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};return String(e).split('').map(c=>m[c]||c).join('')}
+const linspace=(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+const logspace=(a,b,n)=>linspace(a,b,n).map(v=>Math.pow(10,v));
+const val=id=>+$(id).value;
+function show(id,t){$(id+'v').textContent=t}
+const subs=t=>String(t).replace(/_\{([^}]+)\}|_([A-Za-z0-9α-ωΑ-Ω]+)/g,(m,a,b)=>'<sub>'+(a||b)+'</sub>');
+function cards(id,list){$(id).innerHTML=list.map(c=>'<div class="card '+(c[2]||'')+'"><b>'+subs(c[0])+'</b><span>'+subs(c[1])+'</span></div>').join('')}
+function prep(cv){const r=window.devicePixelRatio||1,w=cv.clientWidth||600,h=+cv.getAttribute('height');
+ if(cv.width!==Math.round(w*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r);cv.style.height=h+'px'}
+ const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,w,h);return{g,w,h}}
+function nice(span){const p=Math.pow(10,Math.floor(Math.log10(span/5)));const m=span/5/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p}
+// series: {x,y,color,width,dash,label,points,r,fill}; o: xmin..ymax, xlabel, ylabel, logx, logy, legend
+function plot(cv,series,o){const {g,w,h}=prep(cv);const L=60,R=12,T=10,B=38;
+ const tx=v=>o.logx?Math.log10(v):v, ty=v=>o.logy?Math.log10(v):v;
+ const x0=tx(o.xmin),x1=tx(o.xmax),y0=ty(o.ymin),y1=ty(o.ymax);
+ const X=x=>L+(tx(x)-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(ty(y)-y0)/(y1-y0)*(h-T-B);
+ g.font='12px Calibri,Arial';g.fillStyle=C.sl;g.strokeStyle='#ECEDF3';g.lineWidth=1;
+ const tick=(lo,hi,lg)=>{const t=[];if(lg){const st=(hi-lo)>10?2:1;for(let k=Math.ceil(lo-1e-9);k<=hi+1e-9;k+=st)t.push(k)}else{const d=nice(hi-lo);for(let v=Math.ceil(lo/d)*d;v<=hi+d*1e-6;v+=d)t.push(+v.toPrecision(10))}return t};
+ const lab=(v,lg)=>lg?('10'+sup(Math.round(v))):(+v.toPrecision(6)).toString();
+ for(const t of tick(x0,x1,o.logx)){const px=L+(t-x0)/(x1-x0)*(w-L-R);g.beginPath();g.moveTo(px,T);g.lineTo(px,h-B);g.stroke();g.textAlign='center';g.fillText(lab(t,o.logx),px,h-B+15)}
+ for(const t of tick(y0,y1,o.logy)){const py=h-B-(t-y0)/(y1-y0)*(h-T-B);g.beginPath();g.moveTo(L,py);g.lineTo(w-R,py);g.stroke();g.textAlign='right';g.fillText(lab(t,o.logy),L-5,py+4)}
+ g.strokeStyle=C.sl;g.strokeRect(L,T,w-L-R,h-T-B);
+ const U=t=>(t||'').replace(/_/g,'');g.fillStyle=C.mid;g.textAlign='center';g.fillText(U(o.xlabel),L+(w-L-R)/2,h-6);
+ g.save();g.translate(14,T+(h-T-B)/2);g.rotate(-Math.PI/2);g.fillText(U(o.ylabel),0,0);g.restore();
+ g.save();g.beginPath();g.rect(L,T,w-L-R,h-T-B);g.clip();
+ if(o.bands)for(const b of o.bands){g.fillStyle=b.color||'rgba(231,179,200,.45)';if(b.y){g.fillRect(L,Y(b.y[1]),w-L-R,Y(b.y[0])-Y(b.y[1]))}else{g.fillRect(X(b.x[0]),T,X(b.x[1])-X(b.x[0]),h-T-B)}}
+ for(const s of series){g.strokeStyle=s.color;g.fillStyle=s.color;g.lineWidth=s.width||1.8;g.setLineDash(s.dash||[]);
+  if(s.points){for(let i=0;i<s.x.length;i++){if(!isFinite(s.y[i]))continue;g.beginPath();g.arc(X(s.x[i]),Y(s.y[i]),s.r||3.5,0,7);s.hollow?g.stroke():g.fill()}}
+  else{g.beginPath();let pen=false;for(let i=0;i<s.x.length;i++){const yy=s.y[i];if(!isFinite(yy)||!isFinite(s.x[i])||(o.logy&&yy<=0)){pen=false;continue}const px=X(s.x[i]),py=Y(yy);pen?g.lineTo(px,py):g.moveTo(px,py);pen=true}g.stroke()}}
+ g.restore();g.setLineDash([]);
+ if(o.legend){const ls=series.filter(s=>s.label);let ly=o.legendBottom?h-B-10-16*(ls.length-1):T+12;const lx=o.legendLeft?L+10:w-R-(o.legendW||200);g.textAlign='left';
+  for(const s of ls){g.fillStyle='rgba(255,255,255,.85)';g.fillRect(lx-4,ly-11,(o.legendW||200)-4,15);g.fillStyle=s.color;if(s.points){g.beginPath();g.arc(lx+7,ly-4,3.5,0,7);g.fill()}else g.fillRect(lx,ly-5,14,3);g.fillStyle=C.mid;g.fillText(U(s.label),lx+20,ly);ly+=16}}
+ return {X,Y,g,w,h};}
+let seed=12345;const rnd=()=>{seed=(seed+0x6D2B79F5)|0;let t=seed;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return(((t^(t>>>14))>>>0)+0.5)/4294967296};
+const randn=()=>Math.sqrt(-2*Math.log(rnd()))*Math.cos(2*Math.PI*rnd());
+function erfc(x){const z=Math.abs(x),t=1/(1+0.5*z);const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return x>=0?r:2-r}
+function besselJ(n,x){let s=0;const N=60;for(let k=0;k<N;k++){const th=Math.PI*(k+0.5)/N;s+=Math.cos(n*th-x*Math.sin(th))}return s/N}
+function bisect(f,a,b,it=80){let fa=f(a);for(let i=0;i<it;i++){const m=(a+b)/2,fm=f(m);if(fa*fm<=0)b=m;else{a=m;fa=fm}}return(a+b)/2}
+// complex helpers
+const cx=(re,im=0)=>({re,im});const cadd=(a,b)=>cx(a.re+b.re,a.im+b.im);const cmul=(a,b)=>cx(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const cexp=t=>cx(Math.cos(t),Math.sin(t));const cabs2=a=>a.re*a.re+a.im*a.im;const cscale=(a,s)=>cx(a.re*s,a.im*s);
+const cdiv=(a,b)=>{const d=b.re*b.re+b.im*b.im;return cx((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d)};
+function setupTabs(draw){document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.exp').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));draw()});
+ document.querySelectorAll('input[type=range],select').forEach(r=>r.oninput=draw);window.addEventListener('resize',draw);}
+
+
+function slab(n1,n2,w,lam){const k0=2*Math.PI/lam,lo=k0*n2,hi=k0*n1;
+ const h=b=>Math.sqrt(Math.max(k0*k0*n1*n1-b*b,0)),p=b=>Math.sqrt(Math.max(b*b-k0*k0*n2*n2,0));
+ return{k0,lo,hi,h,p}}
+function roots(f,a,b,N=3000){const r=[];let x0=a+(b-a)*1e-9,v0=f(x0);for(let i=1;i<=N;i++){const x1=a+(b-a)*(i/N)*(1-2e-9)+(b-a)*1e-9,v1=f(x1);if(v0*v1<0&&Math.abs(v0)<50&&Math.abs(v1)<50)r.push(bisect(f,x0,x1,60));x0=x1;v0=v1}return r}
+function modes(n1,w,s,lam){const n2=1.45,M=slab(n1,n2,w,lam),{k0,lo,hi,h,p}=M;
+ const b0=Math.max(...roots(b=>h(b)*Math.tan(h(b)*w/2)-p(b),lo,hi));
+ const fs=(b,ev)=>{const H=h(b),P=p(b);let A,B;if(ev){A=Math.cosh(P*s/2);B=P/H*Math.sinh(P*s/2)}else{A=Math.sinh(P*s/2);B=P/H*Math.cosh(P*s/2)}return(-H*A*Math.sin(H*w)+H*B*Math.cos(H*w))+P*(A*Math.cos(H*w)+B*Math.sin(H*w))};
+ const be=Math.max(...roots(b=>fs(b,true),lo,hi)),bo=Math.max(...roots(b=>fs(b,false),lo,hi));
+ const H=h(b0),P=p(b0);const kc=2*H*H*P*Math.exp(-P*s)/(b0*(w+2/P)*(H*H+P*P));
+ return{b0,be,bo,ksm:(be-bo)/2,kcmt:kc,H,P,k0,h,p}}
+function field(x,b,s,w,ev,h,p){const H=h(b),P=p(b);let A,B;if(ev){A=Math.cosh(P*s/2);B=P/H*Math.sinh(P*s/2)}else{A=Math.sinh(P*s/2);B=P/H*Math.cosh(P*s/2)}
+ const xa=Math.abs(x);let E;if(xa<s/2)E=ev?Math.cosh(P*xa):Math.sinh(P*xa);else if(xa<=s/2+w)E=A*Math.cos(H*(xa-s/2))+B*Math.sin(H*(xa-s/2));else E=(A*Math.cos(H*w)+B*Math.sin(H*w))*Math.exp(-P*(xa-s/2-w));return ev?E:E*Math.sign(x)}
+function e1(){const n1=val('e1n'),w=val('e1w'),s=val('e1s'),lam=val('e1l');show('e1n',n1.toFixed(3));show('e1w',w.toFixed(2)+' µm');show('e1s',s.toFixed(2)+' µm');show('e1l',lam.toFixed(2)+' µm');
+ const m=modes(n1,w,s,lam),V=m.k0*w*Math.sqrt(n1*n1-1.45*1.45);
+ cards('e1cards',[['n_eff (one guide)',(m.b0/m.k0).toFixed(5)],['V-number',V.toFixed(3)+(V<Math.PI?' (single-mode)':' (multimode)')],['κ exact supermodes',fmt(m.ksm,4)+' µm⁻¹','ok'],['κ CMT',fmt(m.kcmt,4)+' µm⁻¹','th'],['CMT error',(100*(m.kcmt-m.ksm)/m.ksm).toFixed(1)+' %'],['L_c = π/2κ',fmt(Math.PI/(2*m.ksm),4)+' µm']]);
+ const G=linspace(0.3,3,28),ks=[],kc=[];for(const g of G){const q=modes(n1,w,g,lam);ks.push(q.ksm);kc.push(q.kcmt)}
+ const all=ks.concat(kc).filter(v=>v>0);
+ plot($('e1k'),[{x:G,y:ks,color:C.mag,width:2.2,label:'exact supermodes'},{x:G,y:kc,color:C.teal,points:true,r:3,label:'CMT formula'},{x:[s],y:[m.ksm],color:C.mid,points:true,r:6}],
+  {xmin:0.3,xmax:3,ymin:Math.pow(10,Math.floor(Math.log10(Math.min(...all)))),ymax:Math.pow(10,Math.ceil(Math.log10(Math.max(...all)))),logy:true,xlabel:'Gap s [µm]',ylabel:'κ [µm⁻¹]',legend:true});
+ const X=linspace(-(s/2+w+3),s/2+w+3,600);const ee=X.map(x=>field(x,m.be,s,w,true,m.h,m.p)),oo=X.map(x=>field(x,m.bo,s,w,false,m.h,m.p));
+ const ne=Math.max(...ee.map(Math.abs)),no=Math.max(...oo.map(Math.abs));
+ plot($('e1f'),[{x:X,y:ee.map(v=>v/ne),color:C.mag,width:2.2,label:'even, n = '+(m.be/m.k0).toFixed(5)},{x:X,y:oo.map(v=>v/no),color:C.teal,width:2.2,dash:[6,4],label:'odd, n = '+(m.bo/m.k0).toFixed(5)}],
+  {xmin:X[0],xmax:X[X.length-1],ymin:-1.15,ymax:1.15,xlabel:'x [µm]',ylabel:'Field (normalised)',legend:true,legendW:210,bands:[{x:[-s/2-w,-s/2]},{x:[s/2,s/2+w]}]});}
+function e2(){const k=val('e2k'),r=val('e2d'),zs=val('e2z');show('e2k',k.toFixed(4));show('e2d',r.toFixed(2));show('e2z',zs.toFixed(1));
+ const d=r*k,Lc=Math.PI/(2*k),zmax=zs*Lc,psi=Math.sqrt(k*k+d*d);const N=1200,dz=zmax/N;
+ let a1=cx(1),a2=cx(0);const zr=[0],P1=[1],P2=[0];let err=0,cons=0;
+ const f=(z,A1,A2)=>[cmul(cx(0,-k),cmul(A2,cexp(2*d*z))),cmul(cx(0,-k),cmul(A1,cexp(-2*d*z)))];
+ for(let i=0;i<N;i++){const z=i*dz;const k1=f(z,a1,a2),k2=f(z+dz/2,cadd(a1,cscale(k1[0],dz/2)),cadd(a2,cscale(k1[1],dz/2))),k3=f(z+dz/2,cadd(a1,cscale(k2[0],dz/2)),cadd(a2,cscale(k2[1],dz/2))),k4=f(z+dz,cadd(a1,cscale(k3[0],dz)),cadd(a2,cscale(k3[1],dz)));
+  a1=cadd(a1,cscale(cadd(cadd(k1[0],cscale(k2[0],2)),cadd(cscale(k3[0],2),k4[0])),dz/6));a2=cadd(a2,cscale(cadd(cadd(k1[1],cscale(k2[1],2)),cadd(cscale(k3[1],2),k4[1])),dz/6));
+  const zz=z+dz,pa=k*k/(psi*psi)*Math.sin(psi*zz)**2;err=Math.max(err,Math.abs(cabs2(a2)-pa));cons=Math.max(cons,Math.abs(cabs2(a1)+cabs2(a2)-1));if((i+1)%30==0){zr.push(zz);P1.push(cabs2(a1));P2.push(cabs2(a2))}}
+ cards('e2cards',[['L_c = π/2κ',fmt(Lc,4)+' µm'],['3-dB length',fmt(Lc/2,4)+' µm'],['Max transfer F',(k*k/(psi*psi)).toFixed(4),'th'],['Max |P₂ RK4 − analytic|',fmt(err,2),'ok'],['Max |P₁ + P₂ − 1|',fmt(cons,2),'ok'],['Exchange period π/ψ',fmt(Math.PI/psi/Lc,4)+' L_c']]);
+ const Z=linspace(0,zmax,500);
+ plot($('e2p'),[{x:Z.map(z=>z/Lc),y:Z.map(z=>1-k*k/(psi*psi)*Math.sin(psi*z)**2),color:C.teal,width:2,label:'P₁ analytic'},{x:Z.map(z=>z/Lc),y:Z.map(z=>k*k/(psi*psi)*Math.sin(psi*z)**2),color:C.mag,width:2,label:'P₂ analytic'},{x:zr.map(z=>z/Lc),y:P2,color:C.mid,points:true,r:2.5,label:'P₂ RK4'}],
+  {xmin:0,xmax:zs,ymin:0,ymax:1.05,xlabel:'z / L_c',ylabel:'Power',legend:true,legendW:130});
+ const R=linspace(0,3,200);plot($('e2m'),[{x:R,y:R.map(q=>1/(1+q*q)),color:C.mag,width:2},{x:[r],y:[1/(1+r*r)],color:C.mid,points:true,r:6}],{xmin:0,xmax:3,ymin:0,ymax:1.05,xlabel:'δ/κ',ylabel:'F = κ²/(κ² + δ²)'});}
+function e3(){const N=val('e3n'),nc=val('e3c'),t=val('e3t'),w1=val('e3w1'),w2=val('e3w2'),d=val('e3o'),lam=1.55,np=1.8;
+ show('e3n',N.toFixed(2));show('e3c',nc.toFixed(3));show('e3t',t.toFixed(1)+'°');show('e3w1',w1.toFixed(2)+' µm');show('e3w2',w2.toFixed(2)+' µm');show('e3o',d.toFixed(2)+' µm');
+ const sd=x=>Math.sin(x*Math.PI/180),Lam=lam/(N-nc*sd(t));
+ const th=l=>Math.asin((N-l/Lam)/nc)*180/Math.PI,dth=(th(1.551)-th(1.549))/2;
+ const eta=(2*w1*w2/(w1*w1+w2*w2))**2*Math.exp(-2*d*d/(w1*w1+w2*w2));
+ cards('e3cards',[['Grating period Λ',(Lam*1e3).toFixed(1)+' nm','th'],['dθ/dλ',dth.toFixed(3)+' °/nm'],['Prism angle θ_p',N<np?(Math.asin(N/np)*180/Math.PI).toFixed(2)+'°':'impossible (N_eff > n_p)'],['Butt-coupling η',(100*eta).toFixed(1)+' %','ok'],['Coupling loss',(-10*Math.log10(eta)).toFixed(2)+' dB']]);
+ const T=linspace(-10,25,300);plot($('e3g'),[{x:T,y:T.map(a=>1e3*lam/(N-nc*sd(a))),color:C.mag,width:2},{x:[t],y:[Lam*1e3],color:C.mid,points:true,r:6}],{xmin:-10,xmax:25,ymin:Math.min(...T.map(a=>1e3*lam/(N-nc*sd(a))))*0.97,ymax:Math.max(...T.map(a=>1e3*lam/(N-nc*sd(a))))*1.03,xlabel:'Coupling angle θ [deg]',ylabel:'Λ [nm]'});
+ const D=linspace(0,5,200),ef=x=>(2*w1*w2/(w1*w1+w2*w2))**2*Math.exp(-2*x*x/(w1*w1+w2*w2));
+ plot($('e3b'),[{x:D,y:D.map(x=>100*ef(x)),color:C.teal,width:2},{x:[d],y:[100*eta],color:C.mid,points:true,r:6}],{xmin:0,xmax:5,ymin:0,ymax:105,xlabel:'Lateral offset d [µm]',ylabel:'η [%]'});}
+
+const FN=[e1,e2,e3];
+function draw(){const id=document.querySelector('.exp.on').id;FN[+id.slice(1)-1]();}
+setupTabs(draw);draw();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

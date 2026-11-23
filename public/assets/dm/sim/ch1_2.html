@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monte Carlo photon capture · DMP Ch1</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 1 · SIMULATOR 2</small><h1>Monte Carlo: how many photons enter the fibre?</h1></header>
+<div class="wrap">
+<div class="grid">
+ <div class="card">
+  <canvas id="geo" width="800" height="420"></canvas>
+  <div class="eq">θ<sub>max</sub> = arcsin(NA) ,  p = (1 − cos θ<sub>max</sub>)/2</div>
+  <label>Numerical aperture NA: <span class="val" id="nav"></span></label>
+  <input type="range" id="na" min="0.05" max="0.6" step="0.01" value="0.22">
+  <button class="main" id="run">Run continuously</button><button data-n="100">+100</button><button data-n="1000">+1 000</button><button data-n="10000">+10 000</button><button id="reset">Reset</button>
+ </div>
+ <div class="card">
+  <canvas id="plot" width="800" height="420"></canvas>
+  <div class="stats">
+   <div class="s"><span>Photons N</span><b id="sN">0</b></div>
+   <div class="s"><span>Captured</span><b id="sH">0</b></div>
+   <div class="s"><span>Exact p</span><b id="sP"></b></div>
+   <div class="s"><span>Estimate p̂</span><b id="sE">—</b></div>
+   <div class="s"><span>95% half-width 1.96·SE</span><b id="sS">—</b></div>
+   <div class="s"><span>Error / SE</span><b id="sZ">—</b></div>
+  </div>
+  <div class="ar" id="ar">ابدأ بإضافة 100 فوتون ثم زد العدد. لاحظ أن نطاق الثقة يضيق ببطء: كي يضيق إلى النصف تحتاج أربعة أضعاف الفوتونات.</div>
+ </div>
+</div>
+</div>
+<script>
+const g=document.getElementById('geo').getContext('2d'),pl=document.getElementById('plot').getContext('2d');
+const naEl=document.getElementById('na');let N=0,Hh=0,hist=[],recent=[],timer=null;
+function p(){const t=Math.asin(+naEl.value);return(1-Math.cos(t))/2;}
+function reset(){N=0;Hh=0;hist=[];recent=[];upd();}
+function shoot(n){const cm=Math.cos(Math.asin(+naEl.value));for(let i=0;i<n;i++){const c=2*Math.random()-1,phi=2*Math.PI*Math.random();const hit=c>cm;N++;if(hit)Hh++;if(recent.length>400)recent.shift();recent.push([Math.acos(c),Math.cos(phi),hit]);
+ if(N<10||N%Math.max(1,Math.floor(N/200))===0)hist.push([N,Hh/N]);}upd();}
+function geo(){const W=800,H=420,ox=90,oy=H/2;g.clearRect(0,0,W,H);g.fillStyle='#1E1E22';g.fillRect(0,0,W,H);
+ const th=Math.asin(+naEl.value),L=640;
+ g.fillStyle='rgba(242,163,58,0.15)';g.beginPath();g.moveTo(ox,oy);g.lineTo(ox+L,oy-L*Math.tan(th));g.lineTo(ox+L,oy+L*Math.tan(th));g.closePath();g.fill();
+ g.fillStyle='#3A3A40';g.fillRect(560,oy-70,240,140);g.fillStyle='#5A5650';g.fillRect(560,oy-22,240,44);
+ g.fillStyle='#CFCAC0';g.font='16px Calibri,Arial';g.fillText('fibre core',600,oy+6);g.fillText('acceptance cone θmax = '+(th*180/Math.PI).toFixed(1)+'°',120,30);
+ for(const r of recent){const a=r[0],s=r[1]>=0?1:-1;const len=r[2]?470:150;const dx=Math.cos(a),dy=Math.sin(a)*s;g.strokeStyle=r[2]?'#F2A33A':'rgba(140,140,132,0.45)';g.lineWidth=r[2]?1.6:1;g.beginPath();g.moveTo(ox,oy);g.lineTo(ox+len*dx,oy-len*dy);g.stroke();}
+ g.fillStyle='#F4F1EA';g.beginPath();g.arc(ox,oy,8,0,7);g.fill();g.fillStyle='#CFCAC0';g.fillText('isotropic emitter',30,oy+34);}
+function plot(){const W=800,H=420,pd={l:70,r:16,t:20,b:50};pl.clearRect(0,0,W,H);pl.fillStyle='#fff';pl.fillRect(0,0,W,H);
+ const P=p(),lmin=1,lmax=6,ymax=Math.max(4*P,0.02);
+ const X=n=>pd.l+(W-pd.l-pd.r)*(Math.log10(n)-lmin)/(lmax-lmin),Y=v=>H-pd.b-(H-pd.t-pd.b)*v/ymax;
+ pl.font='15px Calibri,Arial';pl.fillStyle='#5A5650';pl.strokeStyle='#E2DCCF';
+ for(let k=lmin;k<=lmax;k++){pl.beginPath();pl.moveTo(X(10**k),pd.t);pl.lineTo(X(10**k),H-pd.b);pl.stroke();pl.fillText('10'+['¹','²','³','⁴','⁵','⁶'][k-1],X(10**k)-10,H-pd.b+22);}
+ for(let i=0;i<=4;i++){const v=ymax*i/4;pl.beginPath();pl.moveTo(pd.l,Y(v));pl.lineTo(W-pd.r,Y(v));pl.stroke();pl.fillText(v.toFixed(3),8,Y(v)+5);}
+ pl.fillText('number of photons N (log scale)',W/2-100,H-12);
+ pl.fillStyle='rgba(46,111,142,0.15)';pl.beginPath();for(let i=0;i<=100;i++){const n=10**(lmin+(lmax-lmin)*i/100);const v=P+1.96*Math.sqrt(P*(1-P)/n);i?pl.lineTo(X(n),Y(Math.min(v,ymax))):pl.moveTo(X(n),Y(Math.min(v,ymax)));}
+ for(let i=100;i>=0;i--){const n=10**(lmin+(lmax-lmin)*i/100);const v=P-1.96*Math.sqrt(P*(1-P)/n);pl.lineTo(X(n),Y(Math.max(v,0)));}pl.closePath();pl.fill();
+ pl.strokeStyle='#1E1E22';pl.lineWidth=2;pl.beginPath();pl.moveTo(X(10),Y(P));pl.lineTo(X(1e6),Y(P));pl.stroke();
+ pl.strokeStyle='#E07B1A';pl.lineWidth=2;pl.beginPath();let st=false;for(const [n,v] of hist){if(n<10)continue;const y=Y(Math.min(v,ymax));st?pl.lineTo(X(n),y):pl.moveTo(X(n),y);st=true;}pl.stroke();
+ pl.fillStyle='#2E6F8E';pl.fillText('p ± 1.96 SE',W-130,pd.t+18);pl.fillStyle='#E07B1A';pl.fillText('running estimate',W-130,pd.t+38);}
+function upd(){const P=p();document.getElementById('nav').textContent=(+naEl.value).toFixed(2);
+ document.getElementById('sN').textContent=N.toLocaleString('en');document.getElementById('sH').textContent=Hh.toLocaleString('en');document.getElementById('sP').textContent=P.toFixed(5);
+ if(N>0){const e=Hh/N,se=Math.sqrt(P*(1-P)/N);document.getElementById('sE').textContent=e.toFixed(5);document.getElementById('sS').textContent=(1.96*se).toFixed(5);document.getElementById('sZ').textContent=((e-P)/se).toFixed(2);}
+ else{['sE','sS','sZ'].forEach(i=>document.getElementById(i).textContent='—');}
+ if(N>=1e6){stop();}geo();plot();}
+function stop(){clearInterval(timer);timer=null;document.getElementById('run').textContent='Run continuously';}
+document.getElementById('run').onclick=()=>{if(timer){stop();return;}document.getElementById('run').textContent='Pause';timer=setInterval(()=>shoot(Math.max(50,Math.floor(N/40))),60);};
+document.querySelectorAll('button[data-n]').forEach(b=>b.onclick=()=>shoot(+b.dataset.n));
+document.getElementById('reset').onclick=()=>{stop();reset();};
+naEl.oninput=()=>{stop();reset();};
+reset();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f3"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

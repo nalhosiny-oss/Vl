@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>قبل المعمل وبعده: الفصل السادس – الروابط الجزيئية والدوران والاهتزاز</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#FBF8F1;--panel:#FFFFFF;--ink:#2A2623;--muted:#6F6553;--line:#E2DACB;--acc:#2A2623;--onacc:#fff;--acc2:#8C6414;--chip:#F4EEE2;--ok:#1E8E5A;--okbg:#E3F5EC;--bad:#C63A3A;--badbg:#FBE6E6}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.65}
+.wrap{max-width:980px;margin:0 auto;padding:14px 14px 16px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;justify-content:space-between}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.1rem,3.2vw,1.45rem);margin:.3em 0 0}
+h1 span{color:var(--acc)}
+.tabs{display:flex;gap:8px;margin:12px 0 10px}
+.tabs button{flex:1;font:inherit;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 10px;border-radius:12px;cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.pane{display:none}.pane.on{display:block}
+.hint{color:var(--muted);font-size:.86rem;margin:0 0 8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:300px}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.tag{display:inline-block;font-size:.78rem;color:var(--acc2);border:1px solid var(--line);border-radius:999px;padding:0 10px;margin-inline-start:6px}
+.q{margin:4px 0 8px;font-size:1rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:8px 12px;border-radius:10px;margin:5px 0;cursor:pointer;min-height:42px}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.fb{margin-top:6px;font-size:.9rem;color:var(--muted)}
+.fb b{color:var(--ink)}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+textarea{width:100%;min-height:76px;font:inherit;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px;resize:vertical}
+.show{font:inherit;margin-top:6px;border:1px solid var(--acc2);background:transparent;color:var(--acc2);padding:6px 14px;border-radius:10px;cursor:pointer;min-height:40px}
+.ans{display:none;margin-top:8px;background:var(--chip);border-radius:10px;padding:8px 12px;font-size:.93rem}
+.ans.on{display:block}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.nav button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 16px;border-radius:10px;cursor:pointer;min-height:40px}
+.nav button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--acc)}
+.score{text-align:center;padding:30px 10px}
+.score .big{font-size:2rem;color:var(--acc2);font-weight:700}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+.step{font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+.do{margin-top:8px;background:var(--chip);border-inline-start:3px solid var(--acc2);border-radius:10px;padding:8px 12px;font-size:.93rem}
+.verdict{font-weight:700}
+.tabs button{font-size:clamp(.8rem,2.6vw,1rem);padding:8px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><span class="badge" id="badge"></span></div>
+<h1 id="h1"></h1>
+<nav class="tabs" role="tablist"><button role="tab" aria-selected="true" data-p="pre" id="t1"></button><button role="tab" aria-selected="false" data-p="poe" id="t3"></button><button role="tab" aria-selected="false" data-p="post" id="t2"></button></nav>
+<section class="pane on" id="pre"><p class="hint" id="h_pre"></p><div class="card" id="pc"></div><div class="nav"><button id="pp"></button><div class="dots" id="pd"></div><button id="pn"></button></div></section>
+<section class="pane" id="poe"><p class="hint" id="h_poe"></p><div class="card" id="ec"></div><div class="nav"><button id="ep"></button><div class="dots" id="ed"></div><button id="en"></button></div></section>
+<section class="pane" id="post"><p class="hint" id="h_post"></p><div class="card" id="dc"></div><div class="nav"><button id="dp"></button><div class="dots" id="dd"></div><button id="dn"></button></div></section>
+</div>
+<script>
+const D={"lang":"ar","course":"الأطياف الذرية والجزيئية","code":"2037003-4","title":"قبل المعمل وبعده: <span>الفصل السادس – الروابط الجزيئية والدوران والاهتزاز</span>","review":"محاضرة الفصل السادس: الروابط بين الذرات، الدوار الصلد، المتذبذب التوافقي واللاتوافقي، الطيف الاهتزازي الدوراني.","pre":[{"q":"الرابطة في جزيء Ar₂ من نوع:","o":["تساهمية","أيونية","فان دير فالس","فلزية"],"a":2,"e":"ذرتا الأرجون غازان نبيلان مغلقا القشرة، فلا يرتبطان إلا بقوى فان دير فالس الضعيفة، وطاقة تفككها نحو 0.012 eV فقط."},{"q":"طاقة مستويات الدوار الصلد تعطى بالعلاقة:","o":["<span class=\"eq\" dir=\"ltr\">E = BJ</span>","<span class=\"eq\" dir=\"ltr\">E = BJ(J+1)</span>","<span class=\"eq\" dir=\"ltr\">E = B(J+½)</span>","<span class=\"eq\" dir=\"ltr\">E = BJ²</span>"],"a":1,"e":"حيث <span class=\"eq\" dir=\"ltr\">B = h/(8π²cI)</span> ثابت الدوران."},{"q":"المسافة بين خطين متتاليين في الطيف الدوراني الخالص تساوي:","o":["B","2B","4B","B/2"],"a":1,"e":"الخطوط عند <span class=\"eq\" dir=\"ltr\">ν̃ = 2B(J+1)</span>، فالفاصل الثابت 2B."},{"q":"لماذا لا يظهر طيف دوراني خالص لجزيء N₂؟","o":["لأنه ثقيل","لأنه ليس له عزم ثنائي قطب دائم","لأنه لا يدور","لأن B صغير جدًا"],"a":1,"e":"امتصاص الإشعاع الدوراني يحتاج عزم ثنائي قطب دائمًا، والجزيء المتماثل ليس له عزم."},{"q":"في المتذبذب اللاتوافقي تصبح المسافة بين المستويات الاهتزازية:","o":["ثابتة","أكبر كلما زاد v","أصغر كلما زاد v","صفرًا"],"a":2,"e":"<span class=\"eq\" dir=\"ltr\">ΔG = ω<sub>e</sub> − 2ω<sub>e</sub>x<sub>e</sub>(v+1)</span> يتناقص مع v حتى تتقارب المستويات عند حد التفكك."},{"q":"في الطيف الاهتزازي الدوراني لـ HCl، الفرع R ينتج عن انتقالات:","o":["<span class=\"eq\" dir=\"ltr\">ΔJ = −1</span>","<span class=\"eq\" dir=\"ltr\">ΔJ = 0</span>","<span class=\"eq\" dir=\"ltr\">ΔJ = +1</span>","<span class=\"eq\" dir=\"ltr\">ΔJ = ±2</span>"],"a":2,"e":"الفرع R عند الترددات الأعلى من ν₀ ويقابل ΔJ = +1، والفرع P يقابل ΔJ = −1."}],"post":[{"t":"التجربة 1: منحنى الطاقة","q":"قارن D<sub>e</sub> لـ H₂ وAr₂ بالطاقة الحرارية kT عند درجة حرارة الغرفة، وماذا تستنتج؟","a":"H₂: 4.75 eV ≫ 0.026 eV فالرابطة مستقرة. Ar₂: 0.012 eV &lt; kT تقريبًا، فتكسره التصادمات الحرارية بسهولة ولا يوجد إلا عند درجات حرارة منخفضة جدًا."},{"t":"التجربة 2: الطيف الدوراني","q":"احسب طول رابطة HCl من الفاصل 2B = 21.18 cm⁻¹.","a":"B = 10.59 cm<sup>−1</sup> ⇒ <span class=\"eq\" dir=\"ltr\">I = h/(8π²cB) ≈ 2.64×10<sup>−47</sup> kg m²</span>، و<span class=\"eq\" dir=\"ltr\">μ = 0.98 u ≈ 1.63×10<sup>−27</sup> kg</span> ⇒ <span class=\"eq\" dir=\"ltr\">r = √(I/μ) ≈ 1.27 Å</span>."},{"t":"التجربة 3: المستويات الاهتزازية","q":"احسب ν(0→1) وν(0→2) لـ HCl، ولماذا لا يساوي الثاني ضعف الأول؟","a":"<span class=\"eq\" dir=\"ltr\">ν(0→1) = ω<sub>e</sub> − 2ω<sub>e</sub>x<sub>e</sub> = 2885.3 cm<sup>−1</sup></span>، <span class=\"eq\" dir=\"ltr\">ν(0→2) = 2ω<sub>e</sub> − 6ω<sub>e</sub>x<sub>e</sub> = 5664.9 cm<sup>−1</sup></span>، وهو أقل من الضعف بسبب اللاتوافقية التي تقرّب المستويات العليا."},{"t":"التجربة 4: الطيف الاهتزازي الدوراني","q":"فسّر الفجوة عند ν₀، وتقارب خطوط R، وازدواج الخطوط.","a":"الفجوة: ΔJ = 0 ممنوعة لجزيء ثنائي الذرة في حالة Σ، فلا فرع Q. التقارب: B₁ &lt; B₀ لأن متوسط طول الرابطة أكبر في v = 1. الازدواج: النظيران H³⁵Cl وH³⁷Cl يختلفان في الكتلة المختزلة فيزاح خط الأثقل قليلًا إلى تردد أقل، وشدته ثلث الآخر تقريبًا."}],"poe":[{"t":"التجربة 1: منحنى الطاقة والروابط","q":"مقارنةً بـ <span class=\"eq\" dir=\"ltr\">kT ≈ 0.025 eV</span> في درجة حرارة الغرفة، عمق بئر الجهد للجزيء <span class=\"eq\" dir=\"ltr\">Ar<sub>2</sub></span>:","o":["أكبر بمئات المرات","أصغر منه أو مقارب له","يساوي عمق <span class=\"eq\" dir=\"ltr\">H<sub>2</sub></span>","لا يوجد بئر أصلًا"],"a":1,"do":"في تبويب «منحنى الطاقة والروابط» قارن عمق البئر وموضع قاعه بين <span class=\"eq\" dir=\"ltr\">H<sub>2</sub></span> و<span class=\"eq\" dir=\"ltr\">Ar<sub>2</sub></span>.","e":"رابطة فان دير فالس في <span class=\"eq\" dir=\"ltr\">Ar<sub>2</sub></span> عمقها نحو <span class=\"eq\" dir=\"ltr\">0.01 eV</span>، أي أقل من طاقة الحركة الحرارية، فيتفكك بالتصادمات. أما <span class=\"eq\" dir=\"ltr\">H<sub>2</sub></span> فعمقه نحو <span class=\"eq\" dir=\"ltr\">4.5 eV</span> وقاعه أقرب."},{"t":"التجربة 2: الطيف الدوراني","q":"إذا رفعت درجة الحرارة في الطيف الدوراني لـ <span class=\"eq\" dir=\"ltr\">HCl</span> فإن:","o":["المسافة بين الخطوط تتضاعف","قمة الشدة تنتقل إلى قيم <span class=\"eq\" dir=\"ltr\">J</span> أكبر والمسافة بين الخطوط ثابتة","تختفي الخطوط","تتقارب الخطوط"],"a":1,"do":"في تبويب «الطيف الدوراني» اختر <span class=\"eq\" dir=\"ltr\">H<sup>35</sup>Cl</span>، وقارن الطيف عند <span class=\"eq\" dir=\"ltr\">100 K</span> وعند <span class=\"eq\" dir=\"ltr\">1000 K</span>.","e":"المسافة بين الخطوط <span class=\"eq\" dir=\"ltr\">2B</span> صفة للجزيء (نحو <span class=\"eq\" dir=\"ltr\">21 cm<sup>−1</sup></span>)، أما الحرارة فتغيّر توزيع بولتزمان على المستويات، فتنتقل القمة إلى <span class=\"eq\" dir=\"ltr\">J</span> أعلى. ومن <span class=\"eq\" dir=\"ltr\">B</span> نحسب طول الرابطة."},{"t":"التجربة 3: المستويات الاهتزازية","q":"تردد النطاق الأساسي لـ <span class=\"eq\" dir=\"ltr\">HCl</span> نحو <span class=\"eq\" dir=\"ltr\">2886 cm<sup>−1</sup></span>. أول توافقي (<span class=\"eq\" dir=\"ltr\">0 → 2</span>) يقع عند:","o":["<span class=\"eq\" dir=\"ltr\">5772 cm<sup>−1</sup></span> تمامًا","أقل قليلًا من ضعفه، نحو <span class=\"eq\" dir=\"ltr\">5668 cm<sup>−1</sup></span>","<span class=\"eq\" dir=\"ltr\">2886 cm<sup>−1</sup></span>","<span class=\"eq\" dir=\"ltr\">8658 cm<sup>−1</sup></span>"],"a":1,"do":"في تبويب «المستويات الاهتزازية» اختر <span class=\"eq\" dir=\"ltr\">HCl</span>، وأظهر المستويات، وقارن الفجوات بين المستويات المتتالية.","e":"الجهد غير توافقي (مورس)، فتتقارب المستويات كلما زاد <span class=\"eq\" dir=\"ltr\">v</span>، ويكون <span class=\"eq\" dir=\"ltr\">0 → 2</span> أقل من ضعف <span class=\"eq\" dir=\"ltr\">0 → 1</span> بمقدار <span class=\"eq\" dir=\"ltr\">≈ 2ω<sub>e</sub>x<sub>e</sub></span>."},{"t":"التجربة 4: الطيف الاهتزازي الدوراني","q":"عند إظهار النظير <span class=\"eq\" dir=\"ltr\">H<sup>37</sup>Cl</span> في الطيف الاهتزازي الدوراني، تظهر خطوطه:","o":["فوق خطوط <span class=\"eq\" dir=\"ltr\">H<sup>35</sup>Cl</span> تمامًا","مزاحة قليلًا نحو أعداد موجية أصغر","مزاحة كثيرًا نحو أعداد موجية أكبر","في منتصف الطيف (فرع Q)"],"a":1,"do":"في تبويب «الطيف الاهتزازي الدوراني» فعّل «إظهار النظير <span class=\"eq\" dir=\"ltr\">H<sup>37</sup>Cl</span>» وقارن مواضع الخطوط.","e":"النظير الأثقل له كتلة مختزلة أكبر قليلًا، فيقل <span class=\"eq\" dir=\"ltr\">ω = √(k/μ)</span> ويقل <span class=\"eq\" dir=\"ltr\">B</span>، فتظهر خطوطه أزواجًا مزاحة قليلًا. وفي المنتصف فجوة لأن <span class=\"eq\" dir=\"ltr\">ΔJ = 0</span> ممنوع في الجزيئات الثنائية من هذا النوع."}]};
+const T=D.lang==='ar'?{t1:'١) اختبار قبلي',t3:'٢) توقّع ثم جرّب',t2:'٣) مناقشة بعد المعمل',hpoe:'أثناء المعمل: توقّع النتيجة أولًا، ثم جرّبها في المعمل، ثم اقرأ التفسير.',s1:'① توقّع',s2:'② جرّب في المعمل',s3:'③ فسّر',see:'جرّبت، أظهر التفسير',hit:'توقّعك صحيح.',miss:'توقّعك يخالف النتيجة، وهذا مفيد: لاحظ السبب.',hpre:'أجب قبل فتح المعمل؛ يظهر التصحيح فور اختيارك، ولا تُحفظ النتيجة ولا تُرسل لأحد.',hpost:'بعد إنهاء المعمل: اكتب إجابتك أولًا، ثم قارنها بالإجابة النموذجية.',prev:'السابق',next:'التالي',res:'النتيجة',again:'إعادة الاختبار',ok:'إجابة صحيحة.',no:'ليست هذه.',show:'أظهر الإجابة النموذجية',hide:'أخفِ الإجابة',ph:'اكتب إجابتك هنا…',q:'السؤال',of:'من',good:'أنت مستعد للمعمل، افتحه الآن.',mid:'جيد، راجع ما أخطأت فيه ثم ابدأ المعمل.',low:'راجع المحاضرة قبل أن تبدأ المعمل: '}:{t1:'1) Pre-lab quiz',t3:'2) Predict & try',t2:'3) Post-lab discussion',hpoe:'During the lab: predict first, try it in the lab, then read the explanation.',s1:'① Predict',s2:'② Try it in the lab',s3:'③ Explain',see:'I tried it, show explanation',hit:'Your prediction was right.',miss:'Your prediction differs from the result, which is useful: see why.',hpre:'Answer before opening the lab. Feedback appears instantly; nothing is saved or sent.',hpost:'After the lab: write your own answer first, then compare it with the model answer.',prev:'Previous',next:'Next',res:'Result',again:'Retake quiz',ok:'Correct.',no:'Not quite.',show:'Show model answer',hide:'Hide answer',ph:'Write your answer here…',q:'Question',of:'of',good:'You are ready, open the lab now.',mid:'Good. Review what you missed, then start the lab.',low:'Review the lecture before starting the lab: '};
+const $=id=>document.getElementById(id);
+$('badge').innerHTML=D.course+' · <bdi dir="ltr">'+D.code+'</bdi>';$('h1').innerHTML=D.title;
+$('t1').textContent=T.t1;$('t2').textContent=T.t2;$('t3').textContent=T.t3;$('h_poe').textContent=T.hpoe;$('h_pre').textContent=T.hpre;$('h_post').textContent=T.hpost;
+['pp','dp','ep'].forEach(i=>$(i).textContent=T.prev);['pn','dn','en'].forEach(i=>$(i).textContent=T.next);
+let pi=0,st=D.pre.map(()=>-1),di=0,shown=D.post.map(()=>false),txt=D.post.map(()=>'');
+function dots(el,n,k){el.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('i');if(i===k)d.className='on';el.appendChild(d);}}
+function rPre(){const c=$('pc');const N=D.pre.length;
+ if(pi===N){const s=st.filter((v,i)=>v===D.pre[i].a).length;c.innerHTML='<div class="score"><div>'+T.res+'</div><div class="big">'+s+' / '+N+'</div><p>'+(s>=N-1?T.good:(s>=Math.ceil(N/2)?T.mid:T.low+D.review))+'</p><button class="show" id="rt">'+T.again+'</button></div>';$('rt').onclick=()=>{st=st.map(()=>-1);pi=0;rPre();};}
+ else{const it=D.pre[pi];c.innerHTML='<div class="qn">'+T.q+' '+(pi+1)+' '+T.of+' '+N+'</div><div class="q">'+it.q+'</div>';
+  it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=t;
+   if(st[pi]>=0){b.disabled=true;if(j===it.a)b.classList.add('right');else if(j===st[pi])b.classList.add('wrong');}
+   b.onclick=()=>{st[pi]=j;rPre();};c.appendChild(b);});
+  if(st[pi]>=0){const f=document.createElement('div');f.className='fb';f.innerHTML='<b>'+(st[pi]===it.a?T.ok:T.no)+'</b> '+it.e;c.appendChild(f);}}
+ dots($('pd'),N+1,pi);$('pp').disabled=pi===0;$('pn').disabled=pi===N||(pi<N&&st[pi]<0);}
+function rPost(){const c=$('dc');const N=D.post.length;const it=D.post[di];
+ c.innerHTML='<div class="qn">'+T.q+' '+(di+1)+' '+T.of+' '+N+'<span class="tag">'+it.t+'</span></div><div class="q">'+it.q+'</div><textarea placeholder="'+T.ph+'"></textarea><button class="show">'+(shown[di]?T.hide:T.show)+'</button><div class="ans'+(shown[di]?' on':'')+'">'+it.a+'</div>';
+ const ta=c.querySelector('textarea');ta.value=txt[di];ta.oninput=()=>txt[di]=ta.value;
+ c.querySelector('.show').onclick=()=>{shown[di]=!shown[di];rPost();};
+ dots($('dd'),N,di);$('dp').disabled=di===0;$('dn').disabled=di===N-1;}
+$('pp').onclick=()=>{pi--;rPre();};$('pn').onclick=()=>{pi++;rPre();};$('dp').onclick=()=>{di--;rPost();};$('dn').onclick=()=>{di++;rPost();};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===b.dataset.p));});
+let ei=0,ech=D.poe.map(()=>-1),eopen=D.poe.map(()=>false);
+function rPoe(){const c=$('ec');const N=D.poe.length;const it=D.poe[ei];
+ c.innerHTML='<div class="qn">'+T.q+' '+(ei+1)+' '+T.of+' '+N+'<span class="tag">'+it.t+'</span></div><div class="step">'+T.s1+'</div><div class="q">'+it.q+'</div>';
+ it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=t;
+  if(ech[ei]>=0){b.disabled=true;if(eopen[ei]&&j===it.a)b.classList.add('right');else if(j===ech[ei])b.classList.add(eopen[ei]&&j!==it.a?'wrong':'right');if(!eopen[ei]&&j===ech[ei]){b.classList.remove('right');b.style.borderColor='var(--acc2)';}}
+  b.onclick=()=>{ech[ei]=j;rPoe();};c.appendChild(b);});
+ if(ech[ei]>=0){const d=document.createElement('div');d.innerHTML='<div class="step">'+T.s2+'</div><div class="do">'+it.do+'</div>'+(eopen[ei]?'<div class="step">'+T.s3+'</div><div class="fb"><span class="verdict">'+(ech[ei]===it.a?T.hit:T.miss)+'</span> '+it.e+'</div>':'<button class="show" id="see">'+T.see+'</button>');c.appendChild(d);
+  const s=c.querySelector('#see');if(s)s.onclick=()=>{eopen[ei]=true;rPoe();};}
+ dots($('ed'),N,ei);$('ep').disabled=ei===0;$('en').disabled=ei===N-1;}
+$('ep').onclick=()=>{ei--;rPoe();};$('en').onclick=()=>{ei++;rPoe();};
+rPre();rPost();rPoe();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f1"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script><script>(function(){var p=(location.hash||"#pre").slice(1);
+var b=document.querySelector('.tabs button[data-p="'+p+'"]');if(b)b.click();
+["nav.tabs",".top","#h1"].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display="none";});
+document.documentElement.style.background=document.body.style.background="transparent";})();</script>
+</body>
+</html>

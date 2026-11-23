@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 1 — Interference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&family=Source+Serif+4:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0B1E3A; --teal:#0E8C9A; --coral:#E8604C; --tint:#E3F4F6; --bg:#F4F8FA; --grey:#5A6B7F; --line:#C9D6E0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--navy); font-family:"Source Sans 3", Calibri, "Segoe UI", Arial, sans-serif; font-size:16px; }
+  header { background:var(--navy); color:#fff; padding:18px 22px 14px; position:relative; overflow:hidden; }
+  header .rings { position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%;
+    background: repeating-radial-gradient(circle, rgba(70,200,215,.55) 0 3px, transparent 3px 14px); opacity:.55; }
+  header h1 { font-family:"Source Serif 4", Cambria, Georgia, serif; margin:0; font-size:23px; }
+  header p { margin:4px 0 0; color:#BFE6EA; font-size:14.5px; }
+  nav { display:flex; gap:6px; flex-wrap:wrap; padding:12px 22px 0; }
+  nav button { border:1px solid var(--line); background:#fff; color:var(--navy); padding:9px 14px; border-radius:10px 10px 0 0; font:inherit; font-weight:600; cursor:pointer; }
+  nav button.on { background:var(--teal); color:#fff; border-color:var(--teal); }
+  main { padding:0 22px 26px; }
+  .exp { display:none; background:#fff; border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; }
+  .exp.on { display:block; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap:16px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  nav { display:none; } .exp { border-radius:12px; margin-top:12px; } header { padding:12px 18px 10px; } header h1 { font-size:19px; } main { padding:0 12px 14px; } footer { display:none; }
+  h2 { font-family:"Source Serif 4", Cambria, Georgia, serif; font-size:19px; margin:0 0 6px; }
+  .lead { color:var(--grey); margin:0 0 12px; font-size:14.5px; }
+  .panel { background:var(--tint); border-radius:10px; padding:12px; }
+  .ctl { margin-bottom:11px; }
+  .ctl label { display:flex; justify-content:space-between; font-size:14px; font-weight:600; }
+  .ctl label span { color:var(--teal); font-variant-numeric: tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--teal); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 10px; }
+  .presets button, .seg button { border:1px solid var(--teal); background:#fff; color:var(--teal); border-radius:16px; padding:4px 11px; font:inherit; font-size:13.5px; cursor:pointer; }
+  .presets button:hover, .seg button.on { background:var(--teal); color:#fff; }
+  .seg { display:flex; gap:6px; margin-bottom:10px; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(135px,1fr)); gap:8px; margin:10px 0; }
+  .card { border:1px solid var(--line); border-radius:9px; padding:7px 9px; background:#fff; }
+  .card b { display:block; font-size:12.5px; color:var(--grey); font-weight:600; }
+  .card span { font-size:18px; font-weight:600; font-variant-numeric: tabular-nums; }
+  .card.ok span { color:var(--teal); } .card.th span { color:var(--coral); }
+  canvas { width:100%; display:block; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .cv-title { font-size:13.5px; font-weight:600; color:var(--grey); margin:10px 0 4px; }
+  .eq { font-family:"Source Serif 4", Cambria, Georgia, serif; background:#fff; border-left:3px solid var(--teal); padding:6px 10px; margin:8px 0; font-size:15px; }
+  .tasks { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .tasks h3 { font-size:15.5px; margin:0 0 4px; }
+  .tasks ol { margin:0; padding-left:20px; font-size:14.5px; } .tasks li { margin:3px 0; }
+  .ar { direction:rtl; text-align:right; font-family:"Noto Naskh Arabic", "Traditional Arabic", Tahoma, serif; background:#FFF6F3; border-right:4px solid var(--coral); border-radius:8px; padding:9px 12px; margin-top:12px; font-size:15.5px; line-height:1.8; }
+  .ar b { color:var(--coral); }
+  footer { color:var(--grey); font-size:13px; padding:0 22px 18px; }
+  .note { font-size:13px; color:var(--grey); }
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header><div class="rings"></div>
+  <h1>Virtual Lab · Chapter 1 — Interference</h1>
+  <p>Interferometric Systems and Their Applications (203673-3) · MSc in Physics · Prof. Najm Al-Hosiny</p>
+</header>
+<nav>
+  <button class="on" data-t="e1">1 · Two-beam fringes and visibility</button>
+  <button data-t="e2">2 · Temporal coherence</button>
+  <button data-t="e3">3 · Point and extended sources</button>
+</nav>
+<main>
+<!-- ================= Experiment 1 ================= -->
+<section class="exp on" id="e1">
+  <h2>Experiment 1 — Intensity in a two-beam pattern and fringe visibility</h2>
+  <p class="lead">Two coherent plane waves meet at a small angle α. Change the beam irradiances, the angle between their polarization directions and the wavelength, and compare the visibility measured from the pattern with theory.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Wavelength λ <span id="e1lamv"></span></label><input type="range" id="e1lam" min="400" max="700" step="1" value="633"></div>
+      <div class="ctl"><label>Angle between beams α <span id="e1alv"></span></label><input type="range" id="e1al" min="0.1" max="3" step="0.01" value="0.5"></div>
+      <div class="ctl"><label>Irradiance ratio I₂/I₁ <span id="e1rv"></span></label><input type="range" id="e1r" min="0" max="1" step="0.01" value="1"></div>
+      <div class="ctl"><label>Angle between polarizations θ <span id="e1thv"></span></label><input type="range" id="e1th" min="0" max="90" step="1" value="0"></div>
+      <div class="presets"><button data-p="1,0">Equal, parallel</button><button data-p="0.25,0">I₂/I₁ = 0.25</button><button data-p="0.04,0">I₂/I₁ = 0.04</button><button data-p="1,90">Crossed polarizers</button></div>
+      <div class="eq">I = I₁ + I₂ + 2√(I₁I₂) cos θ cos(2πx/Λ)<br>Λ = λ / [2 sin(α/2)]<br>V = 2√(I₁I₂) cos θ / (I₁ + I₂)</div>
+    </div>
+    <div>
+      <div class="cards">
+        <div class="card"><b>Fringe spacing Λ</b><span id="e1L"></span></div>
+        <div class="card ok"><b>V measured from pattern</b><span id="e1Vm"></span></div>
+        <div class="card th"><b>V theory</b><span id="e1Vt"></span></div>
+        <div class="card"><b>I_max / I_min</b><span id="e1C"></span></div>
+      </div>
+      <div class="cv-title">Fringes on the screen (screen width 200 µm)</div>
+      <canvas id="e1img" height="70"></canvas>
+      <div class="cv-title">Irradiance profile I(x)</div>
+      <canvas id="e1prof" height="230"></canvas>
+      <div class="cv-title">Visibility versus I₂/I₁ (θ as set) — the dot is the current setting</div>
+      <canvas id="e1vr" height="200"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Set I₂/I₁ = 0.25. Predict V before reading it, then check. How small must I₂/I₁ be for V to fall below 0.5?</li>
+    <li>With equal beams, increase θ from 0° to 90°. At which θ does V = 0.5? Why are crossed polarizations unable to interfere?</li>
+    <li>Double α. What happens to Λ? Which angle gives Λ = 10 µm at 633 nm?</li>
+    <li>Change λ only: does the visibility depend on the wavelength? Explain.</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الهدب الحادة لا تحتاج شدة كبيرة، بل تحتاج تساوي الشدتين. حتى لو كانت إحدى الحزمتين ربع الأخرى تبقى الرؤية ٠٫٨. أما إذا تعامد الاستقطابان فلا يحدث تداخل إطلاقاً مهما كانت الشدة.</div>
+</section>
+
+<!-- ================= Experiment 2 ================= -->
+<section class="exp" id="e2">
+  <h2>Experiment 2 — Visibility and temporal coherence</h2>
+  <p class="lead">A two-beam interferometer with equal beams is lit by a source with a Gaussian spectrum. Every wavelength makes its own fringes and they add in intensity; the fringes fade as the optical path difference D grows. The interferogram is computed by adding 401 spectral components and compared with the analytical visibility |γ(D)|.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="presets"><button data-s="633,0.002">He–Ne laser</button><button data-s="589,0.6">Na doublet width</button><button data-s="600,20">LED</button><button data-s="550,100">Broadband 100 nm</button></div>
+      <div class="ctl"><label>Centre wavelength λ₀ <span id="e2lamv"></span></label><input type="range" id="e2lam" min="400" max="800" step="1" value="600"></div>
+      <div class="ctl"><label>Spectral width Δλ (FWHM) <span id="e2dlv"></span></label><input type="range" id="e2dl" min="-2.7" max="2" step="0.01" value="1.301"></div>
+      <div class="ctl"><label>Path difference D₀ for the zoom <span id="e2Dv"></span></label><input type="range" id="e2D" min="0" max="3" step="0.01" value="0.5"></div>
+      <div class="eq">l_c = λ₀² / Δλ<br>V(D) = |γ(D)| = exp[−(πΔσD)² / (4 ln 2)], Δσ = Δλ/λ₀²</div>
+      <p class="note">The zoom slider is in units of l_c.</p>
+    </div>
+    <div>
+      <div class="cards">
+        <div class="card"><b>Coherence length l_c</b><span id="e2lc"></span></div>
+        <div class="card"><b>D where V = ½</b><span id="e2half"></span></div>
+        <div class="card ok"><b>V(D₀) numerical</b><span id="e2Vn"></span></div>
+        <div class="card th"><b>V(D₀) analytical</b><span id="e2Va"></span></div>
+      </div>
+      <div class="cv-title" id="e2t1">Interferogram over ±3 l_c with envelope (1 ± V)/2</div>
+      <canvas id="e2full" height="230"></canvas>
+      <div class="cv-title">Zoom: ±8 fringes around D₀ (numerical sum of spectral components)</div>
+      <canvas id="e2zoom" height="190"></canvas>
+      <div class="cv-title">Source spectrum</div>
+      <canvas id="e2spec" height="130"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Compare the coherence lengths of the He–Ne laser, the LED and the 100 nm broadband source. Which could you use for holography of a 10 cm deep object?</li>
+    <li>For the LED (600 nm, 20 nm), find D at which the fringes have visibility 0.5. Check it with the formula 2 ln 2/(πΔσ).</li>
+    <li>Why are white-light fringes useful for finding the position of zero path difference?</li>
+    <li>Halve Δλ. By what factor does l_c change?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> كل لون يرسم هدبه بمسافة مختلفة قليلاً. عند فرق مسار صفر تتطابق كل الهدب، ثم تنزلق عن بعضها كلما زاد فرق المسار حتى يمحو بعضها بعضاً. لذلك كلما كان الطيف أعرض قصر طول التماسك.</div>
+</section>
+
+<!-- ================= Experiment 3 ================= -->
+<section class="exp" id="e3">
+  <h2>Experiment 3 — Interference with a point source, and the effect of an extended source</h2>
+  <p class="lead">Part A: two coherent point sources (images of one source) are added as exact spherical waves on a screen. Part B: an extended, incoherent source of width w lights two pinholes; the intensities from all source points add.</p>
+  <div class="seg"><button class="on" data-m="t">A1 · Transverse pair</button><button data-m="a">A2 · Axial pair</button><button data-m="x">B · Extended source</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Wavelength λ <span id="e3lamv"></span></label><input type="range" id="e3lam" min="400" max="700" step="1" value="633"></div>
+      <div id="e3ct">
+        <div class="ctl"><label>Source separation d (screen at z = 1 m) <span id="e3dv"></span></label><input type="range" id="e3d" min="0.2" max="3" step="0.01" value="1"></div>
+        <div class="eq">Straight fringes, spacing λz/d</div>
+      </div>
+      <div id="e3ca" style="display:none">
+        <div class="ctl"><label>Axial separation s <span id="e3sv"></span></label><input type="range" id="e3s" min="2" max="80" step="0.5" value="40"></div>
+        <div class="eq">Circular fringes of equal inclination; nearer source 0.2 m from the screen</div>
+      </div>
+      <div id="e3cx" style="display:none">
+        <div class="ctl"><label>Source width w <span id="e3wv"></span></label><input type="range" id="e3w" min="0" max="3" step="0.01" value="0.3"></div>
+        <div class="ctl"><label>Pinhole separation d <span id="e3pv"></span></label><input type="range" id="e3p" min="0.2" max="2" step="0.01" value="1"></div>
+        <div class="eq">Source–pinhole distance R = 1 m<br>V(w) = |sinc(wd/λR)|, sinc u = sin(πu)/(πu)</div>
+      </div>
+    </div>
+    <div>
+      <div class="cards" id="e3cards"></div>
+      <div class="cv-title" id="e3t1"></div>
+      <canvas id="e3img" height="330"></canvas>
+      <div class="cv-title" id="e3t2"></div>
+      <canvas id="e3plot" height="210"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>A1: double d. Does the measured fringe spacing follow λz/d?</li>
+    <li>A2: increase s. What happens to the number of rings on the screen, and why are the rings crowded at the edge?</li>
+    <li>B: find the source width at which the fringes vanish for d = 1 mm. Then move just past it: why do the fringes come back with a bright centre turned dark?</li>
+    <li>B: halve d. What largest source width now keeps V ≥ 0.5? Relate this to fringe localization.</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> كل نقطة من المصدر الممتد ترسم هدباً مزاحة قليلاً عن جاراتها، فتتراكب الشدات. عندما يصبح المصدر «كبيراً» كما يُرى من الثقبين تتوزع الهدب المزاحة على هدبة كاملة فتختفي. لهذا تُرى الهدب في مكان محدد فقط، وهذا هو تموضع الهدب.</div>
+</section>
+</main>
+<footer>All results are computed in your browser from the equations of Chapter 1 (Hariharan, Basics of Interferometry, 2nd ed.). The MATLAB versions of these experiments are Labs 1.1–1.3.</footer>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const C = { navy:'#0B1E3A', teal:'#0E8C9A', coral:'#E8604C', grey:'#5A6B7F', line:'#C9D6E0', gold:'#D99A1E' };
+const fmt = (v, d = 3) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : (+v.toFixed(d)).toString();
+function lenStr(m) { const a = Math.abs(m); if (a >= 1) return fmt(m, 3) + ' m'; if (a >= 1e-3) return fmt(m * 1e3, 3) + ' mm'; if (a >= 1e-6) return fmt(m * 1e6, 3) + ' µm'; return fmt(m * 1e9, 3) + ' nm'; }
+
+// ---- canvas helpers ----
+function prep(cv) {
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.getAttribute('height');
+  if (cv.width !== Math.round(w * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.clearRect(0, 0, w, h); return { g, w, h };
+}
+function nice(span) { const p = Math.pow(10, Math.floor(Math.log10(span / 5))); const m = span / 5 / p; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; }
+function plot(cv, series, o) {
+  const { g, w, h } = prep(cv); const L = 56, R = 12, T = 10, B = 38;
+  const x0 = o.xmin, x1 = o.xmax, y0 = o.ymin, y1 = o.ymax;
+  const X = x => L + (x - x0) / (x1 - x0) * (w - L - R), Y = y => h - B - (y - y0) / (y1 - y0) * (h - T - B);
+  g.font = '12px "Source Sans 3", Arial'; g.fillStyle = C.grey; g.strokeStyle = '#E6EDF2'; g.lineWidth = 1;
+  const dx = nice(x1 - x0), dy = nice(y1 - y0);
+  for (let t = Math.ceil(x0 / dx) * dx; t <= x1 + 1e-12; t += dx) { g.beginPath(); g.moveTo(X(t), T); g.lineTo(X(t), h - B); g.stroke(); g.textAlign = 'center'; g.fillText(+t.toPrecision(6), X(t), h - B + 15); }
+  for (let t = Math.ceil(y0 / dy) * dy; t <= y1 + 1e-12; t += dy) { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(w - R, Y(t)); g.stroke(); g.textAlign = 'right'; g.fillText(+t.toPrecision(6), L - 5, Y(t) + 4); }
+  g.strokeStyle = C.grey; g.strokeRect(L, T, w - L - R, h - T - B);
+  g.fillStyle = C.navy; g.textAlign = 'center'; g.fillText(o.xlabel || '', L + (w - L - R) / 2, h - 6);
+  g.save(); g.translate(13, T + (h - T - B) / 2); g.rotate(-Math.PI / 2); g.fillText(o.ylabel || '', 0, 0); g.restore();
+  g.save(); g.beginPath(); g.rect(L, T, w - L - R, h - T - B); g.clip();
+  for (const s of series) {
+    g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = s.width || 1.6; g.setLineDash(s.dash || []);
+    if (s.points) { for (let i = 0; i < s.x.length; i++) { g.beginPath(); g.arc(X(s.x[i]), Y(s.y[i]), s.r || 3.5, 0, 7); s.hollow ? g.stroke() : g.fill(); } }
+    else { g.beginPath(); for (let i = 0; i < s.x.length; i++) { const px = X(s.x[i]), py = Y(s.y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+  }
+  g.restore(); g.setLineDash([]);
+  if (o.legend) { let ly = o.legendBottom ? h - B - 10 - 16 * (series.filter(s => s.label).length - 1) : T + 8; g.textAlign = 'left'; for (const s of series) { if (!s.label) continue; g.fillStyle = s.color; g.fillRect(w - R - 190, ly - 5, 14, 3); g.fillStyle = C.navy; g.fillText(s.label, w - R - 170, ly); ly += 16; } }
+}
+function wl2rgb(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = -(nm - 440) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = -(nm - 510) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = -(nm - 645) / 65; } else r = 1;
+  const f = nm < 420 ? 0.3 + 0.7 * (nm - 380) / 40 : nm > 700 ? 0.3 + 0.7 * (780 - nm) / 80 : 1;
+  return [r * f, g * f, b * f];
+}
+function image(cv, nx, ny, fn, rgb) {   // fn(i,j) in [0,1]
+  const { g, w, h } = prep(cv); const im = g.createImageData(nx, ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const v = Math.max(0, Math.min(1, fn(i, j))), k = 4 * (j * nx + i);
+    im.data[k] = 255 * v * rgb[0]; im.data[k + 1] = 255 * v * rgb[1]; im.data[k + 2] = 255 * v * rgb[2]; im.data[k + 3] = 255; }
+  const tmp = document.createElement('canvas'); tmp.width = nx; tmp.height = ny; tmp.getContext('2d').putImageData(im, 0, 0);
+  g.imageSmoothingEnabled = true; return { g, w, h, tmp };
+}
+const linspace = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * i / (n - 1));
+
+// ---- tabs ----
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.exp').forEach(s => s.classList.toggle('on', s.id === b.dataset.t));
+  draw();
+});
+
+// ================= Experiment 1 =================
+function e1() {
+  const lam = +$('e1lam').value * 1e-9, al = +$('e1al').value * Math.PI / 180, r = +$('e1r').value, th = +$('e1th').value * Math.PI / 180;
+  $('e1lamv').textContent = $('e1lam').value + ' nm'; $('e1alv').textContent = (+$('e1al').value).toFixed(2) + '°';
+  $('e1rv').textContent = r.toFixed(2); $('e1thv').textContent = $('e1th').value + '°';
+  const I1 = 1, I2 = r, Lam = lam / (2 * Math.sin(al / 2));
+  const W = 200e-6, N = 4001, x = linspace(0, W, N);
+  const I = x.map(xx => I1 + I2 + 2 * Math.sqrt(I1 * I2) * Math.cos(th) * Math.cos(2 * Math.PI * xx / Lam));
+  const mx = Math.max(...I), mn = Math.min(...I);
+  const Vm = (mx - mn) / (mx + mn), Vt = 2 * Math.sqrt(I1 * I2) * Math.cos(th) / (I1 + I2);
+  $('e1L').textContent = lenStr(Lam); $('e1Vm').textContent = Vm.toFixed(3); $('e1Vt').textContent = Math.abs(Vt).toFixed(3);
+  $('e1C').textContent = mn > 1e-6 * mx ? fmt(mx / mn, 2) : '∞';
+  const rgb = wl2rgb(+$('e1lam').value);
+  const nx = 800; const { g, w, h, tmp } = image($('e1img'), nx, 1, i => (I1 + I2 + 2 * Math.sqrt(I1 * I2) * Math.cos(th) * Math.cos(2 * Math.PI * (i / (nx - 1)) * W / Lam)) / 4, rgb);
+  g.drawImage(tmp, 0, 0, w, h);
+  plot($('e1prof'), [{ x: x.map(v => v * 1e6), y: I, color: C.teal, width: 1.8 }, { x: [0, 200], y: [mx, mx], color: C.coral, dash: [5, 4], width: 1 }, { x: [0, 200], y: [mn, mn], color: C.coral, dash: [5, 4], width: 1 }],
+    { xmin: 0, xmax: 200, ymin: 0, ymax: 4.2, xlabel: 'x  [µm]', ylabel: 'I(x)  [arb. units]' });
+  const rr = linspace(0, 1, 201);
+  plot($('e1vr'), [{ x: rr, y: rr.map(q => 2 * Math.sqrt(q) * Math.abs(Math.cos(th)) / (1 + q)), color: C.navy, width: 2, label: 'theory 2√r cos θ/(1+r)' }, { x: [r], y: [Vm], color: C.coral, points: true, r: 5, label: 'measured' }],
+    { xmin: 0, xmax: 1, ymin: 0, ymax: 1.05, xlabel: 'I₂/I₁', ylabel: 'Visibility V', legend: true, legendBottom: true });
+}
+document.querySelectorAll('#e1 .presets button').forEach(b => b.onclick = () => { const [r, t] = b.dataset.p.split(','); $('e1r').value = r; $('e1th').value = t; draw(); });
+
+// ================= Experiment 2 =================
+function e2() {
+  const lam0 = +$('e2lam').value * 1e-9, dl = Math.pow(10, +$('e2dl').value) * 1e-9, k = +$('e2D').value;
+  $('e2lamv').textContent = $('e2lam').value + ' nm'; $('e2dlv').textContent = fmt(dl * 1e9, 3) + ' nm';
+  const s0 = 1 / lam0, ds = dl / (lam0 * lam0), lc = 1 / ds, D0 = k * lc;
+  $('e2Dv').textContent = k.toFixed(2) + ' l_c = ' + lenStr(D0);
+  const Va = D => Math.exp(-Math.pow(Math.PI * ds * D, 2) / (4 * Math.LN2));
+  // spectral samples
+  const Ns = 401, sig = linspace(s0 - 4 * ds, s0 + 4 * ds, Ns); let S = sig.map(s => Math.exp(-4 * Math.LN2 * (s - s0) ** 2 / ds ** 2)); const Ss = S.reduce((a, b) => a + b); S = S.map(v => v / Ss);
+  const gam = D => { let re = 0, im = 0; for (let i = 0; i < Ns; i++) { const p = 2 * Math.PI * sig[i] * D; re += S[i] * Math.cos(p); im += S[i] * Math.sin(p); } return [re, im]; };
+  const g0 = gam(D0); const Vn = Math.hypot(g0[0], g0[1]);
+  $('e2lc').textContent = lenStr(lc); $('e2half').textContent = lenStr(2 * Math.LN2 / (Math.PI * ds));
+  $('e2Vn').textContent = Vn.toFixed(3); $('e2Va').textContent = Va(D0).toFixed(3);
+  // full view: unit chosen
+  const span = 3 * lc, u = span >= 1e-3 ? 1e-3 : 1e-6, un = u === 1e-3 ? 'mm' : 'µm';
+  const Dd = linspace(-span, span, 401), env = Dd.map(Va);
+  const ser = [];
+  const dense = lc / lam0 > 120;
+  if (!dense) { const Df = linspace(-span, span, 3001); ser.push({ x: Df.map(v => v / u), y: Df.map(v => (1 + gam(v)[0]) / 2), color: C.teal, width: 0.9 }); }
+  ser.push({ x: Dd.map(v => v / u), y: env.map(v => (1 + v) / 2), color: C.navy, dash: [6, 4], width: 1.6 }, { x: Dd.map(v => v / u), y: env.map(v => (1 - v) / 2), color: C.navy, dash: [6, 4], width: 1.6 });
+  ser.push({ x: [D0 / u, D0 / u], y: [0, 1], color: C.coral, width: 1.4 });
+  $('e2t1').textContent = dense ? 'Envelope (1 ± V)/2 over ±3 l_c — fringes too dense to draw at this scale (' + Math.round(2 * span / lam0).toLocaleString() + ' fringes); use the zoom below' : 'Interferogram over ±3 l_c with envelope (1 ± V)/2';
+  plot($('e2full'), ser, { xmin: -span / u, xmax: span / u, ymin: 0, ymax: 1, xlabel: 'Optical path difference D  [' + un + ']', ylabel: 'Normalised irradiance' });
+  const Dz = linspace(D0 - 8 * lam0, D0 + 8 * lam0, 1201);
+  plot($('e2zoom'), [{ x: Dz.map(v => (v - D0) * 1e6), y: Dz.map(v => (1 + gam(v)[0]) / 2), color: C.teal, width: 1.6 }, { x: [-8 * lam0 * 1e6, 8 * lam0 * 1e6], y: [(1 + Va(D0)) / 2, (1 + Va(D0)) / 2], color: C.coral, dash: [5, 4], width: 1 }, { x: [-8 * lam0 * 1e6, 8 * lam0 * 1e6], y: [(1 - Va(D0)) / 2, (1 - Va(D0)) / 2], color: C.coral, dash: [5, 4], width: 1 }],
+    { xmin: -8 * lam0 * 1e6, xmax: 8 * lam0 * 1e6, ymin: 0, ymax: 1, xlabel: 'D − D₀  [µm]', ylabel: 'Normalised irradiance' });
+  const lw = linspace(Math.max(300, lam0 * 1e9 - 3 * dl * 1e9), lam0 * 1e9 + 3 * dl * 1e9, 400);
+  const lo = lam0 * 1e9 - Math.max(3 * dl * 1e9, 0.5), hi = lam0 * 1e9 + Math.max(3 * dl * 1e9, 0.5); const lw2 = linspace(lo, hi, 400);
+  plot($('e2spec'), [{ x: lw2, y: lw2.map(L => Math.exp(-4 * Math.LN2 * ((1 / (L * 1e-9) - s0) / ds) ** 2)), color: C.gold, width: 2 }],
+    { xmin: lo, xmax: hi, ymin: 0, ymax: 1.05, xlabel: 'Wavelength  [nm]', ylabel: 'S (norm.)' });
+}
+document.querySelectorAll('#e2 .presets button').forEach(b => b.onclick = () => { const [l, d] = b.dataset.s.split(','); $('e2lam').value = l; $('e2dl').value = Math.log10(+d); draw(); });
+
+// ================= Experiment 3 =================
+let mode = 't';
+document.querySelectorAll('#e3 .seg button').forEach(b => b.onclick = () => {
+  mode = b.dataset.m; document.querySelectorAll('#e3 .seg button').forEach(x => x.classList.toggle('on', x === b));
+  $('e3ct').style.display = mode === 't' ? '' : 'none'; $('e3ca').style.display = mode === 'a' ? '' : 'none'; $('e3cx').style.display = mode === 'x' ? '' : 'none'; draw();
+});
+function cards(list) { $('e3cards').innerHTML = list.map(c => '<div class="card ' + (c[2] || '') + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join(''); }
+function e3() {
+  const lamnm = +$('e3lam').value, lam = lamnm * 1e-9, k = 2 * Math.PI / lam, rgb = wl2rgb(lamnm);
+  $('e3lamv').textContent = lamnm + ' nm';
+  const L = 4e-3, n = 300, xs = linspace(-L, L, n);
+  if (mode === 't') {
+    const d = +$('e3d').value * 1e-3, z = 1; $('e3dv').textContent = (+$('e3d').value).toFixed(2) + ' mm';
+    const prof = xs.map(x => { const r1 = Math.hypot(x - d / 2, z), r2 = Math.hypot(x + d / 2, z); return 2 + 2 * Math.cos(k * (r1 - r2)); });
+    const { g, w, h, tmp } = image($('e3img'), n, n, (i, j) => { const x = xs[i], y = xs[j]; const r1 = Math.sqrt((x - d / 2) ** 2 + y * y + z * z), r2 = Math.sqrt((x + d / 2) ** 2 + y * y + z * z); return (2 + 2 * Math.cos(k * (r1 - r2))) / 4; }, rgb);
+    const s = Math.min(w, h); g.drawImage(tmp, (w - s) / 2, 0, s, s);
+    // measured spacing from maxima of central row
+    const pk = []; for (let i = 1; i < n - 1; i++) if (prof[i] > prof[i - 1] && prof[i] >= prof[i + 1] && prof[i] > 3) pk.push(xs[i]);
+    const meas = pk.length > 1 ? (pk[pk.length - 1] - pk[0]) / (pk.length - 1) : NaN;
+    cards([['Theory λz/d', lenStr(lam * z / d), 'th'], ['Measured spacing', isNaN(meas) ? '—' : lenStr(meas), 'ok'], ['Fringes on screen', String(pk.length)]]);
+    $('e3t1').textContent = 'Screen 8 mm × 8 mm at z = 1 m'; $('e3t2').textContent = 'Central row I(x)';
+    plot($('e3plot'), [{ x: xs.map(v => v * 1e3), y: prof, color: C.teal }], { xmin: -4, xmax: 4, ymin: 0, ymax: 4.2, xlabel: 'x  [mm]', ylabel: 'I(x)' });
+  } else if (mode === 'a') {
+    const s = +$('e3s').value * 1e-3, za = 0.2; $('e3sv').textContent = (+$('e3s').value).toFixed(1) + ' mm';
+    const f = (x, y) => { const r2 = x * x + y * y, r1a = Math.sqrt(r2 + za * za), r1b = Math.sqrt(r2 + (za + s) ** 2); return 2 + 2 * Math.cos(k * (r1b - r1a)); };
+    const { g, w, h, tmp } = image($('e3img'), n, n, (i, j) => f(xs[i], xs[j]) / 4, rgb);
+    const sz = Math.min(w, h); g.drawImage(tmp, (w - sz) / 2, 0, sz, sz);
+    const rr = linspace(0, L, 1500), pr = rr.map(r => f(r, 0));
+    const D0 = s, Dedge = Math.sqrt(L * L + (za + s) ** 2) - Math.sqrt(L * L + za * za);
+    const rings = Math.floor((D0 - Dedge) / lam);
+    cards([['Order at centre s/λ', fmt(s / lam, 1)], ['Path difference at edge', lenStr(Dedge)], ['Rings across radius', String(rings), 'ok']]);
+    $('e3t1').textContent = 'Screen 8 mm × 8 mm, nearer source 0.2 m away'; $('e3t2').textContent = 'Radial profile I(r)';
+    plot($('e3plot'), [{ x: rr.map(v => v * 1e3), y: pr, color: C.teal, width: 1.2 }], { xmin: 0, xmax: 4, ymin: 0, ymax: 4.2, xlabel: 'r  [mm]', ylabel: 'I(r)' });
+  } else {
+    const wsrc = +$('e3w').value * 1e-3, d = +$('e3p').value * 1e-3, R = 1, zs = 1; $('e3wv').textContent = (+$('e3w').value).toFixed(2) + ' mm'; $('e3pv').textContent = (+$('e3p').value).toFixed(2) + ' mm';
+    const Ms = 201, us = wsrc > 0 ? Array.from({ length: Ms }, (_, i) => -wsrc / 2 + (i + 0.5) * wsrc / Ms) : [0];
+    const per = lam * zs / d, X = linspace(-2.5 * per, 2.5 * per, 600);
+    const I = X.map(x => { let t = 0; for (const u of us) t += 2 + 2 * Math.cos(2 * Math.PI * d * (x / zs + u / R) / lam); return t / us.length; });
+    const mx = Math.max(...I), mn = Math.min(...I), Vn = (mx - mn) / (mx + mn);
+    const sinc = q => q === 0 ? 1 : Math.sin(Math.PI * q) / (Math.PI * q);
+    const q = wsrc * d / (lam * R), Vt = Math.abs(sinc(q));
+    const { g, w, h, tmp } = image($('e3img'), 600, 1, i => I[i] / 4, rgb);
+    g.drawImage(tmp, 0, 0, w, h);
+    const sign = sinc(q) < 0 ? 'reversed (dark centre)' : 'normal (bright centre)';
+    cards([['V numerical', Vn.toFixed(3), 'ok'], ['V = |sinc(wd/λR)|', Vt.toFixed(3), 'th'], ['First zero at w', lenStr(lam * R / d)], ['Fringe contrast', sign]]);
+    $('e3t1').textContent = 'Fringes on the screen (5 fringe periods, period λz/d = ' + lenStr(per) + ')';
+    $('e3t2').textContent = 'Visibility versus source width — the dot is the current setting';
+    const W = linspace(0, 3e-3, 400);
+    plot($('e3plot'), [{ x: W.map(v => v * 1e3), y: W.map(v => Math.abs(sinc(v * d / (lam * R)))), color: C.navy, width: 2, label: '|sinc(wd/λR)|' }, { x: [wsrc * 1e3], y: [Vn], color: C.coral, points: true, r: 5, label: 'numerical' }],
+      { xmin: 0, xmax: 3, ymin: 0, ymax: 1.05, xlabel: 'Source width w  [mm]', ylabel: 'Visibility V', legend: true });
+  }
+}
+
+function draw() { const t = document.querySelector('.exp.on').id; if (t === 'e1') e1(); else if (t === 'e2') e2(); else e3(); }
+document.querySelectorAll('input[type=range]').forEach(r => r.oninput = draw);
+window.addEventListener('resize', draw);
+draw();
+</script>
+<script>(function(){var b=document.querySelector('nav button[data-t="e3"]'); if(b) b.click();})();</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f4"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 4 — Photodetectors and CCD Arrays</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&family=Source+Serif+4:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0B1E3A; --teal:#0E8C9A; --coral:#E8604C; --tint:#E3F4F6; --bg:#F4F8FA; --grey:#5A6B7F; --line:#C9D6E0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--navy); font-family:"Source Sans 3", Calibri, "Segoe UI", Arial, sans-serif; font-size:16px; }
+  header { background:var(--navy); color:#fff; padding:18px 22px 14px; position:relative; overflow:hidden; }
+  header .rings { position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%;
+    background: repeating-radial-gradient(circle, rgba(70,200,215,.55) 0 3px, transparent 3px 14px); opacity:.55; }
+  header h1 { font-family:"Source Serif 4", Cambria, Georgia, serif; margin:0; font-size:23px; }
+  header p { margin:4px 0 0; color:#BFE6EA; font-size:14.5px; }
+  nav { display:flex; gap:6px; flex-wrap:wrap; padding:12px 22px 0; }
+  nav button { border:1px solid var(--line); background:#fff; color:var(--navy); padding:9px 14px; border-radius:10px 10px 0 0; font:inherit; font-weight:600; cursor:pointer; }
+  nav button.on { background:var(--teal); color:#fff; border-color:var(--teal); }
+  main { padding:0 22px 26px; }
+  .exp { display:none; background:#fff; border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; }
+  .exp.on { display:block; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap:16px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  nav { display:none; } .exp { border-radius:12px; margin-top:12px; } header { padding:12px 18px 10px; } header h1 { font-size:19px; } main { padding:0 12px 14px; } footer { display:none; }
+  h2 { font-family:"Source Serif 4", Cambria, Georgia, serif; font-size:19px; margin:0 0 6px; }
+  .lead { color:var(--grey); margin:0 0 12px; font-size:14.5px; }
+  .panel { background:var(--tint); border-radius:10px; padding:12px; }
+  .ctl { margin-bottom:11px; }
+  .ctl label { display:flex; justify-content:space-between; font-size:14px; font-weight:600; }
+  .ctl label span { color:var(--teal); font-variant-numeric: tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--teal); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 10px; }
+  .presets button, .seg button { border:1px solid var(--teal); background:#fff; color:var(--teal); border-radius:16px; padding:4px 11px; font:inherit; font-size:13.5px; cursor:pointer; }
+  .presets button:hover, .seg button.on { background:var(--teal); color:#fff; }
+  .seg { display:flex; gap:6px; margin-bottom:10px; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(135px,1fr)); gap:8px; margin:10px 0; }
+  .card { border:1px solid var(--line); border-radius:9px; padding:7px 9px; background:#fff; }
+  .card b { display:block; font-size:12.5px; color:var(--grey); font-weight:600; }
+  .card span { font-size:18px; font-weight:600; font-variant-numeric: tabular-nums; }
+  .card.ok span { color:var(--teal); } .card.th span { color:var(--coral); }
+  canvas { width:100%; display:block; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .cv-title { font-size:13.5px; font-weight:600; color:var(--grey); margin:10px 0 4px; }
+  .eq { font-family:"Source Serif 4", Cambria, Georgia, serif; background:#fff; border-left:3px solid var(--teal); padding:6px 10px; margin:8px 0; font-size:15px; }
+  .tasks { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .tasks h3 { font-size:15.5px; margin:0 0 4px; }
+  .tasks ol { margin:0; padding-left:20px; font-size:14.5px; } .tasks li { margin:3px 0; }
+  .ar { direction:rtl; text-align:right; font-family:"Noto Naskh Arabic", "Traditional Arabic", Tahoma, serif; background:#FFF6F3; border-right:4px solid var(--coral); border-radius:8px; padding:9px 12px; margin-top:12px; font-size:15.5px; line-height:1.8; }
+  .ar b { color:var(--coral); }
+  footer { color:var(--grey); font-size:13px; padding:0 22px 18px; }
+  .note { font-size:13px; color:var(--grey); }
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header><div class="rings"></div>
+  <h1>Virtual Lab · Chapter 4 — Photodetectors and CCD Arrays</h1>
+  <p>Interferometric Systems and Their Applications (203673-3) · MSc in Physics · Prof. Najm Al-Hosiny</p>
+</header>
+<nav>
+  <button class="on" data-t="e1">1 · Photon statistics and PMT</button>
+  <button data-t="e2">2 · Pixel noise and photon transfer</button>
+  <button data-t="e3">3 · Sampling and pixel MTF</button>
+</nav>
+<main>
+<!-- ================= Experiment 1 ================= -->
+<section class="exp on" id="e1">
+  <h2>Experiment 1 — Photon statistics and the photomultiplier</h2>
+  <p class="lead">Photoelectrons from a steady beam are Poisson distributed: mean N, variance N, so SNR = √N. A photomultiplier multiplies each electron at n dynodes (mean gain δ per dynode); the random multiplication adds an excess noise factor F.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Mean photoelectrons per measurement N <span id="e1Nv"></span></label><input type="range" id="e1N" min="0" max="3" step="0.01" value="1"></div>
+      <div class="ctl"><label>Dynode gain δ <span id="e1dv"></span></label><input type="range" id="e1d" min="2" max="8" step="0.1" value="4"></div>
+      <div class="ctl"><label>Number of dynodes n <span id="e1nv"></span></label><input type="range" id="e1n" min="1" max="12" step="1" value="10"></div>
+      <div class="ctl"><label>Amplifier noise of a photodiode σ_amp <span id="e1av"></span></label><input type="range" id="e1a" min="0" max="3" step="0.01" value="2"></div>
+      <div class="presets"><button id="e1run">⟳ New 5000 trials</button></div>
+      <div class="eq">Poisson: SNR = √N<br>G = δⁿ, F = 1 + (1 − δ⁻ⁿ)/(δ − 1) ≈ δ/(δ − 1)<br>PMT: SNR = √(N/F); photodiode: SNR = N/√(N + σ_amp²)</div>
+    </div>
+    <div>
+      <div class="cards" id="e1cards"></div>
+      <div class="cv-title">Histogram of photoelectron counts in 5000 measurements (bars) and the Poisson law (line)</div>
+      <canvas id="e1hist" height="210"></canvas>
+      <div class="cv-title">SNR versus mean photoelectrons: PMT (excess noise F) and photodiode + amplifier (dot: current N)</div>
+      <canvas id="e1snr" height="230"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Set N = 10 and N = 1000. Do the measured SNRs follow √N? Why does the histogram look Gaussian for large N?</li>
+    <li>Change δ from 3 to 6. How does the excess noise factor F change, and why does the first dynode matter most?</li>
+    <li>With σ_amp = 100 electrons, below which N does the PMT beat the photodiode? Above which N does it lose?</li>
+    <li>Why can a PMT count single photons while a photodiode with an amplifier cannot?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الضوء يصل على شكل فوتونات عشوائية، فلا يمكن قياس شدته بدقة أفضل من الجذر التربيعي لعدد الفوتونات. المضاعِف الضوئي يكبّر الإشارة كثيراً، لكنه يضيف ضجيجاً صغيراً من عشوائية التضخيم نفسها.</div>
+</section>
+
+<!-- ================= Experiment 2 ================= -->
+<section class="exp" id="e2">
+  <h2>Experiment 2 — CCD/CMOS pixel noise and the photon transfer curve</h2>
+  <p class="lead">Pixel model: signal = Poisson(μ + dark) + read noise, clipped at the full well; output DN = offset + K·signal. Two flat frames are subtracted to remove fixed-pattern noise; the variance–mean slope gives the conversion gain K and the intercept gives the read noise.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Full well FW <span id="e2fv"></span></label><input type="range" id="e2f" min="5000" max="60000" step="1000" value="20000"></div>
+      <div class="ctl"><label>Read noise σ_r <span id="e2rv"></span></label><input type="range" id="e2r" min="1" max="40" step="0.5" value="10"></div>
+      <div class="ctl"><label>Conversion gain K <span id="e2kv"></span></label><input type="range" id="e2k" min="0.05" max="1" step="0.01" value="0.25"></div>
+      <div class="ctl"><label>Exposure of the fringe pattern (peak electrons) <span id="e2ev"></span></label><input type="range" id="e2e" min="1" max="4.6" step="0.01" value="3"></div>
+      <div class="presets"><button id="e2run">⟳ New frames</button></div>
+      <div class="eq">var(DN) = K·μ_DN + K²σ_r²<br>SNR = μ/√(μ + σ_r²), DR = FW/σ_r</div>
+    </div>
+    <div>
+      <div class="cards" id="e2cards"></div>
+      <div class="cv-title">Photon transfer curve: variance versus mean (from frame pairs) and the fitted line</div>
+      <canvas id="e2pt" height="220"></canvas>
+      <div class="cv-title">A recorded fringe pattern at the chosen exposure (row profile)</div>
+      <canvas id="e2fr" height="200"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Read K and σ_r from the fit and compare them with the sliders. Why must two frames be subtracted?</li>
+    <li>Lower the exposure to ~30 electrons. Which noise dominates now? At which signal do read noise and shot noise become equal?</li>
+    <li>Raise the exposure above the full well. What happens to the fringe peaks and to the photon transfer curve?</li>
+    <li>Compute the dynamic range in dB for FW = 20 000 e⁻ and σ_r = 10 e⁻.</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> عند الإضاءة الضعيفة يطغى ضجيج القراءة الإلكتروني، وعند الإضاءة القوية يطغى ضجيج الفوتونات. وإذا تجاوزت الإشارة سعة البئر قُصّت قمم الهدب، فضاعت معلومات الطور.</div>
+</section>
+
+<!-- ================= Experiment 3 ================= -->
+<section class="exp" id="e3">
+  <h2>Experiment 3 — Sampling fringes with a pixel array: pixel MTF and aliasing</h2>
+  <p class="lead">Fringes I(x) = 1 + cos(2πx/p) are integrated over each pixel of width a = ff·Δ and sampled every Δ. The recorded modulation is |sinc(a/p)|; fringes finer than two pixels per period alias.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Fringe period p (in pixel pitches) <span id="e3pv"></span></label><input type="range" id="e3p" min="1.05" max="12" step="0.01" value="4"></div>
+      <div class="ctl"><label>Fill factor ff <span id="e3fv"></span></label><input type="range" id="e3f" min="0.1" max="1" step="0.01" value="1"></div>
+      <div class="ctl"><label>Pixel pitch Δ <span id="e3dv"></span></label><input type="range" id="e3d" min="1" max="10" step="0.05" value="6.45"></div>
+      <div class="ctl"><label>Charge-transfer efficiency CTE <span id="e3cv"></span></label><input type="range" id="e3c" min="0.99" max="0.999999" step="0.000001" value="0.99999"></div>
+      <div class="eq">M = |sinc(ff·Δ/p)|, Nyquist p ≥ 2Δ<br>f_seen = |f − k/Δ|; after n transfers Q = CTEⁿ</div>
+    </div>
+    <div>
+      <div class="cards" id="e3cards"></div>
+      <div class="cv-title">True fringes (thin) and the pixel values (steps) over 24 pixels</div>
+      <canvas id="e3sig" height="220"></canvas>
+      <div class="cv-title">Pixel MTF: recorded modulation versus fringe period (dot: current setting)</div>
+      <canvas id="e3mtf" height="200"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Set p = 2 (Nyquist). What modulation is recorded for ff = 1 and ff = 0.5?</li>
+    <li>Set p = 1.25. How many pixels per period do the samples seem to show? Check with f_seen = |f − 1/Δ|.</li>
+    <li>Why does a smaller fill factor raise the MTF but also let aliased frequencies through?</li>
+    <li>CTE: what fraction of the charge from the far corner of a 2048 × 2048 array survives for CTE = 0.99999?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> البكسل يجمع الضوء على مساحته، فيمتزج المضيء والمعتم من الهدب الدقيقة. وإذا كانت الهدبة أضيق من بكسلين ظهرت للكاميرا بتردد زائف أخفض من ترددها الحقيقي.</div>
+</section>
+</main>
+
+<footer>All results are computed in your browser from the equations of Chapter 4 (Malacara & Servín, Interferogram Analysis for Optical Testing, 2nd ed.). The MATLAB versions of these experiments are Labs 4.1–4.3.</footer>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const C = { navy:'#0B1E3A', teal:'#0E8C9A', coral:'#E8604C', grey:'#5A6B7F', line:'#C9D6E0', gold:'#D99A1E' };
+const fmt = (v, d = 3) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : (+v.toFixed(d)).toString();
+function lenStr(m) { const a = Math.abs(m); if (a >= 1) return fmt(m, 3) + ' m'; if (a >= 1e-3) return fmt(m * 1e3, 3) + ' mm'; if (a >= 1e-6) return fmt(m * 1e6, 3) + ' µm'; return fmt(m * 1e9, 3) + ' nm'; }
+
+// ---- canvas helpers ----
+function prep(cv) {
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.getAttribute('height');
+  if (cv.width !== Math.round(w * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.clearRect(0, 0, w, h); return { g, w, h };
+}
+function nice(span) { const p = Math.pow(10, Math.floor(Math.log10(span / 5))); const m = span / 5 / p; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; }
+function plot(cv, series, o) {
+  const { g, w, h } = prep(cv); const L = 56, R = 12, T = 10, B = 38;
+  const x0 = o.xmin, x1 = o.xmax, y0 = o.ymin, y1 = o.ymax;
+  const X = x => L + (x - x0) / (x1 - x0) * (w - L - R), Y = y => h - B - (y - y0) / (y1 - y0) * (h - T - B);
+  g.font = '12px "Source Sans 3", Arial'; g.fillStyle = C.grey; g.strokeStyle = '#E6EDF2'; g.lineWidth = 1;
+  const dx = nice(x1 - x0), dy = nice(y1 - y0);
+  for (let t = Math.ceil(x0 / dx) * dx; t <= x1 + 1e-12; t += dx) { g.beginPath(); g.moveTo(X(t), T); g.lineTo(X(t), h - B); g.stroke(); g.textAlign = 'center'; g.fillText(+t.toPrecision(6), X(t), h - B + 15); }
+  for (let t = Math.ceil(y0 / dy) * dy; t <= y1 + 1e-12; t += dy) { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(w - R, Y(t)); g.stroke(); g.textAlign = 'right'; g.fillText(+t.toPrecision(6), L - 5, Y(t) + 4); }
+  g.strokeStyle = C.grey; g.strokeRect(L, T, w - L - R, h - T - B);
+  g.fillStyle = C.navy; g.textAlign = 'center'; g.fillText(o.xlabel || '', L + (w - L - R) / 2, h - 6);
+  g.save(); g.translate(13, T + (h - T - B) / 2); g.rotate(-Math.PI / 2); g.fillText(o.ylabel || '', 0, 0); g.restore();
+  g.save(); g.beginPath(); g.rect(L, T, w - L - R, h - T - B); g.clip();
+  for (const s of series) {
+    g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = s.width || 1.6; g.setLineDash(s.dash || []);
+    if (s.points) { for (let i = 0; i < s.x.length; i++) { g.beginPath(); g.arc(X(s.x[i]), Y(s.y[i]), s.r || 3.5, 0, 7); s.hollow ? g.stroke() : g.fill(); } }
+    else { g.beginPath(); for (let i = 0; i < s.x.length; i++) { const px = X(s.x[i]), py = Y(s.y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+  }
+  g.restore(); g.setLineDash([]);
+  if (o.legend) { let ly = o.legendBottom ? h - B - 10 - 16 * (series.filter(s => s.label).length - 1) : T + 8; g.textAlign = 'left'; for (const s of series) { if (!s.label) continue; g.fillStyle = s.color; g.fillRect(w - R - 190, ly - 5, 14, 3); g.fillStyle = C.navy; g.fillText(s.label, w - R - 170, ly); ly += 16; } }
+}
+function wl2rgb(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = -(nm - 440) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = -(nm - 510) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = -(nm - 645) / 65; } else r = 1;
+  const f = nm < 420 ? 0.3 + 0.7 * (nm - 380) / 40 : nm > 700 ? 0.3 + 0.7 * (780 - nm) / 80 : 1;
+  return [r * f, g * f, b * f];
+}
+function image(cv, nx, ny, fn, rgb) {   // fn(i,j) in [0,1]
+  const { g, w, h } = prep(cv); const im = g.createImageData(nx, ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const v = Math.max(0, Math.min(1, fn(i, j))), k = 4 * (j * nx + i);
+    im.data[k] = 255 * v * rgb[0]; im.data[k + 1] = 255 * v * rgb[1]; im.data[k + 2] = 255 * v * rgb[2]; im.data[k + 3] = 255; }
+  const tmp = document.createElement('canvas'); tmp.width = nx; tmp.height = ny; tmp.getContext('2d').putImageData(im, 0, 0);
+  g.imageSmoothingEnabled = true; return { g, w, h, tmp };
+}
+const linspace = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * i / (n - 1));
+
+// ---- tabs ----
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.exp').forEach(s => s.classList.toggle('on', s.id === b.dataset.t));
+  draw();
+});
+function cards(id, list) { $(id).innerHTML = list.map(c => '<div class="card ' + (c[2] || '') + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join(''); }
+// random numbers (seeded)
+let seed = 12345; const rnd = () => { seed = (seed + 0x6D2B79F5) | 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return (((t ^ (t >>> 14)) >>> 0) + 0.5) / 4294967296; };
+const randn = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+function poisson(l) { if (l <= 0) return 0; if (l > 40) return Math.max(0, Math.round(l + Math.sqrt(l) * randn())); const L = Math.exp(-l); let k = 0, p = 1; do { k++; p *= rnd(); } while (p > L); return k - 1; }
+const lgamma = n => { let s = 0; for (let i = 2; i <= n; i++) s += Math.log(i); return s; };
+const pois = (k, l) => k > 170 ? Math.exp(-((k - l) ** 2) / (2 * l)) / Math.sqrt(2 * Math.PI * l) : Math.exp(k * Math.log(l) - l - lgamma(k));
+function bars(cv, centers, heights, line, o) {
+  plot(cv, [{ x: line.x, y: line.y, color: C.coral, width: 2 }], o);
+  const { } = {}; const g = cv.getContext('2d'); const r = window.devicePixelRatio || 1; const w = cv.width / r, h = cv.height / r, L = 56, R = 12, T = 10, B = 38;
+  const X = x => L + (x - o.xmin) / (o.xmax - o.xmin) * (w - L - R), Y = y => h - B - (y - o.ymin) / (o.ymax - o.ymin) * (h - T - B);
+  const bw = Math.max(1, (X(o.xmin + (centers[1] - centers[0] || 1)) - X(o.xmin)) * 0.85);
+  g.fillStyle = 'rgba(14,140,154,0.45)'; centers.forEach((c, i) => { g.fillRect(X(c) - bw / 2, Y(heights[i]), bw, Y(0) - Y(heights[i])); });
+  // redraw the law on top
+  g.strokeStyle = C.coral; g.lineWidth = 2; g.beginPath(); line.x.forEach((x, i) => { const px = X(x), py = Y(line.y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke();
+}
+
+// ================= Experiment 1 =================
+let s1 = 1; $('e1run').onclick = () => { s1++; draw(); };
+function e1() {
+  const N = Math.pow(10, +$('e1N').value), dl = +$('e1d').value, n = +$('e1n').value, sa = Math.pow(10, +$('e1a').value);
+  $('e1Nv').textContent = fmt(N, 3); $('e1dv').textContent = dl.toFixed(1); $('e1nv').textContent = String(n); $('e1av').textContent = fmt(sa, 3) + ' e⁻';
+  seed = 1000 + s1 * 7919;
+  const M = 5000, c = Array.from({ length: M }, () => poisson(N));
+  const mu = c.reduce((a, b) => a + b) / M, va = c.reduce((a, b) => a + (b - mu) ** 2, 0) / (M - 1);
+  const kmin = Math.max(0, Math.floor(N - 5 * Math.sqrt(N) - 1)), kmax = Math.ceil(N + 5 * Math.sqrt(N) + 2);
+  const nb = Math.min(60, kmax - kmin + 1), bwid = Math.max(1, Math.ceil((kmax - kmin + 1) / nb));
+  const cen = [], hh = []; for (let b = kmin; b <= kmax; b += bwid) { cen.push(b + (bwid - 1) / 2); hh.push(c.filter(v => v >= b && v < b + bwid).length / M / bwid); }
+  const kx = []; for (let k = kmin; k <= kmax; k++) kx.push(k);
+  const ymax = Math.max(...hh, ...kx.map(k => pois(k, N))) * 1.15;
+  bars($('e1hist'), cen, hh, { x: kx, y: kx.map(k => pois(k, N)) }, { xmin: kmin - 0.5, xmax: kmax + 0.5, ymin: 0, ymax, xlabel: 'Photoelectron count', ylabel: 'Probability' });
+  // PMT gain cascade for single electrons
+  const G = Math.pow(dl, n), Fth = 1 + (1 - Math.pow(dl, -n)) / (dl - 1);
+  seed = 99 + s1; const Ms = 3000, gains = [];
+  for (let i = 0; i < Ms; i++) { let e = 1; for (let k = 0; k < n; k++) e = poisson(dl * e); gains.push(e); }
+  const gm = gains.reduce((a, b) => a + b) / Ms, gv = gains.reduce((a, b) => a + (b - gm) ** 2, 0) / (Ms - 1), Fm = 1 + gv / (gm * gm);
+  cards('e1cards', [['Measured mean / variance', fmt(mu, 4) + ' / ' + fmt(va, 4)], ['SNR measured', fmt(mu / Math.sqrt(va), 3), 'ok'], ['√N', fmt(Math.sqrt(N), 3), 'th'], ['PMT gain δⁿ', fmt(G, 3)], ['F simulated (3000 e⁻)', fmt(Fm, 3), 'ok'], ['F theory', fmt(Fth, 3), 'th']]);
+  const Nx = linspace(-1, 6, 200).map(v => Math.pow(10, v));
+  plot($('e1snr'), [{ x: Nx.map(Math.log10), y: Nx.map(v => Math.log10(Math.sqrt(v / Fth))), color: C.teal, width: 2, label: 'PMT √(N/F)' }, { x: Nx.map(Math.log10), y: Nx.map(v => Math.log10(v / Math.sqrt(v + sa * sa))), color: C.coral, width: 2, dash: [6, 4], label: 'photodiode + amplifier' }, { x: Nx.map(Math.log10), y: Nx.map(v => Math.log10(Math.sqrt(v))), color: C.grey, width: 1, dash: [2, 3], label: 'ideal √N' }, { x: [Math.log10(N)], y: [Math.log10(mu / Math.sqrt(va))], color: C.navy, points: true, r: 5 }],
+    { xmin: -1, xmax: 6, ymin: -3, ymax: 3.2, xlabel: 'log₁₀ N (photoelectrons)', ylabel: 'log₁₀ SNR', legend: true, legendBottom: true });
+}
+
+// ================= Experiment 2 =================
+let s2 = 1; $('e2run').onclick = () => { s2++; draw(); };
+function e2() {
+  const FW = +$('e2f').value, sr = +$('e2r').value, K = +$('e2k').value, ex = Math.pow(10, +$('e2e').value), dark = 5, off = 100, prnu = 0.01, np = 48;
+  $('e2fv').textContent = FW.toLocaleString() + ' e⁻'; $('e2rv').textContent = sr.toFixed(1) + ' e⁻'; $('e2kv').textContent = K.toFixed(2) + ' DN/e⁻'; $('e2ev').textContent = fmt(ex, 4) + ' e⁻';
+  seed = 777 + s2; const gm = Array.from({ length: np * np }, () => 1 + prnu * randn());
+  const px = (mu, i) => { let s = poisson(mu * gm[i] + dark) + sr * randn(); s = Math.min(s, FW); return Math.max(0, Math.round(off + K * s)); };
+  const levels = [0].concat(linspace(1, Math.log10(1.25 * FW), 26).map(v => Math.pow(10, v)));
+  const mD = [], vD = [];
+  for (const mu of levels) { const A = [], B = []; for (let i = 0; i < np * np; i++) { A.push(px(mu, i)); B.push(px(mu, i)); }
+    const m = (A.reduce((a, b) => a + b) + B.reduce((a, b) => a + b)) / (2 * A.length) - off; const d = A.map((a, i) => a - B[i]); const md = d.reduce((a, b) => a + b) / d.length; const v = d.reduce((a, b) => a + (b - md) ** 2, 0) / (d.length - 1) / 2;
+    mD.push(m); vD.push(v); }
+  // fit on points below 70 % of full well
+  const sel = mD.map((m, i) => i).filter(i => levels[i] < 0.7 * FW && levels[i] > 0);
+  const xm = sel.map(i => mD[i]), ym = sel.map(i => vD[i]); const n = xm.length, sx = xm.reduce((a, b) => a + b), sy = ym.reduce((a, b) => a + b), sxx = xm.reduce((a, b) => a + b * b, 0), sxy = xm.reduce((a, b, i) => a + b * ym[i], 0);
+  const slope = (n * sxy - sx * sy) / (n * sxx - sx * sx), icpt = (sy - slope * sx) / n;
+  const Kfit = slope, srfit = Math.sqrt(Math.max((vD[0] - 1 / 12) / (Kfit * Kfit) - dark, 0));
+  cards('e2cards', [['K from slope', fmt(Kfit, 3) + ' DN/e⁻', 'ok'], ['K set', K.toFixed(3), 'th'], ['σ_r from dark pair (dark shot noise removed)', fmt(srfit, 3) + ' e⁻', 'ok'], ['σ_r set', sr.toFixed(1) + ' e⁻', 'th'], ['Dynamic range FW/σ_r', Math.round(FW / sr).toLocaleString() + ' (' + (20 * Math.log10(FW / sr)).toFixed(1) + ' dB)']]);
+  const xmx = Math.max(...mD) * 1.05;
+  plot($('e2pt'), [{ x: mD, y: vD, color: C.teal, points: true, r: 4, label: 'frame pairs' }, { x: [0, xmx], y: [icpt, icpt + slope * xmx], color: C.coral, width: 1.5, dash: [6, 4], label: 'linear fit (below 70 % FW)' }],
+    { xmin: 0, xmax: xmx, ymin: 0, ymax: Math.max(...vD) * 1.15, xlabel: 'Mean signal  [DN above offset]', ylabel: 'Variance  [DN²]', legend: true, legendBottom: false });
+  // fringe pattern row: peak electrons ex
+  const Npx = 256, row = [], ideal = [];
+  for (let i = 0; i < Npx; i++) { const mu = ex * 0.5 * (1 + Math.cos(2 * Math.PI * i / 32)); let s = poisson(mu + dark) + sr * randn(); s = Math.min(Math.max(s, 0), FW); row.push(s); ideal.push(Math.min(mu + dark, FW)); }
+  const snr = ex / Math.sqrt(ex + sr * sr);
+  $('e2fr').previousElementSibling.textContent = 'A recorded fringe pattern (32-pixel period) — SNR at the peaks ≈ ' + fmt(snr, 3) + (ex > FW ? ' — peaks clipped at the full well' : '');
+  plot($('e2fr'), [{ x: linspace(0, Npx - 1, Npx), y: row, color: C.teal, width: 1.2, label: 'recorded (electrons)' }, { x: linspace(0, Npx - 1, Npx), y: ideal, color: C.navy, width: 1, dash: [5, 4], label: 'noise-free' }],
+    { xmin: 0, xmax: Npx - 1, ymin: Math.min(0, ...row), ymax: Math.max(...row, ...ideal) * 1.1 + 1, xlabel: 'Pixel', ylabel: 'Signal  [e⁻]', legend: true });
+}
+
+// ================= Experiment 3 =================
+function e3() {
+  const p = +$('e3p').value, ff = +$('e3f').value, D = +$('e3d').value, cte = +$('e3c').value;
+  $('e3pv').textContent = p.toFixed(2) + ' Δ'; $('e3fv').textContent = ff.toFixed(2); $('e3dv').textContent = D.toFixed(2) + ' µm'; $('e3cv').textContent = cte.toFixed(6);
+  const Np = 24, sub = 64, xs = linspace(0, Np, 2400);
+  const pix = []; for (let j = 0; j < Np; j++) { let s = 0; for (let k = 0; k < sub; k++) { const x = j + (k + 0.5) / sub * ff + (1 - ff) / 2; s += 1 + Math.cos(2 * Math.PI * x / p); } pix.push(s / sub); }
+  // measured modulation over many pixels
+  const pl = []; for (let j = 0; j < 4000; j++) { let s = 0; for (let k = 0; k < 16; k++) { const x = j + (k + 0.5) / 16 * ff + (1 - ff) / 2; s += 1 + Math.cos(2 * Math.PI * x / p); } pl.push(s / 16); }
+  const sinc = u => u === 0 ? 1 : Math.sin(Math.PI * u) / (Math.PI * u);
+  // amplitude of the sampled cosine via DFT at the apparent frequency
+  const f = 1 / p, fa = Math.abs(f - Math.round(f)); let re = 0, im = 0; for (let j = 0; j < pl.length; j++) { re += (pl[j] - 1) * Math.cos(2 * Math.PI * fa * j); im += (pl[j] - 1) * Math.sin(2 * Math.PI * fa * j); }
+  const Mm = fa === 0 ? Math.abs(pl.reduce((a, b) => a + b) / pl.length - 1) : 2 * Math.hypot(re, im) / pl.length;
+  const Mt = Math.abs(sinc(ff / p));
+  const fN = 1 / (2 * D * 1e-3);
+  cards('e3cards', [['Fringe frequency', fmt(1 / (p * D * 1e-3), 4) + ' lines/mm'], ['Nyquist 1/(2Δ)', fmt(fN, 4) + ' lines/mm'], ['M measured', Mm.toFixed(3), 'ok'], ['|sinc(ff·Δ/p)|', Mt.toFixed(3), 'th'], ['Apparent period', fa > 0 ? fmt(1 / fa, 3) + ' Δ' : '∞ (DC)', p < 2 ? 'th' : ''], ['Charge left after 4096 transfers', fmt(Math.pow(cte, 4096) * 100, 4) + ' %']]);
+  const stx = [], sty = []; pix.forEach((v, j) => { stx.push(j, j + 1); sty.push(v, v); });
+  plot($('e3sig'), [{ x: xs, y: xs.map(x => 1 + Math.cos(2 * Math.PI * x / p)), color: C.grey, width: 1 }, { x: stx, y: sty, color: C.teal, width: 2.2 }, { x: pix.map((_, j) => j + 0.5), y: pix, color: C.coral, points: true, r: 3.5 }],
+    { xmin: 0, xmax: Np, ymin: 0, ymax: 2.1, xlabel: 'Position  [pixels]', ylabel: 'Irradiance' });
+  const P = linspace(1.05, 12, 400);
+  plot($('e3mtf'), [{ x: P, y: P.map(q => Math.abs(sinc(1 / q))), color: C.navy, width: 2, label: 'ff = 1' }, { x: P, y: P.map(q => Math.abs(sinc(0.5 / q))), color: C.gold, width: 2, dash: [6, 4], label: 'ff = 0.5' }, { x: P, y: P.map(q => Math.abs(sinc(ff / q))), color: C.teal, width: 1.2, label: 'current ff' }, { x: [2, 2], y: [0, 1.05], color: C.coral, width: 1, dash: [3, 3], label: 'Nyquist p = 2Δ' }, { x: [p], y: [Mm], color: C.coral, points: true, r: 5 }],
+    { xmin: 1, xmax: 12, ymin: 0, ymax: 1.05, xlabel: 'Fringe period p  [pixel pitches]', ylabel: 'Modulation M', legend: true, legendBottom: true });
+}
+
+function draw() { const t = document.querySelector('.exp.on').id; if (t === 'e1') e1(); else if (t === 'e2') e2(); else e3(); }
+document.querySelectorAll('input[type=range]').forEach(r => r.oninput = draw);
+window.addEventListener('resize', draw);
+draw();
+</script>
+<script>(function(){var b=document.querySelector('nav button[data-t="e3"]'); if(b) b.click();})();</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f4"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

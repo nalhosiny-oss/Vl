@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 6 — Fundamental Principles of Holography</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&family=Source+Serif+4:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0B1E3A; --teal:#0E8C9A; --coral:#E8604C; --tint:#E3F4F6; --bg:#F4F8FA; --grey:#5A6B7F; --line:#C9D6E0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--navy); font-family:"Source Sans 3", Calibri, "Segoe UI", Arial, sans-serif; font-size:16px; }
+  header { background:var(--navy); color:#fff; padding:18px 22px 14px; position:relative; overflow:hidden; }
+  header .rings { position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%;
+    background: repeating-radial-gradient(circle, rgba(70,200,215,.55) 0 3px, transparent 3px 14px); opacity:.55; }
+  header h1 { font-family:"Source Serif 4", Cambria, Georgia, serif; margin:0; font-size:23px; }
+  header p { margin:4px 0 0; color:#BFE6EA; font-size:14.5px; }
+  nav { display:flex; gap:6px; flex-wrap:wrap; padding:12px 22px 0; }
+  nav button { border:1px solid var(--line); background:#fff; color:var(--navy); padding:9px 14px; border-radius:10px 10px 0 0; font:inherit; font-weight:600; cursor:pointer; }
+  nav button.on { background:var(--teal); color:#fff; border-color:var(--teal); }
+  main { padding:0 22px 26px; }
+  .exp { display:none; background:#fff; border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; }
+  .exp.on { display:block; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap:16px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  nav { display:none; } .exp { border-radius:12px; margin-top:12px; } header { padding:12px 18px 10px; } header h1 { font-size:19px; } main { padding:0 12px 14px; } footer { display:none; }
+  h2 { font-family:"Source Serif 4", Cambria, Georgia, serif; font-size:19px; margin:0 0 6px; }
+  .lead { color:var(--grey); margin:0 0 12px; font-size:14.5px; }
+  .panel { background:var(--tint); border-radius:10px; padding:12px; }
+  .ctl { margin-bottom:11px; }
+  .ctl label { display:flex; justify-content:space-between; font-size:14px; font-weight:600; }
+  .ctl label span { color:var(--teal); font-variant-numeric: tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--teal); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 10px; }
+  .presets button, .seg button { border:1px solid var(--teal); background:#fff; color:var(--teal); border-radius:16px; padding:4px 11px; font:inherit; font-size:13.5px; cursor:pointer; }
+  .presets button:hover, .seg button.on { background:var(--teal); color:#fff; }
+  .seg { display:flex; gap:6px; margin-bottom:10px; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(135px,1fr)); gap:8px; margin:10px 0; }
+  .card { border:1px solid var(--line); border-radius:9px; padding:7px 9px; background:#fff; }
+  .card b { display:block; font-size:12.5px; color:var(--grey); font-weight:600; }
+  .card span { font-size:18px; font-weight:600; font-variant-numeric: tabular-nums; }
+  .card.ok span { color:var(--teal); } .card.th span { color:var(--coral); }
+  canvas { width:100%; display:block; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .cv-title { font-size:13.5px; font-weight:600; color:var(--grey); margin:10px 0 4px; }
+  .eq { font-family:"Source Serif 4", Cambria, Georgia, serif; background:#fff; border-left:3px solid var(--teal); padding:6px 10px; margin:8px 0; font-size:15px; }
+  .tasks { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .tasks h3 { font-size:15.5px; margin:0 0 4px; }
+  .tasks ol { margin:0; padding-left:20px; font-size:14.5px; } .tasks li { margin:3px 0; }
+  .ar { direction:rtl; text-align:right; font-family:"Noto Naskh Arabic", "Traditional Arabic", Tahoma, serif; background:#FFF6F3; border-right:4px solid var(--coral); border-radius:8px; padding:9px 12px; margin-top:12px; font-size:15.5px; line-height:1.8; }
+  .ar b { color:var(--coral); }
+  footer { color:var(--grey); font-size:13px; padding:0 22px 18px; }
+  .note { font-size:13px; color:var(--grey); }
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header><div class="rings"></div>
+  <h1>Virtual Lab · Chapter 6 — Fundamental Principles of Holography</h1>
+  <p>Interferometric Systems and Their Applications (203673-3) · MSc in Physics · Prof. Najm Al-Hosiny</p>
+</header>
+<nav>
+  <button class="on" data-t="e1">1 · Diffraction and beam propagation</button>
+  <button data-t="e2">2 · Coherence</button>
+  <button data-t="e3">3 · Hologram and holographic interferometry</button>
+</nav>
+<main>
+<!-- ================= Experiment 1 ================= -->
+<section class="exp on" id="e1">
+  <h2>Experiment 1 — Scalar diffraction: Fresnel and Fraunhofer regions</h2>
+  <p class="lead">A slit of width a is lit by a plane wave. The field at distance z is computed with the angular-spectrum method (exact scalar solution) and compared with the Fresnel integral and the Fraunhofer (far-field) sinc² law. The Fresnel number N_F = (a/2)²/(λz) tells which approximation holds. A second mode follows a Gaussian beam.</p>
+  <div class="seg" id="e1seg"><button class="on" data-m="s">Slit</button><button data-m="g">Gaussian beam</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Wavelength λ <span id="e1lamv"></span></label><input type="range" id="e1lam" min="400" max="700" step="1" value="633"></div>
+      <div id="e1cs">
+        <div class="ctl"><label>Slit width a <span id="e1av"></span></label><input type="range" id="e1a" min="0.2" max="3" step="0.01" value="1"></div>
+        <div class="ctl"><label>Distance z (log scale) <span id="e1zv"></span></label><input type="range" id="e1z" min="-2.5" max="1.5" step="0.01" value="-0.8"></div>
+        <div class="presets"><button data-s="10">N_F = 10</button><button data-s="1">N_F = 1</button><button data-s="0.1">N_F = 0.1</button></div>
+        <div class="eq">N_F = (a/2)²/(λz)<br>Fraunhofer: I ∝ sinc²(ax/λz)</div>
+      </div>
+      <div id="e1cg" style="display:none">
+        <div class="ctl"><label>Waist w₀ <span id="e1wv"></span></label><input type="range" id="e1w" min="0.1" max="2" step="0.01" value="0.5"></div>
+        <div class="ctl"><label>Position z <span id="e1gzv"></span></label><input type="range" id="e1gz" min="0" max="10" step="0.01" value="1.24"></div>
+        <div class="eq">z_R = πw₀²/λ, w(z) = w₀√(1 + (z/z_R)²)<br>R(z) = z[1 + (z_R/z)²], Gouy phase = arctan(z/z_R)</div>
+      </div>
+    </div>
+    <div>
+      <div class="cards" id="e1cards"></div>
+      <div class="cv-title" id="e1t1"></div>
+      <canvas id="e1plot" height="260"></canvas>
+      <div class="cv-title" id="e1t2"></div>
+      <canvas id="e1img" height="150"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Use the N_F presets. In which region does the Fraunhofer curve agree with the exact solution? In which region does the Fresnel integral agree?</li>
+    <li>At N_F = 10, why does the pattern look like the slit itself with ripples at the edges?</li>
+    <li>Gaussian beam: at which z is w = √2 w₀? Where is the wavefront most curved?</li>
+    <li>Why does a hologram recorded close to the object (large N_F) need the Fresnel and not the Fraunhofer description?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> عدد فرينل يقارن الطور التربيعي عبر الفتحة بـ π. إذا كان كبيراً بقي النمط قريباً من شكل الفتحة. وإذا صغر صار النمط تحويل فورييه للفتحة: هذا هو المجال البعيد.</div>
+</section>
+
+<!-- ================= Experiment 2 ================= -->
+<section class="exp" id="e2">
+  <h2>Experiment 2 — Coherence: what a hologram needs from its light source</h2>
+  <p class="lead">Temporal coherence limits the path difference between object and reference beams; spatial coherence limits the source size; a multi-mode laser gives fringes that fade and return with path difference.</p>
+  <div class="seg" id="e2seg"><button class="on" data-m="t">Temporal</button><button data-m="s">Spatial (Young)</button><button data-m="m">Multi-mode laser</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div id="e2ct">
+        <div class="ctl"><label>Centre wavelength λ₀ <span id="e2lv"></span></label><input type="range" id="e2l" min="400" max="800" step="1" value="630"></div>
+        <div class="ctl"><label>Spectral width Δλ (log) <span id="e2dv"></span></label><input type="range" id="e2d" min="-3" max="1.6" step="0.01" value="1.3"></div>
+        <div class="eq">V = exp[−(πΔνOPD/c)²/(4 ln 2)]<br>V = ½ at OPD = 0.44 λ²/Δλ</div>
+      </div>
+      <div id="e2cs" style="display:none">
+        <div class="ctl"><label>Source width s <span id="e2sv"></span></label><input type="range" id="e2s" min="0" max="3" step="0.01" value="1"></div>
+        <div class="ctl"><label>Pinhole separation d <span id="e2pv"></span></label><input type="range" id="e2p" min="0.05" max="2" step="0.01" value="0.4"></div>
+        <div class="eq">Source at L = 1 m, λ = 630 nm<br>V(d) = |sinc(sd/λL)| (van Cittert–Zernike)<br>Coherence width d_c = λL/s</div>
+      </div>
+      <div id="e2cm" style="display:none">
+        <div class="ctl"><label>Cavity length L_cav <span id="e2cv"></span></label><input type="range" id="e2c" min="10" max="100" step="1" value="30"></div>
+        <div class="ctl"><label>Number of equal modes <span id="e2nv"></span></label><input type="range" id="e2n" min="1" max="5" step="1" value="2"></div>
+        <div class="ctl"><label>Path difference OPD <span id="e2ov"></span></label><input type="range" id="e2o" min="0" max="200" step="0.5" value="15"></div>
+        <div class="eq">Mode spacing Δν = c/(2L_cav)<br>Two modes: V = |cos(πΔν·OPD/c)|</div>
+      </div>
+    </div>
+    <div>
+      <div class="cards" id="e2cards"></div>
+      <div class="cv-title" id="e2t1"></div>
+      <canvas id="e2plot" height="240"></canvas>
+      <div class="cv-title" id="e2t2"></div>
+      <canvas id="e2img" height="110"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Temporal: what spectral width allows a hologram of a 5 cm deep object (path differences up to 10 cm)?</li>
+    <li>Spatial: with s = 1 mm, find the pinhole separation at which the fringes vanish. Compare with λL/s.</li>
+    <li>Laser: for a two-mode laser with L_cav = 30 cm, at which OPDs do the fringes disappear and return?</li>
+    <li>Why do holography set-ups match the object and reference path lengths to within a few cm, even with a laser?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الليزر ثنائي الأنماط يشبه لونين متقاربين جداً. هدب كل نمط تنزلق عن هدب الآخر ثم تعود لتتطابق كل مسافة تساوي ضعف طول التجويف، فتختفي الرؤية وتعود دورياً.</div>
+</section>
+
+<!-- ================= Experiment 3 ================= -->
+<section class="exp" id="e3">
+  <h2>Experiment 3 — Recording and reconstructing a hologram; holographic interferometry</h2>
+  <p class="lead">A: an off-axis hologram H = |O + R|² of a transparency (λ = 633 nm, pixel 8 µm, z = 25 mm). Lighting H with R gives R(|O|² + |R|²) + |R|²O + R²O*: the zero order, the image and its twin. B: double-exposure HI of a clamped plate. C: time-average HI of a vibrating plate.</p>
+  <div class="seg" id="e3seg"><button class="on" data-m="h">A · Off-axis hologram</button><button data-m="d">B · Double exposure</button><button data-m="v">C · Time average</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div id="e3ch">
+        <div class="ctl"><label>Reference angle θ <span id="e3tv"></span></label><input type="range" id="e3t" min="0" max="2.2" step="0.01" value="1.4"></div>
+        <div class="presets"><button id="e3flt">Sideband filter: off</button></div>
+        <div class="eq">Carrier f = sin θ/λ ≤ 1/(2Δx) = 62.5 lines/mm<br>Orders separate when f exceeds about 3 × object bandwidth</div>
+      </div>
+      <div id="e3cd" style="display:none">
+        <div class="ctl"><label>Central deflection w₀ <span id="e3wv"></span></label><input type="range" id="e3w" min="0" max="3" step="0.01" value="1.2"></div>
+        <div class="eq">w(r) = w₀(1 − r²/R²)²<br>Δφ = 4πw/λ, fringes I ∝ 1 + cos Δφ<br>Number of fringes ≈ 2w₀/λ</div>
+      </div>
+      <div id="e3cv" style="display:none">
+        <div class="ctl"><label>Vibration amplitude at the centre a₀ <span id="e3av"></span></label><input type="range" id="e3a" min="0" max="1.2" step="0.005" value="0.4"></div>
+        <div class="eq">I ∝ J₀²(4πa/λ)<br>First dark fringe: 4πa/λ = 2.405 (a = 0.121 µm at 633 nm)</div>
+      </div>
+    </div>
+    <div>
+      <div class="cards" id="e3cards"></div>
+      <div class="cv-title" id="e3t1"></div>
+      <canvas id="e3img" height="290"></canvas>
+      <div class="cv-title" id="e3t2"></div>
+      <canvas id="e3plot" height="180"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>A: reduce θ until the three orders overlap in the spectrum. What happens to the reconstructed image?</li>
+    <li>A: switch the sideband filter on. Which terms disappear from the reconstruction?</li>
+    <li>B: count the fringes for w₀ = 1.2 µm and compare with 2w₀/λ. Can you tell from the fringes whether the plate bulges in or out?</li>
+    <li>C: find a₀ at which the first dark ring appears; why is the bright zero-order fringe at the clamped edge?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الهولوغرام يحفظ الطور على شكل هدب دقيقة. حين تُضاء بموجة المرجع تعود موجة الجسم كما كانت، ومعها توأمها والحد الصفري. والزاوية الكافية بين الموجتين هي التي تفصل بين الثلاثة.</div>
+</section>
+</main>
+
+<footer>All results are computed in your browser from the equations of Chapter 6 (Schnars et al., Digital Holography and Wavefront Sensing, 2nd ed.). The MATLAB versions of these experiments are Labs 6.1–6.3.</footer>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const C = { navy:'#0B1E3A', teal:'#0E8C9A', coral:'#E8604C', grey:'#5A6B7F', line:'#C9D6E0', gold:'#D99A1E' };
+const fmt = (v, d = 3) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : (+v.toFixed(d)).toString();
+function lenStr(m) { const a = Math.abs(m); if (a >= 1) return fmt(m, 3) + ' m'; if (a >= 1e-3) return fmt(m * 1e3, 3) + ' mm'; if (a >= 1e-6) return fmt(m * 1e6, 3) + ' µm'; return fmt(m * 1e9, 3) + ' nm'; }
+
+// ---- canvas helpers ----
+function prep(cv) {
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.getAttribute('height');
+  if (cv.width !== Math.round(w * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.clearRect(0, 0, w, h); return { g, w, h };
+}
+function nice(span) { const p = Math.pow(10, Math.floor(Math.log10(span / 5))); const m = span / 5 / p; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; }
+function plot(cv, series, o) {
+  const { g, w, h } = prep(cv); const L = 56, R = 12, T = 10, B = 38;
+  const x0 = o.xmin, x1 = o.xmax, y0 = o.ymin, y1 = o.ymax;
+  const X = x => L + (x - x0) / (x1 - x0) * (w - L - R), Y = y => h - B - (y - y0) / (y1 - y0) * (h - T - B);
+  g.font = '12px "Source Sans 3", Arial'; g.fillStyle = C.grey; g.strokeStyle = '#E6EDF2'; g.lineWidth = 1;
+  const dx = nice(x1 - x0), dy = nice(y1 - y0);
+  for (let t = Math.ceil(x0 / dx) * dx; t <= x1 + 1e-12; t += dx) { g.beginPath(); g.moveTo(X(t), T); g.lineTo(X(t), h - B); g.stroke(); g.textAlign = 'center'; g.fillText(+(Math.abs(t) < dx * 1e-6 ? 0 : t).toPrecision(6), X(t), h - B + 15); }
+  for (let t = Math.ceil(y0 / dy) * dy; t <= y1 + 1e-12; t += dy) { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(w - R, Y(t)); g.stroke(); g.textAlign = 'right'; g.fillText(+(Math.abs(t) < dy * 1e-6 ? 0 : t).toPrecision(6), L - 5, Y(t) + 4); }
+  g.strokeStyle = C.grey; g.strokeRect(L, T, w - L - R, h - T - B);
+  g.fillStyle = C.navy; g.textAlign = 'center'; g.fillText(o.xlabel || '', L + (w - L - R) / 2, h - 6);
+  g.save(); g.translate(13, T + (h - T - B) / 2); g.rotate(-Math.PI / 2); g.fillText(o.ylabel || '', 0, 0); g.restore();
+  g.save(); g.beginPath(); g.rect(L, T, w - L - R, h - T - B); g.clip();
+  for (const s of series) {
+    g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = s.width || 1.6; g.setLineDash(s.dash || []);
+    if (s.points) { for (let i = 0; i < s.x.length; i++) { g.beginPath(); g.arc(X(s.x[i]), Y(s.y[i]), s.r || 3.5, 0, 7); s.hollow ? g.stroke() : g.fill(); } }
+    else { g.beginPath(); for (let i = 0; i < s.x.length; i++) { const px = X(s.x[i]), py = Y(s.y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+  }
+  g.restore(); g.setLineDash([]);
+  if (o.legend) { let ly = o.legendBottom ? h - B - 10 - 16 * (series.filter(s => s.label).length - 1) : T + 8; g.textAlign = 'left'; for (const s of series) { if (!s.label) continue; g.fillStyle = s.color; g.fillRect(w - R - 190, ly - 5, 14, 3); g.fillStyle = C.navy; g.fillText(s.label, w - R - 170, ly); ly += 16; } }
+}
+function wl2rgb(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = -(nm - 440) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = -(nm - 510) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = -(nm - 645) / 65; } else r = 1;
+  const f = nm < 420 ? 0.3 + 0.7 * (nm - 380) / 40 : nm > 700 ? 0.3 + 0.7 * (780 - nm) / 80 : 1;
+  return [r * f, g * f, b * f];
+}
+function image(cv, nx, ny, fn, rgb) {   // fn(i,j) in [0,1]
+  const { g, w, h } = prep(cv); const im = g.createImageData(nx, ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const v = Math.max(0, Math.min(1, fn(i, j))), k = 4 * (j * nx + i);
+    im.data[k] = 255 * v * rgb[0]; im.data[k + 1] = 255 * v * rgb[1]; im.data[k + 2] = 255 * v * rgb[2]; im.data[k + 3] = 255; }
+  const tmp = document.createElement('canvas'); tmp.width = nx; tmp.height = ny; tmp.getContext('2d').putImageData(im, 0, 0);
+  g.imageSmoothingEnabled = true; return { g, w, h, tmp };
+}
+const linspace = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * i / (n - 1));
+
+// ---- tabs ----
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.exp').forEach(s => s.classList.toggle('on', s.id === b.dataset.t));
+  draw();
+});
+function cards(id, list) { $(id).innerHTML = list.map(c => '<div class="card ' + (c[2] || '') + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join(''); }
+function segs(id, cb) { document.querySelectorAll('#' + id + ' button').forEach(b => b.onclick = () => { document.querySelectorAll('#' + id + ' button').forEach(x => x.classList.toggle('on', x === b)); cb(b.dataset.m); draw(); }); }
+let seed = 7; const rnd = () => { seed = (seed + 0x6D2B79F5) | 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return (((t ^ (t >>> 14)) >>> 0) + 0.5) / 4294967296; };
+const randn = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+// ---- FFT (radix 2, in place) ----
+function fft(re, im, inv) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) { let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+  for (let len = 2; len <= n; len <<= 1) { const a = (inv ? 2 : -2) * Math.PI / len, wr = Math.cos(a), wi = Math.sin(a);
+    for (let i = 0; i < n; i += len) { let cr = 1, ci = 0; for (let k = 0; k < len / 2; k++) { const ur = re[i + k], ui = im[i + k], vr = re[i + k + len / 2] * cr - im[i + k + len / 2] * ci, vi = re[i + k + len / 2] * ci + im[i + k + len / 2] * cr;
+      re[i + k] = ur + vr; im[i + k] = ui + vi; re[i + k + len / 2] = ur - vr; im[i + k + len / 2] = ui - vi; const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t; } } }
+  if (inv) for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+}
+function fft2(re, im, n, inv) {
+  const r = new Float64Array(n), q = new Float64Array(n);
+  for (let y = 0; y < n; y++) { for (let x = 0; x < n; x++) { r[x] = re[y * n + x]; q[x] = im[y * n + x]; } fft(r, q, inv); for (let x = 0; x < n; x++) { re[y * n + x] = r[x]; im[y * n + x] = q[x]; } }
+  for (let x = 0; x < n; x++) { for (let y = 0; y < n; y++) { r[y] = re[y * n + x]; q[y] = im[y * n + x]; } fft(r, q, inv); for (let y = 0; y < n; y++) { re[y * n + x] = r[y]; im[y * n + x] = q[y]; } }
+}
+// colour maps and multi-panel images
+function jet(v) { v = Math.max(0, Math.min(1, v)); return [Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 3))), Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 2))), Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 1)))]; }
+function panels(cv, list) {   // list of {data, n, min, max, map:'gray'|'jet', title, circle:{cx,cy,r}}
+  const { g, w, h } = prep(cv); const k = list.length, gap = 10, top = 20, s = Math.min((w - gap * (k - 1)) / k, h - top);
+  const x0 = (w - (k * s + gap * (k - 1))) / 2;
+  list.forEach((p, i) => {
+    const tmp = document.createElement('canvas'); tmp.width = p.n; tmp.height = p.n; const c = tmp.getContext('2d'), im = c.createImageData(p.n, p.n);
+    for (let j = 0; j < p.n * p.n; j++) { const v = (p.data[j] - p.min) / (p.max - p.min || 1); const col = p.map === 'jet' ? jet(v) : [v, v, v].map(z => Math.max(0, Math.min(1, z))); im.data[4 * j] = 255 * col[0]; im.data[4 * j + 1] = 255 * col[1]; im.data[4 * j + 2] = 255 * col[2]; im.data[4 * j + 3] = 255; }
+    c.putImageData(im, 0, 0); const xx = x0 + i * (s + gap); g.imageSmoothingEnabled = false; g.drawImage(tmp, xx, top, s, s);
+    g.fillStyle = C.navy; g.font = '12.5px "Source Sans 3", Arial'; g.textAlign = 'center'; g.fillText(p.title, xx + s / 2, 14);
+    if (p.circle) { g.strokeStyle = '#FFD24D'; g.lineWidth = 1.5; g.beginPath(); g.arc(xx + p.circle.cx * s, top + p.circle.cy * s, p.circle.r * s, 0, 7); g.stroke(); }
+  });
+}
+
+function J0(x) { x = Math.abs(x); if (x < 8) { const y = x * x; return (57568490574.0 + y * (-13362590354.0 + y * (651619640.7 + y * (-11214424.18 + y * (77392.33017 + y * (-184.9052456)))))) / (57568490411.0 + y * (1029532985.0 + y * (9494680.718 + y * (59272.64853 + y * (267.8532712 + y))))); }
+  const z = 8 / x, y = z * z, xx = x - 0.785398164; const p = 1 + y * (-0.1098628627e-2 + y * (0.2734510407e-4 + y * (-0.2073370639e-5 + y * 0.2093887211e-6))); const q = -0.1562499995e-1 + y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 - y * 0.934935152e-7)));
+  return Math.sqrt(0.636619772 / x) * (Math.cos(xx) * p - z * Math.sin(xx) * q); }
+const sinc = u => u === 0 ? 1 : Math.sin(Math.PI * u) / (Math.PI * u);
+
+// ================= Experiment 1 =================
+let m1 = 's'; segs('e1seg', m => { m1 = m; $('e1cs').style.display = m === 's' ? '' : 'none'; $('e1cg').style.display = m === 'g' ? '' : 'none'; });
+document.querySelectorAll('#e1 .presets button').forEach(b => b.onclick = () => { const lam = +$('e1lam').value * 1e-9, a = +$('e1a').value * 1e-3; $('e1z').value = Math.log10((a / 2) ** 2 / (lam * +b.dataset.s)); draw(); });
+function strip(cv, xs, I, rgb) { const n = xs.length, mx = Math.max(...I); const { g, w, h, tmp } = image(cv, n, 1, i => Math.sqrt(I[i] / mx), rgb); g.drawImage(tmp, 0, 0, w, h); }
+function e1() {
+  const lamnm = +$('e1lam').value, lam = lamnm * 1e-9; $('e1lamv').textContent = lamnm + ' nm';
+  if (m1 === 's') {
+    const a = +$('e1a').value * 1e-3, z = Math.pow(10, +$('e1z').value), NF = (a / 2) ** 2 / (lam * z);
+    $('e1av').textContent = (a * 1e3).toFixed(2) + ' mm'; $('e1zv').textContent = lenStr(z);
+    // angular spectrum, N = 32768
+    const N = 32768, W = Math.max(16 * a, 12 * lam * z / a), dx = W / N;
+    const re = new Float64Array(N), im = new Float64Array(N); for (let i = 0; i < N; i++) { const x = (i - N / 2) * dx; re[i] = Math.max(0, Math.min(1, (a / 2 - Math.abs(x)) / dx + 0.5)); }
+    fft(re, im, false);
+    for (let k = 0; k < N; k++) { const f = (k < N / 2 ? k : k - N) / W, u = (lam * f) ** 2; const ph = u < 1 ? -2 * Math.PI / lam * z * u / (1 + Math.sqrt(1 - u)) : 0; const att = (u < 1 && Math.abs(lam * f) * z < 0.45 * W) ? 1 : 0; /* band limit: no wrap-around */ const c = Math.cos(ph) * att, s = Math.sin(ph) * att; const r = re[k] * c - im[k] * s; im[k] = re[k] * s + im[k] * c; re[k] = r; }
+    fft(re, im, true);
+    const X = Math.max(0.8 * a, 2.5 * lam * z / a), xs = [], Ia = [];
+    for (let i = 0; i < N; i++) { const x = (i - N / 2) * dx; if (Math.abs(x) <= X) { xs.push(x); Ia.push(re[i] ** 2 + im[i] ** 2); } }
+    const step = Math.max(1, Math.floor(xs.length / 700)), xp = xs.filter((_, i) => i % step === 0), Ip = Ia.filter((_, i) => i % step === 0);
+    // Fresnel integral by quadrature
+    const M = 3000, dxi = a / M, Ifr = xp.map(x => { let r = 0, q = 0; for (let j = 0; j < M; j++) { const xi = -a / 2 + (j + 0.5) * dxi, p = Math.PI * (x - xi) ** 2 / (lam * z); r += Math.cos(p); q += Math.sin(p); } return (r * r + q * q) * dxi * dxi / (lam * z); });
+    const Ifh = xp.map(x => a * a / (lam * z) * sinc(a * x / (lam * z)) ** 2);
+    const ymax = Math.max(...Ip, ...Ifr) * 1.1;
+    plot($('e1plot'), [{ x: xp.map(v => v * 1e3), y: Ip, color: C.teal, width: 2.2, label: 'exact (angular spectrum)' }, { x: xp.map(v => v * 1e3), y: Ifr, color: C.navy, width: 1.2, dash: [6, 4], label: 'Fresnel integral' }, { x: xp.map(v => v * 1e3), y: Ifh, color: C.coral, width: 1.4, dash: [2, 3], label: 'Fraunhofer sinc²' }, { x: [-a / 2 * 1e3, -a / 2 * 1e3], y: [0, ymax], color: C.grey, width: 1, dash: [1, 3] }, { x: [a / 2 * 1e3, a / 2 * 1e3], y: [0, ymax], color: C.grey, width: 1, dash: [1, 3] }],
+      { xmin: -X * 1e3, xmax: X * 1e3, ymin: 0, ymax, xlabel: 'x  [mm]  (slit edges dotted)', ylabel: 'I / I₀', legend: true });
+    const rms = (A, B) => Math.sqrt(A.reduce((s, v, i) => s + (v - B[i]) ** 2, 0) / A.length) / Math.max(...A);
+    cards('e1cards', [['Fresnel number N_F', fmt(NF, 3), 'th'], ['Region', NF > 1.5 ? 'Fresnel (near field)' : NF < 0.3 ? 'Fraunhofer (far field)' : 'transition'], ['Fresnel vs exact (rms)', (rms(Ip, Ifr) * 100).toFixed(2) + ' %', 'ok'], ['Fraunhofer vs exact (rms)', (rms(Ip, Ifh) * 100).toFixed(2) + ' %', 'ok']]);
+    $('e1t1').textContent = 'Intensity at distance z'; $('e1t2').textContent = 'The pattern on the screen (√I for visibility)';
+    strip($('e1img'), xp, Ip, wl2rgb(lamnm));
+  } else {
+    const w0 = +$('e1w').value * 1e-3, z = +$('e1gz').value, zR = Math.PI * w0 * w0 / lam, wz = w0 * Math.sqrt(1 + (z / zR) ** 2), Rz = z === 0 ? Infinity : z * (1 + (zR / z) ** 2), gouy = Math.atan(z / zR);
+    $('e1wv').textContent = (w0 * 1e3).toFixed(2) + ' mm'; $('e1gzv').textContent = z.toFixed(2) + ' m';
+    cards('e1cards', [['Rayleigh range z_R', lenStr(zR)], ['Beam radius w(z)', lenStr(wz), 'ok'], ['Wavefront radius R(z)', isFinite(Rz) ? lenStr(Rz) : '∞ (plane)'], ['Gouy phase', (gouy * 180 / Math.PI).toFixed(1) + '°', 'th'], ['Far-field half-angle λ/πw₀', fmt(lam / (Math.PI * w0) * 1e3, 3) + ' mrad']]);
+    const Z = linspace(0, 10, 400), Wz = Z.map(q => w0 * Math.sqrt(1 + (q / zR) ** 2) * 1e3);
+    $('e1t1').textContent = 'Beam envelope ±w(z) (teal), Rayleigh range (dashed) and current position (dot)';
+    plot($('e1plot'), [{ x: Z, y: Wz, color: C.teal, width: 2 }, { x: Z, y: Wz.map(v => -v), color: C.teal, width: 2 }, { x: [zR, zR], y: [-1e3, 1e3], color: C.coral, dash: [5, 4], width: 1 }, { x: [z, z], y: [wz * 1e3, -wz * 1e3], color: C.navy, points: true, r: 5 }],
+      { xmin: 0, xmax: 10, ymin: -Math.max(...Wz) * 1.15, ymax: Math.max(...Wz) * 1.15, xlabel: 'z  [m]', ylabel: 'w  [mm]' });
+    $('e1t2').textContent = 'Transverse intensity at z (window ±3w₀ scaled to the waist)';
+    const xs = linspace(-3 * w0 * Math.max(1, wz / w0), 3 * w0 * Math.max(1, wz / w0), 500); strip($('e1img'), xs, xs.map(x => Math.exp(-2 * x * x / (wz * wz))), wl2rgb(lamnm));
+  }
+}
+
+// ================= Experiment 2 =================
+let m2 = 't'; segs('e2seg', m => { m2 = m; ['t', 's', 'm'].forEach(k => $('e2c' + k).style.display = k === m ? '' : 'none'); });
+function e2() {
+  const c = 299792458;
+  if (m2 === 't') {
+    const l0 = +$('e2l').value * 1e-9, dl = Math.pow(10, +$('e2d').value) * 1e-9; $('e2lv').textContent = $('e2l').value + ' nm'; $('e2dv').textContent = fmt(dl * 1e9, 3) + ' nm';
+    const dnu = c * dl / (l0 * l0), half = 2 * Math.LN2 / Math.PI * l0 * l0 / dl, O = linspace(0, 3 * half, 400);
+    const u = half >= 1e-3 ? [1e-3, 'mm'] : [1e-6, 'µm'];
+    cards('e2cards', [['Linewidth Δν', fmt(dnu / 1e9, 4) + ' GHz'], ['Coherence length λ²/Δλ', lenStr(l0 * l0 / dl)], ['OPD at V = ½', lenStr(half), 'ok']]);
+    $('e2t1').textContent = 'Fringe visibility versus optical path difference'; $('e2t2').textContent = 'Fringes at OPD = 0, ½, 1 and 2 × (OPD at V = ½)';
+    plot($('e2plot'), [{ x: O.map(v => v / u[0]), y: O.map(o => Math.exp(-((Math.PI * dnu * o / c) ** 2) / (4 * Math.LN2))), color: C.teal, width: 2 }, { x: [half / u[0]], y: [0.5], color: C.coral, points: true, r: 5 }], { xmin: 0, xmax: 3 * half / u[0], ymin: 0, ymax: 1.05, xlabel: 'OPD  [' + u[1] + ']', ylabel: 'Visibility V' });
+    const Vs = [0, 0.5, 1, 2].map(k => Math.exp(-((Math.PI * dnu * k * half / c) ** 2) / (4 * Math.LN2)));
+    const n = 400; const { g, w, h, tmp } = image($('e2img'), n, 1, i => { const q = Math.floor(i / (n / 4)), x = (i % (n / 4)) / (n / 4); return 0.5 * (1 + Vs[q] * Math.cos(2 * Math.PI * 6 * x)); }, wl2rgb(+$('e2l').value)); g.drawImage(tmp, 0, 0, w, h);
+  } else if (m2 === 's') {
+    const s = +$('e2s').value * 1e-3, d = +$('e2p').value * 1e-3, lam = 630e-9, L = 1; $('e2sv').textContent = (s * 1e3).toFixed(2) + ' mm'; $('e2pv').textContent = (d * 1e3).toFixed(2) + ' mm';
+    const V = Math.abs(sinc(s * d / (lam * L))), D = linspace(0.01e-3, 2e-3, 400);
+    // numerical: sum fringes from 201 source points
+    const M = 201, us = s > 0 ? Array.from({ length: M }, (_, i) => -s / 2 + (i + 0.5) * s / M) : [0], X = linspace(-2.5, 2.5, 400);
+    const I = X.map(x => us.reduce((t, u) => t + 1 + Math.cos(2 * Math.PI * (x + u * d / (lam * L))), 0) / us.length);
+    const Vn = (Math.max(...I) - Math.min(...I)) / (Math.max(...I) + Math.min(...I));
+    cards('e2cards', [['V numerical', Vn.toFixed(3), 'ok'], ['|sinc(sd/λL)|', V.toFixed(3), 'th'], ['Coherence width λL/s', s > 0 ? lenStr(lam * L / s) : '∞']]);
+    $('e2t1').textContent = 'Visibility versus pinhole separation (dot: current d)'; $('e2t2').textContent = 'Young fringes on the screen (5 periods)';
+    plot($('e2plot'), [{ x: D.map(v => v * 1e3), y: D.map(q => Math.abs(sinc(s * q / (lam * L)))), color: C.teal, width: 2 }, { x: [d * 1e3], y: [Vn], color: C.coral, points: true, r: 5 }], { xmin: 0, xmax: 2, ymin: 0, ymax: 1.05, xlabel: 'Pinhole separation d  [mm]', ylabel: 'Visibility V' });
+    const { g, w, h, tmp } = image($('e2img'), 400, 1, i => I[i] / 2, wl2rgb(630)); g.drawImage(tmp, 0, 0, w, h);
+  } else {
+    const Lc = +$('e2c').value * 1e-2, nm = +$('e2n').value, O = +$('e2o').value * 1e-2; $('e2cv').textContent = (Lc * 100).toFixed(0) + ' cm'; $('e2nv').textContent = String(nm); $('e2ov').textContent = (O * 100).toFixed(1) + ' cm';
+    const dnu = c / (2 * Lc), Vf = o => { let r = 0, q = 0; for (let k = 0; k < nm; k++) { r += Math.cos(2 * Math.PI * k * dnu * o / c); q += Math.sin(2 * Math.PI * k * dnu * o / c); } return Math.hypot(r, q) / nm; };
+    const OO = linspace(0, 2, 800), V = Vf(O);
+    cards('e2cards', [['Mode spacing c/2L', fmt(dnu / 1e6, 4) + ' MHz'], ['V at this OPD', V.toFixed(3), 'ok'], ['Revival period 2L_cav', lenStr(2 * Lc), 'th']]);
+    $('e2t1').textContent = 'Visibility versus OPD for ' + nm + ' equal mode(s) (dot: current OPD)'; $('e2t2').textContent = 'Fringes at the current OPD';
+    plot($('e2plot'), [{ x: OO.map(v => v * 100), y: OO.map(Vf), color: C.teal, width: 2 }, { x: [O * 100], y: [V], color: C.coral, points: true, r: 5 }], { xmin: 0, xmax: 200, ymin: 0, ymax: 1.05, xlabel: 'OPD  [cm]', ylabel: 'Visibility V' });
+    const { g, w, h, tmp } = image($('e2img'), 400, 1, i => 0.5 * (1 + V * Math.cos(2 * Math.PI * 10 * i / 400)), wl2rgb(633)); g.drawImage(tmp, 0, 0, w, h);
+  }
+}
+
+// ================= Experiment 3 =================
+let m3 = 'h', filt = false;
+segs('e3seg', m => { m3 = m; [['h', 'e3ch'], ['d', 'e3cd'], ['v', 'e3cv']].forEach(([k, id]) => $(id).style.display = k === m ? '' : 'none'); });
+$('e3flt').onclick = () => { filt = !filt; $('e3flt').textContent = 'Sideband filter: ' + (filt ? 'on' : 'off'); draw(); };
+function asm2(re, im, n, dx, lam, z) {
+  fft2(re, im, n, false);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const fx = (x < n / 2 ? x : x - n) / (n * dx), fy = (y < n / 2 ? y : y - n) / (n * dx), u = lam * lam * (fx * fx + fy * fy);
+    const ph = u < 1 ? -2 * Math.PI / lam * z * u / (1 + Math.sqrt(1 - u)) : 0, at = u < 1 ? 1 : 0, c = Math.cos(ph) * at, s = Math.sin(ph) * at, k = y * n + x, r = re[k] * c - im[k] * s; im[k] = re[k] * s + im[k] * c; re[k] = r; }
+  fft2(re, im, n, true);
+}
+let objCache = null;
+function object(n) {
+  if (objCache) return objCache; const o = new Float64Array(n * n);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const u = (x - n / 2) / n, v = (y - n / 2) / n, r = Math.hypot(u, v);
+    let a = 0; if (r > 0.12 && r < 0.16) a = 1; if (Math.abs(u) < 0.025 && Math.abs(v) < 0.1) a = 1; if (Math.abs(v + 0.12) < 0.02 && Math.abs(u) < 0.06) a = 1; o[y * n + x] = a; }
+  // soften edges a little (3x3 average)
+  const s = new Float64Array(n * n); for (let y = 1; y < n - 1; y++) for (let x = 1; x < n - 1; x++) { let t = 0; for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) t += o[(y + j) * n + x + i]; s[y * n + x] = t / 9; }
+  return objCache = s;
+}
+function e3() {
+  const lam = 633e-9;
+  if (m3 === 'h') {
+    const n = 256, dx = 8e-6, z = 25e-3, th = +$('e3t').value * Math.PI / 180; $('e3tv').textContent = (+$('e3t').value).toFixed(2) + '°';
+    const ob = object(n), Ore = Float64Array.from(ob), Oim = new Float64Array(n * n); asm2(Ore, Oim, n, dx, lam, z);
+    let om = 0; for (let i = 0; i < n * n; i++) om = Math.max(om, Math.hypot(Ore[i], Oim[i]));
+    const fc = Math.sin(th) / lam, Ar = om, H = new Float64Array(n * n);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const k = y * n + x, p = 2 * Math.PI * fc * x * dx; H[k] = (Ore[k] + Ar * Math.cos(p)) ** 2 + (Oim[k] + Ar * Math.sin(p)) ** 2; }
+    const hr = Float64Array.from(H), hi = new Float64Array(n * n); fft2(hr, hi, n, false);
+    const spec = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) spec[((y + n / 2) % n) * n + (x + n / 2) % n] = Math.log10(1 + Math.hypot(hr[y * n + x], hi[y * n + x]));
+    let rr, ri; const kc = fc * n * dx, rad = Math.max(4, 0.45 * kc);
+    if (filt) {   // keep the O R* lobe at -kc, then multiply by R
+      rr = new Float64Array(n * n); ri = new Float64Array(n * n);
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const fx = x < n / 2 ? x : x - n, fy = y < n / 2 ? y : y - n; if ((fx + kc) ** 2 + fy * fy <= rad * rad) { rr[y * n + x] = hr[y * n + x]; ri[y * n + x] = hi[y * n + x]; } }
+      fft2(rr, ri, n, true);
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const k = y * n + x, p = 2 * Math.PI * fc * x * dx, c = Math.cos(p), s = Math.sin(p), r = rr[k] * c - ri[k] * s; ri[k] = rr[k] * s + ri[k] * c; rr[k] = r; }
+    } else {
+      rr = new Float64Array(n * n); ri = new Float64Array(n * n);
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const k = y * n + x, p = 2 * Math.PI * fc * x * dx; rr[k] = H[k] * Math.cos(p); ri[k] = H[k] * Math.sin(p); }
+    }
+    asm2(rr, ri, n, dx, lam, -z);
+    const rec = new Float64Array(n * n); for (let i = 0; i < n * n; i++) rec[i] = Math.hypot(rr[i], ri[i]);
+    const rs = Array.from(rec).sort((a, b) => a - b), rmax = rs[Math.floor(0.995 * rs.length)];
+    const sm = Math.max(...spec), hmx = Math.max(...H);
+    // object bandwidth: radius containing 95 % of the object-spectrum energy
+    const ore = Float64Array.from(ob), oim = new Float64Array(n * n); fft2(ore, oim, n, false); const e = []; let tot = 0;
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const fx = x < n / 2 ? x : x - n, fy = y < n / 2 ? y : y - n, p = ore[y * n + x] ** 2 + oim[y * n + x] ** 2; if (fx || fy) { e.push([Math.hypot(fx, fy), p]); tot += p; } }
+    e.sort((a, b) => a[0] - b[0]); let acc = 0, B = 0; for (const [r, p] of e) { acc += p; if (acc > 0.95 * tot) { B = r; break; } }
+    const Bf = B / (n * dx) / 1000, fcl = fc / 1000;
+    cards('e3cards', [['Carrier sin θ/λ', fmt(fcl, 3) + ' lines/mm'], ['Nyquist 1/(2Δx)', '62.5 lines/mm'], ['Object bandwidth (95 %)', fmt(Bf, 3) + ' lines/mm'], ['Orders separated?', fcl >= 3 * Bf ? 'yes' : fcl >= Bf ? 'partly' : 'no', 'ok']]);
+    $('e3t1').textContent = 'Hologram (centre crop) → spectrum of H → reconstruction refocused at −z' + (filt ? ' (sideband only)' : ' (all terms)');
+    const crop = 96, hc = new Float64Array(crop * crop); for (let y = 0; y < crop; y++) for (let x = 0; x < crop; x++) hc[y * crop + x] = H[(y + n / 2 - crop / 2) * n + x + n / 2 - crop / 2];
+    panels($('e3img'), [{ data: hc, n: crop, min: 0, max: hmx, title: 'hologram H (crop)' }, { data: spec, n, min: 0, max: sm, title: 'log |FFT H|', circle: filt ? { cx: 0.5 - kc / n, cy: 0.5, r: rad / n } : null }, { data: rec, n, min: 0, max: rmax, title: 'reconstruction' }]);
+    $('e3t2').textContent = 'Spectrum of H along the carrier axis (fy = 0)';
+    const fxs = Array.from({ length: n }, (_, i) => (i - n / 2) / (n * dx) / 1000);
+    plot($('e3plot'), [{ x: fxs, y: fxs.map((_, i) => spec[(n / 2) * n + i]), color: C.navy, width: 1.4 }, { x: [-fcl, -fcl], y: [0, sm], color: C.coral, dash: [4, 4], width: 1 }, { x: [fcl, fcl], y: [0, sm], color: C.coral, dash: [4, 4], width: 1 }], { xmin: fxs[0], xmax: fxs[n - 1], ymin: 0, ymax: sm * 1.05, xlabel: 'fx  [lines/mm]', ylabel: 'log |FFT|' });
+  } else {
+    const n = 200; seed = 31; const sp = new Float64Array(n * n);
+    // speckle: smooth random complex field -> |.|² (3x3 correlated)
+    const a1 = Array.from({ length: n * n }, () => randn()), a2 = Array.from({ length: n * n }, () => randn());
+    for (let y = 1; y < n - 1; y++) for (let x = 1; x < n - 1; x++) { let r = 0, q = 0; for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) { r += a1[(y + j) * n + x + i]; q += a2[(y + j) * n + x + i]; } sp[y * n + x] = (r * r + q * q) / 18; }
+    const R0 = n / 2 - 4, img = new Float64Array(n * n), rr = linspace(0, 1, 400);
+    let prof;
+    if (m3 === 'd') {
+      const w0 = +$('e3w').value * 1e-6; $('e3wv').textContent = (w0 * 1e6).toFixed(2) + ' µm';
+      const wf = r => w0 * (1 - r * r) ** 2;
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const r = Math.hypot(x - n / 2, y - n / 2) / R0; img[y * n + x] = r > 1 ? 0.03 : sp[y * n + x] * (1 + Math.cos(4 * Math.PI * wf(r) / lam)) / 2; }
+      prof = rr.map(r => (1 + Math.cos(4 * Math.PI * wf(r) / lam)) / 2);
+      cards('e3cards', [['Maximum phase 4πw₀/λ', fmt(4 * Math.PI * w0 / lam, 3) + ' rad'], ['Fringes 2w₀/λ', fmt(2 * w0 / lam, 3), 'th'], ['Sign of w from fringes', 'unknown (cos is even)']]);
+      $('e3t1').textContent = 'Reconstructed image of the plate with double-exposure fringes (speckled)'; $('e3t2').textContent = 'Fringe function (1 + cos Δφ)/2 along a radius';
+    } else {
+      const a0 = +$('e3a').value * 1e-6; $('e3av').textContent = (a0 * 1e6).toFixed(3) + ' µm';
+      const af = r => a0 * (1 - r * r) ** 2;
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const r = Math.hypot(x - n / 2, y - n / 2) / R0; img[y * n + x] = r > 1 ? 0.03 : sp[y * n + x] * J0(4 * Math.PI * af(r) / lam) ** 2; }
+      prof = rr.map(r => J0(4 * Math.PI * af(r) / lam) ** 2);
+      const zeros = [2.405, 5.520, 8.654, 11.79, 14.93].filter(z0 => z0 < 4 * Math.PI * a0 / lam).length;
+      cards('e3cards', [['4πa₀/λ at the centre', fmt(4 * Math.PI * a0 / lam, 3)], ['Dark rings (zeros of J₀)', String(zeros), 'ok'], ['a for the first dark ring', lenStr(2.405 * lam / (4 * Math.PI)), 'th']]);
+      $('e3t1').textContent = 'Time-average hologram of the vibrating plate (speckled)'; $('e3t2').textContent = 'Fringe function J₀²(4πa/λ) along a radius';
+    }
+    const ms = Array.from(img).sort((a, b) => a - b)[Math.floor(0.99 * n * n)];
+    panels($('e3img'), [{ data: img, n, min: 0, max: ms, title: m3 === 'd' ? 'double exposure' : 'time average' }]);
+    plot($('e3plot'), [{ x: rr, y: prof, color: C.teal, width: 2 }], { xmin: 0, xmax: 1, ymin: 0, ymax: 1.05, xlabel: 'r / R (centre → clamped edge)', ylabel: 'Fringe function' });
+  }
+}
+
+function draw() { const t = document.querySelector('.exp.on').id; if (t === 'e1') e1(); else if (t === 'e2') e2(); else e3(); }
+document.querySelectorAll('input[type=range]').forEach(r => r.oninput = draw);
+window.addEventListener('resize', draw);
+draw();
+</script>
+<script>(function(){var b=document.querySelector('nav button[data-t="e3"]'); if(b) b.click();})();</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f4"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

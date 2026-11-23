@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الروابط الجزيئية والدوران والاهتزاز</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#FBF8F1;--panel:#FFFFFF;--ink:#2A2623;--muted:#6F6553;--line:#E2DACB;--gold:#B8862B;--golddk:#8C6414;--chip:#F4EEE2;--plot:#FFFDF8;--grid:#EEE6D6;--dark:#1A1714;--blue:#3D4E8C;--ok:#2E7D4F;--bad:#B23A2E}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 44px}
+.fstrip{height:14px;border-radius:7px;margin:0 0 14px;direction:ltr;background:
+ linear-gradient(90deg,transparent 0 21%,#1A1714 21% 21.4%,transparent 21.4% 45%,#1A1714 45% 45.3%,transparent 45.3% 62.6%,#1A1714 62.6% 63.2%,transparent 63.2% 86%,#1A1714 86% 86.4%,transparent 86.4%),
+ linear-gradient(90deg,#6B3FB0,#3D5BD9 16%,#2BA5D9 32%,#3BB55A 48%,#E3D332 64%,#F29A2E 80%,#E0402F)}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--golddk);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:66ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}
+@media (max-width:840px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border:1px solid var(--grid);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:11px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.08rem;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--chip);color:var(--ink);width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 11px;border-radius:8px;cursor:pointer;min-height:36px}
+.btn.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.readout{background:var(--chip);border-radius:10px;padding:10px 13px;font-size:.95rem}
+.readout .eq{display:block}
+.eq{font-family:'STIX Two Text',serif;font-size:1.06rem;direction:ltr;unicode-bidi:isolate;text-align:left}
+.note{font-size:.92rem;margin-top:4px}
+.good{color:var(--ok);font-weight:700}.badx{color:var(--bad);font-weight:700}
+.task{border-top:1px solid var(--line);padding-top:10px;font-size:.93rem}
+.task h3{margin:0 0 4px;font-size:1rem;color:var(--golddk)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.93rem;color:var(--ink)}
+.chk input{width:18px;height:18px;accent-color:var(--gold)}
+footer{margin-top:20px;color:var(--muted);font-size:.85rem}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fstrip" aria-hidden="true"></div>
+<header>
+  <span class="badge">الأطياف الذرية والجزيئية · <bdi dir="ltr">2037003-4</bdi></span>
+  <h1>معمل الروابط الجزيئية والدوران والاهتزاز</h1>
+  <p>الفصل السادس. غيّر القيم وراقب النتيجة، وأجب عن السؤال في أسفل كل تجربة.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" aria-selected="true" data-t="t1">١. منحنى الطاقة والروابط</button><button role="tab" aria-selected="false" data-t="t2">٢. الطيف الدوراني</button><button role="tab" aria-selected="false" data-t="t3">٣. المستويات الاهتزازية</button><button role="tab" aria-selected="false" data-t="t4">٤. الطيف الاهتزازي الدوراني</button></nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="620" aria-label="منحنى طاقة الوضع بين ذرتين"></canvas>
+  <div class="ctrl">
+    <label for="s1m">الجزيء</label><select id="s1m"><option value="H2">H₂ (رابطة تساهمية)</option><option value="HCl">HCl (تساهمية قطبية)</option><option value="N2">N₂ (رابطة ثلاثية)</option><option value="Ar2">Ar₂ (فان دير فالس)</option></select>
+    <label>طاقة الاهتزاز نسبةً إلى طاقة التفكك <b id="o1e"></b></label><input id="i1e" type="range" min="0.02" max="0.98" step="0.01" value="0.3">
+    <div class="readout" id="r1"></div>
+    <div class="task"><h3>سؤال</h3>قارن عمق البئر وموضع قاعه بين H₂ وAr₂. لماذا يسهل تفكيك Ar₂ عند درجة حرارة الغرفة تقريبًا؟ ولماذا لا يبقى الاهتزاز متماثلًا حول r<sub>e</sub> عند الطاقات العالية؟</div>
+  </div>
+</section>
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="620" aria-label="مستويات الدوار الصلد وخطوط الطيف الدوراني"></canvas>
+  <div class="ctrl">
+    <label for="s2m">الجزيء</label><select id="s2m"><option value="HCl">H³⁵Cl</option><option value="CO">CO</option><option value="HF">HF</option><option value="N2">N₂</option></select>
+    <label>درجة الحرارة T (K) <b id="o2t"></b></label><input id="i2t" type="range" min="20" max="1000" step="5" value="300">
+    <div class="readout" id="r2"></div>
+    <div class="task"><h3>سؤال</h3>ما المسافة بين خطين متتاليين في الطيف الدوراني؟ احسب منها طول الرابطة في HCl. ولماذا لا يظهر طيف دوراني لـ N₂؟</div>
+  </div>
+</section>
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="620" aria-label="مستويات الاهتزاز التوافقية واللاتوافقية"></canvas>
+  <div class="ctrl">
+    <label for="s3m">الجزيء</label><select id="s3m"><option value="HCl">HCl</option><option value="CO">CO</option><option value="H2">H₂</option><option value="I2">I₂</option></select>
+    <label class="chk"><input type="checkbox" id="k3h" checked> إظهار المستويات التوافقية للمقارنة</label>
+    <div class="readout" id="r3"></div>
+    <div class="task"><h3>سؤال</h3>لماذا تتقارب المستويات الاهتزازية كلما زاد v؟ احسب تردد النطاق الأساسي (0 → 1) والتوافقي الأول (0 → 2) لـ HCl.</div>
+  </div>
+</section>
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="620" aria-label="الفرعان P وR في طيف HCl"></canvas>
+  <div class="ctrl">
+    <label>درجة الحرارة T (K) <b id="o4t"></b></label><input id="i4t" type="range" min="50" max="1200" step="10" value="300">
+    <label class="chk"><input type="checkbox" id="k4i" checked> إظهار النظير H³⁷Cl</label>
+    <div class="readout" id="r4"></div>
+    <div class="task"><h3>سؤال</h3>لماذا توجد فجوة في منتصف الطيف (لا فرع Q)؟ ولماذا تتقارب خطوط الفرع R وتتباعد خطوط الفرع P؟ وما سبب ظهور كل خط مزدوجًا؟</div>
+  </div>
+</section>
+<footer>أ.د. نجم الحصيني – الأطياف الذرية والجزيئية، الفصل السادس. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+const h=6.62607015e-34,c=2.99792458e8,kB=1.380649e-23,eV=1.602176634e-19;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let active='t1',dirty=true;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;dirty=true;}));
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>dirty=true);e.addEventListener('change',()=>dirty=true);});
+
+/* number formatting with real superscripts */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sciParts(v,d){const e=Math.floor(Math.log10(Math.abs(v)));let m=v/Math.pow(10,e);if(+m.toFixed(d)>=10){return [(m/10).toFixed(d),e+1];}return [m.toFixed(d),e];}
+function H(v,d=3){return H0(v,d).replace(/-/g,'−');}
+function H0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10<sup>'+e+'</sup>';}
+function U(v,d=3){return U0(v,d).replace(/-/g,'−');}
+function U0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10'+String(e).split('').map(ch=>SUP[ch]).join('');}
+
+/* colour of a wavelength (nm) */
+function rgbOf(l){let r=0,g=0,b=0;
+ if(l>=380&&l<440){r=-(l-440)/60;b=1;}else if(l<490){g=(l-440)/50;b=1;}else if(l<510){g=1;b=-(l-510)/20;}else if(l<580){r=(l-510)/70;g=1;}else if(l<645){r=1;g=-(l-645)/65;}else if(l<=750){r=1;}
+ let f=0;if(l>=380&&l<420)f=0.3+0.7*(l-380)/40;else if(l>=420&&l<=700)f=1;else if(l>700&&l<=750)f=0.3+0.7*(750-l)/50;
+ return [r*f,g*f,b*f];}
+function colStr(l,I){const v=l>=380&&l<=750?rgbOf(l):[0.62,0.6,0.58];const k=Math.pow(Math.max(0,Math.min(1,I)),0.55);return 'rgb('+v.map(x=>Math.round(255*x*k)).join(',')+')';}
+function planck(lnm,T){const l=lnm*1e-9;const x=h*c/(l*kB*T);if(x>700)return 0;return 2*h*c*c/Math.pow(l,5)/(Math.expm1(x));}
+
+/* drawing helpers */
+function txt(g,s,x,y,col,al,sz,rtl,bold){g.font=(bold?'700 ':'')+(sz||22)+'px "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function poly(g,pts,col,w){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function strip(g,x,y,w,hh,l0,l1,If){g.fillStyle='#0D0B09';g.fillRect(x,y,w,hh);for(let i=0;i<w;i++){const l=l0+(l1-l0)*i/w;const I=If(l);if(I<=0.003)continue;g.fillStyle=colStr(l,I);g.fillRect(x+i,y,1.2,hh);}g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(x,y,w,hh);}
+function axisNm(g,x,y,w,l0,l1,step){seg(g,x,y,x+w,y,css('--muted'),1.5);for(let l=Math.ceil(l0/step)*step;l<=l1+1e-9;l+=step){const px=x+(l-l0)/(l1-l0)*w;seg(g,px,y,px,y+8,css('--muted'),1.5);txt(g,String(Math.round(l)),px,y+30,css('--muted'),'center',18);}txt(g,'λ (nm)',x+w,y+56,css('--muted'),'right',18);}
+
+/* atomic line data: air wavelengths (nm) and relative intensities */
+const LINES={
+ H:[[656.28,1],[486.13,.55],[434.05,.32],[410.17,.22],[397.01,.14]],
+ He:[[447.15,.45],[471.31,.22],[492.19,.25],[501.57,.55],[587.56,1],[667.82,.45],[706.52,.4]],
+ Na:[[588.995,1],[589.592,.55],[568.82,.08],[615.42,.07],[497.85,.04]],
+ Hg:[[253.65,1],[365.02,.55],[404.66,.45],[435.83,.85],[546.07,1],[576.96,.5],[579.07,.5]],
+ Ne:[[585.25,.6],[588.19,.3],[594.48,.4],[609.61,.4],[614.31,.5],[626.65,.4],[633.44,.45],[640.22,.9],[650.65,.5],[659.90,.3],[692.95,.4],[703.24,.55]]};
+const NAME={H:'الهيدروجين',He:'الهيليوم',Na:'الصوديوم',Hg:'الزئبق',Ne:'النيون'};
+function lineSpec(el,w){const L=LINES[el];return l=>{let s=0;for(const [l0,a] of L){const d=(l-l0)/w;if(Math.abs(d)<6)s+=a*Math.exp(-d*d/2);}return s;};}
+
+
+
+const hc=1.98644586e-23,kBc=0.69503476; /* J cm, cm^-1/K */
+/* 1. potentials */
+const MOL={H2:{De:4.75,re:0.741,a:1.94,t:'تساهمية'},HCl:{De:4.62,re:1.275,a:1.87,t:'تساهمية قطبية'},N2:{De:9.91,re:1.098,a:2.69,t:'تساهمية ثلاثية'},Ar2:{De:0.0123,re:3.816,lj:3.40,t:'فان دير فالس'}};
+function Vpot(m,r){if(m.lj){const x=m.lj/r;return 4*m.De*(Math.pow(x,12)-Math.pow(x,6));}const e=Math.exp(-m.a*(r-m.re));return m.De*(1-e)*(1-e)-m.De;}
+function lab1(t){const g=$('c1').getContext('2d');g.clearRect(0,0,1200,620);const key=$('s1m').value,m=MOL[key],f=+$('i1e').value;$('o1e').textContent=(f*100).toFixed(0)+'%';
+ const r0=m.re*0.6,r1=m.re*(m.lj?2.6:3.6),X=80,W=760,top=60,bot=560,yv=v=>top+(bot-top)*(0.18-v/m.De*0.82*-1)/1;
+ const ys=v=>{const y=top+(v/m.De+1)/1.25*(bot-top);return bot-(y-top);};
+ const yy=v=>bot-(v+m.De)/(1.25*m.De)*(bot-top);
+ seg(g,X,yy(0),X+W,yy(0),css('--muted'),1.5,[6,5]);txt(g,'E = 0 (ذرتان منفصلتان)',X+W,yy(0)-8,css('--muted'),'right',16,1);
+ const pts=[];for(let i=0;i<=600;i++){const r=r0+(r1-r0)*i/600,v=Vpot(m,r);if(v<0.25*m.De)pts.push([X+W*i/600,yy(v)]);}poly(g,pts,css('--ink'),3);
+ const xr=r=>X+W*(r-r0)/(r1-r0);seg(g,xr(m.re),yy(-m.De),xr(m.re),bot+10,css('--muted'),1,[4,4]);txt(g,'rₑ',xr(m.re),bot+30,css('--muted'),'center',18);
+ const Ev=-m.De*(1-f);let ra=m.re,rb=m.re;for(let r=m.re;r>r0;r-=0.0005)if(Vpot(m,r)>Ev){ra=r;break;}for(let r=m.re;r<r1;r+=0.0005)if(Vpot(m,r)>Ev){rb=r;break;}
+ seg(g,xr(ra),yy(Ev),xr(rb),yy(Ev),css('--gold'),3);const ph=(Math.sin(t*2.2)+1)/2,rp=ra+(rb-ra)*ph;g.fillStyle='#3D4E8C';g.beginPath();g.arc(xr(rp),yy(Ev),9,0,7);g.fill();
+ seg(g,X+W+30,yy(-m.De),X+W+30,yy(0),'#B23A2E',2);txt(g,'Dₑ',X+W+40,(yy(-m.De)+yy(0))/2,'#B23A2E','left',20);
+ txt(g,'r (Å)',X+W,bot+30,css('--muted'),'right',16);for(let r=Math.ceil(r0*2)/2;r<=r1;r+=0.5){seg(g,xr(r),bot,xr(r),bot+6,css('--muted'),1.5);}
+ /* atoms picture */
+ const ax=960,ay=150,sep=Math.min(150,40+(rp-r0)/(r1-r0)*260);g.fillStyle='#B8862B';g.beginPath();g.arc(ax,ay,26,0,7);g.fill();g.fillStyle='#3D4E8C';g.beginPath();g.arc(ax+sep,ay,26,0,7);g.fill();
+ $('r1').innerHTML='<b>'+key+'</b>: رابطة '+m.t+'<span class="eq">D<sub>e</sub> = '+H(m.De,3)+' eV ,  r<sub>e</sub> = '+H(m.re,4)+' Å</span><span class="eq">kT (300 K) = 0.0259 eV</span><div class="note">نقطتا الارتداد: '+H(ra,3)+' Å و'+H(rb,3)+' Å — '+(f>0.4?'الاهتزاز غير متماثل: الجدار الأيسر أشد انحدارًا (تنافر) من الأيمن.':'قرب القاع يشبه المنحنى قطعًا مكافئًا (اهتزاز توافقي).')+'</div>';}
+/* 2. rotor */
+const ROT={HCl:{B:10.59,mu:0.97959,dip:1},CO:{B:1.9313,mu:6.8562,dip:1},HF:{B:20.56,mu:0.95705,dip:1},N2:{B:1.998,mu:7.0015,dip:0}};
+function lab2(){const g=$('c2').getContext('2d');g.clearRect(0,0,1200,620);const key=$('s2m').value,m=ROT[key],T=+$('i2t').value;$('o2t').textContent=T;
+ const B=m.B,I=6.62607015e-34/(8*Math.PI*Math.PI*2.99792458e10*B),r=Math.sqrt(I/(m.mu*1.66053907e-27))*1e10,Jmax=Math.max(0,Math.sqrt(T*kBc/(2*B))-0.5);
+ /* level ladder */
+ const X=60,top=60,bot=560,Jtop=Math.max(6,Math.min(14,Math.ceil(Jmax*1.8)+2)),Etop=B*Jtop*(Jtop+1),ey=E=>bot-(bot-top)*E/Etop;
+ for(let J=0;J<=Jtop;J++){const y=ey(B*J*(J+1));seg(g,X,y,X+230,y,css('--ink'),1.5);if(J<=8||J===Jtop)txt(g,'J = '+J,X+240,y+5,css('--muted'),'left',14);}
+ for(let J=0;J<Math.min(Jtop,6);J++){const x=X+30+J*30;seg(g,x,ey(B*J*(J+1)),x,ey(B*(J+1)*(J+2))+6,css('--gold'),2);}
+ txt(g,'E = B J(J+1)',X+120,bot+40,css('--ink'),'center',20);
+ /* spectrum */
+ const SX=380,SW=760,sy=470,nmax=Math.max(10,Math.min(40,Math.ceil(Jmax*3)+4)),numax=2*B*(nmax+1)*1.03,xs=v=>SX+SW*v/numax;seg(g,SX,sy,SX+SW,sy,css('--muted'),1.5);
+ let pmax=0;const pops=[];for(let J=0;J<=nmax;J++){const p=(2*J+1)*Math.exp(-B*J*(J+1)/(kBc*T))*(1-Math.exp(-2*B*(J+1)/(kBc*T)))*(J+1);pops.push(p);pmax=Math.max(pmax,p);}
+ if(m.dip){pops.forEach((p,J)=>{const x=xs(2*B*(J+1));seg(g,x,sy,x,sy-330*p/pmax,css('--golddk'),3);});}
+ else txt(g,'لا خطوط: N₂ ليس له عزم ثنائي قطب دائم',SX+SW/2,sy-160,'#B23A2E','center',22,1,1);
+ const st=[1,2,5,10,20,50,100,200].find(s=>numax/s<10)||500;for(let v=0;v<=numax;v+=st){seg(g,xs(v),sy,xs(v),sy+8,css('--muted'),1.5);txt(g,String(v),xs(v),sy+28,css('--muted'),'center',15);}
+ txt(g,'ν̃ (cm⁻¹)',SX+SW,sy+54,css('--muted'),'right',16);txt(g,'شدة خطوط الامتصاص',SX,90,css('--muted'),'left',16,1);
+ if(m.dip&&nmax>2){const x0=xs(2*B),x1=xs(4*B);seg(g,x0,sy+70,x1,sy+70,'#B23A2E',2);txt(g,'2B',(x0+x1)/2,sy+94,'#B23A2E','center',18);}
+ $('r2').innerHTML='<span class="eq">B = '+H(B,4)+' cm<sup>−1</sup></span><span class="eq">2B = '+H(2*B,4)+' cm<sup>−1</sup></span><span class="eq">I = h/(8π²cB) = '+H(I,3)+' kg m²</span><span class="eq">r = √(I/μ) = '+H(r,4)+' Å</span><span class="eq">J<sub>max</sub> ≈ √(kT/2hcB) − ½ = '+H(Jmax,3)+'</span>'+(m.dip?'':'<div class="note badx">الجزيء ثنائي الذرة المتماثل لا يمتص في الميكروويف، لكن يمكن قياس دورانه بمطيافية رامان.</div>');}
+/* 3. vibrational levels */
+const VIB={HCl:{w:2990.9,x:52.82,re:1.275},CO:{w:2169.8,x:13.29,re:1.128},H2:{w:4401.2,x:121.3,re:0.741},I2:{w:214.5,x:0.614,re:2.666}};
+function lab3(){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,620);const key=$('s3m').value,m=VIB[key],harm=$('k3h').checked;
+ const De=m.w*m.w/(4*m.x),G=v=>m.w*(v+0.5)-m.x*(v+0.5)*(v+0.5),vmax=Math.floor(m.w/(2*m.x)-0.5),D0=De-G(0);
+ const X=70,W=620,top=50,bot=560,yy=E=>bot-(bot-top)*E/(De*1.15);const a=Math.sqrt(2*m.x*1)*0.0; 
+ /* Morse in reduced units: V = De(1-e^{-x})^2 with x scaled */
+ const xr=x=>X+W*(x+1.6)/7.6;const pts=[];for(let i=0;i<=500;i++){const x=-1.6+7.6*i/500,V=De*Math.pow(1-Math.exp(-x),2);if(V<De*1.12)pts.push([xr(x),yy(V)]);}poly(g,pts,css('--ink'),3);
+ seg(g,X,yy(De),X+W,yy(De),css('--muted'),1.5,[6,5]);txt(g,'حد التفكك',X+W,yy(De)-8,css('--muted'),'right',15,1);
+ const show=Math.min(vmax,key==='I2'?40:vmax);for(let v=0;v<=show;v+=(key==='I2'?3:1)){const E=G(v);const xa=-Math.log(1+Math.sqrt(E/De)),xb=-Math.log(1-Math.sqrt(Math.min(0.999,E/De)));seg(g,xr(xa),yy(E),xr(xb),yy(E),css('--golddk'),2);if(v<5)txt(g,'v='+v,xr(xb)+6,yy(E)+5,css('--muted'),'left',13);}
+ if(harm){for(let v=0;v<8;v++){const E=m.w*(v+0.5);if(E>De*1.1)break;seg(g,X+W+20,yy(E),X+W+90,yy(E),'#3D4E8C',2,[5,4]);}txt(g,'توافقي',X+W+55,bot+24,'#3D4E8C','center',15,1);}
+ txt(g,'لاتوافقي (مورس)',xr(3),bot+24,css('--golddk'),'center',15,1);
+ /* table */
+ const TX=1140;[['النطاق الأساسي 0→1',G(1)-G(0)],['التوافقي الأول 0→2',G(2)-G(0)],['التوافقي الثاني 0→3',G(3)-G(0)]].forEach(([n,v],i)=>{txt(g,n,TX,80+i*60,css('--ink'),'right',17,1);txt(g,U(v,5)+' cm⁻¹',TX,104+i*60,css('--golddk'),'right',17,0,1);});
+ $('r3').innerHTML='<span class="eq">G(v) = ω<sub>e</sub>(v+½) − ω<sub>e</sub>x<sub>e</sub>(v+½)²</span><span class="eq">ω<sub>e</sub> = '+m.w+' ,  ω<sub>e</sub>x<sub>e</sub> = '+m.x+' cm<sup>−1</sup></span><span class="eq">ν(0→1) = '+H(G(1)-G(0),5)+' cm<sup>−1</sup> ,  ν(0→2) = '+H(G(2)-G(0),5)+' cm<sup>−1</sup></span><span class="eq">v<sub>max</sub> ≈ '+vmax+' ,  D₀ ≈ '+H(D0/8065.54,3)+' eV (تقدير نموذج مورس)</span><div class="note">طاقة نقطة الصفر G(0) = '+H(G(0),4)+' cm<sup>−1</sup>: لا يتوقف الجزيء عن الاهتزاز حتى عند الصفر المطلق.</div>';}
+/* 4. rovibrational HCl */
+const ISO=[{n0:2885.98,B0:10.4398,B1:10.1360,ab:0.758,c:css('--golddk'),nm:'H³⁵Cl'},{n0:2883.88,B0:10.4240,B1:10.1207,ab:0.242,c:'#3D4E8C',nm:'H³⁷Cl'}];
+function lab4(){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,620);const T=+$('i4t').value,iso=$('k4i').checked;$('o4t').textContent=T;
+ const lo=2600,hi=3150,X=50,W=1100,sy=500,xs=v=>X+W*(v-lo)/(hi-lo);seg(g,X,sy,X+W,sy,css('--muted'),1.5);
+ let mx=0;const L=[];ISO.forEach((s,k)=>{if(k&&!iso)return;for(let J=0;J<=25;J++){const p=s.ab*(2*J+1)*Math.exp(-s.B0*J*(J+1)/(kBc*T));const R=s.n0+(s.B1+s.B0)*(J+1)+(s.B1-s.B0)*(J+1)*(J+1);L.push([R,p,s.c,'R'+J,k]);if(J>0){const P=s.n0-(s.B1+s.B0)*J+(s.B1-s.B0)*J*J;L.push([P,p,s.c,'P'+J,k]);}mx=Math.max(mx,p);}});
+ L.forEach(([v,p,c,lb,k])=>{if(v<lo||v>hi)return;seg(g,xs(v)+(k?2:0),sy,xs(v)+(k?2:0),sy-380*p/mx,c,2.4);if(!k&&(lb==='R0'||lb==='R3'||lb==='P1'||lb==='P4'))txt(g,lb,xs(v),sy-380*p/mx-8,css('--ink'),'center',14);});
+ seg(g,xs(2885.98),sy,xs(2885.98),sy-420,'#B23A2E',1.5,[6,5]);txt(g,'ν₀ (لا يوجد فرع Q)',xs(2885.98),sy-428,'#B23A2E','center',16,1);
+ txt(g,'الفرع P (ΔJ = −1)',xs(2700),110,css('--ink'),'center',19,1,1);txt(g,'الفرع R (ΔJ = +1)',xs(3060),110,css('--ink'),'center',19,1,1);
+ for(let v=2600;v<=3150;v+=50){seg(g,xs(v),sy,xs(v),sy+8,css('--muted'),1.5);if(v%100===0)txt(g,String(v),xs(v),sy+28,css('--muted'),'center',15);}txt(g,'ν̃ (cm⁻¹)',X+W,sy+54,css('--muted'),'right',16);
+ $('r4').innerHTML='<span class="eq">R(J) = ν₀ + (B₁+B₀)(J+1) + (B₁−B₀)(J+1)²</span><span class="eq">P(J) = ν₀ − (B₁+B₀)J + (B₁−B₀)J²</span><span class="eq">ν₀ = 2885.98 cm<sup>−1</sup> ,  B₀ = 10.44 ,  B₁ = 10.14 cm<sup>−1</sup></span><div class="note">B₁ &lt; B₀ لأن الرابطة تطول قليلًا في المستوى الاهتزازي الأعلى، فتتقارب خطوط R وتتباعد خطوط P.'+(iso?'<br>الخط المزدوج: النظيران ³⁵Cl (75.8%) و³⁷Cl (24.2%)؛ الأثقل تردده أقل قليلًا.':'')+'</div>';}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4};const ANIM=new Set(["t1"]);let T0=performance.now();
+function loop(t){if(dirty||ANIM.has(active)){dirty=false;LABS[active]((t-T0)/1000);}requestAnimationFrame(loop);}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>dirty=true);
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

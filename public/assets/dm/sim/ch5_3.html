@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comparing two designs · DMP Ch5</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+select{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 5 · SIMULATOR 3</small><h1>Comparing two designs: common random numbers versus independent streams</h1></header>
+<div class="wrap"><div class="grid">
+<div class="card">
+ <div class="eq">E: S ~ Exp(1)  ·  P: S = 0.25 + 0.70 Exp(1)  ·  λ = 0.8 per μs, mean wait of 500 packets</div>
+ <label>Replications R: <span class="val" id="rv"></span></label><input type="range" id="R" min="3" max="30" step="1" value="10">
+ <button class="main" id="go">Run one comparison</button><button id="rep">Repeat 100 comparisons</button>
+ <div class="stats"><div class="s"><span>CRN: d ± half-width</span><b id="s1">—</b></div><div class="s"><span>Independent (Welch)</span><b id="s2">—</b></div><div class="s"><span>Correlation (CRN)</span><b id="s3">—</b></div></div>
+ <p id="det" style="font-size:15px;font-weight:bold;margin:10px 0 0"></p>
+ <div class="ar">في الأرقام العشوائية المشتركة يواجه التصميمان الحزم نفسها بالترتيب نفسه، فتتحرك نتائجهما معاً ويضيق مجال الثقة للفرق. كرر المقارنة 100 مرة وقارن نسبة اكتشاف الفرق الحقيقي في الطريقتين.</div>
+</div>
+<div class="card"><canvas id="c" width="800" height="380"></canvas><canvas id="b" width="800" height="230"></canvas></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);let last=null;
+function tq(df){const z=1.96,g1=(z**3+z)/4,g2=(5*z**5+16*z**3+3*z)/96,g3=(3*z**7+19*z**5+17*z**3-15*z)/384;return z+g1/df+g2/df**2+g3/df**3}
+function port(U1,U2,d){let w=0,s=0,sum=0;for(let i=0;i<U1.length;i++){const a=-Math.log(1-U1[i])/0.8;if(i>0)w=Math.max(0,w+s-a);sum+=w;const e=-Math.log(1-U2[i]);s=d==='E'?e:0.25+0.7*e}return sum/U1.length}
+const U=()=>{const u=new Float64Array(500);for(let i=0;i<500;i++)u[i]=Math.random();return u};
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length,vr=a=>{const m=mean(a);return a.reduce((x,y)=>x+(y-m)**2,0)/(a.length-1)};
+function one(R){const E=[],P=[],Pi=[];for(let r=0;r<R;r++){const u1=U(),u2=U();E.push(port(u1,u2,'E'));P.push(port(u1,u2,'P'));Pi.push(port(U(),U(),'P'))}
+ const d=E.map((x,i)=>x-P[i]),hc=tq(R-1)*Math.sqrt(vr(d)/R);const s1=vr(E)/R,s2=vr(Pi)/R,df=(s1+s2)**2/(s1**2/(R-1)+s2**2/(R-1)),hw=tq(Math.floor(df))*Math.sqrt(s1+s2);
+ const me=mean(E),mp=mean(P),cov=E.reduce((x,y,i)=>x+(y-me)*(P[i]-mp),0)/(R-1),rho=cov/Math.sqrt(vr(E)*vr(P));
+ return{E,P,Pi,dc:mean(d),hc,dw:me-mean(Pi),hw,rho}}
+function draw(o){const c=$('c').getContext('2d'),W=800,H=380,L=60,B=40;c.clearRect(0,0,W,H);
+ const all=[...o.E,...o.P,...o.Pi],mx=Math.max(...all)*1.05,X=v=>L+v/mx*(W-L-30),Y=v=>H-B-v/mx*(H-B-20);
+ c.strokeStyle='#E2DCCF';c.beginPath();c.moveTo(L,H-B);c.lineTo(W-20,H-B);c.moveTo(L,H-B);c.lineTo(L,10);c.moveTo(X(0),Y(0));c.lineTo(X(mx),Y(mx));c.stroke();
+ c.fillStyle='#5A5650';c.font='15px Calibri';c.fillText('design E mean wait (μs)',W-200,H-8);c.fillText('design P mean wait (μs)',8,22);c.fillText('equal line',X(mx*0.82)+6,Y(mx*0.82));
+ o.E.forEach((e,i)=>{c.fillStyle='#E07B1A';c.beginPath();c.arc(X(e),Y(o.P[i]),6,0,7);c.fill();c.fillStyle='#2E6F8E';c.fillRect(X(e)-5,Y(o.Pi[i])-5,10,10)});
+ c.font='14px Calibri';c.fillStyle='#E07B1A';c.fillText('● same random numbers (CRN)',L+20,40);c.fillStyle='#2E6F8E';c.fillText('■ independent streams',L+20,60);
+ const g=$('b').getContext('2d'),H2=230;g.clearRect(0,0,W,H2);const lo=Math.min(0,o.dc-o.hc,o.dw-o.hw)-0.2,hi=Math.max(o.dc+o.hc,o.dw+o.hw)+0.2,Xb=v=>L+60+(v-lo)/(hi-lo)*(W-L-120);
+ g.strokeStyle='#5A5650';g.setLineDash([5,5]);g.beginPath();g.moveTo(Xb(0),15);g.lineTo(Xb(0),H2-30);g.stroke();g.setLineDash([]);g.fillStyle='#5A5650';g.font='14px Calibri';g.fillText('0',Xb(0)-4,H2-12);g.fillText('95% interval for E − P (μs)',W-220,H2-12);
+ [[o.dc,o.hc,'CRN paired-t','#E07B1A',70],[o.dw,o.hw,'independent Welch','#2E6F8E',150]].forEach(a=>{g.strokeStyle=a[3];g.lineWidth=4;g.beginPath();g.moveTo(Xb(a[0]-a[1]),a[4]);g.lineTo(Xb(a[0]+a[1]),a[4]);g.stroke();g.fillStyle=a[3];g.beginPath();g.arc(Xb(a[0]),a[4],7,0,7);g.fill();g.font='14px Calibri';g.fillText(a[2],8,a[4]+5)});
+ $('s1').textContent=o.dc.toFixed(2)+' ± '+o.hc.toFixed(2);$('s2').textContent=o.dw.toFixed(2)+' ± '+o.hw.toFixed(2);$('s3').textContent=o.rho.toFixed(3)}
+$('R').oninput=()=>$('rv').textContent=$('R').value;$('rv').textContent=$('R').value;
+$('go').onclick=()=>{last=one(+$('R').value);draw(last);$('det').textContent=(last.dc-last.hc>0?'CRN detects the difference':'CRN misses it')+' · '+(last.dw-last.hw>0?'independent streams detect it':'independent streams miss it (interval contains 0)')};
+$('rep').onclick=()=>{const R=+$('R').value;let a=0,b=0,wa=0,wb=0;for(let k=0;k<100;k++){const o=one(R);if(o.dc-o.hc>0)a++;if(o.dw-o.hw>0)b++;wa+=2*o.hc;wb+=2*o.hw;last=o}draw(last);$('det').textContent='Out of 100 comparisons: CRN detected the difference '+a+' times (mean width '+(wa/100).toFixed(2)+'), independent streams '+b+' times (mean width '+(wb/100).toFixed(2)+').'};
+$('go').click();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f4"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

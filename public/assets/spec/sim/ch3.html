@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الأعداد الكمية والذرات متعددة الإلكترونات</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#FBF8F1;--panel:#FFFFFF;--ink:#2A2623;--muted:#6F6553;--line:#E2DACB;--gold:#B8862B;--golddk:#8C6414;--chip:#F4EEE2;--plot:#FFFDF8;--grid:#EEE6D6;--dark:#1A1714;--blue:#3D4E8C;--ok:#2E7D4F;--bad:#B23A2E}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 44px}
+.fstrip{height:14px;border-radius:7px;margin:0 0 14px;direction:ltr;background:
+ linear-gradient(90deg,transparent 0 21%,#1A1714 21% 21.4%,transparent 21.4% 45%,#1A1714 45% 45.3%,transparent 45.3% 62.6%,#1A1714 62.6% 63.2%,transparent 63.2% 86%,#1A1714 86% 86.4%,transparent 86.4%),
+ linear-gradient(90deg,#6B3FB0,#3D5BD9 16%,#2BA5D9 32%,#3BB55A 48%,#E3D332 64%,#F29A2E 80%,#E0402F)}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--golddk);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:66ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}
+@media (max-width:840px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border:1px solid var(--grid);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:11px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.08rem;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--chip);color:var(--ink);width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 11px;border-radius:8px;cursor:pointer;min-height:36px}
+.btn.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.readout{background:var(--chip);border-radius:10px;padding:10px 13px;font-size:.95rem}
+.readout .eq{display:block}
+.eq{font-family:'STIX Two Text',serif;font-size:1.06rem;direction:ltr;unicode-bidi:isolate;text-align:left}
+.note{font-size:.92rem;margin-top:4px}
+.good{color:var(--ok);font-weight:700}.badx{color:var(--bad);font-weight:700}
+.task{border-top:1px solid var(--line);padding-top:10px;font-size:.93rem}
+.task h3{margin:0 0 4px;font-size:1rem;color:var(--golddk)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.93rem;color:var(--ink)}
+.chk input{width:18px;height:18px;accent-color:var(--gold)}
+footer{margin-top:20px;color:var(--muted);font-size:.85rem}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fstrip" aria-hidden="true"></div>
+<header>
+  <span class="badge">الأطياف الذرية والجزيئية · <bdi dir="ltr">2037003-4</bdi></span>
+  <h1>معمل الأعداد الكمية والذرات متعددة الإلكترونات</h1>
+  <p>الفصل الثالث. غيّر القيم وراقب النتيجة، وأجب عن السؤال في أسفل كل تجربة.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" aria-selected="true" data-t="t1">١. المدارات والأعداد الكمية</button><button role="tab" aria-selected="false" data-t="t2">٢. التوزيع الإلكتروني</button><button role="tab" aria-selected="false" data-t="t3">٣. قواعد هوند ورمز الحد</button><button role="tab" aria-selected="false" data-t="t4">٤. ازدواج الزخم الزاوي</button></nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="620" aria-label="كثافة احتمال الإلكترون في مدار هيدروجيني"></canvas>
+  <div class="ctrl">
+    <label>العدد الكمي الرئيسي n <b id="o1n"></b></label><input id="i1n" type="range" min="1" max="4" step="1" value="2">
+    <label>العدد الكمي المداري l <b id="o1l"></b></label><input id="i1l" type="range" min="0" max="3" step="1" value="1">
+    <label><span>العدد الكمي المغناطيسي m<sub>l</sub></span> <b id="o1m"></b></label><input id="i1m" type="range" min="-3" max="3" step="1" value="0">
+    <div class="readout" id="r1"></div>
+    <div class="task"><h3>سؤال</h3>كم عقدة نصف قطرية وكم عقدة زاوية في المدار 3p؟ وكم حالة (مع المغزل) تتسع لها القشرة n = 3؟</div>
+  </div>
+</section>
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="620" aria-label="ملء المستويات الفرعية بالإلكترونات"></canvas>
+  <div class="ctrl">
+    <label>العدد الذري Z <b id="o2z"></b></label><input id="i2z" type="range" min="1" max="36" step="1" value="8">
+    <div class="row"><button class="btn" type="button" data-z="6">C</button><button class="btn" type="button" data-z="7">N</button><button class="btn" type="button" data-z="11">Na</button><button class="btn" type="button" data-z="24">Cr</button><button class="btn" type="button" data-z="26">Fe</button><button class="btn" type="button" data-z="29">Cu</button></div>
+    <div class="readout" id="r2"></div>
+    <div class="task"><h3>سؤال</h3>لماذا يُملأ المستوى 4s قبل 3d؟ ولماذا يشذ الكروم والنحاس عن ترتيب الملء؟</div>
+  </div>
+</section>
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="620" aria-label="ترتيب الإلكترونات في مستوى فرعي وتحديد رمز الحد الأرضي"></canvas>
+  <div class="ctrl">
+    <label for="s3l">المستوى الفرعي</label><select id="s3l"><option value="1">p (l = 1)</option><option value="2">d (l = 2)</option><option value="3">f (l = 3)</option></select>
+    <label>عدد الإلكترونات k <b id="o3k"></b></label><input id="i3k" type="range" min="1" max="6" step="1" value="2">
+    <div class="row"><button class="btn" type="button" data-p="1,2">C: 2p²</button><button class="btn" type="button" data-p="1,3">N: 2p³</button><button class="btn" type="button" data-p="1,4">O: 2p⁴</button><button class="btn" type="button" data-p="2,6">Fe: 3d⁶</button><button class="btn" type="button" data-p="2,5">Mn: 3d⁵</button></div>
+    <div class="readout" id="r3"></div>
+    <div class="task"><h3>سؤال</h3>طبّق قواعد هوند الثلاث على ذرة الأكسجين 2p⁴. لماذا تكون J = L + S هنا، بينما J = |L − S| للكربون 2p²؟</div>
+  </div>
+</section>
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="620" aria-label="النموذج المتجهي لجمع زخمين زاويين"></canvas>
+  <div class="ctrl">
+    <label><span>الزخم الأول j<sub>1</sub></span> <b id="o4a"></b></label><input id="i4a" type="range" min="0" max="3" step="0.5" value="1">
+    <label><span>الزخم الثاني j<sub>2</sub></span> <b id="o4b"></b></label><input id="i4b" type="range" min="0" max="3" step="0.5" value="1">
+    <label>المحصلة المختارة J <b id="o4j"></b></label><input id="i4j" type="range" min="0" max="2" step="1" value="2">
+    <div class="row"><button class="btn" type="button" data-j="1,0.5">l = 1 و s = ½</button><button class="btn" type="button" data-j="0.5,0.5">مغزلان s = ½</button><button class="btn" type="button" data-j="1,1">إلكترونا p</button><button class="btn" type="button" data-j="2,1">D و P</button></div>
+    <div class="readout" id="r4"></div>
+    <div class="task"><h3>سؤال</h3>عند جمع زخمين j₁ = 1 وj₂ = 1، ما قيم J الممكنة؟ تحقق أن مجموع (2J + 1) يساوي (2j₁ + 1)(2j₂ + 1). ماذا يعني ذلك؟</div>
+  </div>
+</section>
+<footer>أ.د. نجم الحصيني – الأطياف الذرية والجزيئية، الفصل الثالث. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+const h=6.62607015e-34,c=2.99792458e8,kB=1.380649e-23,eV=1.602176634e-19;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let active='t1',dirty=true;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;dirty=true;}));
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>dirty=true);e.addEventListener('change',()=>dirty=true);});
+
+/* number formatting with real superscripts */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sciParts(v,d){const e=Math.floor(Math.log10(Math.abs(v)));let m=v/Math.pow(10,e);if(+m.toFixed(d)>=10){return [(m/10).toFixed(d),e+1];}return [m.toFixed(d),e];}
+function H(v,d=3){return H0(v,d).replace(/-/g,'−');}
+function H0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10<sup>'+e+'</sup>';}
+function U(v,d=3){return U0(v,d).replace(/-/g,'−');}
+function U0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10'+String(e).split('').map(ch=>SUP[ch]).join('');}
+
+/* colour of a wavelength (nm) */
+function rgbOf(l){let r=0,g=0,b=0;
+ if(l>=380&&l<440){r=-(l-440)/60;b=1;}else if(l<490){g=(l-440)/50;b=1;}else if(l<510){g=1;b=-(l-510)/20;}else if(l<580){r=(l-510)/70;g=1;}else if(l<645){r=1;g=-(l-645)/65;}else if(l<=750){r=1;}
+ let f=0;if(l>=380&&l<420)f=0.3+0.7*(l-380)/40;else if(l>=420&&l<=700)f=1;else if(l>700&&l<=750)f=0.3+0.7*(750-l)/50;
+ return [r*f,g*f,b*f];}
+function colStr(l,I){const v=l>=380&&l<=750?rgbOf(l):[0.62,0.6,0.58];const k=Math.pow(Math.max(0,Math.min(1,I)),0.55);return 'rgb('+v.map(x=>Math.round(255*x*k)).join(',')+')';}
+function planck(lnm,T){const l=lnm*1e-9;const x=h*c/(l*kB*T);if(x>700)return 0;return 2*h*c*c/Math.pow(l,5)/(Math.expm1(x));}
+
+/* drawing helpers */
+function txt(g,s,x,y,col,al,sz,rtl,bold){g.font=(bold?'700 ':'')+(sz||22)+'px "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function poly(g,pts,col,w){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function strip(g,x,y,w,hh,l0,l1,If){g.fillStyle='#0D0B09';g.fillRect(x,y,w,hh);for(let i=0;i<w;i++){const l=l0+(l1-l0)*i/w;const I=If(l);if(I<=0.003)continue;g.fillStyle=colStr(l,I);g.fillRect(x+i,y,1.2,hh);}g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(x,y,w,hh);}
+function axisNm(g,x,y,w,l0,l1,step){seg(g,x,y,x+w,y,css('--muted'),1.5);for(let l=Math.ceil(l0/step)*step;l<=l1+1e-9;l+=step){const px=x+(l-l0)/(l1-l0)*w;seg(g,px,y,px,y+8,css('--muted'),1.5);txt(g,String(Math.round(l)),px,y+30,css('--muted'),'center',18);}txt(g,'λ (nm)',x+w,y+56,css('--muted'),'right',18);}
+
+/* atomic line data: air wavelengths (nm) and relative intensities */
+const LINES={
+ H:[[656.28,1],[486.13,.55],[434.05,.32],[410.17,.22],[397.01,.14]],
+ He:[[447.15,.45],[471.31,.22],[492.19,.25],[501.57,.55],[587.56,1],[667.82,.45],[706.52,.4]],
+ Na:[[588.995,1],[589.592,.55],[568.82,.08],[615.42,.07],[497.85,.04]],
+ Hg:[[253.65,1],[365.02,.55],[404.66,.45],[435.83,.85],[546.07,1],[576.96,.5],[579.07,.5]],
+ Ne:[[585.25,.6],[588.19,.3],[594.48,.4],[609.61,.4],[614.31,.5],[626.65,.4],[633.44,.45],[640.22,.9],[650.65,.5],[659.90,.3],[692.95,.4],[703.24,.55]]};
+const NAME={H:'الهيدروجين',He:'الهيليوم',Na:'الصوديوم',Hg:'الزئبق',Ne:'النيون'};
+function lineSpec(el,w){const L=LINES[el];return l=>{let s=0;for(const [l0,a] of L){const d=(l-l0)/w;if(Math.abs(d)<6)s+=a*Math.exp(-d*d/2);}return s;};}
+
+
+
+const LET='SPDFGHIKLMN',sub='spdfghik';
+function fr(x){return Number.isInteger(x)?String(x):(Math.round(x*2)+'/2');}
+/* 1. orbitals */
+function lagu(k,a,x){if(k===0)return 1;let L0=1,L1=1+a-x;for(let i=1;i<k;i++){const L2=((2*i+1+a-x)*L1-(i+a)*L0)/(i+1);L0=L1;L1=L2;}return L1;}
+function plm(l,m,x){m=Math.abs(m);let pmm=1;const s=Math.sqrt(Math.max(0,1-x*x));for(let i=1;i<=m;i++)pmm*=-(2*i-1)*s;if(l===m)return pmm;let p1=x*(2*m+1)*pmm;if(l===m+1)return p1;let p0=pmm;for(let ll=m+2;ll<=l;ll++){const p2=((2*ll-1)*x*p1-(ll+m-1)*p0)/(ll-m);p0=p1;p1=p2;}return p1;}
+function Rnl(n,l,r){const rho=2*r/n;return Math.pow(rho,l)*Math.exp(-rho/2)*lagu(n-l-1,2*l+1,rho);}
+let img1=null,key1='';
+function lab1(){const g=$('c1').getContext('2d');g.clearRect(0,0,1200,620);const sn=$('i1n'),sl=$('i1l'),sm=$('i1m');const n=+sn.value;sl.max=n-1;if(+sl.value>n-1)sl.value=n-1;const l=+sl.value;sm.min=-l;sm.max=l;if(Math.abs(+sm.value)>l)sm.value=0;const m=+sm.value;
+ $('o1n').textContent=n;$('o1l').textContent=l+' ('+sub[l]+')';$('o1m').textContent=(m>0?'+':'')+m;
+ const rmax=2.4*n*n+4,N=200,k=n+','+l+','+m;
+ if(k!==key1){key1=k;const vals=new Float32Array(N*N);let mx=0;for(let iy=0;iy<N;iy++)for(let ix=0;ix<N;ix++){const x=(ix/(N-1)*2-1)*rmax,z=(1-iy/(N-1)*2)*rmax,r=Math.hypot(x,z),ct=r>0?z/r:1;const v=Math.pow(Rnl(n,l,r)*plm(l,m,ct),2);vals[iy*N+ix]=v;if(v>mx)mx=v;}
+  const c=document.createElement('canvas');c.width=N;c.height=N;const cg=c.getContext('2d'),id=cg.createImageData(N,N);for(let i=0;i<N*N;i++){const t=Math.pow(vals[i]/mx,0.45);id.data[4*i]=Math.round(255-(255-140)*t);id.data[4*i+1]=Math.round(253-(253-100)*t);id.data[4*i+2]=Math.round(248-(248-20)*t);id.data[4*i+3]=255;}cg.putImageData(id,0,0);img1=c;}
+ g.imageSmoothingEnabled=true;g.drawImage(img1,40,40,540,540);g.strokeStyle=css('--line');g.strokeRect(40,40,540,540);txt(g,'z',310,32,css('--muted'),'center',18);txt(g,'x',592,316,css('--muted'),'left',18);
+ g.fillStyle='#B23A2E';g.beginPath();g.arc(310,310,3,0,7);g.fill();txt(g,'مقطع في المستوى xz — اللون الداكن: احتمال أكبر',310,608,css('--muted'),'center',16,1);
+ /* radial probability */
+ const X=660,W=480,Y0=300,Hh=220;let mv=0;const P=[];for(let i=0;i<=400;i++){const r=i/400*rmax,v=r*r*Math.pow(Rnl(n,l,r),2);P.push(v);mv=Math.max(mv,v);}
+ seg(g,X,Y0,X+W,Y0,css('--muted'),1.5);poly(g,P.map((v,i)=>[X+W*i/400,Y0-Hh*v/mv]),css('--golddk'),3);txt(g,'P(r) = r²|R|²',X+W,Y0-Hh-12,css('--muted'),'right',18);
+ for(let a=0;a<=rmax;a+=(n>2?10:5)){const p=X+W*a/rmax;seg(g,p,Y0,p,Y0+8,css('--muted'),1.5);txt(g,String(a),p,Y0+26,css('--muted'),'center',15);}txt(g,'r / a₀',X+W,Y0+50,css('--muted'),'right',16);
+ /* subshell list */
+ txt(g,'حالات القشرة n = '+n+':',X+W,400,css('--ink'),'right',20,1,1);let y=440;for(let ll=0;ll<n;ll++){txt(g,n+sub[ll]+' : '+(2*ll+1)+' مدارات × 2 = '+(2*(2*ll+1))+' إلكترونات',X+W,y,ll===l?css('--golddk'):css('--muted'),'right',18,1,ll===l);y+=30;}
+ txt(g,'المجموع 2n² = '+2*n*n,X+W,y+6,css('--ink'),'right',18,1,1);
+ $('r1').innerHTML='<b>المدار '+n+sub[l]+'</b> ، m<sub>l</sub> = '+m+'<span class="eq">E<sub>n</sub> = −13.6/n² = '+H(-13.6057/(n*n),4)+' eV</span><span class="eq">|L| = √(l(l+1)) ħ = '+H(Math.sqrt(l*(l+1)),3)+' ħ ,  L<sub>z</sub> = m<sub>l</sub>ħ = '+m+'ħ</span><div class="note">العقد نصف القطرية: n − l − 1 = <b>'+(n-l-1)+'</b> ، العقد الزاوية: l = <b>'+l+'</b><br>في الهيدروجين تتساوى طاقات كل المدارات ذات n نفسه (انحلال قدره n² = '+n*n+'، و2n² مع المغزل).</div>';}
+/* 2. aufbau */
+const SYM=['','H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg','Al','Si','P','S','Cl','Ar','K','Ca','Sc','Ti','V','Cr','Mn','Fe','Co','Ni','Cu','Zn','Ga','Ge','As','Se','Br','Kr'];
+const ORD=[[1,0],[2,0],[2,1],[3,0],[3,1],[4,0],[3,2],[4,1]];
+document.querySelectorAll('[data-z]').forEach(b=>b.onclick=()=>{$('i2z').value=b.dataset.z;dirty=true;});
+function fill(Z){let left=Z;const occ=ORD.map(([n,l])=>{const c=Math.min(left,2*(2*l+1));left-=c;return c;});if(Z===24||Z===29){occ[5]=1;occ[6]=Z===24?5:10;}return occ;}
+function lab2(){const g=$('c2').getContext('2d');g.clearRect(0,0,1200,620);const Z=+$('i2z').value;$('o2z').textContent=Z+' ('+SYM[Z]+')';const occ=fill(Z);
+ const lvy=[560,490,430,370,315,265,240,195],X0=80;let unp=0;
+ ORD.forEach(([n,l],i)=>{const nb=2*l+1,bw=48,x0=X0+[0,0,170,0,170,0,400,170][i]+(i>=5&&i!==6?0:0),y=lvy[i];const xs=[0,0,190,0,190,0,420,190][i]+X0+(n>=3&&l===0?0:0),xo=(l===0?0:0);
+  const xb=X0+(l===0?0:(l===1?190:420))+(n-1)*0;const yy=y;const k=occ[i];
+  for(let b=0;b<nb;b++){const bx=xb+b*bw;g.strokeStyle=css('--ink');g.lineWidth=1.5;g.strokeRect(bx,yy-40,bw-4,40);
+   const up=k>b?1:0,dn=k>nb+b?1:0;if(up&&!dn)unp++;if(up){seg(g,bx+14,yy-6,bx+14,yy-34,'#3D4E8C',3);g.fillStyle='#3D4E8C';g.beginPath();g.moveTo(bx+14,yy-38);g.lineTo(bx+8,yy-28);g.lineTo(bx+20,yy-28);g.fill();}
+   if(dn){seg(g,bx+30,yy-6,bx+30,yy-34,'#B23A2E',3);g.fillStyle='#B23A2E';g.beginPath();g.moveTo(bx+30,yy-2);g.lineTo(bx+24,yy-12);g.lineTo(bx+36,yy-12);g.fill();}}
+  txt(g,n+sub[l],xb+nb*bw+6,yy-14,k?css('--ink'):css('--muted'),'left',20);});
+ txt(g,'↑ الطاقة',40,40,css('--muted'),'left',18,1);txt(g,'ترتيب الملء:',1140,50,css('--golddk'),'right',20,1,1);txt(g,'1s → 2s → 2p → 3s → 3p → 4s → 3d → 4p',1140,82,css('--golddk'),'right',20);
+ const cfg=ORD.map(([n,l],i)=>occ[i]?n+sub[l]+'<sup>'+occ[i]+'</sup>':'').filter(Boolean).join(' ');
+ const big=SYM[Z];g.fillStyle=css('--chip');g.fillRect(860,120,280,200);g.strokeStyle=css('--gold');g.lineWidth=2;g.strokeRect(860,120,280,200);txt(g,big,1000,240,css('--ink'),'center',90,0,1);txt(g,String(Z),875,150,css('--muted'),'left',22);
+ $('r2').innerHTML='<b>'+SYM[Z]+'</b>: <span class="eq" style="display:inline">'+cfg+'</span><div class="note">الإلكترونات المنفردة: <b>'+unp+'</b>'+((Z===24||Z===29)?'<br><b>استثناء:</b> نصف امتلاء 3d (أو امتلاؤه) أكثر استقرارًا، فينتقل إلكترون من 4s إلى 3d.':'')+'<br>مبدأ باولي: لا يتشارك إلكترونان في الأعداد الكمية الأربعة، فكل صندوق يتسع لإلكترونين متعاكسي المغزل.</div>';}
+/* 3. Hund */
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const [l,k]=b.dataset.p.split(',');$('s3l').value=l;$('i3k').max=2*(2*l+1);$('i3k').value=k;dirty=true;});
+function lab3(){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,620);const l=+$('s3l').value,sk=$('i3k');sk.max=2*(2*l+1);if(+sk.value>+sk.max)sk.value=sk.max;const k=+sk.value,nb=2*l+1;$('o3k').textContent=k;
+ const up=Math.min(k,nb),dn=k-up;let ML=0;for(let i=0;i<up;i++)ML+=l-i;for(let i=0;i<dn;i++)ML+=l-i;const S=(up-dn)/2,L=Math.abs(ML),J=k<nb?Math.abs(L-S):(k>nb?L+S:S);
+ const bw=110,x0=600-nb*bw/2,y0=200;for(let b=0;b<nb;b++){const ml=l-b,bx=x0+b*bw;g.strokeStyle=css('--ink');g.lineWidth=2;g.strokeRect(bx,y0,bw-8,90);txt(g,(ml>0?'+':'')+ml,bx+(bw-8)/2,y0+122,css('--muted'),'center',20);
+  if(b<up){seg(g,bx+32,y0+75,bx+32,y0+20,'#3D4E8C',4);g.fillStyle='#3D4E8C';g.beginPath();g.moveTo(bx+32,y0+12);g.lineTo(bx+22,y0+30);g.lineTo(bx+42,y0+30);g.fill();}
+  if(b<dn){seg(g,bx+70,y0+15,bx+70,y0+70,'#B23A2E',4);g.fillStyle='#B23A2E';g.beginPath();g.moveTo(bx+70,y0+80);g.lineTo(bx+60,y0+62);g.lineTo(bx+80,y0+62);g.fill();}}
+ txt(g,'mₗ',x0-20,y0+122,css('--muted'),'right',22);
+ const term=(2*S+1)+LET[L]+fr(J);txt(g,'رمز الحد الأرضي',600,420,css('--muted'),'center',22,1);
+ g.font='700 70px "STIX Two Text", serif';g.fillStyle=css('--ink');g.textAlign='center';g.direction='ltr';const sup=String(2*S+1),bodyW=g.measureText(LET[L]).width;g.fillText(LET[L],600,520);g.font='700 38px "STIX Two Text", serif';g.fillText(sup,600-bodyW/2-14,480);g.fillText(fr(J),600+bodyW/2+22,540);
+ const half=k<nb?'أقل من النصف ⇐ J = |L − S|':(k>nb?'أكثر من النصف ⇐ J = L + S':'نصف ممتلئ ⇐ L = 0 و J = S');
+ $('r3').innerHTML='<div class="note">١) أكبر S: المغازل متوازية ما أمكن ⇐ <b>S = '+fr(S)+'</b><br>٢) أكبر L: ⇐ <span class="eq" style="display:inline">L = |Σm<sub>l</sub>| = '+L+'</span> ('+LET[L]+')<br>٣) المستوى الفرعي '+half+' ⇐ <b>J = '+fr(J)+'</b></div><span class="eq">'+'<sup>'+(2*S+1)+'</sup>'+LET[L]+'<sub>'+fr(J)+'</sub></span>';}
+/* 4. vector coupling */
+document.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{const [a,c]=b.dataset.j.split(',');$('i4a').value=a;$('i4b').value=c;$('i4j').value=10;dirty=true;});
+function lab4(t){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,620);const a=+$('i4a').value,b=+$('i4b').value,sj=$('i4j'),nJ=Math.round(2*Math.min(a,b))+1;sj.max=nJ-1;if(+sj.value>nJ-1)sj.value=nJ-1;const J=Math.abs(a-b)+(+sj.value);
+ $('o4a').textContent=fr(a);$('o4b').textContent=fr(b);$('o4j').textContent=fr(J);
+ const Js=[];for(let j=Math.abs(a-b);j<=a+b+1e-9;j+=1)Js.push(j);const sum=Js.reduce((s,j)=>s+2*j+1,0);
+ const ma=Math.sqrt(a*(a+1)),mb=Math.sqrt(b*(b+1)),mJ=Math.sqrt(J*(J+1)),sc=105,cx=330,cy=470;
+ /* resultant along vertical; angle between j1 and J by cosine rule */
+ const cosA=mJ>0?(ma*ma+mJ*mJ-mb*mb)/(2*ma*mJ):0,A=Math.acos(Math.max(-1,Math.min(1,cosA)));const ph=t*0.9;
+ const jx=ma*Math.sin(A)*Math.cos(ph),jy=ma*Math.cos(A),jz=ma*Math.sin(A)*Math.sin(ph);
+ const P=(x,y,z)=>[cx+sc*(x+0.35*z),cy-sc*(y+0.2*z)];
+ const arrow=(p0,p1,col,w,lb)=>{seg(g,p0[0],p0[1],p1[0],p1[1],col,w);const an=Math.atan2(p1[1]-p0[1],p1[0]-p0[0]);g.fillStyle=col;g.beginPath();g.moveTo(p1[0],p1[1]);g.lineTo(p1[0]-14*Math.cos(an-0.4),p1[1]-14*Math.sin(an-0.4));g.lineTo(p1[0]-14*Math.cos(an+0.4),p1[1]-14*Math.sin(an+0.4));g.fill();txt(g,lb,p1[0]+10,p1[1],col,'left',22);};
+ g.strokeStyle=css('--line');g.lineWidth=1;g.beginPath();for(let k=0;k<=60;k++){const q=k/60*2*Math.PI,p=P(ma*Math.sin(A)*Math.cos(q),jy,ma*Math.sin(A)*Math.sin(q));k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();
+ const O=P(0,0,0),pJ=P(0,mJ,0),p1=P(jx,jy,jz);if(mJ>0)arrow(O,pJ,css('--ink'),4,'J');arrow(O,p1,'#3D4E8C',3,'j₁');arrow(p1,pJ,'#B23A2E',3,'');txt(g,'j₂',(p1[0]+pJ[0])/2+12,(p1[1]+pJ[1])/2,'#B23A2E','left',22);
+ txt(g,mJ>0?'يدور j₁ وj₂ معًا حول J الثابت':'J = 0: المتجهان متعاكسان تمامًا فلا محصلة',cx,600,css('--muted'),'center',17,1);
+ /* list of J */
+ const X=700;txt(g,'قيم J الممكنة:',1140,60,css('--ink'),'right',20,1,1);txt(g,'|j₁ − j₂| ≤ J ≤ j₁ + j₂',1140,92,css('--ink'),'right',20);
+ Js.forEach((j,i)=>{const y=120+i*52+10;g.fillStyle=Math.abs(j-J)<1e-9?'rgba(184,134,43,.18)':css('--chip');g.fillRect(X,y,440,42);txt(g,'J = '+fr(j),X+420,y+28,css('--ink'),'right',20,0,1);txt(g,'عدد الحالات (2J + 1): '+(2*j+1),X+250,y+28,css('--ink'),'right',18,1);});
+ const yb=140+Js.length*52;txt(g,'مجموع الحالات:',X+420,yb+20,css('--golddk'),'right',20,1,1);txt(g,sum+' = ('+(2*a+1)+') × ('+(2*b+1)+')',X+420,yb+52,css('--golddk'),'right',20,0,1);
+ $('r4').innerHTML='<span class="eq">|J| = √(J(J+1)) ħ = '+H(mJ,3)+' ħ</span><span class="eq">J = '+Js.map(fr).join(', ')+'</span><div class="note">عدد الحالات لا يتغير بالازدواج: هو '+sum+' قبل الجمع وبعده، وإنما يُعاد تنظيمها في مستويات J.</div>';}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4};const ANIM=new Set(["t4"]);let T0=performance.now();
+function loop(t){if(dirty||ANIM.has(active)){dirty=false;LABS[active]((t-T0)/1000);}requestAnimationFrame(loop);}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>dirty=true);
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 9 — Digital Holographic Interferometry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&family=Source+Serif+4:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0B1E3A; --teal:#0E8C9A; --coral:#E8604C; --tint:#E3F4F6; --bg:#F4F8FA; --grey:#5A6B7F; --line:#C9D6E0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--navy); font-family:"Source Sans 3", Calibri, "Segoe UI", Arial, sans-serif; font-size:16px; }
+  header { background:var(--navy); color:#fff; padding:18px 22px 14px; position:relative; overflow:hidden; }
+  header .rings { position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%;
+    background: repeating-radial-gradient(circle, rgba(70,200,215,.55) 0 3px, transparent 3px 14px); opacity:.55; }
+  header h1 { font-family:"Source Serif 4", Cambria, Georgia, serif; margin:0; font-size:23px; }
+  header p { margin:4px 0 0; color:#BFE6EA; font-size:14.5px; }
+  nav { display:flex; gap:6px; flex-wrap:wrap; padding:12px 22px 0; }
+  nav button { border:1px solid var(--line); background:#fff; color:var(--navy); padding:9px 14px; border-radius:10px 10px 0 0; font:inherit; font-weight:600; cursor:pointer; }
+  nav button.on { background:var(--teal); color:#fff; border-color:var(--teal); }
+  main { padding:0 22px 26px; }
+  .exp { display:none; background:#fff; border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; }
+  .exp.on { display:block; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap:16px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  nav { display:none; } .exp { border-radius:12px; margin-top:12px; } header { padding:12px 18px 10px; } header h1 { font-size:19px; } main { padding:0 12px 14px; } footer { display:none; }
+  h2 { font-family:"Source Serif 4", Cambria, Georgia, serif; font-size:19px; margin:0 0 6px; }
+  .lead { color:var(--grey); margin:0 0 12px; font-size:14.5px; }
+  .panel { background:var(--tint); border-radius:10px; padding:12px; }
+  .ctl { margin-bottom:11px; }
+  .ctl label { display:flex; justify-content:space-between; font-size:14px; font-weight:600; }
+  .ctl label span { color:var(--teal); font-variant-numeric: tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--teal); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 10px; }
+  .presets button, .seg button { border:1px solid var(--teal); background:#fff; color:var(--teal); border-radius:16px; padding:4px 11px; font:inherit; font-size:13.5px; cursor:pointer; }
+  .presets button:hover, .seg button.on { background:var(--teal); color:#fff; }
+  .seg { display:flex; gap:6px; margin-bottom:10px; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(135px,1fr)); gap:8px; margin:10px 0; }
+  .card { border:1px solid var(--line); border-radius:9px; padding:7px 9px; background:#fff; }
+  .card b { display:block; font-size:12.5px; color:var(--grey); font-weight:600; }
+  .card span { font-size:18px; font-weight:600; font-variant-numeric: tabular-nums; }
+  .card.ok span { color:var(--teal); } .card.th span { color:var(--coral); }
+  canvas { width:100%; display:block; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .cv-title { font-size:13.5px; font-weight:600; color:var(--grey); margin:10px 0 4px; }
+  .eq { font-family:"Source Serif 4", Cambria, Georgia, serif; background:#fff; border-left:3px solid var(--teal); padding:6px 10px; margin:8px 0; font-size:15px; }
+  .tasks { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .tasks h3 { font-size:15.5px; margin:0 0 4px; }
+  .tasks ol { margin:0; padding-left:20px; font-size:14.5px; } .tasks li { margin:3px 0; }
+  .ar { direction:rtl; text-align:right; font-family:"Noto Naskh Arabic", "Traditional Arabic", Tahoma, serif; background:#FFF6F3; border-right:4px solid var(--coral); border-radius:8px; padding:9px 12px; margin-top:12px; font-size:15.5px; line-height:1.8; }
+  .ar b { color:var(--coral); }
+  footer { color:var(--grey); font-size:13px; padding:0 22px 18px; }
+  .note { font-size:13px; color:var(--grey); }
+</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<header><div class="rings"></div>
+  <h1>Virtual Lab · Chapter 9 — Digital Holographic Interferometry</h1>
+  <p>Interferometric Systems and Their Applications (203673-3) · MSc in Physics · Prof. Najm Al-Hosiny</p>
+</header>
+<nav>
+  <button class="on" data-t="e1">1 · Deformation by DHI</button>
+  <button data-t="e2">2 · Sensitivity vector and shape</button>
+  <button data-t="e3">3 · Temperature by phase-shifting DHI</button>
+</nav>
+<main>
+<!-- ================= Experiment 1 ================= -->
+<section class="exp on" id="e1">
+  <h2>Experiment 1 — Deformation by digital holographic interferometry</h2>
+  <p class="lead">Two reconstructed speckle fields of a centrally loaded plate, Γ₁ (before) and Γ₂ (after). The interference phase is Δφ = arg(Γ₂Γ₁*); a sine/cosine filter removes the speckle noise; unwrapping and w = λΔφ/4π give the out-of-plane displacement (normal illumination and observation, λ = 633 nm). An in-plane shift of the speckles between the states decorrelates them.</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Central deflection w₀ <span id="e1wv"></span></label><input type="range" id="e1w" min="0.1" max="3" step="0.01" value="1"></div>
+      <div class="ctl"><label>Filter window (pixels) <span id="e1kv"></span></label><input type="range" id="e1k" min="1" max="11" step="2" value="5"></div>
+      <div class="ctl"><label>Speckle shift between states <span id="e1sv"></span></label><input type="range" id="e1s" min="0" max="1.5" step="0.01" value="0"></div>
+      <div class="ctl"><label>Additive noise <span id="e1nv"></span></label><input type="range" id="e1n" min="0" max="0.6" step="0.01" value="0.15"></div>
+      <div class="eq">Δφ = arg(Γ₂Γ₁*), w = λΔφ/4π<br>Δφ_f = atan2(⟨sin Δφ⟩, ⟨cos Δφ⟩)<br>Q = intensity-weighted |⟨exp[i(Δφ − Δφ_f)]⟩|</div>
+    </div>
+    <div>
+      <div class="cards" id="e1cards"></div>
+      <div class="cv-title">|Γ₁| (speckle) · raw Δφ · filtered Δφ · displacement w</div>
+      <canvas id="e1img" height="250"></canvas>
+      <div class="cv-title">Central profile: true w (dashed) and DHI result</div>
+      <canvas id="e1plot" height="200"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Compare the error with filter windows 1, 3, 7 and 11. When does a large window start to blur the fringes near the edge?</li>
+    <li>Increase w₀ until the result breaks. How many fringes per window does that correspond to?</li>
+    <li>Move the speckle shift from 0 to 1 speckle. Follow Q: at which shift is the phase lost?</li>
+    <li>Why does each state reconstruct a perfect speckle image even when Q is almost zero?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> طور البقع العشوائي لا يهمنا، لأنه نفسه في الحالتين فيُحذف عند ضرب Γ₂ في مرافق Γ₁. لكن إذا انزاحت البقع بين الحالتين لم يعد الطوران متطابقين، فيضيع طور التداخل.</div>
+</section>
+
+<!-- ================= Experiment 2 ================= -->
+<section class="exp" id="e2">
+  <h2>Experiment 2 — Sensitivity vector, 3-D displacement and two-wavelength contouring</h2>
+  <p class="lead">Δφ = (2π/λ) S·d with S = e_o − e_i. Three illuminations give three equations for (u, v, w). Shape: two wavelengths give the synthetic wavelength Λ = λ₁λ₂/|λ₁ − λ₂|; hierarchical unwrapping uses the coarse synthetic height to pick the fringe order of λ₁.</p>
+  <div class="seg" id="e2seg"><button class="on" data-m="d">3-D displacement</button><button data-m="c">Two-wavelength contouring</button></div>
+  <div class="grid">
+    <div class="panel">
+      <div id="e2cd">
+        <div class="ctl"><label>Illumination angle α <span id="e2av"></span></label><input type="range" id="e2a" min="5" max="80" step="1" value="30"></div>
+        <div class="ctl"><label>Phase noise σ_φ <span id="e2sv"></span></label><input type="range" id="e2s" min="0.01" max="0.3" step="0.005" value="0.05"></div>
+        <div class="eq">λ = 532 nm, azimuths 0°, 120°, 240°<br>d = (λ/2π) M⁻¹Δφ<br>σ_d = (λσ_φ/2π)√diag[(MᵀM)⁻¹]</div>
+      </div>
+      <div id="e2cc" style="display:none">
+        <div class="ctl"><label>λ₁ <span id="e2l1v"></span></label><input type="range" id="e2l1" min="600" max="640" step="0.5" value="633"></div>
+        <div class="ctl"><label>λ₂ <span id="e2l2v"></span></label><input type="range" id="e2l2" min="580" max="632" step="0.5" value="612"></div>
+        <div class="ctl"><label>Phase noise per wavelength <span id="e2pv"></span></label><input type="range" id="e2p" min="0" max="0.1" step="0.001" value="0.02"></div>
+        <div class="eq">Λ = λ₁λ₂/|λ₁ − λ₂|, h = ΛΔφ_syn/4π<br>m = round[(4πh_s/λ₁ − φ₁)/2π]<br>Safe if 3σ_h < λ₁/4</div>
+      </div>
+    </div>
+    <div>
+      <div class="cards" id="e2cards"></div>
+      <div class="cv-title" id="e2t1"></div>
+      <canvas id="e2plot" height="260"></canvas>
+      <div class="cv-title" id="e2t2"></div>
+      <canvas id="e2plot2" height="200"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>3-D: at α = 30° read the predicted and simulated errors of u, v, w. Why is w measured about five times better?</li>
+    <li>3-D: which α minimises the in-plane error? What happens to the out-of-plane error?</li>
+    <li>Contouring: with 633/612 nm and σ = 0.02 rad, are there wrong orders? Raise σ until they appear and compare with 3σ_h = λ₁/4.</li>
+    <li>Contouring: bring λ₂ closer to λ₁. Range grows — what happens to reliability?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> DHI يقيس مركّبة الإزاحة في اتجاه متجه الحساسية فقط. لذلك نحتاج ثلاثة اتجاهات إضاءة للإزاحة الكاملة. وفي قياس الشكل، يعطي الطول الموجي الاصطناعي المدى، والطول الموجي الحقيقي يعطي الدقة.</div>
+</section>
+
+<!-- ================= Experiment 3 ================= -->
+<section class="exp" id="e3">
+  <h2>Experiment 3 — Phase-shifting DHI of a hot-air plume</h2>
+  <p class="lead">A slab of air of length L along the beam is heated. Gladstone–Dale: n − 1 = (n₀ − 1)T₀/T, so the phase Δφ = (2π/λ)L(n − n₀) falls as the gas warms. Four phase-shifted frames (8-bit, with noise) give the phase of the cold and hot states; their difference gives the temperature field (λ = 633 nm, T₀ = 293 K, n₀ − 1 = 2.92 × 10⁻⁴).</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="ctl"><label>Peak temperature rise ΔT_max <span id="e3tv"></span></label><input type="range" id="e3t" min="5" max="200" step="1" value="60"></div>
+      <div class="ctl"><label>Path length L <span id="e3lv"></span></label><input type="range" id="e3l" min="5" max="60" step="1" value="20"></div>
+      <div class="ctl"><label>Camera noise (grey levels) <span id="e3nv"></span></label><input type="range" id="e3n" min="0" max="10" step="0.5" value="2"></div>
+      <div class="presets"><button id="e3lin">Conversion: exact Gladstone–Dale</button></div>
+      <div class="eq">|dΔφ/dT| = 2πL(n₀ − 1)/(λT₀) at T₀<br>T = (n₀ − 1)T₀ / (n₀ − 1 + λΔφ/2πL)</div>
+    </div>
+    <div>
+      <div class="cards" id="e3cards"></div>
+      <div class="cv-title">Hot-state frame 1 · wrapped Δφ · recovered temperature (°C) · error (K)</div>
+      <canvas id="e3img" height="250"></canvas>
+      <div class="cv-title">Temperature along the central row: true (dashed) and measured</div>
+      <canvas id="e3plot" height="200"></canvas>
+    </div>
+  </div>
+  <div class="tasks"><h3>Try this</h3><ol>
+    <li>Read the phase sensitivity and the temperature change per fringe. Check 2πL(n₀ − 1)/(λT₀).</li>
+    <li>Double L. How do the sensitivity and the temperature error change?</li>
+    <li>Raise ΔT_max to 150 K and switch to the linear conversion. How large is the error of the linear law at the peak?</li>
+    <li>Why is the result an average along the beam, and what is needed for a true 3-D temperature field?</li>
+  </ol></div>
+  <div class="ar"><b>الحدس الفيزيائي:</b> الهواء الساخن أخف كثافة، فيقل معامل انكساره ويقصر المسار البصري. وإزاحة الطور تعطي الطور مباشرة عند كل بكسل، فنحوّله إلى درجة حرارة.</div>
+</section>
+</main>
+
+<footer>All results are computed in your browser from the equations of Chapter 9 (Schnars et al., Digital Holography and Wavefront Sensing, 2nd ed.). The MATLAB versions of these experiments are Labs 9.1–9.3.</footer>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const C = { navy:'#0B1E3A', teal:'#0E8C9A', coral:'#E8604C', grey:'#5A6B7F', line:'#C9D6E0', gold:'#D99A1E' };
+const fmt = (v, d = 3) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : (+v.toFixed(d)).toString();
+function lenStr(m) { const a = Math.abs(m); if (a >= 1) return fmt(m, 3) + ' m'; if (a >= 1e-3) return fmt(m * 1e3, 3) + ' mm'; if (a >= 1e-6) return fmt(m * 1e6, 3) + ' µm'; return fmt(m * 1e9, 3) + ' nm'; }
+
+// ---- canvas helpers ----
+function prep(cv) {
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.getAttribute('height');
+  if (cv.width !== Math.round(w * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.clearRect(0, 0, w, h); return { g, w, h };
+}
+function nice(span) { const p = Math.pow(10, Math.floor(Math.log10(span / 5))); const m = span / 5 / p; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; }
+function plot(cv, series, o) {
+  const { g, w, h } = prep(cv); const L = 56, R = 12, T = 10, B = 38;
+  const x0 = o.xmin, x1 = o.xmax, y0 = o.ymin, y1 = o.ymax;
+  const X = x => L + (x - x0) / (x1 - x0) * (w - L - R), Y = y => h - B - (y - y0) / (y1 - y0) * (h - T - B);
+  g.font = '12px "Source Sans 3", Arial'; g.fillStyle = C.grey; g.strokeStyle = '#E6EDF2'; g.lineWidth = 1;
+  const dx = nice(x1 - x0), dy = nice(y1 - y0);
+  for (let t = Math.ceil(x0 / dx) * dx; t <= x1 + 1e-12; t += dx) { g.beginPath(); g.moveTo(X(t), T); g.lineTo(X(t), h - B); g.stroke(); g.textAlign = 'center'; g.fillText(+(Math.abs(t) < dx * 1e-6 ? 0 : t).toPrecision(6), X(t), h - B + 15); }
+  for (let t = Math.ceil(y0 / dy) * dy; t <= y1 + 1e-12; t += dy) { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(w - R, Y(t)); g.stroke(); g.textAlign = 'right'; g.fillText(+(Math.abs(t) < dy * 1e-6 ? 0 : t).toPrecision(6), L - 5, Y(t) + 4); }
+  g.strokeStyle = C.grey; g.strokeRect(L, T, w - L - R, h - T - B);
+  g.fillStyle = C.navy; g.textAlign = 'center'; g.fillText(o.xlabel || '', L + (w - L - R) / 2, h - 6);
+  g.save(); g.translate(13, T + (h - T - B) / 2); g.rotate(-Math.PI / 2); g.fillText(o.ylabel || '', 0, 0); g.restore();
+  g.save(); g.beginPath(); g.rect(L, T, w - L - R, h - T - B); g.clip();
+  for (const s of series) {
+    g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = s.width || 1.6; g.setLineDash(s.dash || []);
+    if (s.points) { for (let i = 0; i < s.x.length; i++) { g.beginPath(); g.arc(X(s.x[i]), Y(s.y[i]), s.r || 3.5, 0, 7); s.hollow ? g.stroke() : g.fill(); } }
+    else { g.beginPath(); for (let i = 0; i < s.x.length; i++) { const px = X(s.x[i]), py = Y(s.y[i]); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); }
+  }
+  g.restore(); g.setLineDash([]);
+  if (o.legend) { let ly = o.legendBottom ? h - B - 10 - 16 * (series.filter(s => s.label).length - 1) : T + 8; g.textAlign = 'left'; for (const s of series) { if (!s.label) continue; g.fillStyle = s.color; g.fillRect(w - R - 190, ly - 5, 14, 3); g.fillStyle = C.navy; g.fillText(s.label, w - R - 170, ly); ly += 16; } }
+}
+function wl2rgb(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = -(nm - 440) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = -(nm - 510) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = -(nm - 645) / 65; } else r = 1;
+  const f = nm < 420 ? 0.3 + 0.7 * (nm - 380) / 40 : nm > 700 ? 0.3 + 0.7 * (780 - nm) / 80 : 1;
+  return [r * f, g * f, b * f];
+}
+function image(cv, nx, ny, fn, rgb) {   // fn(i,j) in [0,1]
+  const { g, w, h } = prep(cv); const im = g.createImageData(nx, ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const v = Math.max(0, Math.min(1, fn(i, j))), k = 4 * (j * nx + i);
+    im.data[k] = 255 * v * rgb[0]; im.data[k + 1] = 255 * v * rgb[1]; im.data[k + 2] = 255 * v * rgb[2]; im.data[k + 3] = 255; }
+  const tmp = document.createElement('canvas'); tmp.width = nx; tmp.height = ny; tmp.getContext('2d').putImageData(im, 0, 0);
+  g.imageSmoothingEnabled = true; return { g, w, h, tmp };
+}
+const linspace = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * i / (n - 1));
+
+// ---- tabs ----
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.exp').forEach(s => s.classList.toggle('on', s.id === b.dataset.t));
+  draw();
+});
+function cards(id, list) { $(id).innerHTML = list.map(c => '<div class="card ' + (c[2] || '') + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join(''); }
+function segs(id, cb) { document.querySelectorAll('#' + id + ' button').forEach(b => b.onclick = () => { document.querySelectorAll('#' + id + ' button').forEach(x => x.classList.toggle('on', x === b)); cb(b.dataset.m); draw(); }); }
+let seed = 7; const rnd = () => { seed = (seed + 0x6D2B79F5) | 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return (((t ^ (t >>> 14)) >>> 0) + 0.5) / 4294967296; };
+const randn = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+// ---- FFT (radix 2, in place) ----
+function fft(re, im, inv) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) { let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+  for (let len = 2; len <= n; len <<= 1) { const a = (inv ? 2 : -2) * Math.PI / len, wr = Math.cos(a), wi = Math.sin(a);
+    for (let i = 0; i < n; i += len) { let cr = 1, ci = 0; for (let k = 0; k < len / 2; k++) { const ur = re[i + k], ui = im[i + k], vr = re[i + k + len / 2] * cr - im[i + k + len / 2] * ci, vi = re[i + k + len / 2] * ci + im[i + k + len / 2] * cr;
+      re[i + k] = ur + vr; im[i + k] = ui + vi; re[i + k + len / 2] = ur - vr; im[i + k + len / 2] = ui - vi; const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t; } } }
+  if (inv) for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+}
+function fft2(re, im, n, inv) {
+  const r = new Float64Array(n), q = new Float64Array(n);
+  for (let y = 0; y < n; y++) { for (let x = 0; x < n; x++) { r[x] = re[y * n + x]; q[x] = im[y * n + x]; } fft(r, q, inv); for (let x = 0; x < n; x++) { re[y * n + x] = r[x]; im[y * n + x] = q[x]; } }
+  for (let x = 0; x < n; x++) { for (let y = 0; y < n; y++) { r[y] = re[y * n + x]; q[y] = im[y * n + x]; } fft(r, q, inv); for (let y = 0; y < n; y++) { re[y * n + x] = r[y]; im[y * n + x] = q[y]; } }
+}
+// colour maps and multi-panel images
+function jet(v) { v = Math.max(0, Math.min(1, v)); return [Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 3))), Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 2))), Math.max(0, Math.min(1, 1.5 - Math.abs(4 * v - 1)))]; }
+function panels(cv, list) {   // list of {data, n, min, max, map:'gray'|'jet', title, circle:{cx,cy,r}}
+  const { g, w, h } = prep(cv); const k = list.length, gap = 10, top = 20, s = Math.min((w - gap * (k - 1)) / k, h - top);
+  const x0 = (w - (k * s + gap * (k - 1))) / 2;
+  list.forEach((p, i) => {
+    const tmp = document.createElement('canvas'); tmp.width = p.n; tmp.height = p.n; const c = tmp.getContext('2d'), im = c.createImageData(p.n, p.n);
+    for (let j = 0; j < p.n * p.n; j++) { const v = (p.data[j] - p.min) / (p.max - p.min || 1); const col = p.map === 'jet' ? jet(v) : [v, v, v].map(z => Math.max(0, Math.min(1, z))); im.data[4 * j] = 255 * col[0]; im.data[4 * j + 1] = 255 * col[1]; im.data[4 * j + 2] = 255 * col[2]; im.data[4 * j + 3] = 255; }
+    c.putImageData(im, 0, 0); const xx = x0 + i * (s + gap); g.imageSmoothingEnabled = false; g.drawImage(tmp, xx, top, s, s);
+    g.fillStyle = C.navy; g.font = '12.5px "Source Sans 3", Arial'; g.textAlign = 'center'; g.fillText(p.title, xx + s / 2, 14);
+    if (p.circle) { g.strokeStyle = '#FFD24D'; g.lineWidth = 1.5; g.beginPath(); g.arc(xx + p.circle.cx * s, top + p.circle.cy * s, p.circle.r * s, 0, 7); g.stroke(); }
+  });
+}
+
+const N9 = 128;
+function smoothField(n, corr) { // complex circular Gaussian speckle with correlation ~corr px, via FFT low-pass
+  const re = Float64Array.from({ length: n * n }, () => randn()), im = Float64Array.from({ length: n * n }, () => randn()); fft2(re, im, n, false);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const fx = (x < n / 2 ? x : x - n) / n, fy = (y < n / 2 ? y : y - n) / n; const g = Math.exp(-(fx * fx + fy * fy) * (Math.PI * corr) ** 2); re[y * n + x] *= g; im[y * n + x] *= g; }
+  fft2(re, im, n, true); let s = 0; for (let i = 0; i < n * n; i++) s += re[i] ** 2 + im[i] ** 2; s = Math.sqrt(s / (n * n)); return { re: re.map(v => v / s), im: im.map(v => v / s) };
+}
+function shiftField(f, n, sx) { const re = Float64Array.from(f.re), im = Float64Array.from(f.im); fft2(re, im, n, false);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const fx = (x < n / 2 ? x : x - n) / n, p = -2 * Math.PI * fx * sx, c = Math.cos(p), s = Math.sin(p), k = y * n + x, r = re[k] * c - im[k] * s; im[k] = re[k] * s + im[k] * c; re[k] = r; }
+  fft2(re, im, n, true); return { re, im }; }
+function boxMean(a, n, k) { if (k <= 1) return Float64Array.from(a); const r = (k - 1) / 2, o = new Float64Array(n * n);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { let s = 0, c = 0; for (let j = -r; j <= r; j++) for (let i = -r; i <= r; i++) { const xx = x + i, yy = y + j; if (xx < 0 || yy < 0 || xx >= n || yy >= n) continue; s += a[yy * n + xx]; c++; } o[y * n + x] = s / c; } return o; }
+function unwrapC(w, n) { const c = n >> 1, wrap = d => d - 2 * Math.PI * Math.round(d / (2 * Math.PI)), out = new Float64Array(n * n); out[c * n + c] = w[c * n + c];
+  for (let y = c + 1; y < n; y++) out[y * n + c] = out[(y - 1) * n + c] + wrap(w[y * n + c] - w[(y - 1) * n + c]);
+  for (let y = c - 1; y >= 0; y--) out[y * n + c] = out[(y + 1) * n + c] + wrap(w[y * n + c] - w[(y + 1) * n + c]);
+  for (let y = 0; y < n; y++) { for (let x = c + 1; x < n; x++) out[y * n + x] = out[y * n + x - 1] + wrap(w[y * n + x] - w[y * n + x - 1]); for (let x = c - 1; x >= 0; x--) out[y * n + x] = out[y * n + x + 1] + wrap(w[y * n + x] - w[y * n + x + 1]); }
+  return out; }
+
+function unwrapQ(w, q, n) { // quality-guided flood fill from the best pixel near the centre
+  const out = new Float64Array(n * n), done = new Uint8Array(n * n), heap = [], wrap = d => d - 2 * Math.PI * Math.round(d / (2 * Math.PI));
+  const push = (qq, i) => { heap.push([qq, i]); let k = heap.length - 1; while (k > 0) { const p = (k - 1) >> 1; if (heap[p][0] >= heap[k][0]) break; [heap[p], heap[k]] = [heap[k], heap[p]]; k = p; } };
+  const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let k = 0; for (;;) { const l = 2 * k + 1, r = l + 1; let m = k; if (l < heap.length && heap[l][0] > heap[m][0]) m = l; if (r < heap.length && heap[r][0] > heap[m][0]) m = r; if (m === k) break; [heap[m], heap[k]] = [heap[k], heap[m]]; k = m; } } return top; };
+  const c = (n >> 1) * n + (n >> 1); out[c] = w[c]; done[c] = 1;
+  const nb = i => { const x = i % n, y = (i / n) | 0, r = []; if (x > 0) r.push(i - 1); if (x < n - 1) r.push(i + 1); if (y > 0) r.push(i - n); if (y < n - 1) r.push(i + n); return r; };
+  const add = i => { for (const j of nb(i)) if (!done[j]) { done[j] = 2; push(q[j], j); } };
+  add(c);
+  while (heap.length) { const [, j] = pop(); let ref = -1, bq = -1; for (const k of nb(j)) if (done[k] === 1 && q[k] > bq) { bq = q[k]; ref = k; } out[j] = out[ref] + wrap(w[j] - w[ref]); done[j] = 1; add(j); }
+  return out;
+}
+// ================= Experiment 1 =================
+let G1 = null;
+function e1() {
+  const n = N9, lam = 633e-9, w0 = +$('e1w').value * 1e-6, k = +$('e1k').value, sh = +$('e1s').value, ns = +$('e1n').value, corr = 2.0;
+  $('e1wv').textContent = (w0 * 1e6).toFixed(2) + ' µm'; $('e1kv').textContent = k + ' × ' + k; $('e1sv').textContent = sh.toFixed(2) + ' speckle'; $('e1nv').textContent = ns.toFixed(2);
+  if (!G1) { seed = 41; G1 = smoothField(n, corr); }
+  const Rp = 0.42 * n, wTrue = new Float64Array(n * n);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const r = Math.hypot(x - n / 2, y - n / 2) / Rp; wTrue[y * n + x] = r < 1 ? w0 * (1 - r * r) ** 2 : 0; }
+  const G2s = shiftField(G1, n, sh * 2 * corr);   // speckle size ≈ 2 corr pixels
+  seed = 97; const g1 = { re: G1.re.map(v => v + ns * randn()), im: G1.im.map(v => v + ns * randn()) };
+  const g2 = { re: new Float64Array(n * n), im: new Float64Array(n * n) };
+  for (let i = 0; i < n * n; i++) { const p = 4 * Math.PI * wTrue[i] / lam, c = Math.cos(p), s = Math.sin(p); g2.re[i] = G2s.re[i] * c - G2s.im[i] * s + ns * randn(); g2.im[i] = G2s.re[i] * s + G2s.im[i] * c + ns * randn(); }
+  const raw = new Float64Array(n * n); for (let i = 0; i < n * n; i++) { const r = g2.re[i] * g1.re[i] + g2.im[i] * g1.im[i], q = g2.im[i] * g1.re[i] - g2.re[i] * g1.im[i]; raw[i] = Math.atan2(q, r); }
+  // sine/cosine filter of the interference phase (window k × k)
+  const ms = boxMean(raw.map(Math.sin), n, k), mc = boxMean(raw.map(Math.cos), n, k), filt = ms.map((v, i) => Math.atan2(v, mc[i]));
+  // quality: coherence of the residual phase raw − filtered, weighted by the speckle intensity
+  const qr = new Float64Array(n * n), qi = new Float64Array(n * n), qw = new Float64Array(n * n);
+  for (let i = 0; i < n * n; i++) { const m = Math.hypot(g1.re[i], g1.im[i]) * Math.hypot(g2.re[i], g2.im[i]), d = raw[i] - filt[i]; qr[i] = m * Math.cos(d); qi[i] = m * Math.sin(d); qw[i] = m; }
+  const Qa = boxMean(qr, n, 7), Qb = boxMean(qi, n, 7), Qc = boxMean(qw, n, 7), Q = Qa.map((v, i) => Math.hypot(v, Qb[i]) / (Qc[i] || 1));
+  const un = unwrapQ(filt, Q, n), wm = un.map(p => lam * p / (4 * Math.PI));
+  // remove offset using the clamped rim (w = 0 just outside the plate)
+  let off = 0, c = 0, se = 0, cq = 0, qs = 0; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const r = Math.hypot(x - n / 2, y - n / 2) / Rp; if (r > 1.02 && r < 1.12) { off += wm[y * n + x]; c++; } } off /= c;
+  c = 0; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const r = Math.hypot(x - n / 2, y - n / 2) / Rp; if (r < 0.68) { se += (wm[y * n + x] - off - wTrue[y * n + x]) ** 2; c++; qs += Q[y * n + x]; } }
+  const rms = Math.sqrt(se / c);
+  const amp = G1.re.map((v, i) => Math.hypot(v, G1.im[i]));
+  panels($('e1img'), [{ data: amp, n, min: 0, max: 2.5, title: '|Γ₁|' }, { data: raw, n, min: -Math.PI, max: Math.PI, title: 'raw Δφ' }, { data: filt, n, min: -Math.PI, max: Math.PI, title: 'filtered Δφ' }, { data: wm.map(v => (v - off) * 1e6), n, min: 0, max: w0 * 1e6, map: 'jet', title: 'w [µm]' }]);
+  cards('e1cards', [['RMS error (r < 0.68R)', fmt(rms * 1e9, 3) + ' nm', 'ok'], ['Fringes 2w₀/λ', fmt(2 * w0 / lam, 3)], ['Mean quality Q', (qs / c).toFixed(3), 'th'], ['One fringe', lenStr(lam / 2)]]);
+  const xs = Array.from({ length: n }, (_, x) => x), yc = n / 2;
+  plot($('e1plot'), [{ x: xs, y: xs.map(x => wTrue[yc * n + x] * 1e6), color: C.navy, dash: [6, 4], width: 1.5 }, { x: xs, y: xs.map(x => (wm[yc * n + x] - off) * 1e6), color: C.coral, width: 1.5 }], { xmin: 0, xmax: n - 1, ymin: -0.3 * w0 * 1e6, ymax: 1.3 * w0 * 1e6, xlabel: 'x  [pixels]', ylabel: 'w  [µm]' });
+}
+
+// ================= Experiment 2 =================
+let m2 = 'd'; segs('e2seg', m => { m2 = m; $('e2cd').style.display = m === 'd' ? '' : 'none'; $('e2cc').style.display = m === 'c' ? '' : 'none'; });
+function inv3(M) { const [a, b, c] = M[0], [d, e, f] = M[1], [g, h, i] = M[2]; const A = e * i - f * h, B = -(d * i - f * g), Cc = d * h - e * g, det = a * A + b * B + c * Cc;
+  return [[A / det, -(b * i - c * h) / det, (b * f - c * e) / det], [B / det, (a * i - c * g) / det, -(a * f - c * d) / det], [Cc / det, -(a * h - b * g) / det, (a * e - b * d) / det]]; }
+function Smat(al) { return [0, 120, 240].map(az => { const a = az * Math.PI / 180; return [Math.sin(al) * Math.cos(a), Math.sin(al) * Math.sin(a), 1 + Math.cos(al)]; }); }
+function predErr(al, lam, s) { const M = Smat(al), MtM = [0, 1, 2].map(i => [0, 1, 2].map(j => M.reduce((t, r) => t + r[i] * r[j], 0))), Iv = inv3(MtM); return [0, 1, 2].map(i => lam * s / (2 * Math.PI) * Math.sqrt(Iv[i][i])); }
+function e2() {
+  if (m2 === 'd') {
+    const al = +$('e2a').value * Math.PI / 180, s = +$('e2s').value, lam = 532e-9; $('e2av').textContent = $('e2a').value + '°'; $('e2sv').textContent = s.toFixed(3) + ' rad';
+    const pe = predErr(al, lam, s), M = Smat(al), Mi = inv3(M), d0 = [0.2e-6, -0.1e-6, 0.5e-6];
+    seed = 13; const K = 3000, err = [0, 0, 0];
+    for (let t = 0; t < K; t++) { const ph = M.map(r => 2 * Math.PI / lam * (r[0] * d0[0] + r[1] * d0[1] + r[2] * d0[2]) + s * randn()); for (let i = 0; i < 3; i++) { const di = lam / (2 * Math.PI) * (Mi[i][0] * ph[0] + Mi[i][1] * ph[1] + Mi[i][2] * ph[2]); err[i] += (di - d0[i]) ** 2; } }
+    const sim = err.map(v => Math.sqrt(v / K));
+    cards('e2cards', [['S₁ (azimuth 0°)', '(' + M[0].map(v => v.toFixed(3)).join(', ') + ')'], ['Predicted σ_u, σ_v, σ_w', pe.map(v => (v * 1e9).toFixed(2)).join(', ') + ' nm', 'th'], ['Simulated (3000 trials)', sim.map(v => (v * 1e9).toFixed(2)).join(', ') + ' nm', 'ok']]);
+    const A = linspace(5, 80, 200), P = A.map(a => predErr(a * Math.PI / 180, lam, s));
+    $('e2t1').textContent = 'Predicted error versus illumination angle — dots: simulated at the current α';
+    plot($('e2plot'), [{ x: A, y: P.map(p => p[0] * 1e9), color: C.teal, width: 2, label: 'in-plane u, v' }, { x: A, y: P.map(p => p[2] * 1e9), color: C.coral, width: 2, dash: [6, 4], label: 'out-of-plane w' }, { x: [al * 180 / Math.PI, al * 180 / Math.PI], y: [sim[0] * 1e9, sim[2] * 1e9], color: C.navy, points: true, r: 5 }],
+      { xmin: 5, xmax: 80, ymin: 0, ymax: Math.min(Math.max(...P.map(p => p[0])) * 1e9, 8 * pe[0] * 1e9) * 1.05, xlabel: 'Illumination angle α  [deg]', ylabel: 'rms error  [nm]', legend: true });
+    $('e2t2').textContent = 'Phase sensitivity per µm of displacement for each illumination: components of (2π/λ)S';
+    const comp = ['u', 'v', 'w']; const ser = [0, 1, 2].map(k => ({ x: [k + 0.75, k + 1, k + 1.25], y: M.map(r => 2 * Math.PI / lam * r[k] * 1e-6), color: [C.teal, C.gold, C.coral][k], points: true, r: 6, label: comp[k] + ' (three illuminations)' }));
+    plot($('e2plot2'), ser, { xmin: 0.5, xmax: 3.5, ymin: -10, ymax: 35, xlabel: 'Displacement component  u · v · w', ylabel: 'rad per µm', legend: true });
+  } else {
+    const l1 = +$('e2l1').value * 1e-9, l2 = +$('e2l2').value * 1e-9, sp = +$('e2p').value; $('e2l1v').textContent = (l1 * 1e9).toFixed(1) + ' nm'; $('e2l2v').textContent = (l2 * 1e9).toFixed(1) + ' nm'; $('e2pv').textContent = sp.toFixed(3) + ' rad';
+    const Lam = l1 * l2 / Math.abs(l1 - l2), x = linspace(0, 10e-3, 1000);
+    const h = x.map(v => Math.min(0.5e-6 + 2e-6 * Math.floor(v / 2e-3) + 0.3e-6 * Math.sin(2 * Math.PI * v / 4e-3), 0.48 * Lam));
+    seed = 17; const wrap = p => p - 2 * Math.PI * Math.floor(p / (2 * Math.PI));
+    const p1 = h.map(v => wrap(4 * Math.PI * v / l1 + sp * randn())), p2 = h.map(v => wrap(4 * Math.PI * v / l2 + sp * randn()));
+    const hs = p1.map((v, i) => Lam * wrap(p2[i] - v) / (4 * Math.PI));
+    const hh = hs.map((v, i) => { const m = Math.round((4 * Math.PI * v / l1 - p1[i]) / (2 * Math.PI)); return l1 * (p1[i] + 2 * Math.PI * m) / (4 * Math.PI); });
+    const rmsS = Math.sqrt(hs.reduce((a, v, i) => a + (v - h[i]) ** 2, 0) / h.length), wrong = hh.filter((v, i) => Math.abs(v - h[i]) > l1 / 4).length;
+    const rmsH = Math.sqrt(hh.reduce((a, v, i) => a + (Math.abs(v - h[i]) > l1 / 4 ? 0 : (v - h[i]) ** 2), 0) / Math.max(1, h.length - wrong));
+    const sh = Lam * Math.SQRT2 * sp / (4 * Math.PI);
+    cards('e2cards', [['Synthetic wavelength Λ', lenStr(Lam)], ['Range Λ/2', lenStr(Lam / 2)], ['σ_h predicted Λ√2σ/4π', lenStr(sh), 'th'], ['Synthetic error (rms)', lenStr(rmsS), 'ok'], ['Hierarchical error (rms)', lenStr(rmsH), 'ok'], ['Wrong orders (of 1000)', String(wrong), wrong ? 'th' : 'ok']]);
+    $('e2t1').textContent = 'Single wavelength (grey) cannot follow the steps; synthetic (dots) and hierarchical (line) results';
+    plot($('e2plot'), [{ x: x.map(v => v * 1e3), y: p1.map(v => l1 * v / (4 * Math.PI) * 1e6), color: C.grey, width: 1 }, { x: x.map(v => v * 1e3), y: hs.map(v => v * 1e6), color: C.teal, points: true, r: 1.5 }, { x: x.map(v => v * 1e3), y: hh.map(v => v * 1e6), color: C.navy, width: 1.5 }],
+      { xmin: 0, xmax: 10, ymin: -0.5, ymax: Math.max(...h) * 1e6 * 1.15 + 0.5, xlabel: 'x  [mm]', ylabel: 'height  [µm]' });
+    $('e2t2').textContent = 'Error of the hierarchical result (wrong fringe orders show as jumps of λ₁/2)';
+    plot($('e2plot2'), [{ x: x.map(v => v * 1e3), y: hh.map((v, i) => (v - h[i]) * 1e9), color: C.coral, width: 1 }], { xmin: 0, xmax: 10, ymin: -l1 * 1e9 * 0.6, ymax: l1 * 1e9 * 0.6, xlabel: 'x  [mm]', ylabel: 'error  [nm]' });
+  }
+}
+
+// ================= Experiment 3 =================
+let linear = false; $('e3lin').onclick = () => { linear = !linear; $('e3lin').textContent = 'Conversion: ' + (linear ? 'linear dn/dT' : 'exact Gladstone–Dale'); draw(); };
+function e3() {
+  const n = N9, lam = 633e-9, T0 = 293, ng = 2.92e-4, dT = +$('e3t').value, L = +$('e3l').value * 1e-3, ns = +$('e3n').value;
+  $('e3tv').textContent = dT + ' K'; $('e3lv').textContent = (L * 1e3).toFixed(0) + ' mm'; $('e3nv').textContent = String(ns);
+  const T = new Float64Array(n * n); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const u = (x - n / 2) / (0.18 * n), v = (y - n * 0.6) / (0.32 * n); T[y * n + x] = T0 + dT * Math.exp(-u * u - v * v); }
+  const phiOf = t => 2 * Math.PI / lam * L * (ng * T0 / t - ng);   // relative to the cold state
+  seed = 23; const a = 110, b = 90;
+  const frames = (ph) => [0, 1, 2, 3].map(k => ph.map(p => Math.round(Math.max(0, Math.min(255, a + b * Math.cos(p + k * Math.PI / 2) + ns * randn())))));
+  const hot = frames(Array.from(T, phiOf)), cold = frames(new Float64Array(n * n));
+  const ps = f => f[0].map((v, i) => Math.atan2(f[3][i] - f[1][i], v - f[2][i]));
+  const ph = ps(hot), pc = ps(cold), dphi = ph.map((v, i) => Math.atan2(Math.sin(v - pc[i]), Math.cos(v - pc[i])));
+  const un = unwrapC(dphi, n);
+  // reference: median of the cold border (top rows) set to 0
+  let off = 0, c = 0; for (let y = 0; y < 6; y++) for (let x = 0; x < n; x++) { off += un[y * n + x]; c++; } off /= c;
+  const sens = 2 * Math.PI * L * ng / (lam * T0);   // rad per K at T0
+  const Tm = un.map(p => { const q = p - off; return linear ? T0 - q / sens : ng * T0 / (ng + lam * q / (2 * Math.PI * L)); });
+  const errT = Tm.map((v, i) => v - T[i]); let se = 0, cc = 0; for (let i = 0; i < n * n; i++) { se += errT[i] ** 2; cc++; } const rms = Math.sqrt(se / cc);
+  let pk = 0; for (let i = 1; i < n * n; i++) if (T[i] > T[pk]) pk = i;
+  panels($('e3img'), [{ data: hot[0], n, min: 0, max: 255, title: 'hot frame 1' }, { data: dphi, n, min: -Math.PI, max: Math.PI, title: 'wrapped Δφ' }, { data: Tm.map(v => v - 273.15), n, min: 20, max: 20 + dT, map: 'jet', title: 'T [°C]' }, { data: errT, n, min: -Math.max(1, 4 * rms), max: Math.max(1, 4 * rms), map: 'jet', title: 'error [K]' }]);
+  cards('e3cards', [['Sensitivity at T₀', fmt(sens, 3) + ' rad/K'], ['One fringe', fmt(2 * Math.PI / sens, 3) + ' K'], ['Peak phase', fmt(phiOf(T0 + dT), 3) + ' rad'], ['Peak T measured / true', (Tm[pk] - 273.15).toFixed(1) + ' / ' + (T[pk] - 273.15).toFixed(1) + ' °C', 'ok'], ['RMS error', fmt(rms, 3) + ' K', 'th']]);
+  const xs = Array.from({ length: n }, (_, x) => x), yr = Math.floor(n * 0.6);
+  plot($('e3plot'), [{ x: xs, y: xs.map(x => T[yr * n + x] - 273.15), color: C.navy, dash: [6, 4], width: 1.5 }, { x: xs, y: xs.map(x => Tm[yr * n + x] - 273.15), color: C.coral, width: 1.5 }], { xmin: 0, xmax: n - 1, ymin: 15, ymax: 25 + dT * 1.15, xlabel: 'x  [pixels]', ylabel: 'T  [°C]' });
+}
+
+function draw() { const t = document.querySelector('.exp.on').id; if (t === 'e1') e1(); else if (t === 'e2') e2(); else e3(); }
+document.querySelectorAll('input[type=range]').forEach(r => r.oninput = draw);
+window.addEventListener('resize', draw);
+draw();
+</script>
+<script>(function(){var b=document.querySelector('nav button[data-t="e1"]'); if(b) b.click();})();</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

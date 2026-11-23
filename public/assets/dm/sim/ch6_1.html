@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slab mode solver · DMP Ch6</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+select{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 6 · SIMULATOR 1</small><h1>Slab mode solver: finite differences against the exact solution</h1></header>
+<div class="wrap"><div class="grid">
+<div class="card">
+ <div class="eq">(E<sub>i+1</sub> − 2E<sub>i</sub> + E<sub>i−1</sub>)/h<sup>2</sup> + k<sub>0</sub><sup>2</sup>n<sub>i</sub><sup>2</sup>E<sub>i</sub> = β<sup>2</sup>E<sub>i</sub> ,  n<sub>eff</sub> = β/k<sub>0</sub></div>
+ <label>Core index n<sub>1</sub>: <span class="val" id="v1"></span></label><input type="range" id="n1" min="1.6" max="3.6" step="0.01" value="3.48">
+ <label>Cladding index n<sub>2</sub>: <span class="val" id="v2"></span></label><input type="range" id="n2" min="1.0" max="1.6" step="0.01" value="1.44">
+ <label>Core thickness d (nm): <span class="val" id="v3"></span></label><input type="range" id="d" min="100" max="1200" step="10" value="220">
+ <label>Wavelength λ (nm): <span class="val" id="v4"></span></label><input type="range" id="lam" min="1200" max="1700" step="10" value="1550">
+ <label>Grid step h and mode: 
+  <select id="h"><option value="0.04">40 nm</option><option value="0.02" selected>20 nm</option><option value="0.01">10 nm</option><option value="0.005">5 nm</option><option value="0.0025">2.5 nm</option></select>
+  <select id="m"><option value="0">TE0</option><option value="1">TE1</option><option value="2">TE2</option></select></label>
+ <div class="stats"><div class="s"><span>n<sub>eff</sub> exact / FD</span><b id="s1">—</b></div><div class="s"><span>Error · cells in core</span><b id="s2">—</b></div><div class="s"><span>V · guided TE modes</span><b id="s3">—</b></div></div>
+ <div class="ar">قسّم الخطوة على 2 ولاحظ أن الخطأ ينقسم على 4 تقريباً (تقارب من الرتبة الثانية). ابدأ بالخطوة 40 nm وسماكة 220 nm: عدد الخلايا داخل اللب قليل فلا يكون الخطأ في نطاقه التقاربي بعد.</div>
+</div>
+<div class="card"><canvas id="c" width="800" height="300"></canvas><canvas id="p" width="800" height="300"></canvas></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);const HS=[0.04,0.02,0.01,0.005,0.0025];
+function exact(n1,n2,d,k0,m){const g=n=>{const ka=k0*Math.sqrt(n1*n1-n*n),ga=k0*Math.sqrt(n*n-n2*n2);return ka*d-m*Math.PI-2*Math.atan(ga/ka)};
+ let a=n2+1e-12,b=n1-1e-12;if(g(a)<=0)return NaN;for(let i=0;i<80;i++){const c=(a+b)/2;g(c)>0?a=c:b=c}return (a+b)/2}
+function build(n1,n2,d,k0,h,L){const N=Math.round(L/h),x=[],e=[];for(let i=0;i<N;i++){const xc=-L/2+(i+0.5)*h,lo=Math.max(xc-h/2,-d/2),hi=Math.min(xc+h/2,d/2),fr=Math.max(0,hi-lo)/h;x.push(xc);e.push(fr*n1*n1+(1-fr)*n2*n2)}
+ const D=e.map(v=>-2/(h*h)+k0*k0*v);return {N,x,D,o:1/(h*h)}}
+function countBelow(A,s){let c=0,q=A.D[0]-s;if(q<0)c++;for(let i=1;i<A.N;i++){if(q===0)q=1e-300;q=A.D[i]-s-A.o*A.o/q;if(q<0)c++}return c}
+function kth(A,k,lo,hi){for(let i=0;i<70;i++){const s=(lo+hi)/2;(A.N-countBelow(A,s))>k?lo=s:hi=s}return (lo+hi)/2}
+function vec(A,lam){const N=A.N,s=lam*(1+1e-9);let v=new Float64Array(N).fill(1);for(let it=0;it<3;it++){const c=new Float64Array(N),y=new Float64Array(N);let b=A.D[0]-s;c[0]=A.o/b;y[0]=v[0]/b;
+ for(let i=1;i<N;i++){b=A.D[i]-s-A.o*c[i-1];c[i]=A.o/b;y[i]=(v[i]-A.o*y[i-1])/b}for(let i=N-2;i>=0;i--)y[i]-=c[i]*y[i+1];let m=0;y.forEach(t=>m=Math.max(m,Math.abs(t)));v=y.map(t=>t/m)}
+ let mi=0;v.forEach((t,i)=>{if(Math.abs(t)>Math.abs(v[mi]))mi=i});const sg=Math.sign(v[mi]);return v.map(t=>t*sg)}
+function solve(n1,n2,d,k0,h,L,m){const A=build(n1,n2,d,k0,h,L);const lam=kth(A,m,k0*k0*n2*n2*0.5,k0*k0*n1*n1);return {A,lam,n:Math.sqrt(Math.max(lam,0))/k0}}
+function draw(){let n1=+$('n1').value,n2=+$('n2').value;const d=$('d').value/1000,lam=$('lam').value/1000,h=+$('h').value,m=+$('m').value,k0=2*Math.PI/lam;
+ [['v1',n1.toFixed(2)],['v2',n2.toFixed(2)],['v3',$('d').value],['v4',$('lam').value]].forEach(a=>$(a[0]).textContent=a[1]);
+ const V=k0*d/2*Math.sqrt(Math.max(n1*n1-n2*n2,0)),M=n1>n2?Math.floor(2*V/Math.PI)+1:0;$('s3').textContent=V.toFixed(3)+' · '+M;
+ const c=$('c').getContext('2d'),p=$('p').getContext('2d'),W=800,H=300;c.clearRect(0,0,W,H);p.clearRect(0,0,W,H);c.font=p.font='14px Calibri';
+ const ne=n1>n2?exact(n1,n2,d,k0,m):NaN;if(!(ne>n2)){['s1','s2'].forEach(i=>$(i).textContent='no mode');c.fillStyle='#5A5650';c.fillText('Mode TE'+m+' is not guided: increase d or the index contrast',20,40);return}
+ const ga=k0*Math.sqrt(ne*ne-n2*n2),ka=k0*Math.sqrt(n1*n1-ne*ne),L=d+2*Math.max(1.5,8/ga);
+ const r=solve(n1,n2,d,k0,h,L,m),err=r.n-ne;$('s1').textContent=ne.toFixed(5)+' / '+r.n.toFixed(5);$('s2').textContent=err.toExponential(2)+' · '+Math.round(d/h);
+ // profile
+ const xr=Math.min(L/2,d/2+4/ga),X=x=>40+(x+xr)/(2*xr)*(W-60),Y=v=>H/2-v*(H/2-40);
+ c.fillStyle='#FCEBD3';c.fillRect(X(-d/2),20,X(d/2)-X(-d/2),H-50);c.strokeStyle='#E2DCCF';c.beginPath();c.moveTo(40,Y(0));c.lineTo(W-20,Y(0));c.stroke();
+ const ex=x=>{const ax=Math.abs(x),sym=m%2===0;let v;if(ax<=d/2)v=sym?Math.cos(ka*x):Math.sin(ka*x);else{const edge=sym?Math.cos(ka*d/2):Math.sin(ka*d/2)*Math.sign(x);v=edge*Math.exp(-ga*(ax-d/2))}return v};
+ let mx=0;for(let x=-xr;x<=xr;x+=xr/400)mx=Math.max(mx,Math.abs(ex(x)));
+ c.strokeStyle='#1E1E22';c.lineWidth=2;c.beginPath();for(let x=-xr,f=1;x<=xr;x+=xr/400,f=0){const v=ex(x)/mx;f?c.moveTo(X(x),Y(v)):c.lineTo(X(x),Y(v))}c.stroke();
+ const v=vec(r.A,r.lam);let vm=0,step=Math.max(1,Math.floor(r.A.N/120));r.A.x.forEach((x,i)=>{if(Math.abs(x)<=xr)vm=Math.max(vm,Math.abs(v[i]))});
+ const sg=Math.sign(v.reduce((s,t,i)=>s+t*ex(r.A.x[i]),0))||1;c.fillStyle='#E07B1A';r.A.x.forEach((x,i)=>{if(Math.abs(x)<=xr&&i%step===0){c.beginPath();c.arc(X(x),Y(sg*v[i]/vm),3,0,7);c.fill()}});
+ c.fillStyle='#5A5650';c.fillText('mode profile E(x): exact (line), finite differences (dots); core shaded',20,16);c.fillText('x (μm)  ±'+xr.toFixed(2),W-130,H-8);
+ // convergence
+ const es=HS.map(hh=>{const rr=solve(n1,n2,d,k0,hh,L,m);return Math.abs(rr.n-ne)}),L1=70,B=40;
+ const lx=Math.log10,xmin=lx(0.002),xmax=lx(0.05),emax=Math.ceil(lx(Math.max(...es))+0.3),emin=Math.floor(lx(Math.max(Math.min(...es),1e-9))-0.3);
+ const PX=hh=>L1+(lx(hh)-xmin)/(xmax-xmin)*(W-L1-20),PY=e=>H-B-(lx(e)-emin)/(emax-emin)*(H-B-25);
+ p.strokeStyle='#E2DCCF';p.beginPath();p.moveTo(L1,H-B);p.lineTo(W-20,H-B);p.moveTo(L1,H-B);p.lineTo(L1,10);p.stroke();p.fillStyle='#5A5650';
+ for(let e=emin;e<=emax;e++)p.fillText('1e'+e,L1-40,PY(Math.pow(10,e))+5);HS.forEach(hh=>p.fillText(hh*1000,PX(hh)-8,H-B+16));p.fillText('grid step h (nm), log scale',W-200,H-6);p.fillText('|error of n_eff|',L1+6,18);
+ p.setLineDash([5,5]);p.strokeStyle='#5A5650';p.beginPath();p.moveTo(PX(0.04),PY(es[0]));p.lineTo(PX(0.0025),PY(es[0]*Math.pow(0.0025/0.04,2)));p.stroke();p.setLineDash([]);p.fillText('slope 2',PX(0.006),PY(es[0]*Math.pow(0.006/0.04,2))+18);
+ p.strokeStyle='#2E6F8E';p.lineWidth=2;p.beginPath();es.forEach((e,i)=>{i?p.lineTo(PX(HS[i]),PY(e)):p.moveTo(PX(HS[i]),PY(e))});p.stroke();
+ es.forEach((e,i)=>{p.fillStyle=HS[i]===h?'#E07B1A':'#2E6F8E';p.beginPath();p.arc(PX(HS[i]),PY(e),HS[i]===h?7:4,0,7);p.fill()})}
+['n1','n2','d','lam','h','m'].forEach(id=>$(id).oninput=draw);draw();
+</script>
+
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

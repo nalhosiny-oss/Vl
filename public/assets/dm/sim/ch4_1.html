@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solver verification · DMP Ch4</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+select{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 4 · SIMULATOR 1</small><h1>Verifying an ODE solver: order of convergence</h1></header>
+<div class="wrap"><div class="grid">
+<div class="card">
+ <div class="eq">dn/dt = (I/I<sub>th</sub> − n)/τ<sub>n</sub>  ·  n(t) = (I/I<sub>th</sub>)(1 − e<sup>−t/τ<sub>n</sub></sup>)  ·  t<sub>d</sub> = τ<sub>n</sub> ln[I/(I − I<sub>th</sub>)]</div>
+ <label>Drive I/I<sub>th</sub>: <span class="val" id="rv"></span></label><input type="range" id="r" min="1.05" max="4" step="0.05" value="1.5">
+ <label>Carrier lifetime τ<sub>n</sub> (ns): <span class="val" id="tv"></span></label><input type="range" id="tau" min="1" max="4" step="0.1" value="2.2">
+ <label>Time step Δt (ns): <span class="val" id="dv"></span></label><input type="range" id="dt" min="-2" max="-0.2" step="0.05" value="-0.7">
+ <div><button class="main" data-m="E">Euler</button><button data-m="H">Heun</button><button data-m="R">RK4</button></div>
+ <label><input type="checkbox" id="bug"> Insert a bug in the method (wrong stage)</label>
+ <div class="stats"><div class="s"><span>Error at t = 2 ns</span><b id="s1">—</b></div><div class="s"><span>Observed order p</span><b id="s2">—</b></div><div class="s"><span>t<sub>d</sub> numeric / exact (ns)</span><b id="s3">—</b></div></div>
+ <div class="ar">التحقق لا يحتاج إلى قياس: نقارن الحل العددي بالحل الدقيق. انظر إلى رتبة التقارب p: أويلر 1، هيون 2، رانج-كوتا 4. فعّل «الخطأ المتعمد» ولاحظ كيف تكشفه الرتبة حتى لو بدا المنحنى قريباً من الصحيح.</div>
+</div>
+<div class="card"><canvas id="c" width="800" height="400"></canvas><canvas id="e" width="800" height="300"></canvas></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);let M='E';
+function step(m,n,h,f,bug){if(m==='E')return n+h*f(n);
+ if(m==='H'){const k1=f(n),k2=f(n+h*k1);return bug?n+h*k2:n+h/2*(k1+k2)}
+ const k1=f(n),k2=f(n+h/2*k1),k3=f(n+h/2*k2),k4=f(n+h*(bug?k2:k3));return n+h/6*(k1+2*k2+2*k3+k4)}
+function solveAt(m,r,tau,h,T,bug){const f=n=>(r-n)/tau;let n=0;const N=Math.round(T/h);for(let i=0;i<N;i++)n=step(m,n,h,f,bug);return n}
+function errAt(m,r,tau,h,bug){const T=2,hh=T/Math.max(1,Math.round(T/h));return Math.abs(solveAt(m,r,tau,hh,T,bug)-r*(1-Math.exp(-T/tau)))}
+function draw(){const r=+$('r').value,tau=+$('tau').value,h=Math.pow(10,+$('dt').value),bug=$('bug').checked;
+ $('rv').textContent=r.toFixed(2);$('tv').textContent=tau.toFixed(1);$('dv').textContent=h.toFixed(3);
+ const f=n=>(r-n)/tau,Tm=8;const c=$('c').getContext('2d'),W=800,H=400,L=60,B=40;c.clearRect(0,0,W,H);
+ const ymax=Math.max(1.2,r*1.05),X=t=>L+t/Tm*(W-L-20),Y=v=>H-B-v/ymax*(H-B-20);
+ c.strokeStyle='#E2DCCF';c.lineWidth=1;c.beginPath();c.moveTo(L,H-B);c.lineTo(W-20,H-B);c.moveTo(L,H-B);c.lineTo(L,10);c.stroke();
+ c.fillStyle='#5A5650';c.font='15px Calibri';for(let t=0;t<=8;t+=2)c.fillText(t,X(t)-4,H-B+18);c.fillText('t (ns)',W-60,H-8);c.fillText('n = N/N_th',8,22);
+ c.setLineDash([6,5]);c.strokeStyle='#5A5650';c.beginPath();c.moveTo(L,Y(1));c.lineTo(W-20,Y(1));c.stroke();c.setLineDash([]);c.fillText('threshold',W-90,Y(1)-6);
+ c.strokeStyle='#1E1E22';c.lineWidth=2;c.beginPath();for(let i=0;i<=400;i++){const t=i/400*Tm,v=r*(1-Math.exp(-t/tau));i?c.lineTo(X(t),Y(v)):c.moveTo(X(t),Y(v))}c.stroke();
+ let n=0,t=0,tdN=null;c.fillStyle='#E07B1A';const N=Math.round(Tm/h);c.strokeStyle='#E07B1A';c.lineWidth=1.5;c.beginPath();c.moveTo(X(0),Y(0));
+ for(let i=0;i<N;i++){const nn=step(M,n,h,f,bug);if(tdN===null&&nn>=1)tdN=t+h*(1-n)/(nn-n);n=nn;t+=h;c.lineTo(X(t),Y(n))}c.stroke();
+ if(h>0.05){n=0;t=0;for(let i=0;i<N;i++){n=step(M,n,h,f,bug);t+=h;c.beginPath();c.arc(X(t),Y(n),3,0,7);c.fill()}}
+ const e1=errAt(M,r,tau,h,bug),e2=errAt(M,r,tau,h/2,bug),p=Math.log2(e1/e2),tdE=tau*Math.log(r/(r-1));
+ $('s1').textContent=e1.toExponential(2);$('s2').textContent=isFinite(p)?p.toFixed(2):'—';$('s3').textContent=(tdN===null?'—':tdN.toFixed(3))+' / '+tdE.toFixed(3);
+ const g=$('e').getContext('2d'),W2=800,H2=300;g.clearRect(0,0,W2,H2);const hs=[],lx0=-2.3,lx1=-0.2,ly0=-14,ly1=0;
+ const XX=v=>L+(v-lx0)/(lx1-lx0)*(W2-L-20),YY=v=>H2-B-(Math.max(ly0,v)-ly0)/(ly1-ly0)*(H2-B-15);
+ g.strokeStyle='#E2DCCF';g.beginPath();g.moveTo(L,H2-B);g.lineTo(W2-20,H2-B);g.moveTo(L,H2-B);g.lineTo(L,10);g.stroke();
+ g.fillStyle='#5A5650';g.font='14px Calibri';for(let k=-2;k<=0;k++)g.fillText('10^'+k,XX(k)-12,H2-B+18);for(let k=-12;k<=0;k+=4)g.fillText('10^'+k,8,YY(k)+4);g.fillText('Δt (ns)',W2-70,H2-6);g.fillText('error at 2 ns',L+8,20);
+ const col={E:'#E07B1A',H:'#2E6F8E',R:'#1E1E22'};
+ for(const m of ['E','H','R']){g.strokeStyle=col[m];g.lineWidth=m===M?3:1.2;g.beginPath();let first=true;
+  for(let lv=lx0;lv<=lx1+1e-9;lv+=0.1){const e=errAt(m,r,tau,Math.pow(10,lv),bug&&m===M);if(e<=0)continue;const y=Math.log10(e);first?g.moveTo(XX(lv),YY(y)):g.lineTo(XX(lv),YY(y));first=false}g.stroke()}
+ g.fillStyle='#E07B1A';g.beginPath();g.arc(XX(Math.log10(h)),YY(Math.log10(e1)),6,0,7);g.fill();
+ g.font='14px Calibri';[['E','Euler'],['H','Heun'],['R','RK4']].forEach((a,i)=>{g.fillStyle=col[a[0]];g.fillText(a[1],W2-160+i*52,24)})}
+document.querySelectorAll('button[data-m]').forEach(b=>b.onclick=()=>{M=b.dataset.m;document.querySelectorAll('button[data-m]').forEach(x=>x.classList.toggle('main',x===b));draw()});
+['r','tau','dt','bug'].forEach(id=>$(id).oninput=draw);draw();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

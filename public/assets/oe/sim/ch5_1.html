@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab · Chapter 5 — Integrated Sources and Detectors; Injection Lasers and LEDs</title><style>
+:root{--mid:#101634;--mag:#C2185B;--pink:#E7B3C8;--pk2:#FBEAF0;--lt:#F6F6F9;--sl:#5B6380;--line:#D6D8E4;--teal:#1F8A9E;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--lt);color:var(--mid);font-family:Calibri,"Source Sans 3","Segoe UI",Arial,sans-serif;font-size:16px}
+header{background:var(--mid);color:#fff;padding:18px 22px 14px;position:relative;overflow:hidden}
+header .lat{position:absolute;right:-10px;top:-10px;width:260px;height:120px;opacity:.55;
+ background-image:radial-gradient(circle,rgba(231,179,200,.9) 0 4px,transparent 5px);background-size:22px 22px}
+header h1{font-family:Cambria,Georgia,serif;margin:0;font-size:23px;position:relative}
+header p{margin:4px 0 0;color:#E7B3C8;font-size:14.5px;position:relative}
+nav{display:flex;gap:6px;flex-wrap:wrap;padding:12px 22px 0}
+nav button{border:1px solid var(--line);background:#fff;color:var(--mid);padding:9px 14px;border-radius:10px 10px 0 0;font:inherit;font-weight:600;cursor:pointer}
+nav button.on{background:var(--mag);color:#fff;border-color:var(--mag)}
+main{padding:0 22px 26px}
+.exp{display:none;background:#fff;border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:16px}
+.exp.on{display:block}
+.grid{display:grid;grid-template-columns:310px 1fr;gap:16px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+h2{font-family:Cambria,Georgia,serif;font-size:19px;margin:0 0 6px}
+.lead{color:var(--sl);margin:0 0 12px;font-size:14.5px}
+.panel{background:var(--pk2);border-radius:10px;padding:12px}
+.ctl{margin-bottom:11px}
+.ctl label{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:600}
+.ctl label i{font-style:normal}
+.ctl label span{color:var(--mag);font-variant-numeric:tabular-nums;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--mag)}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.btns button{border:1px solid var(--mag);background:#fff;color:var(--mag);border-radius:16px;padding:4px 11px;font:inherit;font-size:13.5px;cursor:pointer}
+.btns button:hover,.btns button.on{background:var(--mag);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:0 0 10px}
+.card{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:#fff}
+.card b{display:block;font-size:12.5px;color:var(--sl);font-weight:600}
+.card span{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.card.ok span{color:var(--teal)} .card.th span{color:var(--mag)}
+canvas{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:8px}
+.cv-title{font-size:13.5px;font-weight:600;color:var(--sl);margin:10px 0 4px}
+.eq{font-family:Cambria,Georgia,serif;background:#fff;border-left:3px solid var(--mag);padding:6px 10px;margin:8px 0;font-size:15px;line-height:1.55}
+.tasks{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.tasks h3{font-size:15.5px;margin:0 0 4px}
+.tasks ol{margin:0;padding-left:20px;font-size:14.5px}.tasks li{margin:3px 0}
+.ar{direction:rtl;text-align:right;font-family:"Traditional Arabic","Noto Naskh Arabic",Tahoma,Arial,serif;background:#FFF5F9;border-right:4px solid var(--mag);border-radius:8px;padding:9px 12px;margin-top:12px;font-size:16px;line-height:1.8}
+.ar b{color:var(--mag)}
+footer{color:var(--sl);font-size:13px;padding:0 22px 18px}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><div class="lat"></div><h1>Virtual Lab · Chapter 5 — Integrated Sources and Detectors; Injection Lasers and LEDs</h1>
+<p>Optoelectronics (203675-3) · MSc in Physics · Prof. Najm Al-Hosiny</p></header>
+<nav><button class="on" data-t="e1">1 · LED spectrum and efficiency</button><button data-t="e2">2 · Rate equations and L–I curve</button><button data-t="e3">3 · Laser dynamics and modulation</button><button data-t="e4">4 · Vacuum deposition</button></nav><main><section class="exp on" id="e1">
+<h2>Experiment 1 — LED emission spectrum and efficiency</h2><p class="lead">Spontaneous emission follows the joint density of states times the Boltzmann factor. The internal efficiency follows the ABC model, and only light inside the escape cone leaves a planar surface.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Temperature T [K]</i> <span id="e1Tv"></span></label><input type="range" id="e1T" min="200" max="400" step="1" value="300"></div><div class="ctl"><label><i>Carrier density log₁₀(n / cm⁻³)</i> <span id="e1nv"></span></label><input type="range" id="e1n" min="16" max="20" step="0.01" value="18"></div><div class="ctl"><label><i>Refractive index n<sub>r</sub></i> <span id="e1rv"></span></label><input type="range" id="e1r" min="1.5" max="4" step="0.01" value="3.6"></div><div class="eq">I(hν) ∝ (hν − E<sub>g</sub>)<sup>1/2</sup> e<sup>−(hν−E<sub>g</sub>)/kT</sup>; peak E<sub>g</sub> + kT/2, FWHM = 1.795kT<br>GaAs: E<sub>g</sub>(T) = 1.519 − 5.405×10⁻⁴T²/(T + 204) eV<br>η<sub>int</sub> = Bn²/(An + Bn² + Cn³), A = 10⁷ s⁻¹, B = 10⁻¹⁰ cm³/s, C = 10⁻³⁰ cm⁶/s<br>η<sub>extr</sub> = ½(1 − cos θ<sub>c</sub>)[1 − ((n<sub>r</sub>−1)/(n<sub>r</sub>+1))²]</div></div>
+<div><div class="cards" id="e1cards"></div><div class="cv-title" id="e1st">Emission spectrum at the current temperature (dashed: 300 K)</div><canvas id="e1s" height="210"></canvas><div class="cv-title" id="e1qt">Internal quantum efficiency versus carrier density (dot: current n)</div><canvas id="e1q" height="210"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Raise T from 250 to 350 K. How do the peak wavelength and the spectral width change? Check FWHM = 1.795kT.</li><li>Find the carrier density of maximum η<sub>int</sub> and compare with √(A/C). Why does the efficiency drop at high density (droop)?</li><li>For GaAs (n<sub>r</sub> = 3.6), what fraction of the light escapes a planar surface? What happens for n<sub>r</sub> = 2.5 (GaN)?</li><li>Estimate the external efficiency η<sub>int</sub>η<sub>extr</sub> at n = 10¹⁸ cm⁻³.</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> عرض طيف الثنائي الباعث يحدده التوزيع الحراري للإلكترونات، لذا يتسع مع الحرارة. ومعظم الضوء المتولد يحبسه الانعكاس الكلي داخل الشبه موصل، فلا يخرج من السطح المستوي إلا جزء صغير.</div></section><section class="exp" id="e2">
+<h2>Experiment 2 — Laser rate equations and the L–I characteristic</h2><p class="lead">The steady-state rate equations are solved at each current. Above threshold the carrier density clamps at n<sub>th</sub> and every extra electron becomes a stimulated photon.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Current I / I<sub>th</sub></i> <span id="e2Iv"></span></label><input type="range" id="e2I" min="0" max="3" step="0.01" value="2"></div><div class="ctl"><label><i>Facet reflectivity R</i> <span id="e2Rv"></span></label><input type="range" id="e2R" min="0.05" max="0.95" step="0.01" value="0.32"></div><div class="ctl"><label><i>Cavity length L [µm]</i> <span id="e2Lv"></span></label><input type="range" id="e2L" min="100" max="1000" step="5" value="300"></div><div class="ctl"><label><i>Internal loss α<sub>i</sub> [cm⁻¹]</i> <span id="e2av"></span></label><input type="range" id="e2a" min="2" max="30" step="0.5" value="10"></div><div class="ctl"><label><i>Spontaneous coupling log₁₀ β</i> <span id="e2bv"></span></label><input type="range" id="e2b" min="-6" max="-2" step="0.1" value="-4"></div><div class="eq">dn/dt = I/qV − n/τ<sub>n</sub> − v<sub>g</sub>a(n − n<sub>tr</sub>)S<br>dS/dt = Γv<sub>g</sub>a(n − n<sub>tr</sub>)S − S/τ<sub>p</sub> + Γβn/τ<sub>n</sub><br>Γ = 0.3, a = 2.5×10⁻¹⁶ cm², n<sub>tr</sub> = 10¹⁸ cm⁻³, τ<sub>n</sub> = 2 ns, w = 2 µm, d = 0.2 µm, hν = 0.8 eV<br>dP/dI = (hν/q)α<sub>m</sub>/(α<sub>i</sub> + α<sub>m</sub>)</div></div>
+<div><div class="cards" id="e2cards"></div><div class="cv-title" id="e2pt">L–I curve, both facets (dot: current I)</div><canvas id="e2p" height="220"></canvas><div class="cv-title" id="e2nt">Carrier density versus current: clamping above threshold</div><canvas id="e2n" height="200"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Read α<sub>m</sub>, τ<sub>p</sub>, n<sub>th</sub> and I<sub>th</sub> for the default laser. Check the slope against (hν/q)α<sub>m</sub>/(α<sub>i</sub> + α<sub>m</sub>).</li><li>Coat one facet to R = 0.9 (here both facets change). How do I<sub>th</sub> and the slope efficiency change? Explain the trade-off.</li><li>Increase β to 10⁻². Why does the threshold kink become soft?</li><li>Double the cavity length. Why does the threshold current rise even though the threshold gain falls?</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> تحت العتبة يزداد عدد الحاملات مع التيار، وعند العتبة يتساوى الكسب مع الفقد فيثبت عددها. بعد ذلك يتحول كل إلكترون إضافي إلى فوتون محفَّز، فتزداد القدرة خطياً مع التيار.</div></section><section class="exp" id="e3">
+<h2>Experiment 3 — Laser dynamics: turn-on, relaxation oscillations and modulation response</h2><p class="lead">The rate equations are integrated in time (RK4, 0.05-ps step) for a current step from zero. The small-signal theory predicts the relaxation frequency and the modulation response H(f).</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Bias current I / I<sub>th</sub></i> <span id="e3Iv"></span></label><input type="range" id="e3I" min="1.1" max="5" step="0.01" value="2"></div><div class="ctl"><label><i>Time window [ns]</i> <span id="e3tv"></span></label><input type="range" id="e3t" min="1" max="8" step="0.1" value="4"></div><div class="eq">ω<sub>R</sub>² = v<sub>g</sub>aS₀/τ<sub>p</sub>, γ = 1/τ<sub>n</sub> + v<sub>g</sub>aS₀<br>H(ω) = ω<sub>R</sub>²/(ω<sub>R</sub>² − ω² + iωγ)<br>(same laser as Experiment 2 with default values)</div></div>
+<div><div class="cards" id="e3cards"></div><div class="cv-title" id="e3pt">Turn-on transient: output power (left) and carrier density (normalised to n_th)</div><canvas id="e3p" height="230"></canvas><div class="cv-title" id="e3ht">Small-signal modulation response |H(f)| (dot: f_R)</div><canvas id="e3h" height="210"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>Measure the period of the late relaxation oscillations and compare 1/T with f<sub>R</sub> from the formula.</li><li>What is the turn-on delay at I = 2I<sub>th</sub>? Why does it shorten at higher current?</li><li>Quadruple the output power (raise the bias). Does f<sub>R</sub> double? Check f<sub>R</sub> ∝ √(I/I<sub>th</sub> − 1).</li><li>Read the 3-dB modulation bandwidth. Why does stronger damping eventually limit it?</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> الحاملات والفوتونات يتبادلان الطاقة كالنابض والكتلة: تتراكم الحاملات فتنفجر الفوتونات، فتستنزف الحاملات فتهبط الفوتونات، وهكذا حتى يخمد التذبذب. وتردد هذا التذبذب هو الحد الطبيعي لسرعة تعديل الليزر.</div></section><section class="exp" id="e4">
+<h2>Experiment 4 — Vacuum deposition: kinetic theory and thickness uniformity (CLO 1.2)</h2><p class="lead">Physical vapour deposition needs a mean free path longer than the chamber and a background that deposits much less than a monolayer during growth. A small evaporation source follows the cosine law.</p>
+<div class="grid"><div class="panel"><div class="ctl"><label><i>Pressure log₁₀(p / Torr)</i> <span id="e4pv"></span></label><input type="range" id="e4p" min="-11" max="3" step="0.01" value="-6"></div><div class="ctl"><label><i>Source–substrate distance h [cm]</i> <span id="e4hv"></span></label><input type="range" id="e4h" min="10" max="80" step="1" value="40"></div><div class="ctl"><label><i>Substrate radius r [cm]</i> <span id="e4rv"></span></label><input type="range" id="e4r" min="0" max="30" step="0.1" value="8"></div><div class="eq">λ<sub>mfp</sub> = k<sub>B</sub>T/(√2 πd²p), N₂: d = 0.37 nm, T = 300 K<br>Φ = p/√(2πmk<sub>B</sub>T), τ<sub>ML</sub> = N<sub>s</sub>/Φ, N<sub>s</sub> = 10¹⁵ cm⁻²<br>t(r)/t₀ = [1 + (r/h)²]⁻²</div></div>
+<div><div class="cards" id="e4cards"></div><div class="cv-title" id="e4at">Mean free path and monolayer time versus pressure (dots: current p)</div><canvas id="e4a" height="220"></canvas><div class="cv-title" id="e4bt">Film thickness profile: Monte Carlo of 10⁶ atoms (dots) and the cosine law (line)</div><canvas id="e4b" height="210"></canvas></div></div>
+<div class="tasks"><h3>Try this</h3><ol><li>At which pressure does λ<sub>mfp</sub> equal a 0.5-m chamber? Why is thermal evaporation done below 10⁻⁵ Torr?</li><li>Find the monolayer time at 10⁻⁶ Torr and 10⁻¹⁰ Torr. Why does MBE need ultra-high vacuum?</li><li>With h = 40 cm, what radius keeps the thickness within 1 %? Within 5 %?</li><li>Compare the pressure ranges of evaporation, sputtering (~10⁻³–10⁻² Torr) and PECVD (~0.1–1 Torr) on the λ<sub>mfp</sub> curve.</li></ol></div>
+<div class="ar"><b>الحدس الفيزيائي:</b> الذرات المتبخرة تحتاج طريقاً خالياً من التصادمات لتصل إلى الركيزة في خط مستقيم، وهذا يتطلب ضغطاً منخفضاً جداً. وكلما انخفض الضغط قلّت جزيئات الغاز المتبقي التي تلوث الطبقة أثناء نموها.</div></section></main>
+<footer>All results are computed in your browser from the equations of Chapter 5 (Hunsperger, Integrated Optics; Coldren, Corzine &amp; Mašanović, Diode Lasers and Photonic Integrated Circuits). The MATLAB versions of these experiments are Labs 5.1–5.4.</footer>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const C={mid:'#101634',mag:'#C2185B',sl:'#5B6380',pink:'#E7B3C8',teal:'#1F8A9E',gold:'#D99A1E',green:'#3E8E41',grey:'#9AA0B5'};
+const PAL=[C.mag,C.teal,C.gold,C.mid,C.green,C.sl];
+const fmt=(v,d=3)=>{if(!isFinite(v))return '—';const a=Math.abs(v);return (a>=1e4||(a<1e-3&&v!==0))?v.toExponential(2).replace('e','×10^').replace(/\^\+?(-?\d+)/,(m,e)=>sup(e)):(+v.toPrecision(d)).toString()};
+function sup(e){const m={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};return String(e).split('').map(c=>m[c]||c).join('')}
+const linspace=(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+const logspace=(a,b,n)=>linspace(a,b,n).map(v=>Math.pow(10,v));
+const val=id=>+$(id).value;
+function show(id,t){$(id+'v').textContent=t}
+const subs=t=>String(t).replace(/_\{([^}]+)\}|_([A-Za-z0-9α-ωΑ-Ω]+)/g,(m,a,b)=>'<sub>'+(a||b)+'</sub>');
+function cards(id,list){$(id).innerHTML=list.map(c=>'<div class="card '+(c[2]||'')+'"><b>'+subs(c[0])+'</b><span>'+subs(c[1])+'</span></div>').join('')}
+function prep(cv){const r=window.devicePixelRatio||1,w=cv.clientWidth||600,h=+cv.getAttribute('height');
+ if(cv.width!==Math.round(w*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r);cv.style.height=h+'px'}
+ const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,w,h);return{g,w,h}}
+function nice(span){const p=Math.pow(10,Math.floor(Math.log10(span/5)));const m=span/5/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p}
+// series: {x,y,color,width,dash,label,points,r,fill}; o: xmin..ymax, xlabel, ylabel, logx, logy, legend
+function plot(cv,series,o){const {g,w,h}=prep(cv);const L=60,R=12,T=10,B=38;
+ const tx=v=>o.logx?Math.log10(v):v, ty=v=>o.logy?Math.log10(v):v;
+ const x0=tx(o.xmin),x1=tx(o.xmax),y0=ty(o.ymin),y1=ty(o.ymax);
+ const X=x=>L+(tx(x)-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(ty(y)-y0)/(y1-y0)*(h-T-B);
+ g.font='12px Calibri,Arial';g.fillStyle=C.sl;g.strokeStyle='#ECEDF3';g.lineWidth=1;
+ const tick=(lo,hi,lg)=>{const t=[];if(lg){const st=(hi-lo)>10?2:1;for(let k=Math.ceil(lo-1e-9);k<=hi+1e-9;k+=st)t.push(k)}else{const d=nice(hi-lo);for(let v=Math.ceil(lo/d)*d;v<=hi+d*1e-6;v+=d)t.push(+v.toPrecision(10))}return t};
+ const lab=(v,lg)=>lg?('10'+sup(Math.round(v))):(+v.toPrecision(6)).toString();
+ for(const t of tick(x0,x1,o.logx)){const px=L+(t-x0)/(x1-x0)*(w-L-R);g.beginPath();g.moveTo(px,T);g.lineTo(px,h-B);g.stroke();g.textAlign='center';g.fillText(lab(t,o.logx),px,h-B+15)}
+ for(const t of tick(y0,y1,o.logy)){const py=h-B-(t-y0)/(y1-y0)*(h-T-B);g.beginPath();g.moveTo(L,py);g.lineTo(w-R,py);g.stroke();g.textAlign='right';g.fillText(lab(t,o.logy),L-5,py+4)}
+ g.strokeStyle=C.sl;g.strokeRect(L,T,w-L-R,h-T-B);
+ const U=t=>(t||'').replace(/_/g,'');g.fillStyle=C.mid;g.textAlign='center';g.fillText(U(o.xlabel),L+(w-L-R)/2,h-6);
+ g.save();g.translate(14,T+(h-T-B)/2);g.rotate(-Math.PI/2);g.fillText(U(o.ylabel),0,0);g.restore();
+ g.save();g.beginPath();g.rect(L,T,w-L-R,h-T-B);g.clip();
+ if(o.bands)for(const b of o.bands){g.fillStyle=b.color||'rgba(231,179,200,.45)';if(b.y){g.fillRect(L,Y(b.y[1]),w-L-R,Y(b.y[0])-Y(b.y[1]))}else{g.fillRect(X(b.x[0]),T,X(b.x[1])-X(b.x[0]),h-T-B)}}
+ for(const s of series){g.strokeStyle=s.color;g.fillStyle=s.color;g.lineWidth=s.width||1.8;g.setLineDash(s.dash||[]);
+  if(s.points){for(let i=0;i<s.x.length;i++){if(!isFinite(s.y[i]))continue;g.beginPath();g.arc(X(s.x[i]),Y(s.y[i]),s.r||3.5,0,7);s.hollow?g.stroke():g.fill()}}
+  else{g.beginPath();let pen=false;for(let i=0;i<s.x.length;i++){const yy=s.y[i];if(!isFinite(yy)||!isFinite(s.x[i])||(o.logy&&yy<=0)){pen=false;continue}const px=X(s.x[i]),py=Y(yy);pen?g.lineTo(px,py):g.moveTo(px,py);pen=true}g.stroke()}}
+ g.restore();g.setLineDash([]);
+ if(o.legend){const ls=series.filter(s=>s.label);let ly=o.legendBottom?h-B-10-16*(ls.length-1):T+12;const lx=o.legendLeft?L+10:w-R-(o.legendW||200);g.textAlign='left';
+  for(const s of ls){g.fillStyle='rgba(255,255,255,.85)';g.fillRect(lx-4,ly-11,(o.legendW||200)-4,15);g.fillStyle=s.color;if(s.points){g.beginPath();g.arc(lx+7,ly-4,3.5,0,7);g.fill()}else g.fillRect(lx,ly-5,14,3);g.fillStyle=C.mid;g.fillText(U(s.label),lx+20,ly);ly+=16}}
+ return {X,Y,g,w,h};}
+let seed=12345;const rnd=()=>{seed=(seed+0x6D2B79F5)|0;let t=seed;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return(((t^(t>>>14))>>>0)+0.5)/4294967296};
+const randn=()=>Math.sqrt(-2*Math.log(rnd()))*Math.cos(2*Math.PI*rnd());
+function erfc(x){const z=Math.abs(x),t=1/(1+0.5*z);const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return x>=0?r:2-r}
+function besselJ(n,x){let s=0;const N=60;for(let k=0;k<N;k++){const th=Math.PI*(k+0.5)/N;s+=Math.cos(n*th-x*Math.sin(th))}return s/N}
+function bisect(f,a,b,it=80){let fa=f(a);for(let i=0;i<it;i++){const m=(a+b)/2,fm=f(m);if(fa*fm<=0)b=m;else{a=m;fa=fm}}return(a+b)/2}
+// complex helpers
+const cx=(re,im=0)=>({re,im});const cadd=(a,b)=>cx(a.re+b.re,a.im+b.im);const cmul=(a,b)=>cx(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const cexp=t=>cx(Math.cos(t),Math.sin(t));const cabs2=a=>a.re*a.re+a.im*a.im;const cscale=(a,s)=>cx(a.re*s,a.im*s);
+const cdiv=(a,b)=>{const d=b.re*b.re+b.im*b.im;return cx((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d)};
+function setupTabs(draw){document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.exp').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));draw()});
+ document.querySelectorAll('input[type=range],select').forEach(r=>r.oninput=draw);window.addEventListener('resize',draw);}
+
+
+const qe=1.602e-19,kb=1.381e-23;
+const Eg=T=>1.519-5.405e-4*T*T/(T+204);
+function e1(){const T=val('e1T'),n=Math.pow(10,val('e1n')),nr=val('e1r');show('e1T',T.toFixed(0)+' K');show('e1n',fmt(n,3)+' cm⁻³');show('e1r',nr.toFixed(2));
+ const kT=kb*T/qe,A=1e7,B=1e-10,Cc=1e-30;const iqe=x=>B*x*x/(A*x+B*x*x+Cc*x**3);
+ const spec=(T,E)=>{const k=kb*T/qe,g=Eg(T);return E>g?Math.sqrt(E-g)*Math.exp(-(E-g)/k):0};
+ const E=linspace(Eg(T),Eg(T)+0.3,20001),S=E.map(e=>spec(T,e)),mx=Math.max(...S);const j=S.indexOf(mx);const hi=S.map((s,i)=>s>=mx/2?i:-1).filter(i=>i>=0);const fw=E[hi[hi.length-1]]-E[hi[0]];
+ const thc=Math.asin(1/nr),ex=0.5*(1-Math.cos(thc))*(1-((nr-1)/(nr+1))**2);
+ cards('e1cards',[['E_g(T)',Eg(T).toFixed(4)+' eV'],['Peak − E_g / (kT/2)',((E[j]-Eg(T))/(kT/2)).toFixed(3),'ok'],['FWHM / kT',(fw/kT).toFixed(3),'ok'],['Peak λ, width',(1240/E[j]).toFixed(1)+' nm, '+(1240/E[hi[0]]-1240/E[hi[hi.length-1]]).toFixed(1)+' nm','th'],['η_int at n',iqe(n).toFixed(3)],['Peak at √(A/C)',fmt(Math.sqrt(A/Cc),3)+' cm⁻³'],['η_extr (planar)',(100*ex).toFixed(2)+' %']]);
+ const L=linspace(780,920,400),sp=t=>{const v=L.map(l=>spec(t,1240/l));const m=Math.max(...v);return v.map(x=>x/m)};
+ plot($('e1s'),[{x:L,y:sp(T),color:C.mag,width:2.2,label:'T = '+T+' K'},{x:L,y:sp(300),color:C.grey,width:1.2,dash:[6,4],label:'T = 300 K'}],{xmin:780,xmax:920,ymin:0,ymax:1.05,xlabel:'Wavelength [nm]',ylabel:'Normalised intensity',legend:true,legendW:120});
+ const N=logspace(15,21,300);plot($('e1q'),[{x:N,y:N.map(iqe),color:C.teal,width:2.2},{x:[n],y:[iqe(n)],color:C.mid,points:true,r:6}],{xmin:1e15,xmax:1e21,ymin:0,ymax:1,logx:true,xlabel:'Carrier density [cm⁻³]',ylabel:'η_int',bands:[{x:[Math.sqrt(A/Cc)*0.98,Math.sqrt(A/Cc)*1.02],color:'rgba(194,24,91,.4)'}]});}
+function laser(R,Lum,ai,beta){const c=2.998e10,L=Lum*1e-4,w=2e-4,d=0.2e-4,G=0.3,a=2.5e-16,ntr=1e18,tn=2e-9,ng=3.6,hv=0.8;
+ const V=L*w*d,vg=c/ng,am=Math.log(1/(R*R))/(2*L),tp=1/(vg*(ai+am)),nth=ntr+(ai+am)/(G*a),Ith=qe*V*nth/tn;
+ const ss=I=>{const f=n=>{const den=1/tp-G*vg*a*(n-ntr);const S=G*beta*n/tn/den;return I/(qe*V)-n/tn-vg*a*(n-ntr)*S};let lo=0,hi=nth*(1-1e-12);for(let i=0;i<200;i++){const m=(lo+hi)/2;if(f(m)>0)lo=m;else hi=m}const n=(lo+hi)/2;const S=G*beta*n/tn/(1/tp-G*vg*a*(n-ntr));return{n,S,P:hv*qe*vg*am*S*V/G}};
+ return{V,vg,am,tp,nth,Ith,ss,G,a,ntr,tn,hv,beta}}
+function e2(){const x=val('e2I'),R=val('e2R'),L=val('e2L'),ai=val('e2a'),b=Math.pow(10,val('e2b'));show('e2I',x.toFixed(2));show('e2R',R.toFixed(2));show('e2L',L.toFixed(0)+' µm');show('e2a',ai.toFixed(1)+' cm⁻¹');show('e2b',fmt(b,2));
+ const m=laser(R,L,ai,b);const I=x*m.Ith,s=m.ss(I);const sl=(m.ss(3*m.Ith).P-m.ss(2*m.Ith).P)/m.Ith,slf=m.hv*m.am/(ai+m.am);
+ cards('e2cards',[['α_m',m.am.toFixed(1)+' cm⁻¹'],['τ_p',(m.tp*1e12).toFixed(2)+' ps'],['n_th',fmt(m.nth,4)+' cm⁻³'],['I_th',(m.Ith*1e3).toFixed(2)+' mA','th'],['P at I',(s.P*1e3).toFixed(2)+' mW'],['Slope: rate eqs / formula',sl.toFixed(4)+' / '+slf.toFixed(4)+' W/A','ok']]);
+ const X=linspace(0,3,121),P=X.map(v=>m.ss(v*m.Ith).P*1e3),N=X.map(v=>m.ss(v*m.Ith).n/m.nth);
+ plot($('e2p'),[{x:X.map(v=>v*m.Ith*1e3),y:P,color:C.mag,width:2.4},{x:[I*1e3],y:[s.P*1e3],color:C.mid,points:true,r:6}],{xmin:0,xmax:3*m.Ith*1e3,ymin:0,ymax:Math.max(...P)*1.08+0.01,xlabel:'Current [mA]',ylabel:'Output power [mW]'});
+ plot($('e2n'),[{x:X,y:N,color:C.teal,width:2.4},{x:[x],y:[s.n/m.nth],color:C.mid,points:true,r:6}],{xmin:0,xmax:3,ymin:0,ymax:1.08,xlabel:'I / I_th',ylabel:'n / n_th'});}
+function e3(){const x=val('e3I'),tw=val('e3t')*1e-9;show('e3I',x.toFixed(2));show('e3t',(tw*1e9).toFixed(1)+' ns');
+ const m=laser(0.32,300,10,1e-4);const I=x*m.Ith,s0=m.ss(I);const f=(n,S)=>[I/(qe*m.V)-n/m.tn-m.vg*m.a*(n-m.ntr)*S,m.G*m.vg*m.a*(n-m.ntr)*S-S/m.tp+m.G*m.beta*n/m.tn];
+ const dt=0.05e-12,N=Math.round(tw/dt);let n=0,S=1;const T=[],P=[],NN=[];const k=m.hv*qe*m.vg*m.am*m.V/m.G;
+ for(let i=0;i<N;i++){const a1=f(n,S),a2=f(n+dt/2*a1[0],S+dt/2*a1[1]),a3=f(n+dt/2*a2[0],S+dt/2*a2[1]),a4=f(n+dt*a3[0],S+dt*a3[1]);n+=dt/6*(a1[0]+2*a2[0]+2*a3[0]+a4[0]);S+=dt/6*(a1[1]+2*a2[1]+2*a3[1]+a4[1]);if(S<0)S=0;
+  if(i%20==0){T.push(i*dt*1e9);P.push(S*k*1e3);NN.push(n/m.nth)}}
+ const S0=s0.S,wR=Math.sqrt(m.vg*m.a*S0/m.tp),gam=1/m.tn+m.vg*m.a*S0,fR=wR/(2*Math.PI);
+ // measured period: peaks of P after first peak
+ const pk=[];for(let i=1;i<P.length-1;i++)if(P[i]>P[i-1]&&P[i]>P[i+1]&&P[i]>s0.P*1e3*1.0005)pk.push(T[i]);const fm=pk.length>=3?(pk.length-2)/(pk[pk.length-1]-pk[1])*1e9:NaN;
+ const delay=T[P.findIndex(p=>p>0.1*s0.P*1e3)];const H=fr=>{const w=2*Math.PI*fr;return wR*wR/Math.hypot(wR*wR-w*w,w*gam)};
+ const FF=logspace(8,11.3,400);let f3=NaN;for(let i=FF.length-1;i>=0;i--)if(H(FF[i])>=Math.SQRT1_2){f3=FF[i];break}
+ cards('e3cards',[['Steady power',(s0.P*1e3).toFixed(2)+' mW'],['f_R formula',(fR/1e9).toFixed(2)+' GHz','th'],['f from turn-on ringing (large signal)',isFinite(fm)?(fm/1e9).toFixed(2)+' GHz':'window too short','ok'],['Damping γ',(gam/1e9).toFixed(2)+' ns⁻¹'],['Turn-on delay',delay!==undefined?(delay).toFixed(2)+' ns':'—'],['3-dB bandwidth',(f3/1e9).toFixed(2)+' GHz']]);
+ const r=plot($('e3p'),[{x:T,y:P,color:C.mag,width:1.8,label:'power [mW]'},{x:T,y:NN.map(v=>v*Math.max(...P)/1.3),color:C.teal,width:1.4,dash:[6,3],label:'n/n_th (scaled: 1.3 = top)'}],{xmin:0,xmax:tw*1e9,ymin:0,ymax:Math.max(...P)*1.05,xlabel:'Time [ns]',ylabel:'Output power [mW]',legend:true,legendW:200});
+ plot($('e3h'),[{x:FF,y:FF.map(v=>20*Math.log10(H(v))),color:C.mag,width:2.2},{x:[fR],y:[20*Math.log10(H(fR))],color:C.mid,points:true,r:6}],{xmin:1e8,xmax:2e11,ymin:-30,ymax:Math.max(10,Math.ceil(20*Math.log10(H(fR)))+3),logx:true,xlabel:'Modulation frequency [Hz]',ylabel:'|H(f)| [dB]',bands:[{y:[-3.05,-2.95],color:'rgba(91,99,128,.5)'}]});}
+let s4=1;
+function e4(){const pt=Math.pow(10,val('e4p')),h=val('e4h'),r=val('e4r');show('e4p',fmt(pt,2)+' Torr');show('e4h',h.toFixed(0)+' cm');show('e4r',r.toFixed(1)+' cm');
+ const T=300,d=0.37e-9,m=28*1.6605e-27;const mfp=p=>kb*T/(Math.SQRT2*Math.PI*d*d*p*133.32),tml=p=>1e19/(p*133.32/Math.sqrt(2*Math.PI*m*kb*T));
+ const cl=x=>(1+(x/h)**2)**-2;
+ cards('e4cards',[['Mean free path',fmt(mfp(pt),3)+' m','th'],['Impingement flux',fmt(pt*133.32/Math.sqrt(2*Math.PI*m*kb*T)*1e-4,3)+' cm⁻²s⁻¹'],['Monolayer time',fmt(tml(pt),3)+' s','th'],['t(r)/t₀ cosine law',cl(r).toFixed(4)],['r for ±1 %',(h*Math.sqrt(Math.pow(0.99,-0.5)-1)).toFixed(2)+' cm'],['r for ±5 %',(h*Math.sqrt(Math.pow(0.95,-0.5)-1)).toFixed(2)+' cm']]);
+ const P=logspace(-11,3,300);plot($('e4a'),[{x:P,y:P.map(mfp),color:C.mag,width:2.2,label:'mean free path [m]'},{x:P,y:P.map(tml),color:C.teal,width:2.2,label:'monolayer time [s]'},{x:[pt,pt],y:[mfp(pt),tml(pt)],color:C.mid,points:true,r:6},{x:[1e-11,1e3],y:[0.5,0.5],color:C.grey,width:1,dash:[4,4],label:'chamber size 0.5 m'}],{xmin:1e-11,xmax:1e3,ymin:1e-8,ymax:1e8,logx:true,logy:true,xlabel:'Pressure [Torr]',ylabel:'Value',legend:true,legendW:170});
+ seed=31+s4;const nb=24,rm=30,cnt=new Array(nb).fill(0);const Na=1000000;for(let i=0;i<Na;i++){const ct=Math.sqrt(rnd());const st=Math.sqrt(1-ct*ct);const rr=h*st/ct;if(rr<rm)cnt[Math.floor(rr/rm*nb)]++}
+ const rc=[],th=[];for(let i=0;i<nb;i++){const a=Math.PI*(((i+1)*rm/nb)**2-(i*rm/nb)**2);rc.push((i+0.5)*rm/nb);th.push(cnt[i]/a)}const c0=th[0]/cl(rc[0]);
+ const R=linspace(0,30,200);plot($('e4b'),[{x:R,y:R.map(cl),color:C.mag,width:2.2,label:'cosine law'},{x:rc,y:th.map(v=>v/c0),color:C.mid,points:true,r:3.5,label:'Monte Carlo'},{x:[r],y:[cl(r)],color:C.teal,points:true,r:6}],{xmin:0,xmax:30,ymin:0,ymax:1.1,xlabel:'Radius on the substrate r [cm]',ylabel:'t(r) / t₀',legend:true,legendW:130,legendBottom:true,legendLeft:true});}
+
+const FN=[e1,e2,e3,e4];
+function draw(){const id=document.querySelector('.exp.on').id;FN[+id.slice(1)-1]();}
+setupTabs(draw);draw();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

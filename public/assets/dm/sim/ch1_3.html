@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Discrete-event simulator · DMP Ch1</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+.tabs button{font:inherit;font-weight:bold;border:none;background:none;padding:8px 14px;color:var(--grey);border-bottom:3px solid transparent;cursor:pointer}
+.tabs button.on{color:var(--orange);border-bottom-color:var(--orange)}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:12px}
+.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px}@media(max-width:780px){.grid{grid-template-columns:1fr}}
+canvas{width:100%;height:auto;display:block}
+.btn{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:4px 6px 0 0}
+.btn.main{background:var(--orange);color:#fff}
+select,input[type=range]{accent-color:var(--orange)}
+label{font-size:14px;color:var(--grey)}
+table{border-collapse:collapse;width:100%;font-size:14px;margin-top:8px}th{background:var(--ink);color:#fff;padding:5px}td{border-bottom:1px solid var(--line);text-align:center;padding:4px}
+td.w{background:var(--tint);color:var(--brown);font-weight:bold}tr.new td{animation:fl 1s}@keyframes fl{from{background:#F2A33A55}}
+.fel{font-family:Consolas,monospace;font-size:14px;background:var(--cream);border-radius:8px;padding:8px;min-height:60px}
+.fel div{padding:2px 0}.fel .imm{color:var(--orange);font-weight:bold}
+.clock{font-family:Cambria,serif;font-size:28px}.log{font-size:14px;color:var(--grey);min-height:22px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.s{background:var(--cream);border-radius:8px;padding:7px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:17px}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+.hide{display:none}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 1 · SIMULATOR 3</small><h1>Discrete-event simulation: clock, events and the future event list</h1></header>
+<div class="wrap">
+<div class="tabs"><button class="on" data-t="A">A · Optical switch port</button><button data-t="B">B · Single-photon detector dead time</button></div>
+
+<div id="A">
+ <div class="card">
+  <label>Input: <select id="preset"><option value="lec">Lecture example (6 packets)</option><option value="hw">Problem set example (7 packets)</option><option value="rnd">Random M/M/1 (15 packets)</option></select></label>
+  <label style="margin-left:12px">ρ = λ/μ (random only): <input type="range" id="rho" min="0.3" max="0.95" step="0.05" value="0.8"> <b id="rhov">0.80</b></label>
+  <div><button class="btn main" id="next">Next event ▶</button><button class="btn" id="all">Run to end</button><button class="btn" id="rst">Reset</button></div>
+ </div>
+ <div class="grid">
+  <div class="card">
+   <div style="display:flex;justify-content:space-between;align-items:baseline"><div>Simulation clock <span class="clock" id="clk">0</span> μs</div><div class="log" id="log"></div></div>
+   <canvas id="sys" width="700" height="170"></canvas>
+   <canvas id="nt" width="700" height="200"></canvas>
+  </div>
+  <div class="card">
+   <b>Future event list (ordered by time)</b>
+   <div class="fel" id="fel"></div>
+   <div class="stats">
+    <div class="s"><span>Average wait W<sub>q</sub></span><b id="m1">—</b></div>
+    <div class="s"><span>P(wait)</span><b id="m2">—</b></div>
+    <div class="s"><span>Average in system W</span><b id="m3">—</b></div>
+    <div class="s"><span>Utilisation ρ̂</span><b id="m4">—</b></div>
+    <div class="s"><span>L (time average)</span><b id="m5">—</b></div>
+    <div class="s"><span>λ̂·W (Little)</span><b id="m6">—</b></div>
+   </div>
+  </div>
+ </div>
+ <div class="card"><b>Simulation table (rows complete at each departure)</b>
+  <table><thead><tr><th>Packet</th><th>Arrival</th><th>Service</th><th>Begins</th><th>Waits</th><th>Ends</th><th>In system</th><th>Idle before</th></tr></thead><tbody id="tb"></tbody></table>
+  <div class="ar">الساعة لا تمر على اللحظات الفارغة: تقفز مباشرة إلى أقرب حدث في القائمة. كل وصول يجدول الوصول التالي، وكل بدء خدمة يجدول حدث مغادرة في المستقبل.</div>
+ </div>
+</div>
+
+<div id="B" class="hide">
+ <div class="card">
+  <label>λτ<sub>d</sub> = <b id="xv"></b> <input type="range" id="x" min="-1.3" max="0.7" step="0.05" value="-0.3" style="width:260px"></label>
+  <label style="margin-left:10px"><input type="checkbox" id="par"> paralysable detector</label>
+  <div><button class="btn main" id="simB">Simulate 100 000 photons at this λτ<sub>d</sub></button><button class="btn" id="sweep">Sweep all λτ<sub>d</sub></button><button class="btn" id="clrB">Clear points</button></div>
+ </div>
+ <div class="grid">
+  <div class="card"><canvas id="tl" width="700" height="230"></canvas>
+   <div class="log">First 30 photons: amber = counted, grey = lost during dead time (shaded).</div></div>
+  <div class="card"><canvas id="rp" width="700" height="330"></canvas>
+   <div class="stats"><div class="s"><span>Simulated R/λ</span><b id="b1">—</b></div><div class="s"><span>Theory R/λ</span><b id="b2">—</b></div><div class="s"><span>Lost photons</span><b id="b3">—</b></div></div></div>
+ </div>
+ <div class="ar">الكاشف يعدّ الفوتون ثم «يغمض عينيه» مدة τ<sub>d</sub>. في النوع غير المشلول يضيع ما يصل أثناء الإغماضة فقط، أما في النوع المشلول فكل فوتون يصل أثناءها يمدّها من جديد، فيقل العدّ عند الشدة العالية.</div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('A').classList.toggle('hide',b.dataset.t!=='A');$('B').classList.toggle('hide',b.dataset.t!=='B');if(b.dataset.t==='B')drawB();});
+/* ---------- A: event-scheduling simulator ---------- */
+let S;
+function rexp(m){return -Math.log(1-Math.random())*m;}
+function makeInput(){const v=$('preset').value;
+ if(v==='lec')return{ia:[0,2,4,1,2,6],sv:[3,2,4,1,3,2]};
+ if(v==='hw')return{ia:[0,1,3,1,4,2,1],sv:[2,3,1,2,2,3,1]};
+ const rho=+$('rho').value,ia=[0],sv=[];for(let i=0;i<15;i++){if(i)ia.push(+rexp(1/rho).toFixed(2));sv.push(+rexp(1).toFixed(2));}return{ia,sv};}
+function initA(){const inp=makeInput();const arr=[];let t=0;inp.ia.forEach(d=>{t=+(t+d).toFixed(2);arr.push(t);});
+ S={arr,sv:inp.sv,n:arr.length,clock:0,FEL:[{t:arr[0],type:'A',id:0}],queue:[],busy:false,inS:-1,nSys:0,area:0,next:1,begin:[],fin:[],prevEnd:0,idle:[],trace:[[0,0]],log:'Initialised: first arrival scheduled.'};
+ $('tb').innerHTML='';renderA();}
+function stepA(){if(!S.FEL.length)return false;S.FEL.sort((a,b)=>a.t-b.t||(a.type==='D'?-1:1));const ev=S.FEL.shift();
+ S.area+=S.nSys*(ev.t-S.clock);S.clock=ev.t;
+ if(ev.type==='A'){S.nSys++;if(S.next<S.n){S.FEL.push({t:S.arr[S.next],type:'A',id:S.next});S.next++;}
+  if(!S.busy){S.busy=true;S.inS=ev.id;S.begin[ev.id]=S.clock;S.idle[ev.id]=+(S.clock-S.prevEnd).toFixed(2);S.FEL.push({t:+(S.clock+S.sv[ev.id]).toFixed(2),type:'D',id:ev.id});S.log='Arrival of packet '+(ev.id+1)+': port free, service starts.';}
+  else{S.queue.push(ev.id);S.log='Arrival of packet '+(ev.id+1)+': port busy, joins the queue.';}}
+ else{S.fin[ev.id]=S.clock;S.prevEnd=S.clock;S.nSys--;addRow(ev.id);
+  if(S.queue.length){const id=S.queue.shift();S.inS=id;S.begin[id]=S.clock;S.idle[id]=0;S.FEL.push({t:+(S.clock+S.sv[id]).toFixed(2),type:'D',id});S.log='Departure of packet '+(ev.id+1)+': packet '+(id+1)+' leaves the queue and starts service.';}
+  else{S.busy=false;S.inS=-1;S.log='Departure of packet '+(ev.id+1)+': port becomes idle.';}}
+ S.trace.push([S.clock,S.nSys]);renderA();return true;}
+function addRow(id){const a=S.arr[id],b=S.begin[id],f=S.fin[id],w=+(b-a).toFixed(2);const tr=document.createElement('tr');tr.className='new';
+ tr.innerHTML=`<td>${id+1}</td><td>${a}</td><td>${S.sv[id]}</td><td>${b}</td><td class="${w>0?'w':''}">${w}</td><td>${f}</td><td>${+(f-a).toFixed(2)}</td><td>${S.idle[id]}</td>`;$('tb').appendChild(tr);}
+function renderA(){$('clk').textContent=S.clock;$('log').textContent=S.log;
+ const fel=[...S.FEL].sort((a,b)=>a.t-b.t);$('fel').innerHTML=fel.length?fel.map((e,i)=>`<div class="${i?'':'imm'}">(${e.type==='A'?'Arrival':'Departure'}, t = ${e.t})  packet ${e.id+1}${i?'':'  ← imminent'}</div>`).join(''):'<div>empty: simulation finished</div>';
+ const done=S.fin.filter(x=>x!==undefined).length;
+ if(done){const ids=[...Array(S.n).keys()].filter(i=>S.fin[i]!==undefined);const wq=ids.map(i=>S.begin[i]-S.arr[i]),ws=ids.map(i=>S.fin[i]-S.arr[i]);
+  const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;const T=S.clock;const busy=ids.reduce((s,i)=>s+S.sv[i],0)+(S.busy?(S.clock-S.begin[S.inS]):0);
+  $('m1').textContent=mean(wq).toFixed(3);$('m2').textContent=(wq.filter(x=>x>1e-9).length/ids.length).toFixed(3);$('m3').textContent=mean(ws).toFixed(3);
+  $('m4').textContent=T?(busy/T).toFixed(3):'—';$('m5').textContent=T?(S.area/T).toFixed(3):'—';
+  $('m6').textContent=(!S.FEL.length&&T)?(S.n/T*mean(ws)).toFixed(3):'at end';}
+ else['m1','m2','m3','m4','m5','m6'].forEach(i=>$(i).textContent='—');
+ drawSys();drawNt();}
+function drawSys(){const c=$('sys').getContext('2d'),W=700,H=170;c.clearRect(0,0,W,H);c.fillStyle='#FAF8F3';c.fillRect(0,0,W,H);
+ c.font='15px Calibri,Arial';c.fillStyle='#5A5650';c.fillText('queue (FIFO buffer)',40,30);c.fillText('port (server)',520,30);
+ c.strokeStyle='#5A5650';c.lineWidth=2;c.beginPath();c.moveTo(30,60);c.lineTo(470,60);c.moveTo(30,130);c.lineTo(470,130);c.stroke();
+ S.queue.forEach((id,k)=>{const x=430-k*62;c.fillStyle='#E07B1A';c.fillRect(x,70,50,50);c.fillStyle='#fff';c.font='bold 18px Calibri';c.fillText('P'+(id+1),x+12,102);});
+ c.strokeStyle='#1E1E22';c.lineWidth=3;c.beginPath();c.arc(560,95,45,0,7);c.stroke();
+ if(S.inS>=0){c.fillStyle='#1E1E22';c.beginPath();c.arc(560,95,38,0,7);c.fill();c.fillStyle='#F2A33A';c.font='bold 18px Calibri';c.fillText('P'+(S.inS+1),543,101);}
+ else{c.fillStyle='#8C8C84';c.font='15px Calibri';c.fillText('idle',546,100);}
+ c.fillStyle='#5A5650';c.font='15px Calibri';c.fillText('departed: '+S.fin.filter(x=>x!==undefined).length+' / '+S.n,520,160);}
+function drawNt(){const c=$('nt').getContext('2d'),W=700,H=200,pd={l:44,r:10,t:12,b:30};c.clearRect(0,0,W,H);c.fillStyle='#fff';c.fillRect(0,0,W,H);
+ const Tm=Math.max(S.arr[S.n-1]+S.sv.reduce((a,b)=>a+b,0)*0.5,S.clock,1),ym=Math.max(4,...S.trace.map(x=>x[1]));
+ const X=t=>pd.l+(W-pd.l-pd.r)*t/Tm,Y=v=>H-pd.b-(H-pd.t-pd.b)*v/ym;c.strokeStyle='#E2DCCF';c.font='13px Calibri';c.fillStyle='#5A5650';
+ for(let v=0;v<=ym;v++){c.beginPath();c.moveTo(pd.l,Y(v));c.lineTo(W-pd.r,Y(v));c.stroke();c.fillText(v,pd.l-16,Y(v)+4);}
+ c.fillText('number in system vs t (μs)',pd.l+6,H-8);
+ c.strokeStyle='#E07B1A';c.lineWidth=2.2;c.beginPath();S.trace.forEach(([t,v],i)=>{if(!i)c.moveTo(X(t),Y(v));else{c.lineTo(X(t),Y(S.trace[i-1][1]));c.lineTo(X(t),Y(v));}});c.stroke();}
+$('next').onclick=()=>stepA();$('all').onclick=()=>{while(stepA());};$('rst').onclick=initA;$('preset').onchange=initA;
+$('rho').oninput=()=>{$('rhov').textContent=(+$('rho').value).toFixed(2);if($('preset').value==='rnd')initA();};
+initA();
+/* ---------- B: detector dead time ---------- */
+let pts=[];const td=1;
+function xval(){return 10**(+$('x').value);}
+function detect(x,par,n){let live=-1e9,t=0,c=0;for(let i=0;i<n;i++){t+=-Math.log(1-Math.random())/x;if(t>=live){c++;live=t+td;}else if(par)live=t+td;}return c/t/x;}
+function timeline(){const c=$('tl').getContext('2d'),W=700,H=230;c.clearRect(0,0,W,H);c.fillStyle='#1E1E22';c.fillRect(0,0,W,H);
+ const x=xval(),par=$('par').checked;let t=0,live=-1e9;const ev=[];for(let i=0;i<30;i++){t+=-Math.log(1-Math.random())/x;let cnt=false;if(t>=live){cnt=true;live=t+td;}else if(par)live=t+td;ev.push([t,cnt,live]);}
+ const T=Math.max(t*1.05,5*td),X=v=>20+(W-40)*v/T;c.fillStyle='rgba(242,163,58,0.18)';
+ let ds=null,de=null;ev.forEach(([tt,cnt,lv])=>{if(cnt){if(ds!==null)c.fillRect(X(ds),60,X(de)-X(ds),110);ds=tt;de=lv;}else{de=lv;}});if(ds!==null)c.fillRect(X(ds),60,X(Math.min(de,T))-X(ds),110);
+ c.strokeStyle='#8C8C84';c.beginPath();c.moveTo(20,170);c.lineTo(W-20,170);c.stroke();
+ ev.forEach(([tt,cnt])=>{c.strokeStyle=cnt?'#F2A33A':'#8C8C84';c.lineWidth=cnt?3:2;c.beginPath();c.moveTo(X(tt),170);c.lineTo(X(tt),cnt?70:120);c.stroke();});
+ c.fillStyle='#CFCAC0';c.font='15px Calibri';c.fillText('time in units of τd  →   (shaded = detector dead)',20,205);c.fillText(par?'paralysable':'non-paralysable',20,30);}
+function drawB(){const x=xval();$('xv').textContent=x.toFixed(3);timeline();
+ const c=$('rp').getContext('2d'),W=700,H=330,pd={l:60,r:14,t:16,b:44};c.clearRect(0,0,W,H);c.fillStyle='#fff';c.fillRect(0,0,W,H);
+ const X=v=>pd.l+(W-pd.l-pd.r)*(Math.log10(v)+1.3)/2,Y=v=>H-pd.b-(H-pd.t-pd.b)*v;c.font='14px Calibri';c.fillStyle='#5A5650';c.strokeStyle='#E2DCCF';
+ [0.05,0.1,0.2,0.5,1,2,5].forEach(v=>{c.beginPath();c.moveTo(X(v),pd.t);c.lineTo(X(v),H-pd.b);c.stroke();c.fillText(v,X(v)-8,H-pd.b+18);});
+ for(let i=0;i<=5;i++){const v=i/5;c.beginPath();c.moveTo(pd.l,Y(v));c.lineTo(W-pd.r,Y(v));c.stroke();c.fillText(v.toFixed(1),pd.l-30,Y(v)+5);}
+ c.fillText('λτd',W/2,H-8);c.fillText('R/λ',8,pd.t+10);
+ const curve=(f,col,dash)=>{c.strokeStyle=col;c.lineWidth=2;c.setLineDash(dash);c.beginPath();for(let i=0;i<=200;i++){const v=10**(-1.3+2*i/200);i?c.lineTo(X(v),Y(f(v))):c.moveTo(X(v),Y(f(v)));}c.stroke();c.setLineDash([]);};
+ curve(v=>1/(1+v),'#1E1E22',[]);curve(v=>Math.exp(-v),'#1E1E22',[6,5]);
+ pts.forEach(([v,r,p])=>{c.fillStyle=p?'#2E6F8E':'#E07B1A';c.beginPath();c.arc(X(v),Y(r),5,0,7);c.fill();});
+ c.strokeStyle='#E07B1A';c.setLineDash([3,3]);c.beginPath();c.moveTo(X(x),pd.t);c.lineTo(X(x),H-pd.b);c.stroke();c.setLineDash([]);
+ c.fillStyle='#1E1E22';c.fillText('— non-paralysable 1/(1+λτd)    - - paralysable exp(−λτd)',pd.l+10,pd.t+14);
+ const par=$('par').checked;$('b2').textContent=(par?Math.exp(-x):1/(1+x)).toFixed(4);}
+$('x').oninput=()=>{['b1','b3'].forEach(i=>$(i).textContent='—');drawB();};$('par').onchange=$('x').oninput;
+$('simB').onclick=()=>{const x=xval(),par=$('par').checked,r=detect(x,par,100000);pts.push([x,r,par]);$('b1').textContent=r.toFixed(4);$('b3').textContent=((1-r)*100).toFixed(1)+'%';drawB();};
+$('sweep').onclick=()=>{const par=$('par').checked;for(let i=0;i<=10;i++){const x=10**(-1.3+0.2*i);pts.push([x,detect(x,par,40000),par]);}drawB();};
+$('clrB').onclick=()=>{pts=[];['b1','b3'].forEach(i=>$(i).textContent='—');drawB();};
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f4"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

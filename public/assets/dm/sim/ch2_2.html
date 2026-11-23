@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Random-number generator lab · DMP Ch2</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+input[type=number]{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 2 · SIMULATOR 2</small><h1>Random-number generator lab: period, lattice and tests</h1></header>
+<div class="wrap">
+<div class="grid">
+ <div class="card">
+  <div class="eq">X<sub>i+1</sub> = (a X<sub>i</sub> + c) mod m ,   R<sub>i</sub> = X<sub>i</sub>/m</div>
+  <label>Preset</label>
+  <button data-p="hand">Hand example (5, 3, 16)</button><button data-p="bad">Broken (4, 3, 16)</button><button data-p="small">Small (65, 1, 2048)</button><button data-p="minstd">MINSTD</button><button data-p="randu">RANDU</button>
+  <label>a <input id="a" type="number" value="5" style="width:110px"> &nbsp; c <input id="c" type="number" value="3" style="width:110px"> &nbsp; m <input id="mm" type="number" value="16" style="width:130px"> &nbsp; X<sub>0</sub> <input id="x0" type="number" value="7" style="width:90px"></label>
+  <label>Numbers N for the tests: <span class="val" id="nv"></span></label><input type="range" id="n" min="2" max="5" step="0.5" value="4">
+  <button class="main" id="go">Generate and test</button>
+  <div class="eq" id="seq" style="text-align:left;font-size:15px;min-height:46px"></div>
+  <div class="stats">
+   <div class="s"><span>Period</span><b id="tP">—</b></div>
+   <div class="s"><span>Mean (0.5)</span><b id="tM">—</b></div>
+   <div class="s"><span>Variance (0.0833)</span><b id="tV">—</b></div>
+   <div class="s"><span>χ² (10 classes; crit 16.9)</span><b id="tC">—</b></div>
+   <div class="s"><span>KS D (crit 1.36/√N)</span><b id="tK">—</b></div>
+   <div class="s"><span>Lag-1 autocorrelation Z₀</span><b id="tZ">—</b></div>
+  </div>
+ </div>
+ <div class="card">
+  <canvas id="lat" width="800" height="420"></canvas>
+  <canvas id="pl" width="800" height="260"></canvas>
+  <div class="ar">الشكل العلوي يرسم كل عدد مقابل العدد الذي يليه: المولد الجيد يملأ المربع، والرديء يرسم خطوطاً. الشكل السفلي يحسب مقداراً واحداً من كل ثلاثة أعداد متتالية (معادلته تحت المحور): في مولد RANDU يأخذ هذا المقدار 15 قيمة صحيحة فقط، أي أن الثلاثيات تقع على 15 مستوى.</div>
+ </div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const P={hand:[5,3,16,7],bad:[4,3,16,7],small:[65,1,2048,1],minstd:[16807,0,2147483647,12345],randu:[65539,0,2147483648,1]};
+document.querySelectorAll('button[data-p]').forEach(b=>b.onclick=()=>{const v=P[b.dataset.p];['a','c','mm','x0'].forEach((id,i)=>$(id).value=v[i]);run()});
+$('n').oninput=()=>$('nv').textContent=Math.round(10**+$('n').value).toLocaleString();
+function mod(x,m){return x-Math.floor(x/m)*m}
+function run(){const a=+$('a').value,c=+$('c').value,m=+$('mm').value,x0=+$('x0').value,N=Math.round(10**+$('n').value);
+ if(!(m>1&&a>0&&a*m<9e15)){$('seq').textContent='Choose m > 1 and a·m < 9×10^15 so that the arithmetic is exact.';return}
+ let x=x0,first=[];for(let i=0;i<20;i++){x=mod(a*x+c,m);first.push(x)}
+ $('seq').textContent='X: '+first.join(', ')+' …';
+ // period by Brent's cycle detection (no memory needed), limit 4e6 steps
+ let per='> 4 000 000';{const F=z=>mod(a*z+c,m);let pw=1,lam=1,t=x0,h=F(x0),steps=0;
+  while(t!==h&&steps<4e6){if(pw===lam){t=h;pw*=2;lam=0}h=F(h);lam++;steps++}
+  if(t===h)per=lam.toLocaleString()}
+ $('tP').textContent=per;
+ const R=new Float64Array(N);x=x0;for(let i=0;i<N;i++){x=mod(a*x+c,m);R[i]=x/m}
+ let mu=0;for(const r of R)mu+=r;mu/=N;let v=0;for(const r of R)v+=(r-mu)**2;v/=N-1;
+ const O=new Array(10).fill(0);for(const r of R)O[Math.min(9,Math.floor(r*10))]++;let chi=0;O.forEach(o=>chi+=(o-N/10)**2/(N/10));
+ const S=Array.from(R).sort((p,q)=>p-q);let D=0;for(let i=0;i<N;i++)D=Math.max(D,(i+1)/N-S[i],S[i]-i/N);
+ const M=N-2;let rho=0;for(let k=0;k<=M;k++)rho+=R[k]*R[k+1];rho=rho/(M+1)-0.25;const Z=rho/(Math.sqrt(13*M+7)/(12*(M+1)));
+ $('tM').textContent=mu.toFixed(4);$('tV').textContent=v.toFixed(4);
+ $('tC').textContent=chi.toFixed(1)+(chi>16.92?' reject':' ok');$('tK').textContent=D.toFixed(4)+(D>1.36/Math.sqrt(N)?' reject':' ok');$('tZ').textContent=Z.toFixed(2)+(Math.abs(Z)>1.96?' reject':' ok');
+ // lattice
+ const g=$('lat').getContext('2d');g.clearRect(0,0,800,420);const s=380,ox=210,oy=20;g.strokeStyle='#5A5650';g.strokeRect(ox,oy,s,s);
+ g.fillStyle='#E07B1A';const np=Math.min(N-1,5000);for(let i=0;i<np;i++)g.fillRect(ox+R[i]*s-1,oy+(1-R[i+1])*s-1,2.4,2.4);
+ g.fillStyle='#5A5650';g.font='14px Calibri';g.fillText('R_i',ox+s/2,oy+s+18);g.fillText('R_(i+1)',ox-60,oy+s/2);g.fillText(np+' pairs',ox+s+10,oy+15);
+ // plane detector
+ const h=$('pl').getContext('2d');h.clearRect(0,0,800,260);const bins=new Array(160).fill(0);let nt=0;
+ for(let i=0;i+2<Math.min(N,30000);i+=3){const w=9*R[i]-6*R[i+1]+R[i+2];const b=Math.floor((w+6)/16*160);if(b>=0&&b<160){bins[b]++;nt++}}
+ const bm=Math.max(...bins);h.fillStyle='#2E6F8E';for(let b=0;b<160;b++){const hh=bins[b]/bm*200;h.fillRect(40+b*4.6,225-hh,3.6,hh)}
+ h.strokeStyle='#5A5650';h.beginPath();h.moveTo(40,225);h.lineTo(780,225);h.stroke();h.fillStyle='#5A5650';
+ for(let t=-6;t<=10;t+=2)h.fillText(t,40+(t+6)/16*736-5,245);h.fillText('9u(k) − 6u(k+1) + u(k+2)',300,18);
+ const spikes=bins.filter(b=>b>0).length;h.fillText(spikes<=20?'only '+spikes+' occupied bins → planes':'spread out → no plane structure',560,18)}
+$('go').onclick=run;$('n').oninput();run();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f3"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

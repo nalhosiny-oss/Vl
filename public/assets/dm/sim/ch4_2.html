@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calibration and hold-out · DMP Ch4</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:19px;color:var(--ink)}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:6px 12px;cursor:pointer;margin:6px 6px 0 0}
+button.main{background:var(--orange);color:#fff}button:hover{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.s{background:var(--cream);border-radius:8px;padding:8px}.s span{display:block;font-size:12px;color:var(--grey)}.s b{font-family:Cambria,serif;font-size:18px}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+select{font:inherit;padding:4px;border:1px solid #E2DCCF;border-radius:6px}</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 4 · SIMULATOR 2</small><h1>Calibration and hold-out validation of a turn-on model</h1></header>
+<div class="wrap"><div class="grid">
+<div class="card">
+ <div class="eq">t<sub>d</sub> = t<sub>0</sub> + τ<sub>n</sub> x ,  x = ln[I/(I − I<sub>th</sub>)] ,  I<sub>th</sub> = 20 mA ,  σ<sub>m</sub> = 0.04 ns</div>
+ <p style="font-size:15px">Click a current to move it between the <b style="color:#E07B1A">calibration</b> set and the <b style="color:#2E6F8E">validation</b> set. The model is fitted on the calibration set only.</p>
+ <div id="chips"></div>
+ <div><button class="main" data-k="2">Model t₀ + τx</button><button data-k="1">Model τx (no t₀)</button></div>
+ <div><button id="slide">Slide data</button><button id="nd">New measurements</button></div>
+ <div class="stats"><div class="s"><span>τ̂<sub>n</sub> , t̂<sub>0</sub> (ns)</span><b id="s1">—</b></div><div class="s"><span>RMSE calibration</span><b id="s2">—</b></div><div class="s"><span>RMSE validation</span><b id="s3">—</b></div></div>
+ <div class="ar">الملاءمة الجيدة على بيانات المعايرة لا تكفي؛ الحكم يكون على البيانات المحجوزة. جرّب نموذجاً بلا t₀ وراقب البواقي الموجبة كلها، ثم جرّب المعايرة على أدنى ثلاثة تيارات فقط.</div>
+</div>
+<div class="card"><canvas id="c" width="800" height="400"></canvas><canvas id="e" width="800" height="260"></canvas></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);const I=[25,30,35,40,50,60,70,80],Ith=20,X=I.map(i=>Math.log(i/(i-Ith)));
+const SL=[3.629,2.547,1.908,1.701,1.269,1.000,0.848,0.765];let Y=SL.slice(),cal=[1,0,1,0,1,0,1,0],K=2;
+const gauss=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random());
+function chips(){const d=$('chips');d.innerHTML='';I.forEach((v,i)=>{const b=document.createElement('button');b.textContent=v+' mA';b.className=cal[i]?'main':'';if(!cal[i]){b.style.borderColor='#2E6F8E';b.style.color='#2E6F8E'}b.onclick=()=>{cal[i]=1-cal[i];chips();draw()};d.appendChild(b)})}
+function fit(){const ix=I.map((_,i)=>i).filter(i=>cal[i]);const n=ix.length;if(n<K)return null;
+ if(K===1){let a=0,b=0;ix.forEach(i=>{a+=X[i]*Y[i];b+=X[i]*X[i]});return{t0:0,tau:a/b}}
+ const xm=ix.reduce((s,i)=>s+X[i],0)/n,ym=ix.reduce((s,i)=>s+Y[i],0)/n;let sxx=0,sxy=0;ix.forEach(i=>{sxx+=(X[i]-xm)**2;sxy+=(X[i]-xm)*(Y[i]-ym)});
+ if(sxx<1e-12)return null;const tau=sxy/sxx;return{t0:ym-tau*xm,tau}}
+function draw(){const p=fit();const c=$('c').getContext('2d'),W=800,H=400,L=60,B=40;c.clearRect(0,0,W,H);
+ const Xp=v=>L+(v-20)/65*(W-L-20),Yp=v=>H-B-v/4*(H-B-20);
+ c.strokeStyle='#E2DCCF';c.beginPath();c.moveTo(L,H-B);c.lineTo(W-20,H-B);c.moveTo(L,H-B);c.lineTo(L,10);c.stroke();
+ c.fillStyle='#5A5650';c.font='15px Calibri';for(let v=20;v<=80;v+=10)c.fillText(v,Xp(v)-8,H-B+18);for(let v=0;v<=4;v++)c.fillText(v,L-18,Yp(v)+5);c.fillText('I (mA)',W-60,H-8);c.fillText('t_d (ns)',8,22);
+ if(p){c.strokeStyle='#1E1E22';c.lineWidth=2;c.beginPath();for(let k=0;k<=300;k++){const i=22+k/300*63,v=p.t0+p.tau*Math.log(i/(i-Ith));k?c.lineTo(Xp(i),Yp(Math.min(v,4.2))):c.moveTo(Xp(i),Yp(Math.min(v,4.2)))}c.stroke()}
+ I.forEach((v,i)=>{c.fillStyle=cal[i]?'#E07B1A':'#2E6F8E';c.beginPath();cal[i]?c.arc(Xp(v),Yp(Y[i]),7,0,7):c.rect(Xp(v)-6,Yp(Y[i])-6,12,12);c.fill()});
+ const g=$('e').getContext('2d'),H2=260;g.clearRect(0,0,W,H2);const Yr=v=>H2/2-v/0.2*(H2/2-25);
+ g.strokeStyle='#E2DCCF';g.beginPath();g.moveTo(L,H2/2);g.lineTo(W-20,H2/2);g.stroke();g.setLineDash([5,5]);g.strokeStyle='#B3332F';[0.08,-0.08].forEach(v=>{g.beginPath();g.moveTo(L,Yr(v));g.lineTo(W-20,Yr(v));g.stroke()});g.setLineDash([]);
+ g.fillStyle='#5A5650';g.font='14px Calibri';g.fillText('residual (ns)',8,18);g.fillText('±2σ_m',W-70,Yr(0.08)-5);
+ if(!p){['s1','s2','s3'].forEach(s=>$(s).textContent='—');g.fillText('Need at least '+K+' calibration points',L+20,40);return}
+ let sc=0,nc=0,sv=0,nv=0;I.forEach((v,i)=>{const r=Y[i]-(p.t0+p.tau*X[i]);if(cal[i]){sc+=r*r;nc++}else{sv+=r*r;nv++}
+  g.fillStyle=cal[i]?'#E07B1A':'#2E6F8E';const y=Yr(Math.max(-0.2,Math.min(0.2,r)));g.fillRect(Xp(v)-6,Math.min(y,H2/2),12,Math.abs(y-H2/2)+1)});
+ $('s1').textContent=p.tau.toFixed(3)+' , '+p.t0.toFixed(3);$('s2').textContent=Math.sqrt(sc/nc).toFixed(3)+' ns';$('s3').textContent=nv?Math.sqrt(sv/nv).toFixed(3)+' ns':'—'}
+document.querySelectorAll('button[data-k]').forEach(b=>b.onclick=()=>{K=+b.dataset.k;document.querySelectorAll('button[data-k]').forEach(x=>x.classList.toggle('main',x===b));draw()});
+$('slide').onclick=()=>{Y=SL.slice();draw()};$('nd').onclick=()=>{Y=X.map(x=>+(0.12+2.2*x+0.04*gauss()).toFixed(3));draw()};
+chips();draw();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f3"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>

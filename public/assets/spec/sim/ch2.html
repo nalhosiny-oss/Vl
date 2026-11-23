@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل النماذج الذرية وطيف الهيدروجين</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#FBF8F1;--panel:#FFFFFF;--ink:#2A2623;--muted:#6F6553;--line:#E2DACB;--gold:#B8862B;--golddk:#8C6414;--chip:#F4EEE2;--plot:#FFFDF8;--grid:#EEE6D6;--dark:#1A1714;--blue:#3D4E8C;--ok:#2E7D4F;--bad:#B23A2E}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 44px}
+.fstrip{height:14px;border-radius:7px;margin:0 0 14px;direction:ltr;background:
+ linear-gradient(90deg,transparent 0 21%,#1A1714 21% 21.4%,transparent 21.4% 45%,#1A1714 45% 45.3%,transparent 45.3% 62.6%,#1A1714 62.6% 63.2%,transparent 63.2% 86%,#1A1714 86% 86.4%,transparent 86.4%),
+ linear-gradient(90deg,#6B3FB0,#3D5BD9 16%,#2BA5D9 32%,#3BB55A 48%,#E3D332 64%,#F29A2E 80%,#E0402F)}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--golddk);border-radius:999px;padding:1px 12px;font-size:.82rem}
+h1{font-size:clamp(1.35rem,4vw,2rem);margin:.25em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:66ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}
+@media (max-width:840px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border:1px solid var(--grid);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:11px}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.08rem;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--chip);color:var(--ink);width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 11px;border-radius:8px;cursor:pointer;min-height:36px}
+.btn.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.readout{background:var(--chip);border-radius:10px;padding:10px 13px;font-size:.95rem}
+.readout .eq{display:block}
+.eq{font-family:'STIX Two Text',serif;font-size:1.06rem;direction:ltr;unicode-bidi:isolate;text-align:left}
+.note{font-size:.92rem;margin-top:4px}
+.good{color:var(--ok);font-weight:700}.badx{color:var(--bad);font-weight:700}
+.task{border-top:1px solid var(--line);padding-top:10px;font-size:.93rem}
+.task h3{margin:0 0 4px;font-size:1rem;color:var(--golddk)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.93rem;color:var(--ink)}
+.chk input{width:18px;height:18px;accent-color:var(--gold)}
+footer{margin-top:20px;color:var(--muted);font-size:.85rem}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="fstrip" aria-hidden="true"></div>
+<header>
+  <span class="badge">الأطياف الذرية والجزيئية · <bdi dir="ltr">2037003-4</bdi></span>
+  <h1>معمل النماذج الذرية وطيف الهيدروجين</h1>
+  <p>الفصل الثاني. غيّر القيم وراقب النتيجة، وأجب عن السؤال في أسفل كل تجربة.</p>
+</header>
+<nav class="tabs" role="tablist" aria-label="التجارب"><button role="tab" aria-selected="true" data-t="t1">١. تجربة رذرفورد</button><button role="tab" aria-selected="false" data-t="t2">٢. نموذج بور</button><button role="tab" aria-selected="false" data-t="t3">٣. متسلسلات الهيدروجين</button><button role="tab" aria-selected="false" data-t="t4">٤. الامتصاص والتأين</button><button role="tab" aria-selected="false" data-t="t5">٥. حدود نموذج بور</button></nav>
+
+<section class="lab on" id="t1" role="tabpanel">
+  <canvas id="c1" width="1200" height="620" aria-label="تشتت جسيمات ألفا على صفيحة رقيقة"></canvas>
+  <div class="ctrl">
+    <div class="row" id="m1"><button class="btn sel" type="button" data-m="R">نموذج رذرفورد</button><button class="btn" type="button" data-m="T">نموذج طومسون</button></div>
+    <label>طاقة جسيمات ألفا K (MeV) <b id="o1k"></b></label><input id="i1k" type="range" min="1" max="10" step="0.1" value="5">
+    <label for="s1z">الصفيحة</label><select id="s1z"><option value="79">ذهب (Z = 79)</option><option value="13">ألومنيوم (Z = 13)</option></select>
+    <div class="row"><button class="btn" type="button" id="b1a">أطلق 500 جسيم</button><button class="btn" type="button" id="b1r">تصفير العدّاد</button></div>
+    <div class="readout" id="r1"></div>
+    <div class="task"><h3>سؤال</h3>أطلق عدة دفعات بنموذج رذرفورد ثم بنموذج طومسون. لماذا يدل ارتداد جسيمات قليلة بزوايا أكبر من 90° على أن الشحنة الموجبة مركّزة في نواة صغيرة جدًا؟</div>
+  </div>
+</section>
+<section class="lab" id="t2" role="tabpanel">
+  <canvas id="c2" width="1200" height="620" aria-label="مدارات بور وموجة دي برولي للإلكترون"></canvas>
+  <div class="ctrl">
+    <label for="s2z">الذرة أو الأيون</label><select id="s2z"><option value="1">الهيدروجين H (Z = 1)</option><option value="2">أيون الهيليوم He⁺ (Z = 2)</option><option value="3">أيون الليثيوم Li²⁺ (Z = 3)</option></select>
+    <label>رقم المدار n <b id="o2n"></b></label><input id="i2n" type="range" min="1" max="6" step="1" value="3">
+    <div class="readout" id="r2"></div>
+    <div class="task"><h3>سؤال</h3>لاحظ عدد الأطوال الموجية لموجة دي برولي حول المدار. كيف يفسّر هذا شرط بور لتكمية الزخم الزاوي <span class="eq" style="display:inline">L = nħ</span>؟ وكيف يتغير نصف القطر والطاقة مع Z؟</div>
+  </div>
+</section>
+<section class="lab" id="t3" role="tabpanel">
+  <canvas id="c3" width="1200" height="620" aria-label="مستويات طاقة الهيدروجين ومتسلسلاته الطيفية"></canvas>
+  <div class="ctrl">
+    <label for="s3s">المتسلسلة</label><select id="s3s"><option value="1">ليمان (تنتهي عند n = 1)</option><option value="2" selected>بالمر (تنتهي عند n = 2)</option><option value="3">باشن (تنتهي عند n = 3)</option><option value="4">براكت (تنتهي عند n = 4)</option><option value="5">فوند (تنتهي عند n = 5)</option></select>
+    <label><span>المستوى الابتدائي n<sub>i</sub></span> <b id="o3n"></b></label><input id="i3n" type="range" min="1" max="12" step="1" value="1">
+    <div class="row"><button class="btn" type="button" id="b3l">حد المتسلسلة (n<sub>i</sub> → ∞)</button></div>
+    <div class="readout" id="r3"></div>
+    <div class="task"><h3>سؤال</h3>لماذا تتقارب خطوط كل متسلسلة كلما زاد n<sub>i</sub>؟ وأي متسلسلة تقع خطوطها الأولى في المنطقة المرئية؟</div>
+  </div>
+</section>
+<section class="lab" id="t4" role="tabpanel">
+  <canvas id="c4" width="1200" height="620" aria-label="امتصاص فوتون أو تأين ذرة الهيدروجين"></canvas>
+  <div class="ctrl">
+    <label>طاقة الفوتون الساقط E (eV) <b id="o4e"></b></label><input id="i4e" type="range" min="0.5" max="20" step="0.01" value="10.2">
+    <label for="s4n">حالة الذرة قبل الامتصاص</label><select id="s4n"><option value="1">المستوى الأرضي n = 1</option><option value="2">المستوى المثار n = 2</option></select>
+    <div class="row"><button class="btn" type="button" data-e="10.2">10.2 eV</button><button class="btn" type="button" data-e="11.0">11.0 eV</button><button class="btn" type="button" data-e="12.09">12.09 eV</button><button class="btn" type="button" data-e="13.6">13.6 eV</button><button class="btn" type="button" data-e="16">16 eV</button></div>
+    <div class="readout" id="r4"></div>
+    <div class="task"><h3>سؤال</h3>لماذا لا تمتص ذرة الهيدروجين في حالتها الأرضية فوتونًا طاقته 11.0 eV، بينما تمتص أي فوتون طاقته أكبر من 13.6 eV؟</div>
+  </div>
+</section>
+<section class="lab" id="t5" role="tabpanel">
+  <canvas id="c5" width="1200" height="620" aria-label="التركيب الدقيق لخط Hα ونموذج بور"></canvas>
+  <div class="ctrl">
+    <div class="row" id="m5"><button class="btn sel" type="button" data-m="fs">خط Hα بدقة عالية</button><button class="btn" type="button" data-m="he">ذرة الهيليوم</button></div>
+    <div id="g5f">
+      <label>القدرة التحليلية للمطياف R <b id="o5r"></b></label><input id="i5r" type="range" min="3" max="6.5" step="0.01" value="4">
+      <label>درجة حرارة الغاز T (K) <b id="o5t"></b></label><input id="i5t" type="range" min="20" max="3000" step="10" value="1000">
+    </div>
+    <div class="readout" id="r5"></div>
+    <div class="task"><h3>سؤال</h3>نموذج بور يتنبأ بخط Hα خطًا واحدًا. ماذا ترى عند رفع القدرة التحليلية وتبريد الغاز؟ واذكر سببين لعجز نموذج بور.</div>
+  </div>
+</section>
+<footer>أ.د. نجم الحصيني – الأطياف الذرية والجزيئية، الفصل الثاني. يعمل على الجوال دون تثبيت.</footer>
+</div>
+<script>
+(function(){
+const h=6.62607015e-34,c=2.99792458e8,kB=1.380649e-23,eV=1.602176634e-19;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let active='t1',dirty=true;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;dirty=true;}));
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>dirty=true);e.addEventListener('change',()=>dirty=true);});
+
+/* number formatting with real superscripts */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sciParts(v,d){const e=Math.floor(Math.log10(Math.abs(v)));let m=v/Math.pow(10,e);if(+m.toFixed(d)>=10){return [(m/10).toFixed(d),e+1];}return [m.toFixed(d),e];}
+function H(v,d=3){return H0(v,d).replace(/-/g,'−');}
+function H0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10<sup>'+e+'</sup>';}
+function U(v,d=3){return U0(v,d).replace(/-/g,'−');}
+function U0(v,d){if(!isFinite(v))return '—';if(v===0)return '0';const a=Math.abs(v);if(a>=0.01&&a<1e4)return (+v.toPrecision(d)).toString();const [m,e]=sciParts(v,d-1);return m+'×10'+String(e).split('').map(ch=>SUP[ch]).join('');}
+
+/* colour of a wavelength (nm) */
+function rgbOf(l){let r=0,g=0,b=0;
+ if(l>=380&&l<440){r=-(l-440)/60;b=1;}else if(l<490){g=(l-440)/50;b=1;}else if(l<510){g=1;b=-(l-510)/20;}else if(l<580){r=(l-510)/70;g=1;}else if(l<645){r=1;g=-(l-645)/65;}else if(l<=750){r=1;}
+ let f=0;if(l>=380&&l<420)f=0.3+0.7*(l-380)/40;else if(l>=420&&l<=700)f=1;else if(l>700&&l<=750)f=0.3+0.7*(750-l)/50;
+ return [r*f,g*f,b*f];}
+function colStr(l,I){const v=l>=380&&l<=750?rgbOf(l):[0.62,0.6,0.58];const k=Math.pow(Math.max(0,Math.min(1,I)),0.55);return 'rgb('+v.map(x=>Math.round(255*x*k)).join(',')+')';}
+function planck(lnm,T){const l=lnm*1e-9;const x=h*c/(l*kB*T);if(x>700)return 0;return 2*h*c*c/Math.pow(l,5)/(Math.expm1(x));}
+
+/* drawing helpers */
+function txt(g,s,x,y,col,al,sz,rtl,bold){g.font=(bold?'700 ':'')+(sz||22)+'px "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.fillText(s,x,y);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function poly(g,pts,col,w){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=w;g.stroke();}
+function strip(g,x,y,w,hh,l0,l1,If){g.fillStyle='#0D0B09';g.fillRect(x,y,w,hh);for(let i=0;i<w;i++){const l=l0+(l1-l0)*i/w;const I=If(l);if(I<=0.003)continue;g.fillStyle=colStr(l,I);g.fillRect(x+i,y,1.2,hh);}g.strokeStyle=css('--line');g.lineWidth=1;g.strokeRect(x,y,w,hh);}
+function axisNm(g,x,y,w,l0,l1,step){seg(g,x,y,x+w,y,css('--muted'),1.5);for(let l=Math.ceil(l0/step)*step;l<=l1+1e-9;l+=step){const px=x+(l-l0)/(l1-l0)*w;seg(g,px,y,px,y+8,css('--muted'),1.5);txt(g,String(Math.round(l)),px,y+30,css('--muted'),'center',18);}txt(g,'λ (nm)',x+w,y+56,css('--muted'),'right',18);}
+
+/* atomic line data: air wavelengths (nm) and relative intensities */
+const LINES={
+ H:[[656.28,1],[486.13,.55],[434.05,.32],[410.17,.22],[397.01,.14]],
+ He:[[447.15,.45],[471.31,.22],[492.19,.25],[501.57,.55],[587.56,1],[667.82,.45],[706.52,.4]],
+ Na:[[588.995,1],[589.592,.55],[568.82,.08],[615.42,.07],[497.85,.04]],
+ Hg:[[253.65,1],[365.02,.55],[404.66,.45],[435.83,.85],[546.07,1],[576.96,.5],[579.07,.5]],
+ Ne:[[585.25,.6],[588.19,.3],[594.48,.4],[609.61,.4],[614.31,.5],[626.65,.4],[633.44,.45],[640.22,.9],[650.65,.5],[659.90,.3],[692.95,.4],[703.24,.55]]};
+const NAME={H:'الهيدروجين',He:'الهيليوم',Na:'الصوديوم',Hg:'الزئبق',Ne:'النيون'};
+function lineSpec(el,w){const L=LINES[el];return l=>{let s=0;for(const [l0,a] of L){const d=(l-l0)/w;if(Math.abs(d)<6)s+=a*Math.exp(-d*d/2);}return s;};}
+
+
+
+const RH=1.0967758e7,EH=13.6057;
+/* 1. Rutherford */
+let mode1='R',hist=new Array(18).fill(0),shots=0;
+document.querySelectorAll('#m1 .btn').forEach(b=>b.onclick=()=>{mode1=b.dataset.m;document.querySelectorAll('#m1 .btn').forEach(x=>x.classList.toggle('sel',x===b));hist.fill(0);shots=0;dirty=true;});
+$('b1r').onclick=()=>{hist.fill(0);shots=0;dirty=true;};
+$('i1k').addEventListener('input',()=>{hist.fill(0);shots=0;});$('s1z').addEventListener('change',()=>{hist.fill(0);shots=0;});
+function dist1(){return 1.44*2*(+$('s1z').value)/(+$('i1k').value);} /* fm, distance of closest approach head-on */
+const R_T=1e5; /* Thomson atom radius in fm (0.1 nm) */
+function theta1(b,d){if(mode1==='R')return 2*Math.atan(d/(2*b));const x=Math.min(1,b/R_T);return 2*(d/R_T)*x*Math.sqrt(Math.max(0,1-x*x))*2;}
+$('b1a').onclick=()=>{const d=dist1(),bmax=mode1==='R'?8*d:R_T;for(let i=0;i<500;i++){const b=bmax*Math.sqrt(Math.random()),th=theta1(b,d)*180/Math.PI;hist[Math.min(17,Math.floor(th/10))]++;}shots+=500;dirty=true;};
+function lab1(){const g=$('c1').getContext('2d');g.clearRect(0,0,1200,620);const d=dist1(),K=+$('i1k').value;$('o1k').textContent=K.toFixed(1);
+ const cx=420,cy=330,sc=mode1==='R'?42/d:0.0026;
+ if(mode1==='R'){g.fillStyle='#B23A2E';g.beginPath();g.arc(cx,cy,6,0,7);g.fill();txt(g,'النواة',cx,cy+30,css('--ink'),'center',18,1);}
+ else{g.fillStyle='rgba(178,58,46,.12)';g.beginPath();g.arc(cx,cy,R_T*sc,0,7);g.fill();g.strokeStyle='rgba(178,58,46,.5)';g.stroke();for(let i=0;i<14;i++){const a=i*2.4,r=R_T*sc*Math.sqrt((i+.5)/14);g.fillStyle='#3D4E8C';g.beginPath();g.arc(cx+r*Math.cos(a),cy+r*Math.sin(a),4,0,7);g.fill();}txt(g,'ذرة طومسون: شحنة موجبة موزعة وإلكترونات',cx,cy+R_T*sc+30,css('--ink'),'center',18,1);}
+ const bs=mode1==='R'?[0.12,0.25,0.5,0.8,1.2,2,3.2,5]:[0.15,0.35,0.55,0.75,0.95].map(x=>x*R_T/d);
+ bs.forEach(bb=>{[1,-1].forEach(sg=>{const b=bb*d,th=theta1(b,d),pts=[];
+  if(mode1==='R'){const phmax=Math.PI-th;for(let k=1;k<=900;k++){const ph=phmax*k/901;const inv=Math.sin(ph)/b+d*(Math.cos(ph)-1)/(2*b*b);if(inv<=0)continue;const r=1/inv;const X=cx-r*Math.cos(ph)*sc,Y=cy-sg*r*Math.sin(ph)*sc;if(Math.abs(X-cx)<420&&Math.abs(Y-cy)<300)pts.push([X,Y]);else if(pts.length)pts.push(null);}}
+  else{const y0=cy-sg*b*sc;pts.push([cx-420,y0]);pts.push([cx,y0]);pts.push([cx+420,y0-sg*Math.tan(th)*420]);}
+  g.strokeStyle=css('--gold');g.lineWidth=2;g.beginPath();let pen=false,last=null;pts.forEach(q=>{if(!q){pen=false;return;}if(pen&&last&&Math.hypot(q[0]-last[0],q[1]-last[1])<40)g.lineTo(q[0],q[1]);else g.moveTo(q[0],q[1]);pen=true;last=q;});g.stroke();});});
+ g.fillStyle=css('--ink');txt(g,'α',cx-400,cy-180,css('--golddk'),'center',26);
+ /* histogram */
+ const X=860,W=300,Y0=560,Hh=440;seg(g,X,Y0,X+W,Y0,css('--muted'),1.5);const mx=Math.max(1,...hist),lg=v=>v>0?Math.log10(v+1)/Math.log10(mx+1):0;
+ hist.forEach((v,i)=>{const bw=W/18;g.fillStyle=i>=9?'#B23A2E':css('--gold');const hh=Hh*lg(v);g.fillRect(X+i*bw+1,Y0-hh,bw-2,hh);});
+ for(let a=0;a<=180;a+=45){const p=X+W*a/180;seg(g,p,Y0,p,Y0+8,css('--muted'),1.5);txt(g,a+'°',p,Y0+28,css('--muted'),'center',16);}
+ txt(g,'عدد الجسيمات (مقياس لوغاريتمي)',X+W,Y0-Hh-14,css('--muted'),'right',17,1);txt(g,'زاوية التشتت θ',X+W/2,Y0+52,css('--muted'),'center',17,1);
+ const back=hist.slice(9).reduce((a,b)=>a+b,0);
+ $('r1').innerHTML=(mode1==='R'?'<span class="eq">d = 2kZe²/K = '+H(d,3)+' fm</span><span class="eq">tan(θ/2) = d/(2b)</span>':'<span class="eq">θ<sub>max</sub> ≈ '+H(theta1(R_T/Math.SQRT2,d)*180/Math.PI,2)+'°</span>')+
+  '<div class="note">الجسيمات المطلقة: '+shots+'، المرتدة بزاوية أكبر من 90°: <b>'+back+'</b>'+(mode1==='R'?'<br>نسبتها المتوقعة هنا ≈ (d/2)²/b²<sub>max</sub> = 1/256 لأن معظم الجسيمات تمر بعيدًا عن النواة.':'<br>لا يمكن لشحنة موزعة على حجم الذرة كله أن تعكس جسيم ألفا.')+'</div>';}
+/* 2. Bohr */
+function lab2(t){const g=$('c2').getContext('2d');g.clearRect(0,0,1200,620);const Z=+$('s2z').value,n=+$('i2n').value;$('o2n').textContent=n;
+ const r=0.0529177*n*n/Z,v=2.18769e6*Z/n,En=-EH*Z*Z/(n*n),lam=2*Math.PI*r/n;
+ const cx=330,cy=315,sc=280/36;
+ for(let k=1;k<=6;k++){g.strokeStyle=k===n?css('--ink'):css('--line');g.lineWidth=k===n?2:1.2;g.setLineDash(k===n?[]:[5,5]);g.beginPath();g.arc(cx,cy,k*k*sc*(k===1?1:1),0,7);g.stroke();g.setLineDash([]);if(k>1||n===1)txt(g,'n='+k,cx+k*k*sc+4,cy-6,css('--muted'),'left',15);}
+ g.fillStyle='#B23A2E';g.beginPath();g.arc(cx,cy,5+Z,0,7);g.fill();
+ const R=n*n*sc,A=Math.max(6,R*0.12),pts=[];for(let k=0;k<=360;k++){const ph=k/360*2*Math.PI;const rr=R+A*Math.sin(n*ph-3*t);pts.push([cx+rr*Math.cos(ph),cy-rr*Math.sin(ph)]);}poly(g,pts,css('--gold'),3);
+ const pe=-1.2*t/n;g.fillStyle='#3D4E8C';g.beginPath();g.arc(cx+R*Math.cos(pe),cy-R*Math.sin(pe),9,0,7);g.fill();
+ txt(g,'موجة دي برولي: '+n+' أطوال موجية حول المدار',cx,600,css('--golddk'),'center',19,1);
+ /* energy ladder */
+ const X=760,W=380,top=60,bot=560,Emin=-EH*Z*Z,ey=E=>top+(bot-top)*(E/Emin);seg(g,X,top,X+W,top,css('--muted'),1.5,[6,5]);txt(g,'E = 0 (التأين)',X+W,top-10,css('--muted'),'right',16,1);
+ for(let k=1;k<=6;k++){const E=-EH*Z*Z/(k*k),y=ey(E);seg(g,X,y,X+W,y,k===n?css('--gold'):css('--ink'),k===n?4:1.5);if(k<=4||k===n)txt(g,'n='+k+'   '+U(E,3)+' eV',X+W,y-6,k===n?css('--golddk'):css('--muted'),'right',15);}
+ $('r2').innerHTML='<span class="eq">r<sub>n</sub> = a₀n²/Z = '+H(r,3)+' nm</span><span class="eq">v<sub>n</sub> = '+H(v,3)+' m/s  ('+H(v/2.998e8,2)+' c)</span><span class="eq">E<sub>n</sub> = −13.6 Z²/n² = '+H(En,4)+' eV</span><span class="eq">L = nħ = '+n+'ħ ,  λ<sub>dB</sub> = 2πr<sub>n</sub>/n = '+H(lam,3)+' nm</span>';}
+/* 3. series */
+const SER=['','ليمان','بالمر','باشن','براكت','فوند'];
+let lim3=false;$('b3l').onclick=()=>{lim3=true;dirty=true;};$('i3n').addEventListener('input',()=>lim3=false);
+function regionOf(l){if(l<380)return 'فوق البنفسجية';if(l<=750)return 'المرئية';return 'تحت الحمراء';}
+function lab3(){const g=$('c3').getContext('2d');g.clearRect(0,0,1200,620);const nf=+$('s3s').value,sl=$('i3n');sl.min=nf+1;sl.max=nf+10;if(+sl.value<nf+1)sl.value=nf+1;if(+sl.value>nf+10)sl.value=nf+10;const ni=+sl.value;
+ $('o3n').textContent=lim3?'∞':ni;const inv=RH*(1/(nf*nf)-(lim3?0:1/(ni*ni))),lam=1e9/inv,E=1239.842/lam;
+ /* levels */
+ const X=60,W=380,top=50,bot=580,ey=E=>top+(bot-top)*Math.pow(E/(-EH),0.42);seg(g,X,top,X+W,top,css('--muted'),1.5,[6,5]);txt(g,'∞',X-14,top+6,css('--muted'),'center',18);
+ for(let k=1;k<=8;k++){const y=ey(-EH/(k*k));seg(g,X,y,X+W,y,css('--ink'),1.5);if(k<=6)txt(g,'n='+k,X-10,y+6,css('--muted'),'right',15);}
+ const xa=X+60+nf*45,y1=lim3?top:ey(-EH/(ni*ni)),y2=ey(-EH/(nf*nf)),col=lam>=380&&lam<=750?colStr(lam,1):css('--gold');seg(g,xa,y1,xa,y2-10,col,5);g.fillStyle=col;g.beginPath();g.moveTo(xa,y2);g.lineTo(xa-10,y2-16);g.lineTo(xa+10,y2-16);g.closePath();g.fill();
+ txt(g,'متسلسلة '+SER[nf],X+W/2,bot+30,css('--golddk'),'center',19,1,1);
+ /* series spectrum */
+ const lmin=1e9/(RH/(nf*nf)),lmax=1e9/(RH*(1/(nf*nf)-1/((nf+1)*(nf+1)))),l0=lmin*0.9,l1=lmax*1.08,SX=500,SW=640,sy=200,lx=l=>SX+(l-l0)/(l1-l0)*SW;
+ g.fillStyle='#0D0B09';g.fillRect(SX,sy-90,SW,90);
+ for(let k=nf+1;k<=nf+40;k++){const l=1e9/(RH*(1/(nf*nf)-1/(k*k))),c2=l>=380&&l<=750?colStr(l,1):'#C9C2B3';seg(g,lx(l),sy-90,lx(l),sy,c2,k===ni&&!lim3?4:1.6);}
+ seg(g,lx(lmin),sy-100,lx(lmin),sy+6,css('--gold'),2,[5,4]);txt(g,'حد المتسلسلة',lx(lmin),sy-106,css('--golddk'),'center',16,1);
+ seg(g,lx(lam),sy+4,lx(lam),sy+30,css('--ink'),3);
+ const st=[10,20,50,100,200,500,1000,2000][[10,20,50,100,200,500,1000,2000].findIndex(s=>(l1-l0)/s<9)]||5000;for(let l=Math.ceil(l0/st)*st;l<=l1;l+=st){seg(g,lx(l),sy,lx(l),sy+8,css('--muted'),1.5);txt(g,String(l),lx(l),sy+50,css('--muted'),'center',16);}
+ txt(g,'λ (nm) في الفراغ',SX+SW,sy+76,css('--muted'),'right',16,1);
+ txt(g,'1/λ = R (1/nf² − 1/ni²)',SX+SW/2,380,css('--ink'),'center',30);txt(g,'R = 1.0968×10⁷ m⁻¹',SX+SW/2,425,css('--muted'),'center',22);
+ txt(g,'الخط المختار: '+regionOf(lam),SX+SW,500,css('--golddk'),'right',22,1,1);
+ $('r3').innerHTML='<span class="eq">λ = '+H(lam,5)+' nm</span><span class="eq">ν̃ = 1/λ = '+H(inv/100,5)+' cm<sup>−1</sup></span><span class="eq">f = '+H(2.99792458e8*inv,4)+' Hz ,  E = '+H(E,4)+' eV</span><div class="note">المنطقة: <b>'+regionOf(lam)+'</b>. الطول الموجي هنا في الفراغ؛ في الهواء أقصر بنحو 0.03%.</div>';}
+/* 4. absorption & ionisation */
+document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{$('i4e').value=b.dataset.e;dirty=true;});
+function lab4(){const g=$('c4').getContext('2d');g.clearRect(0,0,1200,620);const Ep=+$('i4e').value,n0=+$('s4n').value;$('o4e').textContent=Ep.toFixed(2);
+ const E0=-EH/(n0*n0),Ion=-E0;let res=null;for(let k=n0+1;k<=30;k++){const dE=EH*(1/(n0*n0)-1/(k*k));if(Math.abs(dE-Ep)<0.025){res=k;break;}}
+ const X=520,W=600,top=60,bot=560,ey=E=>top+(bot-top)*(E/(-EH));seg(g,X,top,X+W,top,css('--muted'),1.5,[6,5]);txt(g,'E = 0',X+W,top-10,css('--muted'),'right',16);
+ for(let k=1;k<=7;k++){const y=ey(-EH/(k*k));seg(g,X,y,X+W,y,css('--ink'),1.5);if(k<=4)txt(g,'n='+k+'  ('+U(-EH/(k*k),3)+' eV)',X+W,y-6,css('--muted'),'right',15);}
+ g.fillStyle='rgba(184,134,43,.12)';g.fillRect(X,top-40,W,40);txt(g,'متصل: إلكترون حر',X+10,top-14,css('--golddk'),'left',16,1);
+ const ys=ey(E0),xa=X+150;g.fillStyle='#3D4E8C';g.beginPath();g.arc(xa,ys,9,0,7);g.fill();
+ /* photon wiggle */
+ const pts=[];for(let x=60;x<=xa-20;x+=2)pts.push([x,ys-6*0+Math.sin((x-60)/9)*14]);poly(g,pts,css('--gold'),3);txt(g,'فوتون '+Ep.toFixed(2)+' eV',200,ys-30,css('--golddk'),'center',19,1);
+ let msg;
+ if(Ep>=Ion){const yt=ey(E0+Ep);const yy=Math.max(top-36,yt);seg(g,xa,ys,xa,yy+10,css('--gold'),4);txt(g,'تأين',xa+20,yy+20,css('--bad'),'left',20,1,1);msg='<b class="badx">تأين:</b> يتحرر الإلكترون.<span class="eq">K = E − '+H(Ion,4)+' = '+H(Ep-Ion,3)+' eV</span>';}
+ else if(res){const y2=ey(-EH/(res*res));seg(g,xa,ys,xa,y2+10,css('--gold'),4);g.fillStyle='#3D4E8C';g.beginPath();g.arc(xa+40,y2,9,0,7);g.fill();msg='<b class="good">يُمتص الفوتون:</b> ينتقل الإلكترون من n = '+n0+' إلى n = '+res+'.<span class="eq">ΔE = 13.6(1/'+n0*n0+' − 1/'+res*res+') = '+H(EH*(1/(n0*n0)-1/(res*res)),4)+' eV</span>';}
+ else{seg(g,xa+20,ys,1150,ys,css('--gold'),2,[6,6]);msg='<b>يمر الفوتون دون امتصاص:</b> طاقته لا تساوي الفرق بين المستوى n = '+n0+' وأي مستوى آخر.';}
+ $('r4').innerHTML=msg+'<div class="note">طاقات الانتقالات الممكنة من n = '+n0+': '+[n0+1,n0+2,n0+3].map(k=>H(EH*(1/(n0*n0)-1/(k*k)),4)).join('، ')+' … eV، وطاقة التأين '+H(Ion,4)+' eV.</div>';}
+/* 5. limits of Bohr model */
+let mode5='fs';document.querySelectorAll('#m5 .btn').forEach(b=>b.onclick=()=>{mode5=b.dataset.m;document.querySelectorAll('#m5 .btn').forEach(x=>x.classList.toggle('sel',x===b));$('g5f').classList.toggle('hide',mode5!=='fs');dirty=true;});
+function lab5(){const g=$('c5').getContext('2d');g.clearRect(0,0,1200,620);
+ if(mode5==='fs'){const R=Math.pow(10,+$('i5r').value),T=+$('i5t').value;$('o5r').innerHTML=U(R,3);$('o5t').textContent=T;
+  const l0=656.47,d=0.0143,comps=[[l0-d*0.36,1],[l0+d*0.64,0.55]],fi=l0/R,fd=l0*7.16e-7*Math.sqrt(T/1.008),fw=Math.sqrt(fi*fi+fd*fd),s=fw/2.3548;
+  const span=Math.max(0.08,fw*6),z0=l0-span/2,z1=l0+span/2,X=60,W=1080,gy=540,gh=360;let mv=0;const P=[];for(let i=0;i<=600;i++){const l=z0+(z1-z0)*i/600;let v=0;comps.forEach(([c,a])=>v+=a*Math.exp(-((l-c)**2)/(2*s*s)));P.push([l,v]);mv=Math.max(mv,v);}
+  g.beginPath();P.forEach(([l,v],i)=>{const x=X+(l-z0)/(z1-z0)*W,y=gy-gh*v/mv;i?g.lineTo(x,y):g.moveTo(x,y);});g.strokeStyle=css('--ink');g.lineWidth=2.5;g.stroke();
+  const xb=X+(l0-z0)/(z1-z0)*W;seg(g,xb,gy,xb,gy-gh-20,'#B23A2E',2,[6,5]);txt(g,'تنبؤ بور: خط واحد',xb,gy-gh-28,'#B23A2E','center',18,1);
+  seg(g,X,gy,X+W,gy,css('--muted'),1.5);const st=span>0.5?0.1:(span>0.2?0.05:0.01);for(let l=Math.ceil(z0/st)*st;l<=z1;l+=st){const p=X+(l-z0)/(z1-z0)*W;seg(g,p,gy,p,gy+8,css('--muted'),1.5);txt(g,l.toFixed(2),p,gy+28,css('--muted'),'center',15);}
+  txt(g,'λ (nm)',X+W,gy+52,css('--muted'),'right',16);
+  const res=fw<d*0.8;
+  $('r5').innerHTML='<span class="eq">Δλ (الجهاز) = λ/R = '+H(fi,3)+' nm</span><span class="eq">Δλ (دوبلر) = '+H(fd,3)+' nm</span><div class="note">'+(res?'<span class="good">يظهر الخط مركّبتين</span> تفصل بينهما نحو 0.014 nm: هذا التركيب الدقيق لا يفسّره نموذج بور، وسببه مغزل الإلكترون والتأثيرات النسبية.':'يبدو الخط واحدًا: العرض الفعلي أكبر من المسافة بين المركّبات. ارفع R وبرّد الغاز.')+'</div>';}
+ else{const X=120,W=960,top=90,bot=520,Emin=-120,ey=E=>top+(bot-top)*E/Emin;seg(g,X,top,X+W,top,css('--muted'),1.5,[6,5]);txt(g,'E = 0',X+W,top-10,css('--muted'),'right',17);
+  const bars=[[-108.8,'بور (بإهمال تنافر الإلكترونين)','#B23A2E'],[-79.0,'القيمة المقيسة','#2E7D4F'],[-54.4,'He⁺ بعد نزع إلكترون واحد','#3D4E8C']];
+  bars.forEach(([E,lb,c],i)=>{const y=ey(E),x0=X+i*330;seg(g,x0,y,x0+280,y,c,5);txt(g,U(E,4)+' eV',x0+140,y-12,c,'center',20);txt(g,lb,x0+140,y+32,css('--ink'),'center',17,1);});
+  txt(g,'طاقة الحالة الأرضية لذرة الهيليوم (إلكترونان)',X+W,bot+60,css('--golddk'),'right',22,1,1);
+  $('r5').innerHTML='نموذج بور يصلح للذرات والأيونات ذات الإلكترون الواحد فقط. في الهيليوم يعطي <span class="eq" style="display:inline">2 × (−13.6 × 2²) = −108.8 eV</span> بينما القيمة المقيسة <span class="eq" style="display:inline">−79.0 eV</span>؛ لأنه يهمل التنافر بين الإلكترونين ولا يملك طريقة لحسابه.<div class="note">ولا يفسّر النموذج أيضًا شدة الخطوط، ولا التركيب الدقيق، ولا تأثير زيمان الشاذ.</div>';}}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4,t5:lab5};const ANIM=new Set(["t2"]);let T0=performance.now();
+function loop(t){if(dirty||ANIM.has(active)){dirty=false;LABS[active]((t-T0)/1000);}requestAnimationFrame(loop);}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>dirty=true);
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

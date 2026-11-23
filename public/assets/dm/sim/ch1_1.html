@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Euler stability explorer · DMP Ch1</title>
+<style>
+:root{--ink:#1E1E22;--cream:#FAF8F3;--amber:#F2A33A;--orange:#E07B1A;--tint:#FCEBD3;--brown:#6B3A08;--grey:#5A5650;--line:#E2DCCF;--teal:#2E6F8E}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--ink);color:#F4F1EA;padding:14px 18px}header small{color:var(--amber);font-weight:bold;letter-spacing:.3px}
+header h1{margin:4px 0 0;font-family:Cambria,Georgia,serif;font-size:22px}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;display:block}
+label{display:block;font-size:14px;color:var(--grey);margin-top:10px}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.val{font-family:Cambria,serif;font-size:20px;color:var(--ink)}
+.stat{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:7px 0;font-size:15px}
+.stat b{font-family:Cambria,serif}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-weight:bold;font-size:13px}
+.ok{background:#DCF1E6;color:#1F6B47}.osc{background:var(--tint);color:var(--brown)}.bad{background:#F6D9D5;color:#8A2E1F}
+.eq{font-family:Cambria,serif;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;margin:8px 0;font-size:16px}
+.ar{direction:rtl;text-align:right;background:var(--tint);color:var(--brown);border-radius:8px;padding:10px;margin-top:12px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6}
+button{font:inherit;border:1px solid var(--orange);background:#fff;color:var(--orange);border-radius:8px;padding:5px 10px;cursor:pointer;margin:4px 4px 0 0}
+button:hover{background:var(--tint)}
+.legend{font-size:13px;color:var(--grey);margin-top:6px}.legend span{display:inline-block;width:14px;height:3px;vertical-align:middle;margin:0 4px 0 10px}
+</style><style id="vlMobCss">
+#vlFS{position:fixed;top:8px;right:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head><body>
+<header><small>DIGITAL METHODS IN PHOTONICS · CHAPTER 1 · SIMULATOR 1</small><h1>Euler stability explorer</h1></header>
+<div class="wrap">
+<div class="grid">
+ <div class="card">
+  <canvas id="c" width="900" height="520"></canvas>
+  <div class="legend"><span style="background:#1E1E22"></span>exact N(t) = Pτ(1 − e<sup>−t/τ</sup>)<span style="background:#E07B1A"></span>explicit Euler<span style="background:#2E6F8E"></span>implicit Euler (optional)</div>
+ </div>
+ <div class="card">
+  <div class="eq">dN/dt = P − N/τ ,  N(0) = 0</div>
+  <div class="eq">N<sub>k+1</sub> = N<sub>k</sub> + Δt(P − N<sub>k</sub>/τ)</div>
+  <label>Time step Δt / τ : <span class="val" id="dtv"></span></label>
+  <input type="range" id="dt" min="0.05" max="3" step="0.05" value="0.5">
+  <div>
+   <button data-v="0.1">0.1</button><button data-v="0.5">0.5</button><button data-v="1">1.0</button><button data-v="1.5">1.5</button><button data-v="1.95">1.95</button><button data-v="2.5">2.5</button>
+  </div>
+  <label><input type="checkbox" id="imp"> show implicit (backward) Euler</label>
+  <div style="margin-top:10px">
+   <div class="stat"><span>Amplification g = 1 − Δt/τ</span><b id="g"></b></div>
+   <div class="stat"><span>|g|</span><b id="ag"></b></div>
+   <div class="stat"><span>N(τ) Euler · exact</span><b id="nt"></b></div>
+   <div class="stat"><span>Behaviour</span><span id="beh" class="badge"></span></div>
+  </div>
+  <div class="ar" id="ar"></div>
+ </div>
+</div>
+</div>
+<script>
+const cv=document.getElementById('c'),cx=cv.getContext('2d'),W=cv.width,H=cv.height,pad={l:62,r:18,t:20,b:48};
+const dt=document.getElementById('dt'),imp=document.getElementById('imp');
+document.querySelectorAll('button[data-v]').forEach(b=>b.onclick=()=>{dt.value=b.dataset.v;draw();});
+dt.oninput=draw;imp.onchange=draw;
+function euler(h,T){const n=Math.round(T/h),t=[0],N=[0];for(let k=0;k<n;k++){N.push(N[k]+h*(1-N[k]));t.push((k+1)*h);}return{t,N};}
+function back(h,T){const n=Math.round(T/h),t=[0],N=[0];for(let k=0;k<n;k++){N.push((N[k]+h)/(1+h));t.push((k+1)*h);}return{t,N};}
+function draw(){
+ const h=+dt.value,T=10,g=1-h;
+ document.getElementById('dtv').textContent=h.toFixed(2);
+ document.getElementById('g').textContent=g.toFixed(2);
+ document.getElementById('ag').textContent=Math.abs(g).toFixed(2);
+ const e=euler(h,T),b=back(h,T);
+ let ymin=-0.2,ymax=1.4;for(const v of e.N){if(isFinite(v)){ymin=Math.min(ymin,v);ymax=Math.max(ymax,v);}}
+ ymin=Math.max(ymin,-6);ymax=Math.min(ymax,8);
+ const X=t=>pad.l+(W-pad.l-pad.r)*t/T,Y=v=>H-pad.b-(H-pad.t-pad.b)*(v-ymin)/(ymax-ymin);
+ cx.clearRect(0,0,W,H);cx.fillStyle='#fff';cx.fillRect(0,0,W,H);
+ cx.strokeStyle='#E2DCCF';cx.lineWidth=1;cx.font='15px Calibri,Arial';cx.fillStyle='#5A5650';
+ const step=(ymax-ymin)>4?1:0.2;
+ for(let y=Math.ceil(ymin/step)*step;y<=ymax+1e-9;y+=step){cx.beginPath();cx.moveTo(pad.l,Y(y));cx.lineTo(W-pad.r,Y(y));cx.stroke();cx.fillText(y.toFixed(step<1?1:0),pad.l-40,Y(y)+5);}
+ for(let t=0;t<=T;t+=1){cx.fillText(t,X(t)-4,H-pad.b+20);}
+ cx.fillText('t / τ',W/2,H-10);cx.save();cx.translate(16,H/2);cx.rotate(-Math.PI/2);cx.fillText('N / Pτ',0,0);cx.restore();
+ cx.strokeStyle='#1E1E22';cx.lineWidth=2.5;cx.beginPath();for(let i=0;i<=400;i++){const t=T*i/400;const v=1-Math.exp(-t);i?cx.lineTo(X(t),Y(v)):cx.moveTo(X(t),Y(v));}cx.stroke();
+ cx.save();cx.beginPath();cx.rect(pad.l,pad.t,W-pad.l-pad.r,H-pad.t-pad.b);cx.clip();
+ if(imp.checked){cx.strokeStyle='#2E6F8E';cx.fillStyle='#2E6F8E';cx.lineWidth=2;cx.beginPath();b.t.forEach((t,i)=>{i?cx.lineTo(X(t),Y(b.N[i])):cx.moveTo(X(t),Y(b.N[i]));});cx.stroke();b.t.forEach((t,i)=>{cx.beginPath();cx.arc(X(t),Y(b.N[i]),3.5,0,7);cx.fill();});}
+ cx.strokeStyle='#E07B1A';cx.fillStyle='#E07B1A';cx.lineWidth=2;cx.beginPath();e.t.forEach((t,i)=>{i?cx.lineTo(X(t),Y(e.N[i])):cx.moveTo(X(t),Y(e.N[i]));});cx.stroke();e.t.forEach((t,i)=>{cx.beginPath();cx.arc(X(t),Y(e.N[i]),4,0,7);cx.fill();});
+ cx.restore();
+ const k=Math.round(1/h);const nt=(Math.abs(k*h-1)<1e-9)?e.N[k].toFixed(4):'—';
+ document.getElementById('nt').textContent=nt+' · '+(1-Math.exp(-1)).toFixed(4);
+ const beh=document.getElementById('beh'),ar=document.getElementById('ar');
+ if(h<1){beh.textContent='stable, monotonic';beh.className='badge ok';ar.textContent='الخطوة أصغر من τ: الحل العددي يقترب من الحل الدقيق دون تذبذب، والخطأ يتناقص بنسبة تقارب Δt.';}
+ else if(h<2-1e-9){beh.textContent='stable, oscillating';beh.className='badge osc';ar.textContent='بين τ و 2τ يصبح معامل التضخيم سالباً: الحل يتذبذب حول القيمة المستقرة لكنه يتقارب في النهاية.';}
+ else if(Math.abs(h-2)<1e-9){beh.textContent='neutral: |g| = 1';beh.className='badge osc';ar.textContent='عند Δt = 2τ بالضبط لا يكبر الخطأ ولا يصغر: الحل يقفز بين قيمتين إلى الأبد.';}
+ else{beh.textContent='UNSTABLE';beh.className='badge bad';ar.textContent='تجاوزت الخطوة 2τ: الخطأ يتضاعف ويغيّر إشارته في كل خطوة فينفجر الحل، مع أن الفيزياء نفسها مستقرة تماماً. فعّل الطريقة الضمنية لترى أنها تبقى مستقرة.';}
+}
+draw();
+</script><script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body></html>
