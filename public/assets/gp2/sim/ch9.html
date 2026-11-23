@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الاهتزازات والموجات</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style>.readout .eq[dir=rtl]{text-align:right;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;font-size:1rem}.readout .eq{margin:2px 0}.readout .ltr{display:inline-block;direction:ltr;font-family:'STIX Two Text',serif}</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل الاهتزازات والموجات</h1><p>الفيزياء العامة (2) – الفصل التاسع. الحركة التوافقية البسيطة، والموجات على الأوتار، والموجات الموقوفة.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">البندول البسيط</button><button role="tab" aria-selected="false" data-t="t2">الموجة على وتر</button><button role="tab" aria-selected="false" data-t="t3">الموجات الموقوفة</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="بندول يتأرجح ومنحنى الإزاحة مع الزمن"></canvas><div class="ctrl"><label>طول الخيط L (m) <b id="o1l"></b></label><input id="i1l" type="range" min="0.2" max="3" step="0.05" value="1"><label>سعة الزاوية θ₀ <b id="o1a"></b></label><input id="i1a" type="range" min="2" max="20" step="1" value="10"><div class="row"><button class="btn" type="button" id="g1">الأرض</button><button class="btn" type="button" id="g2">القمر</button><button class="btn" type="button" id="g3">المريخ</button></div><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span></div><div class="task"><h3>سؤال</h3>كم يجب أن يكون طول بندول على الأرض ليكون زمنه الدوري ثانيتين تمامًا؟ وهل يتغير الزمن الدوري إذا ضاعفت السعة الصغيرة؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="موجة متنقلة على وتر مشدود ونقطة تتحرك صعودًا وهبوطًا"></canvas><div class="ctrl"><label>قوة الشد F (N) <b id="o2F"></b></label><input id="i2F" type="range" min="5" max="200" step="1" value="50"><label>الكتلة لوحدة الطول μ (g/m) <b id="o2u"></b></label><input id="i2u" type="range" min="1" max="50" step="0.5" value="5"><label>التردد f (Hz) <b id="o2f"></b></label><input id="i2f" type="range" min="1" max="12" step="0.5" value="4"><label>السعة A (cm) <b id="o2a"></b></label><input id="i2a" type="range" min="1" max="8" step="0.5" value="4"><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span></div><div class="task"><h3>سؤال</h3>ضاعف قوة الشد أربع مرات. ماذا يحدث لسرعة الموجة؟ ولطولها الموجي إذا بقي التردد ثابتًا؟</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="وتر مثبت الطرفين يهتز بالنمط التوافقي n"></canvas><div class="ctrl"><label>رقم التوافقية n <b id="o3n"></b></label><input id="i3n" type="range" min="1" max="8" step="1" value="2"><label>طول الوتر L (m) <b id="o3L"></b></label><input id="i3L" type="range" min="0.5" max="2" step="0.05" value="1"><label>قوة الشد F (N) <b id="o3F"></b></label><input id="i3F" type="range" min="5" max="200" step="1" value="50"><label>μ (g/m) <b id="o3u"></b></label><input id="i3u" type="range" min="1" max="50" step="0.5" value="5"><div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span class="eq" id="r3c"></span></div><div class="task"><h3>سؤال</h3>عدّ العقد والبطون في النمط n. ما العلاقة بين n وعدد البطون؟ وما الطول الموجي بدلالة L؟</div></div></section>
+<footer>المعامل الافتراضية · إعداد أ.د. نجم الحصيني · قسم الفيزياء، جامعة الطائف</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;const T0={};
+const el=k=>T-(T0[k]||0),rs=k=>{T0[k]=T;};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;rs(active);}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.textBaseline='alphabetic';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function ring(g,x,y,r,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){if(Math.hypot(x1-x0,y1-y0)<4)return;seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function poly(g,pts,col,w,d){if(pts.length<2)return;g.setLineDash(d||[]);g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts)g.lineTo(p[0],p[1]);g.strokeStyle=col;g.lineWidth=w||2;g.stroke();g.setLineDash([]);}
+function box(g,x0,y0,w,h,fc){g.fillStyle=fc||css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+function axes(g,x0,y0,w,h,xl,yl){g.fillStyle=css('--plot');seg(g,x0,y0,x0+w,y0,css('--muted'),2);seg(g,x0,y0,x0,y0-h,css('--muted'),2);for(let i=1;i<=4;i++){seg(g,x0+i*w/4,y0,x0+i*w/4,y0-h,css('--grid'),1);seg(g,x0,y0-i*h/4,x0+w,y0-i*h/4,css('--grid'),1);}text(g,xl,x0+w,y0+30,css('--muted'),'right',20);text(g,yl,x0+6,y0-h-10,css('--muted'),'left',20);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const set=(o)=>{for(const k in o)$(k).value=o[k];};
+const deg=Math.PI/180,G=9.8;
+const R=(id,s)=>{const e=$(id);if(!/[؀-ۿ]/.test(s)){e.dir='ltr';e.textContent=s;return;}e.dir='rtl';const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ e.innerHTML=s.split(/([؀-ۿ][؀-ۿ\s()⚠]*)/).map((p,i)=>{if(i%2)return esc(p);const t=p.trim();if(!t)return p;return (/^\s/.test(p)?' ':'')+'<span class="ltr">'+esc(t)+'</span>'+(/\s$/.test(p)?' ':'');}).join('');};
+const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=1e5||a<1e-3))return v.toExponential(d===undefined?2:d).replace('e','×10^').replace('+','');return v.toFixed(d===undefined?2:d);};
+
+
+let GG=9.8,GN='الأرض';$('g1').onclick=()=>{GG=9.8;GN='الأرض';};$('g2').onclick=()=>{GG=1.62;GN='القمر';};$('g3').onclick=()=>{GG=3.71;GN='المريخ';};
+function lab1(){const g=ctx('c1'),L=sl('i1l','o1l',v=>v.toFixed(2)),a0=sl('i1a','o1a',v=>v+'°')*deg,w=Math.sqrt(GG/L),P=2*Math.PI/w,t=el('t1'),th=a0*Math.cos(w*t);
+ R('r1a',GN+':  g = '+GG+' m/s²');R('r1b','T = 2π√(L/g) = '+P.toFixed(2)+' s,  f = '+(1/P).toFixed(3)+' Hz');R('r1c','θ(t) = θ₀ cos ωt,  ω = '+w.toFixed(2)+' rad/s');
+ const px=280,py=50,Lp=140+L*120,bx=px+Lp*Math.sin(th),by=py+Lp*Math.cos(th);seg(g,160,py,400,py,css('--ink'),5);seg(g,px,py,px,py+Lp+30,css('--muted'),1.5,[5,6]);seg(g,px,py,bx,by,css('--ink'),2);dot(g,bx,by,20,css('--o'));
+ const X0=560,Y0=300,W=580,H=200;seg(g,X0,Y0,X0+W,Y0,css('--muted'),2);seg(g,X0,Y0-H,X0,Y0+H,css('--muted'),2);const p=[];for(let i=0;i<=290;i++){const tau=t-6+6*i/290;p.push([X0+i*2,Y0-H*0.9*Math.cos(w*tau)*a0/(20*deg)]);}poly(g,p,css('--b'),3);dot(g,X0+W,Y0-H*0.9*th/(20*deg),8,css('--o'));text(g,'θ(t)',X0+8,Y0-H-8,css('--muted'),'left',20);text(g,'t',X0+W+12,Y0+8,css('--muted'),'left',20);}
+function lab2(){const g=ctx('c2'),F=sl('i2F','o2F'),mu=sl('i2u','o2u',v=>v.toFixed(1))/1000,f=sl('i2f','o2f',v=>v.toFixed(1)),A=sl('i2a','o2a',v=>v.toFixed(1));const v=Math.sqrt(F/mu),lam=v/f,k=2*Math.PI/lam,w=2*Math.PI*f,t=el('t2');
+ R('r2a','v = √(F/μ) = '+v.toFixed(1)+' m/s');R('r2b','λ = v/f = '+lam.toFixed(2)+' m');R('r2c','y(x,t) = A sin(kx − ωt),  k = '+k.toFixed(2)+' rad/m');
+ const X0=60,Y0=300,W=1080,sx=W/Math.max(3*lam,4);const sc=v=>v*sx;const p=[];for(let i=0;i<=540;i++){const x=i*2/sx;p.push([X0+i*2,Y0-A*14*Math.sin(k*x-w*t*0.25)]);}poly(g,p,css('--b'),4);
+ const xm=W*0.5/sx;dot(g,X0+W*0.5,Y0-A*14*Math.sin(k*xm-w*t*0.25),11,css('--r'));seg(g,X0+W*0.5,Y0-A*14-20,X0+W*0.5,Y0+A*14+20,css('--r'),1,[4,6]);
+ const xa=X0+((Math.PI/2+w*t*0.25)/k%lam)*sx;arrow(g,xa,Y0-A*14-40,xa+60,Y0-A*14-40,css('--o'),3);text(g,'اتجاه الانتشار',xa+70,Y0-A*14-32,css('--o'),'left',18,true);
+ if(lam*sx<W){seg(g,X0+80,Y0+A*14+60,X0+80+lam*sx,Y0+A*14+60,css('--ink'),2);text(g,'λ',X0+80+lam*sx/2,Y0+A*14+90,css('--ink'),'center',24);}text(g,'الحركة معروضة ببطء ×4',1140,580,css('--muted'),'right',18,true);}
+function lab3(){const g=ctx('c3'),n=sl('i3n','o3n'),L=sl('i3L','o3L',v=>v.toFixed(2)),F=sl('i3F','o3F'),mu=sl('i3u','o3u',v=>v.toFixed(1))/1000;const v=Math.sqrt(F/mu),fn=n*v/(2*L),lam=2*L/n;
+ R('r3a','v = √(F/μ) = '+v.toFixed(1)+' m/s');R('r3b','fₙ = nv/2L = '+fn.toFixed(1)+' Hz');R('r3c','λₙ = 2L/n = '+lam.toFixed(3)+' m،  العقد: '+(n+1)+'،  البطون: '+n);
+ const X0=100,W=1000,Y0=300,A=110,c=Math.cos(el('t3')*4);seg(g,X0,Y0-150,X0,Y0+150,css('--ink'),6);seg(g,X0+W,Y0-150,X0+W,Y0+150,css('--ink'),6);
+ const env=s=>{const p=[];for(let i=0;i<=500;i++)p.push([X0+i*2,Y0-s*A*Math.sin(n*Math.PI*i/500)]);return p;};poly(g,env(1),css('--line'),2,[6,6]);poly(g,env(-1),css('--line'),2,[6,6]);poly(g,env(c),css('--b'),4);
+ for(let j=0;j<=n;j++)dot(g,X0+j*W/n,Y0,8,css('--r'));for(let j=0;j<n;j++)text(g,'A',X0+(j+0.5)*W/n,Y0-A-16,css('--o'),'center',20);text(g,'N = عقدة،  A = بطن',600,560,css('--muted'),'center',20,true);}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3};
+function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

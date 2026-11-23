@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل كمية الحركة والتصادمات</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style>.readout .eq[dir=rtl]{text-align:right;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;font-size:1rem}.readout .eq{margin:2px 0}.readout .ltr{display:inline-block;direction:ltr;font-family:'STIX Two Text',serif}</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل كمية الحركة والتصادمات</h1><p>الفيزياء العامة (2) – الفصل الرابع. راقب حفظ كمية الحركة في التصادمات المرنة وغير المرنة.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">التصادم في بعد واحد</button><button role="tab" aria-selected="false" data-t="t2">البندول القذفي</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="عربتان تتصادمان على مسار مستقيم"></canvas><div class="ctrl"><label>m₁ (kg) <b id="o1a"></b></label><input id="i1a" type="range" min="0.5" max="5" step="0.1" value="2"><label>v₁ (m/s) <b id="o1b"></b></label><input id="i1b" type="range" min="-4" max="4" step="0.1" value="3"><label>m₂ (kg) <b id="o1c"></b></label><input id="i1c" type="range" min="0.5" max="5" step="0.1" value="1"><label>v₂ (m/s) <b id="o1d"></b></label><input id="i1d" type="range" min="-4" max="4" step="0.1" value="-1"><label>معامل الارتداد e <b id="o1e"></b></label><input id="i1e" type="range" min="0" max="1" step="0.05" value="1"><div class="row"><button class="btn" type="button" id="p1">مرن تمامًا e = 1</button><button class="btn" type="button" id="q1">عديم المرونة e = 0</button><button class="btn" type="button" id="w1">أعد التشغيل</button></div><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span><span class="eq" id="r1d"></span></div><div class="task"><h3>سؤال</h3>جرّب e = 1 ثم e = 0 بالقيم نفسها. ما الكمية المحفوظة في الحالتين؟ وما الذي يضيع في التصادم عديم المرونة؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="رصاصة تنغرس في قطعة خشب معلقة فترتفع"></canvas><div class="ctrl"><label>كتلة الرصاصة m (g) <b id="o2m"></b></label><input id="i2m" type="range" min="5" max="50" step="1" value="10"><label>كتلة القطعة M (kg) <b id="o2M"></b></label><input id="i2M" type="range" min="0.5" max="5" step="0.1" value="2"><label>سرعة الرصاصة v (m/s) <b id="o2v"></b></label><input id="i2v" type="range" min="100" max="600" step="10" value="300"><div class="row"><button class="btn" type="button" id="p2">أطلق مرة أخرى</button></div><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span><span class="eq" id="r2d"></span></div><div class="task"><h3>سؤال</h3>لماذا لا نستطيع استخدام حفظ الطاقة الميكانيكية أثناء انغراس الرصاصة، بينما نستخدمه بعد ذلك أثناء ارتفاع القطعة؟</div></div></section>
+<footer>المعامل الافتراضية · إعداد أ.د. نجم الحصيني · قسم الفيزياء، جامعة الطائف</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;const T0={};
+const el=k=>T-(T0[k]||0),rs=k=>{T0[k]=T;};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;rs(active);}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.textBaseline='alphabetic';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function ring(g,x,y,r,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){if(Math.hypot(x1-x0,y1-y0)<4)return;seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function poly(g,pts,col,w,d){if(pts.length<2)return;g.setLineDash(d||[]);g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts)g.lineTo(p[0],p[1]);g.strokeStyle=col;g.lineWidth=w||2;g.stroke();g.setLineDash([]);}
+function box(g,x0,y0,w,h,fc){g.fillStyle=fc||css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+function axes(g,x0,y0,w,h,xl,yl){g.fillStyle=css('--plot');seg(g,x0,y0,x0+w,y0,css('--muted'),2);seg(g,x0,y0,x0,y0-h,css('--muted'),2);for(let i=1;i<=4;i++){seg(g,x0+i*w/4,y0,x0+i*w/4,y0-h,css('--grid'),1);seg(g,x0,y0-i*h/4,x0+w,y0-i*h/4,css('--grid'),1);}text(g,xl,x0+w,y0+30,css('--muted'),'right',20);text(g,yl,x0+6,y0-h-10,css('--muted'),'left',20);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const set=(o)=>{for(const k in o)$(k).value=o[k];};
+const deg=Math.PI/180,G=9.8;
+const R=(id,s)=>{const e=$(id);if(!/[؀-ۿ]/.test(s)){e.dir='ltr';e.textContent=s;return;}e.dir='rtl';const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ e.innerHTML=s.split(/([؀-ۿ][؀-ۿ\s()⚠]*)/).map((p,i)=>{if(i%2)return esc(p);const t=p.trim();if(!t)return p;return (/^\s/.test(p)?' ':'')+'<span class="ltr">'+esc(t)+'</span>'+(/\s$/.test(p)?' ':'');}).join('');};
+const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=1e5||a<1e-3))return v.toExponential(d===undefined?2:d).replace('e','×10^').replace('+','');return v.toFixed(d===undefined?2:d);};
+
+
+$('p1').onclick=()=>{set({i1e:1});rs('t1');};$('q1').onclick=()=>{set({i1e:0});rs('t1');};$('w1').onclick=()=>rs('t1');
+function lab1(){const g=ctx('c1'),m1=sl('i1a','o1a',v=>v.toFixed(1)),v1=sl('i1b','o1b',v=>v.toFixed(1)),m2=sl('i1c','o1c',v=>v.toFixed(1)),v2=sl('i1d','o1d',v=>v.toFixed(1)),e=sl('i1e','o1e',v=>v.toFixed(2));
+ const M=m1+m2,P=m1*v1+m2*v2,u1=(P-m2*e*(v1-v2))/M,u2=(P+m1*e*(v1-v2))/M,K0=0.5*m1*v1*v1+0.5*m2*v2*v2,K1=0.5*m1*u1*u1+0.5*m2*u2*u2,hit=v1>v2;
+ R('r1a',hit?'بعد التصادم: v₁′ = '+u1.toFixed(2)+' m/s,  v₂′ = '+u2.toFixed(2)+' m/s':'لن تتصادما: يجب أن تكون v₁ > v₂');R('r1b','p = '+P.toFixed(2)+' kg·m/s  (قبل = بعد)');
+ R('r1c','KE قبل = '+K0.toFixed(2)+' J,  بعد = '+(hit?K1:K0).toFixed(2)+' J');R('r1d',hit?'نسبة الطاقة الحركية الضائعة = '+(K0>0?(1-K1/K0)*100:0).toFixed(1)+' %':'');
+ const s=110,X=40,w=0.7,x1=2,x2=6,tc=hit?(x2-x1-w)/(v1-v2):1e9,t=el('t1')%8;let a,b;if(t<tc){a=x1+v1*t;b=x2+v2*t;}else{a=x1+v1*tc+u1*(t-tc);b=x2+v2*tc+u2*(t-tc);}
+ floor(g,380,20,1180);const h1=60+m1*10,h2=60+m2*10;box(g,X+a*s,380-h1,w*s,h1,css('--o'));box(g,X+b*s,380-h2,w*s,h2,css('--b'));text(g,'m₁',X+(a+w/2)*s,370-h1,css('--ink'),'center',22);text(g,'m₂',X+(b+w/2)*s,370-h2,css('--ink'),'center',22);
+ const X0=120,Y0=560,W=960,bar=(k,v,c,y)=>{g.fillStyle=c;g.fillRect(X0,y,Math.max(2,v*W/Math.max(K0,0.01)/1.05),24);text(g,k,X0-10,y+20,css('--ink'),'right',20,true);};
+ bar('KE قبل',K0,css('--muted'),440);bar('KE بعد',hit&&t>=tc?K1:K0,css('--o'),480);text(g,(t<tc||!hit)?'قبل التصادم':'بعد التصادم',600,40,css('--muted'),'center',24,true);}
+$('p2').onclick=()=>rs('t2');
+function lab2(){const g=ctx('c2'),m=sl('i2m','o2m')/1000,M=sl('i2M','o2M',v=>v.toFixed(1)),v=sl('i2v','o2v');const V=m*v/(m+M),h=V*V/(2*G),L=1.5,K0=0.5*m*v*v,K1=0.5*(m+M)*V*V;
+ R('r2a','حفظ كمية الحركة: V = mv/(m+M) = '+V.toFixed(2)+' m/s');R('r2b','حفظ الطاقة بعدها: h = V²/2g = '+(h*100).toFixed(1)+' cm');R('r2c','KE الرصاصة = '+K0.toFixed(1)+' J،  KE بعد الانغراس = '+K1.toFixed(2)+' J');R('r2d','الطاقة الضائعة (حرارة وتشوه) = '+((1-K1/K0)*100).toFixed(2)+' %');
+ const px=700,py=60,Lp=330,t=el('t2')%5,ph=Math.min(1,Math.max(0,(t-1)/1.5));const thm=Math.acos(Math.max(-1,1-h/L)),ang=thm*Math.sin(ph*Math.PI/2);
+ seg(g,560,py,840,py,css('--ink'),5);const bx=px+Lp*Math.sin(ang),by=py+Lp*Math.cos(ang);seg(g,px-40,py,bx-40,by,css('--muted'),2);seg(g,px+40,py,bx+40,by,css('--muted'),2);box(g,bx-60,by,120,80+M*8,css('--fill'));
+ if(t<1){const xb=100+(px-60-100)*t;dot(g,xb,py+Lp+40,7,css('--r'));arrow(g,xb+12,py+Lp+40,xb+70,py+Lp+40,css('--r'),3);}else dot(g,bx-50,by+40,6,css('--r'));
+ seg(g,400,py+Lp+80+M*8,1000,py+Lp+80+M*8,css('--muted'),1.5,[6,6]);if(ph>0.98)text(g,'h',bx+90,by+40,css('--o'),'left',26);}
+
+const LABS={t1:lab1,t2:lab2};
+function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

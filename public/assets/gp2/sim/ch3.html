@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الخواص المرنة للمواد</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style>.readout .eq[dir=rtl]{text-align:right;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;font-size:1rem}.readout .eq{margin:2px 0}.readout .ltr{display:inline-block;direction:ltr;font-family:'STIX Two Text',serif}</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل الخواص المرنة للمواد</h1><p>الفيزياء العامة (2) – الفصل الثالث. استكشف قانون هوك ومعاملات المرونة الثلاثة: يونغ والقص والحجم.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">قانون هوك</button><button role="tab" aria-selected="false" data-t="t2">معامل يونغ</button><button role="tab" aria-selected="false" data-t="t3">معامل القص</button><button role="tab" aria-selected="false" data-t="t4">معامل الحجم</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="نابض يستطيل بثقل معلق ومنحنى القوة والاستطالة"></canvas><div class="ctrl"><label>ثابت النابض k (N/m) <b id="o1k"></b></label><input id="i1k" type="range" min="10" max="500" step="5" value="100"><label>الكتلة المعلقة m (kg) <b id="o1m"></b></label><input id="i1m" type="range" min="0" max="5" step="0.1" value="1"><div class="row"><button class="btn" type="button" id="p1">مثال: k = 200 N/m، m = 2 kg</button></div><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span></div><div class="task"><h3>سؤال</h3>ضاعف الكتلة المعلقة. ماذا يحدث للاستطالة؟ وماذا يحدث للطاقة المختزنة في النابض؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="سلك معدني يستطيل تحت حمل مع منحنى الإجهاد والانفعال"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="m1">فولاذ</button><button class="btn" type="button" id="m2">نحاس</button><button class="btn" type="button" id="m3">ألومنيوم</button></div><label>الطول الأصلي L₀ (m) <b id="o2l"></b></label><input id="i2l" type="range" min="0.5" max="3" step="0.1" value="2"><label>قطر السلك d (mm) <b id="o2d"></b></label><input id="i2d" type="range" min="0.2" max="2" step="0.05" value="0.8"><label>الكتلة المعلقة M (kg) <b id="o2m"></b></label><input id="i2m" type="range" min="0" max="100" step="1" value="20"><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span><span class="eq" id="r2d"></span></div><div class="task"><h3>سؤال</h3>ثبّت الحمل واجعل القطر نصف ما كان. كم مرة يزداد الإجهاد؟ زِد الحمل حتى تتجاوز حد المرونة، وماذا يعني ذلك للسلك؟</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="مكعب يتشوه بقوة قص موازية لسطحه"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="s1">فولاذ</button><button class="btn" type="button" id="s2">ألومنيوم</button><button class="btn" type="button" id="s3">مطاط</button></div><label>طول ضلع المكعب a (cm) <b id="o3a"></b></label><input id="i3a" type="range" min="5" max="20" step="1" value="10"><label>قوة القص F (N) <b id="o3f"></b></label><input id="i3f" type="range" min="0" max="2000" step="10" value="500"><div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span class="eq" id="r3c"></span></div><div class="task"><h3>سؤال</h3>لماذا يظهر تشوه المطاط بوضوح بينما يكاد ينعدم تشوه الفولاذ بالقوة نفسها؟</div></div></section><section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="مكعب ينضغط تحت ضغط من جميع الجهات"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="v1">ماء</button><button class="btn" type="button" id="v2">فولاذ</button><button class="btn" type="button" id="v3">ألومنيوم</button></div><label>زيادة الضغط ΔP (MPa) <b id="o4p"></b></label><input id="i4p" type="range" min="0" max="200" step="1" value="50"><div class="readout"><span class="eq" id="r4a"></span><span class="eq" id="r4b"></span><span class="eq" id="r4c"></span></div><div class="task"><h3>سؤال</h3>لماذا نعدّ السوائل «غير قابلة للانضغاط» في كثير من المسائل رغم أن لها معامل حجم محددًا؟</div></div></section>
+<footer>المعامل الافتراضية · إعداد أ.د. نجم الحصيني · قسم الفيزياء، جامعة الطائف</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;const T0={};
+const el=k=>T-(T0[k]||0),rs=k=>{T0[k]=T;};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;rs(active);}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.textBaseline='alphabetic';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function ring(g,x,y,r,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){if(Math.hypot(x1-x0,y1-y0)<4)return;seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function poly(g,pts,col,w,d){if(pts.length<2)return;g.setLineDash(d||[]);g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts)g.lineTo(p[0],p[1]);g.strokeStyle=col;g.lineWidth=w||2;g.stroke();g.setLineDash([]);}
+function box(g,x0,y0,w,h,fc){g.fillStyle=fc||css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+function axes(g,x0,y0,w,h,xl,yl){g.fillStyle=css('--plot');seg(g,x0,y0,x0+w,y0,css('--muted'),2);seg(g,x0,y0,x0,y0-h,css('--muted'),2);for(let i=1;i<=4;i++){seg(g,x0+i*w/4,y0,x0+i*w/4,y0-h,css('--grid'),1);seg(g,x0,y0-i*h/4,x0+w,y0-i*h/4,css('--grid'),1);}text(g,xl,x0+w,y0+30,css('--muted'),'right',20);text(g,yl,x0+6,y0-h-10,css('--muted'),'left',20);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const set=(o)=>{for(const k in o)$(k).value=o[k];};
+const deg=Math.PI/180,G=9.8;
+const R=(id,s)=>{const e=$(id);if(!/[؀-ۿ]/.test(s)){e.dir='ltr';e.textContent=s;return;}e.dir='rtl';const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ e.innerHTML=s.split(/([؀-ۿ][؀-ۿ\s()⚠]*)/).map((p,i)=>{if(i%2)return esc(p);const t=p.trim();if(!t)return p;return (/^\s/.test(p)?' ':'')+'<span class="ltr">'+esc(t)+'</span>'+(/\s$/.test(p)?' ':'');}).join('');};
+const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=1e5||a<1e-3))return v.toExponential(d===undefined?2:d).replace('e','×10^').replace('+','');return v.toFixed(d===undefined?2:d);};
+
+
+$('p1').onclick=()=>set({i1k:200,i1m:2});
+function lab1(){const g=ctx('c1'),k=sl('i1k','o1k'),m=sl('i1m','o1m',v=>v.toFixed(1)),F=m*G,x=F/k,U=0.5*k*x*x;
+ R('r1a','F = mg = '+F.toFixed(1)+' N');R('r1b','x = F/k = '+(x*100).toFixed(1)+' cm');R('r1c','U = ½kx² = '+U.toFixed(2)+' J');
+ const top=60,cx=260,L0=150,Lp=L0+Math.min(x*400,330);seg(g,140,top,380,top,css('--ink'),5);const N=14,pts=[[cx,top]];for(let i=1;i<N;i++)pts.push([cx+(i%2?24:-24),top+Lp*i/N]);pts.push([cx,top+Lp]);poly(g,pts,css('--b'),3);
+ if(m>0)box(g,cx-40,top+Lp,80,40+m*8);seg(g,90,top+L0,170,top+L0,css('--muted'),1.5,[5,5]);seg(g,90,top+Lp,170,top+Lp,css('--muted'),1.5,[5,5]);arrow(g,120,top+L0,120,top+Lp,css('--o'),3);text(g,'x',100,top+(L0+Lp)/2,css('--o'),'right',24);
+ const X0=560,Y0=520,W=580,H=420,xm=0.5;axes(g,X0,Y0,W,H,'x (m)','F (N)');const Fm=Math.max(5*G,1);poly(g,[[X0,Y0],[X0+W,Y0-k*xm/Fm*H]].map(p=>[p[0],Math.max(p[1],Y0-H)]),css('--b'),3);
+ const px=X0+Math.min(x/xm,1)*W,py=Y0-F/Fm*H;dot(g,px,py,9,css('--o'));seg(g,px,py,px,Y0,css('--o'),1.5,[5,5]);text(g,'الميل = k',X0+W-10,Y0-H+30,css('--b'),'right',22,true);}
+let E=200e9,EL=250e6,MN='الفولاذ';$('m1').onclick=()=>{E=200e9;EL=250e6;MN='الفولاذ';};$('m2').onclick=()=>{E=110e9;EL=70e6;MN='النحاس';};$('m3').onclick=()=>{E=70e9;EL=95e6;MN='الألومنيوم';};
+function lab2(){const g=ctx('c2'),L0=sl('i2l','o2l',v=>v.toFixed(1)),d=sl('i2d','o2d',v=>v.toFixed(2)),M=sl('i2m','o2m');const A=Math.PI*Math.pow(d/2000,2),F=M*G,s=F/A,e=s/E,dL=e*L0,over=s>EL;
+ R('r2a',MN+':  Y = '+(E/1e9).toFixed(0)+' GPa');R('r2b','σ = F/A = '+(s/1e6).toFixed(1)+' MPa');R('r2c','ε = σ/Y = '+e.toExponential(2)+',  ΔL = '+(dL*1000).toFixed(2)+' mm');R('r2d',over?'⚠ تجاوز الإجهاد حد المرونة ('+(EL/1e6)+' MPa): لن يعود السلك لطوله':'داخل حد المرونة: يعود السلك لطوله عند إزالة الحمل');
+ const cx=220,top=50,Lp=300+Math.min(dL*1000*12,140);seg(g,120,top,320,top,css('--ink'),5);seg(g,cx,top,cx,top+Lp,over?css('--r'):css('--ink'),Math.max(2,d*4));if(M>0)box(g,cx-40,top+Lp,80,50+M*0.6);text(g,'ΔL مكبَّرة للتوضيح',cx,590,css('--muted'),'center',18,true);
+ const X0=520,Y0=520,W=620,H=420,em=EL/E*2,sm=EL*1.4;axes(g,X0,Y0,W,H,'ε','σ');const cur=[];for(let i=0;i<=100;i++){const ee=em*i/100,ss=ee<=EL/E?E*ee:EL+(sm-EL)*(1-Math.exp(-(ee-EL/E)/(EL/E)*1.5));cur.push([X0+ee/em*W,Y0-ss/sm*H]);}poly(g,cur,css('--b'),3);
+ seg(g,X0+EL/E/em*W,Y0,X0+EL/E/em*W,Y0-EL/sm*H,css('--muted'),1.5,[5,5]);text(g,'حد المرونة',X0+EL/E/em*W,Y0+30,css('--muted'),'center',18,true);
+ const ee=Math.min(e,em),ss=ee<=EL/E?E*ee:EL+(sm-EL)*(1-Math.exp(-(ee-EL/E)/(EL/E)*1.5));dot(g,X0+ee/em*W,Y0-ss/sm*H,9,over?css('--r'):css('--o'));}
+let S=80e9,SN='الفولاذ';$('s1').onclick=()=>{S=80e9;SN='الفولاذ';};$('s2').onclick=()=>{S=25e9;SN='الألومنيوم';};$('s3').onclick=()=>{S=0.6e6;SN='المطاط';};
+function lab3(){const g=ctx('c3'),a=sl('i3a','o3a')/100,F=sl('i3f','o3f');const A=a*a,sh=F/A,ga=sh/S,dx=ga*a;
+ R('r3a',SN+':  S = '+(S>=1e9?(S/1e9).toFixed(0)+' GPa':(S/1e6).toFixed(1)+' MPa'));R('r3b','إجهاد القص F/A = '+f2(sh/1e3,1)+' kPa');R('r3c','Δx = Fh/(SA) = '+f2(dx*1000,4)+' mm,  γ = '+f2(ga,4)+' rad');
+ const s=300,x0=420,y0=480,dp=Math.min(dx/a*s,s*0.6);floor(g,y0,300,900);g.fillStyle=css('--fill');g.beginPath();g.moveTo(x0,y0);g.lineTo(x0+s,y0);g.lineTo(x0+s+dp,y0-s);g.lineTo(x0+dp,y0-s);g.closePath();g.fill();g.strokeStyle=css('--ink');g.lineWidth=3;g.stroke();
+ g.strokeStyle=css('--muted');g.setLineDash([6,6]);g.strokeRect(x0,y0-s,s,s);g.setLineDash([]);arrow(g,x0+dp+60,y0-s-24,x0+dp+60+Math.min(F/6,260),y0-s-24,css('--o'),5);text(g,'F',x0+dp+80+Math.min(F/6,260),y0-s-14,css('--o'),'left',26);arrow(g,x0+s+20,y0+30,x0+s+20-Math.min(F/6,260),y0+30,css('--r'),4);text(g,'Δx',x0+s+dp/2,y0-s-60,css('--b'),'center',22);}
+let B=2.2e9,BN='الماء';$('v1').onclick=()=>{B=2.2e9;BN='الماء';};$('v2').onclick=()=>{B=160e9;BN='الفولاذ';};$('v3').onclick=()=>{B=70e9;BN='الألومنيوم';};
+function lab4(){const g=ctx('c4'),P=sl('i4p','o4p')*1e6,fr=P/B;R('r4a',BN+':  B = '+(B/1e9).toFixed(1)+' GPa');R('r4b','ΔV/V = −ΔP/B = −'+(fr*100).toFixed(3)+' %');R('r4c','حجم 1 لتر يصبح '+(1000*(1-fr)).toFixed(2)+' mL');
+ const s0=300,s=s0*Math.cbrt(1-Math.min(fr*40,0.7)),cx=600,cy=300;g.strokeStyle=css('--muted');g.setLineDash([6,6]);g.strokeRect(cx-s0/2,cy-s0/2,s0,s0);g.setLineDash([]);box(g,cx-s/2,cy-s/2,s,s);
+ const k=Math.min(P/1e6,200)/200*90+30;[[0,-1],[0,1],[-1,0],[1,0]].forEach(([u,v])=>{const sx=cx+u*(s/2+20+k),sy=cy+v*(s/2+20+k);arrow(g,sx,sy,cx+u*(s/2+8),cy+v*(s/2+8),css('--o'),4);});text(g,'التغير في الحجم مكبَّر 40 مرة',cx,585,css('--muted'),'center',18,true);}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4};
+function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>
