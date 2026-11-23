@@ -108,7 +108,7 @@ function lab1(){const g=ctx('c1'),l=sl('i1l','o1l')*1e-9,d=sl('i1d','o1d',v=>v.t
  const X=600+n*B*1e3*sc;if(X<1150)arrow(g,600,420,X,420,css('--o'),3);text(g,'y = '+(n*B*1e3).toFixed(2)+' mm',Math.min(X,1100),460,css('--o'),'center',22);text(g,'±20 mm',1150,130,css('--muted'),'right',18);}
 $('p2').onclick=()=>{$('i2m').value=1.5;$('i2t').value=100;$('i2l').value=600;};
 function lab2(){const g=ctx('c2'),m=sl('i2m','o2m',v=>v.toFixed(2)),t=sl('i2t','o2t'),l=sl('i2l','o2l'),I=Math.sin(2*Math.PI*m*t/l)**2;
- $('r2a').textContent='Δ = 2μt = '+(2*m*t).toFixed(0)+' nm,  Δ/λ = '+(2*m*t/l).toFixed(2);$('r2b').textContent='I/I_max = sin²(2πμt/λ) = '+I.toFixed(2)+'   (أول سمك يعطي أقصى انعكاس = λ/4μ = '+(l/(4*m)).toFixed(0)+' nm)';
+ $('r2a').textContent='Δ = 2μt = '+(2*m*t).toFixed(0)+' nm,  Δ/λ = '+(2*m*t/l).toFixed(2);$('r2b').textContent='I/I_max = sin²(2πμt/λ) = '+I.toFixed(2)+',   t (first max) = λ/4μ = '+(l/(4*m)).toFixed(0)+' nm';
  const ty=160,th=30+t*0.15;g.fillStyle=css('--b');g.globalAlpha=.15;g.fillRect(60,ty,600,th);g.globalAlpha=1;seg(g,60,ty,660,ty,css('--ink'),2);seg(g,60,ty+th,660,ty+th,css('--ink'),2);
  arrow(g,150,ty-120,300,ty,wl(l),4);arrow(g,300,ty,450,ty-120,wl(l),2+5*I);seg(g,300,ty,340,ty+th,wl(l),2);seg(g,340,ty+th,380,ty,wl(l),2);arrow(g,380,ty,530,ty-120,wl(l),2+5*I);
  g.fillStyle=wl(l);g.fillRect(800,300-I*220,90,I*220);seg(g,760,300,930,300,css('--muted'),2);text(g,'I',845,330,css('--muted'),'center');

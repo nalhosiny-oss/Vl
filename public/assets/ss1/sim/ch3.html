@@ -126,7 +126,7 @@ function lab1(){const g=ctx('c1'),V=sl('i1v','o1v',v=>v.toFixed(1)),x=sl('i1x','
  const mu=l=>8*Math.pow(l,3)*(l<1.488?1:0.12),cont=l=>l<=lmin?0:(l/lmin-1)/(l*l)*lmin*lmin*0.35*V/25,Ka=1.5406,Kb=1.3922,on=V>8.98;
  const I=l=>(cont(l)+(on?0.9*(V-8.98)/20*Math.exp(-(((l-Ka)/0.008)**2))+0.25*(V-8.98)/20*Math.exp(-(((l-Kb)/0.008)**2)):0));
  plot(g,M,fn(M,I,1500),css('--muted'),2,[5,5]);plot(g,M,fn(M,l=>I(l)*Math.exp(-mu(l)*x),1500),css('--b'),3.5);plot(g,M,[[lmin,0],[lmin,1.2]],css('--r'),2,[4,5]);
- R('r1a','λ_min = hc/eV = 12.398/V(kV) = '+lmin.toFixed(3)+' Å');R('r1b',on?'خطا Kα (1.541 Å) وKβ (1.392 Å) للنحاس ظاهران':'V < 8.98 kV: لا تكفي الطاقة لإقصاء إلكترون K، فلا خطوط مميزة');R('r1c','I = I₀ e^(−μx)،  حافة امتصاص K للنيكل عند 1.488 Å تقع بين Kβ وKα فتمتص Kβ بقوة (مرشح نيكل)');R('r1d','رمادي: قبل الماص · أزرق: بعده');}
+ R('r1a','λ_min = hc/eV = 12.398/V(kV) = '+lmin.toFixed(3)+' Å');R('r1b',on?'خطا Kα (1.541 Å) وKβ (1.392 Å) للنحاس ظاهران':'V < 8.98 kV: لا تكفي الطاقة لإقصاء إلكترون K، فلا خطوط مميزة');R('r1c','I = I₀ e^(−μx)،  مرشح النيكل: حافة امتصاصه K عند 1.488 Å، بين خطي النحاس Kβ وKα، فيمتص Kβ بقوة');R('r1d','رمادي: قبل الماص · أزرق: بعده');}
 function lab2(){const g=ctx('c2'),th=sl('i2t','o2t',v=>v.toFixed(1)+'°')*deg,d=sl('i2d','o2d',v=>v.toFixed(2)),l=sl('i2l','o2l',v=>v.toFixed(2));const s=55,y0=250,dp=d*s;
  for(let j=0;j<5;j++)for(let i=0;i<22;i++)dot(g,80+i*48,y0+j*dp,7,css('--b'));const cx=600;const L=420;
  for(let j=0;j<2;j++){const yy=y0+j*dp,xx=cx+j*dp/Math.tan(th);const dx=Math.cos(th),dy=Math.sin(th);const xa=xx-dx*L,ya=yy-dy*L;
