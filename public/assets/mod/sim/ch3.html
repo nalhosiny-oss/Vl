@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل الطبيعة الموجية للجسيمات</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style>.readout .eq[dir=rtl]{text-align:right;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;font-size:1rem}.readout .eq{margin:2px 0}.readout .ltr{display:inline-block;direction:ltr;font-family:'STIX Two Text',serif}</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل الطبيعة الموجية للجسيمات</h1><p>الفيزياء الحديثة – الوحدة الثالثة. موجات دي برولي، وتجربة دافيسون وجيرمر، ومبدأ الريبة، والتفسير الاحتمالي ومبدأ التناظر.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">طول موجة دي برولي</button><button role="tab" aria-selected="false" data-t="t2">تجربة دافيسون وجيرمر</button><button role="tab" aria-selected="false" data-t="t3">مبدأ الريبة والحزمة الموجية</button><button role="tab" aria-selected="false" data-t="t4">التفسير الاحتمالي ومبدأ التناظر</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="جسيم مسرَّع بجهد وطول موجته المصاحبة"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="q1">إلكترون</button><button class="btn" type="button" id="q2">بروتون</button><button class="btn" type="button" id="q3">كرة تنس 57 g</button></div><label>جهد التسريع V (V) أو سرعة الكرة (m/s) <b id="o1v"></b></label><input id="i1v" type="range" min="1" max="1000" step="1" value="54"><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span><span class="eq" id="r1d"></span></div><div class="task"><h3>سؤال</h3>قارن طول موجة الإلكترون المسرَّع بـ 54 V بالمسافة بين ذرات البلورة (≈ 0.2 nm). لماذا لا نرى سلوكًا موجيًا لكرة التنس؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="حيود الإلكترونات عن بلورة نيكل وشدة الإلكترونات المرتدة مع الزاوية"></canvas><div class="ctrl"><label>جهد التسريع V (V) <b id="o2v"></b></label><input id="i2v" type="range" min="20" max="100" step="1" value="54"><label>المسافة بين صفوف الذرات d (nm) <b id="o2d"></b></label><input id="i2d" type="range" min="0.1" max="0.4" step="0.005" value="0.215"><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span><span class="eq" id="r2d"></span></div><div class="task"><h3>سؤال</h3>عند أي جهد تكون القمة عند 50° للنيكل؟ وكيف تؤكد هذه التجربة فرضية دي برولي؟</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="حزمة موجية من تراكب موجات بانتشار في العدد الموجي Δk"></canvas><div class="ctrl"><label>انتشار العدد الموجي Δk (نسبي) <b id="o3k"></b></label><input id="i3k" type="range" min="0.05" max="2" step="0.05" value="0.5"><label>عدد الموجات المتراكبة <b id="o3n"></b></label><input id="i3n" type="range" min="3" max="60" step="1" value="30"><div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span class="eq" id="r3c"></span></div><div class="task"><h3>سؤال</h3>ضيّق Δk. ماذا يحدث لعرض الحزمة Δx؟ وما علاقة ذلك بمبدأ هايزنبرغ Δx·Δp ≥ ħ/2؟</div></div></section><section class="lab" id="t4" role="tabpanel"><canvas id="c4" width="1200" height="600" aria-label="كثافة الاحتمال لجسيم في صندوق لأعداد كمية متزايدة"></canvas><div class="ctrl"><label>العدد الكمي n <b id="o4n"></b></label><input id="i4n" type="range" min="1" max="40" step="1" value="1"><div class="readout"><span class="eq" id="r4a"></span><span class="eq" id="r4b"></span><span class="eq" id="r4c"></span></div><div class="task"><h3>سؤال</h3>كبّر n كثيرًا. إلى أي توزيع تقترب كثافة الاحتمال؟ وما علاقة ذلك بمبدأ التناظر لبور؟</div></div></section>
+<footer>المعامل الافتراضية · إعداد أ.د. نجم الحصيني · قسم الفيزياء، جامعة الطائف</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;const T0={};
+const el=k=>T-(T0[k]||0),rs=k=>{T0[k]=T;};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;rs(active);}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.textBaseline='alphabetic';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function ring(g,x,y,r,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){if(Math.hypot(x1-x0,y1-y0)<4)return;seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function poly(g,pts,col,w,d){if(pts.length<2)return;g.setLineDash(d||[]);g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts)g.lineTo(p[0],p[1]);g.strokeStyle=col;g.lineWidth=w||2;g.stroke();g.setLineDash([]);}
+function box(g,x0,y0,w,h,fc){g.fillStyle=fc||css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+function axes(g,x0,y0,w,h,xl,yl){g.fillStyle=css('--plot');seg(g,x0,y0,x0+w,y0,css('--muted'),2);seg(g,x0,y0,x0,y0-h,css('--muted'),2);for(let i=1;i<=4;i++){seg(g,x0+i*w/4,y0,x0+i*w/4,y0-h,css('--grid'),1);seg(g,x0,y0-i*h/4,x0+w,y0-i*h/4,css('--grid'),1);}text(g,xl,x0+w,y0+30,css('--muted'),'right',20);text(g,yl,x0+6,y0-h-10,css('--muted'),'left',20);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const set=(o)=>{for(const k in o)$(k).value=o[k];};
+const deg=Math.PI/180,G=9.8;
+const R=(id,s)=>{const e=$(id);if(!/[؀-ۿ]/.test(s)){e.dir='ltr';e.textContent=s;return;}e.dir='rtl';const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ e.innerHTML=s.split(/([؀-ۿ][؀-ۿ\s()⚠]*)/).map((p,i)=>{if(i%2)return esc(p);const t=p.trim();if(!t)return p;return (/^\s/.test(p)?' ':'')+'<span class="ltr">'+esc(t)+'</span>'+(/\s$/.test(p)?' ':'');}).join('');};
+const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=1e5||a<1e-3))return v.toExponential(d===undefined?2:d).replace('e','×10^').replace('+','');return v.toFixed(d===undefined?2:d);};
+
+
+const h=6.626e-34,me=9.109e-31,mp=1.673e-27,e=1.602e-19;let P={n:'الإلكترون',m:me,ball:false};$('q1').onclick=()=>P={n:'الإلكترون',m:me,ball:false};$('q2').onclick=()=>P={n:'البروتون',m:mp,ball:false};$('q3').onclick=()=>{P={n:'كرة التنس',m:0.057,ball:true};set({i1v:30});};
+function lab1(){const g=ctx('c1'),V=sl('i1v','o1v');let p,v;if(P.ball){v=V;p=P.m*v;}else{p=Math.sqrt(2*P.m*e*V);v=p/P.m;}const lam=h/p;
+ R('r1a',P.n+(P.ball?':  السرعة '+V+' m/s':':  مسرَّع بجهد '+V+' V'));R('r1b','p = '+(P.ball?'mv':'√(2meV)')+' = '+p.toExponential(3)+' kg·m/s');R('r1c','λ = h/p = '+(lam<1e-12?lam.toExponential(2)+' m':(lam*1e9).toFixed(4)+' nm'));R('r1d',P.ball?'أصغر من نواة الذرة بمراتب كثيرة: لا يُرصد أي حيود':lam>0.05e-9?'قريب من المسافات الذرية: يحدث حيود في البلورات':'أصغر من المسافات الذرية');
+ const X0=80,cy=300,W=1040,sc=P.ball?40:Math.min(400,Math.max(30,lam*1e9/0.2*120));const p2=[];for(let x=0;x<=W;x+=2)p2.push([X0+x,cy-60*Math.sin(2*Math.PI*x/sc-el('t1')*4)]);poly(g,p2,css('--b'),3);
+ for(let k=0;k<12;k++)dot(g,X0+k*120*0.2/0.2,cy+140,10,css('--muted'));text(g,'ذرات بلورة بفاصل ≈ 0.2 nm (للمقارنة)',600,cy+190,css('--muted'),'center',18,true);if(P.ball)text(g,'الطول الموجي الحقيقي أصغر بكثير من أن يُرسم',600,cy-110,css('--r'),'center',20,true);}
+function lab2(){const g=ctx('c2'),V=sl('i2v','o2v'),d=sl('i2d','o2d',v=>v.toFixed(3))*1e-9;const lam=h/Math.sqrt(2*me*e*V),s=lam/d,phi=s<=1?Math.asin(s):NaN;
+ R('r2a','λ = h/√(2meV) = '+(lam*1e9).toFixed(4)+' nm');R('r2b','شرط الحيود: d sinφ = λ');R('r2c',isNaN(phi)?'λ > d: لا قمة حيود':'زاوية القمة φ = '+(phi/deg).toFixed(1)+'°');R('r2d','النيكل: قمة واضحة عند 54 V و50°');
+ const cx=300,cy=470;box(g,cx-160,cy,320,40,css('--fill'));for(let i=0;i<9;i++)dot(g,cx-140+i*35,cy+20,6,css('--muted'));arrow(g,cx,80,cx,cy-6,css('--b'),4);text(g,'حزمة إلكترونات',cx+12,110,css('--b'),'left',18,true);
+ const I=a=>{if(isNaN(phi))return 0.2+0.1*Math.cos(a);return 0.25+0.75*Math.exp(-Math.pow((a-phi)/(8*deg),2));};const pts=[];for(let a=0;a<=Math.PI/2;a+=0.01){const r=60+I(a)*220;pts.push([cx-r*Math.sin(a),cy-r*Math.cos(a)]);}poly(g,pts,css('--r'),3);
+ if(!isNaN(phi))arrow(g,cx,cy,cx-260*Math.sin(phi),cy-260*Math.cos(phi),css('--o'),3);text(g,'شدة الإلكترونات المرتدة (قطبي)',cx,cy+80,css('--muted'),'center',18,true);
+ const X0=680,Y0=500,W=460,H=380;axes(g,X0,Y0,W,H,'φ (°)','I');const q=[];for(let i=0;i<=180;i++){const a=i/2*deg;q.push([X0+i/180*W,Y0-I(a)*H]);}poly(g,q,css('--r'),3);[0,30,60,90].forEach(a=>text(g,a+'',X0+a/90*W,Y0+24,css('--muted'),'center',16));}
+function lab3(){const g=ctx('c3'),dk=sl('i3k','o3k',v=>v.toFixed(2)),N=sl('i3n','o3n');const k0=6,X0=80,W=1040,cy=260,sx=W/20;const f=x=>{let s=0,n=0;for(let j=0;j<N;j++){const k=k0+dk*(2*j/(N-1)-1)*1.5,a=Math.exp(-Math.pow((k-k0)/dk,2));s+=a*Math.cos(k*x-el('t3')*0);n+=a;}return s/n;};
+ const dx=1/dk;R('r3a','Δk = '+dk.toFixed(2)+'  ⇒  Δx ≈ 1/Δk = '+dx.toFixed(2)+' (وحدات نسبية)');R('r3b','Δx·Δk ≈ 1  ⇒  Δx·Δp ≈ ħ (لأن p = ħk)');R('r3c','حزمة أضيق تتطلب مدى أوسع من الأعداد الموجية (الزخم)');
+ const p=[],env=[];for(let i=0;i<=W;i+=2){const x=(i-W/2)/sx;p.push([X0+i,cy-180*f(x)]);env.push([X0+i,cy-180*Math.exp(-x*x*dk*dk/4)]);}poly(g,env,css('--line'),2,[6,5]);poly(g,p,css('--b'),3);seg(g,X0+W/2-dx*sx,cy+200,X0+W/2+dx*sx,cy+200,css('--o'),4);text(g,'Δx',X0+W/2,cy+232,css('--o'),'center',22);
+ const Y0=590,Hk=110;const sp=[];for(let i=0;i<=200;i++){const k=k0-3+6*i/200;sp.push([X0+700+i*2,Y0-Math.exp(-Math.pow((k-k0)/dk,2))*Hk]);}poly(g,sp,css('--r'),3);text(g,'توزيع k',X0+700,Y0-Hk-6,css('--r'),'left',18,true);}
+function lab4(){const g=ctx('c4'),n=sl('i4n','o4n');R('r4a','ψₙ(x) = √(2/L) sin(nπx/L)');R('r4b','الاحتمال |ψ|² dx: احتمال وجود الجسيم بين x و x + dx');R('r4c',n>=15?'n كبير: الاحتمال يقترب من التوزيع المنتظم الكلاسيكي 1/L (مبدأ التناظر)':'n صغير: مناطق احتمالها صفر (عقد) لا تفسير كلاسيكي لها');
+ const X0=150,Y0=500,W=900,H=380;seg(g,X0,Y0-H-20,X0,Y0,css('--ink'),6);seg(g,X0+W,Y0-H-20,X0+W,Y0,css('--ink'),6);seg(g,X0,Y0,X0+W,Y0,css('--muted'),2);const p=[];g.fillStyle='rgba(94,154,30,.25)';g.beginPath();g.moveTo(X0,Y0);for(let i=0;i<=900;i++){const x=i/900,y=2*Math.pow(Math.sin(n*Math.PI*x),2);p.push([X0+i,Y0-y/2*H*0.9]);g.lineTo(X0+i,Y0-y/2*H*0.9);}g.lineTo(X0+W,Y0);g.fill();poly(g,p,css('--b'),3);
+ seg(g,X0,Y0-H*0.45,X0+W,Y0-H*0.45,css('--r'),2,[8,6]);text(g,'الكلاسيكي: 1/L',X0+W-10,Y0-H*0.45-10,css('--r'),'right',18,true);text(g,'|ψ|²',X0+10,Y0-H-6,css('--muted'),'left',20);}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3,t4:lab4};
+function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>
