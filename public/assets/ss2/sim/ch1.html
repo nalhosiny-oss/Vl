@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل نظرية الحزم</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style>.readout .eq[dir=rtl]{text-align:right;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;font-size:1rem}.readout .eq{margin:2px 0}.readout .ltr{display:inline-block;direction:ltr;font-family:'STIX Two Text',serif}</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل نظرية الحزم</h1><p>فيزياء الجوامد (2) – الوحدة الأولى. أطياف الطاقة في الذرات والجزيئات والجوامد، ونظرية بلوخ، ومناطق بريلوان، وعدد الحالات في الحزمة، وأنموذج الإلكترون شبه الحر.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">من المستويات إلى الحزم</button><button role="tab" aria-selected="false" data-t="t2">موجة بلوخ</button><button role="tab" aria-selected="false" data-t="t3">الإلكترون شبه الحر</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="انقسام مستوى ذري واحد إلى N مستوى عند تقريب N ذرة من بعضها"></canvas><div class="ctrl"><label>عدد الذرات N <b id="o1n"></b></label><input id="i1n" type="range" min="1" max="40" step="1" value="6"><label>التباعد بين الذرات (نسبي) <b id="o1a"></b></label><input id="i1a" type="range" min="0.6" max="3" step="0.02" value="1.2"><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span><span class="eq" id="r1d"></span></div><div class="task"><h3>سؤال</h3>لماذا ينقسم كل مستوى ذري إلى N مستوى؟ لماذا يتسع عرض الحزمة كلما تقاربت الذرات؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="دالة بلوخ ψ = u(x)e^(ikx) حيث u دورية بدورة الشبكة"></canvas><div class="ctrl"><label>ka/π <b id="o2k"></b></label><input id="i2k" type="range" min="-1" max="1" step="0.01" value="0.3"><label>شدة التعديل الدوري <b id="o2u"></b></label><input id="i2u" type="range" min="0" max="1" step="0.05" value="0.6"><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span><span class="eq" id="r2d"></span></div><div class="task"><h3>سؤال</h3>ما معنى أن |ψ|² دورية بدورة الشبكة رغم أن ψ نفسها ليست كذلك؟ لماذا يكفي حصر k في منطقة بريلوان الأولى؟</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="علاقة التشتت E(k) مع فجوة عند حافة منطقة بريلوان والكتلة الفعالة"></canvas><div class="ctrl"><label>مركبة فورييه للجهد |U| <b id="o3u"></b></label><input id="i3u" type="range" min="0" max="0.4" step="0.01" value="0.15"><label>ka/π <b id="o3k"></b></label><input id="i3k" type="range" min="-1" max="1" step="0.01" value="0.85"><div class="row"><button class="btn" type="button" id="kz1">المنطقة المختزلة</button><button class="btn" type="button" id="kz2">المنطقة الممتدة</button></div><div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span class="eq" id="r3c"></span><span class="eq" id="r3d"></span></div><div class="task"><h3>سؤال</h3>لماذا تظهر الفجوة عند k = ±π/a بالضبط؟ لماذا تكون الكتلة الفعالة سالبة قرب قمة الحزمة؟ كم حالة في كل حزمة لبلورة فيها N خلية؟</div></div></section>
+<footer>المعامل الافتراضية · إعداد أ.د. نجم الحصيني · قسم الفيزياء، جامعة الطائف</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;const T0={};
+const el=k=>T-(T0[k]||0),rs=k=>{T0[k]=T;};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;rs(active);}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.textBaseline='alphabetic';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function ring(g,x,y,r,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){if(Math.hypot(x1-x0,y1-y0)<4)return;seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function poly(g,pts,col,w,d){if(pts.length<2)return;g.setLineDash(d||[]);g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts)g.lineTo(p[0],p[1]);g.strokeStyle=col;g.lineWidth=w||2;g.stroke();g.setLineDash([]);}
+function box(g,x0,y0,w,h,fc){g.fillStyle=fc||css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+function axes(g,x0,y0,w,h,xl,yl){g.fillStyle=css('--plot');seg(g,x0,y0,x0+w,y0,css('--muted'),2);seg(g,x0,y0,x0,y0-h,css('--muted'),2);for(let i=1;i<=4;i++){seg(g,x0+i*w/4,y0,x0+i*w/4,y0-h,css('--grid'),1);seg(g,x0,y0-i*h/4,x0+w,y0-i*h/4,css('--grid'),1);}text(g,xl,x0+w,y0+30,css('--muted'),'right',20);text(g,yl,x0+6,y0-h-10,css('--muted'),'left',20);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const set=(o)=>{for(const k in o)$(k).value=o[k];};
+const deg=Math.PI/180,G=9.8;
+const R=(id,s)=>{const e=$(id);if(!/[؀-ۿ]/.test(s)){e.dir='ltr';e.textContent=s;return;}e.dir='rtl';const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ e.innerHTML=s.split(/([؀-ۿ][؀-ۿ\s()⚠]*)/).map((p,i)=>{if(i%2)return esc(p);const t=p.trim();if(!t)return p;return (/^\s/.test(p)?' ':'')+'<span class="ltr">'+esc(t)+'</span>'+(/\s$/.test(p)?' ':'');}).join('');};
+const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=1e5||a<1e-3))return v.toExponential(d===undefined?2:d).replace('e','×10^').replace('+','');return v.toFixed(d===undefined?2:d);};
+
+
+const rk=(f,x,y,h)=>{const k1=f(x,y),k2=f(x+h/2,y+h*k1/2),k3=f(x+h/2,y+h*k2/2),k4=f(x+h,y+h*k3);return y+h*(k1+2*k2+2*k3+k4)/6;};
+function sol(f,x0,y0,x1,n){const pts=[[x0,y0]];let x=x0,y=y0;const h=(x1-x0)/n;for(let i=0;i<n;i++){const s=f(x,y);if(!isFinite(s)||Math.abs(s)>400)break;y=rk(f,x,y,h);x+=h;if(!isFinite(y)||Math.abs(y)>1e4)break;pts.push([x,y]);}return pts;}
+function sol2(F,t0,Y0,t1,n){const out=[[t0,Y0[0],Y0[1]]];let t=t0,Y=Y0.slice();const h=(t1-t0)/n,ad=(A,B,s)=>A.map((v,i)=>v+s*B[i]);for(let i=0;i<n;i++){const k1=F(t,Y),k2=F(t+h/2,ad(Y,k1,h/2)),k3=F(t+h/2,ad(Y,k2,h/2)),k4=F(t+h,ad(Y,k3,h));Y=Y.map((v,j)=>v+h*(k1[j]+2*k2[j]+2*k3[j]+k4[j])/6);t+=h;if(!isFinite(Y[0])||Math.abs(Y[0])>1e5)break;out.push([t,Y[0],Y[1]]);}return out;}
+function frame(g,X0,Y0,W,H,xa,xb,ya,yb,xl,yl){g.fillStyle=css('--plot');g.fillRect(X0,Y0-H,W,H);const X=x=>X0+(x-xa)/(xb-xa)*W,Y=y=>Y0-(y-ya)/(yb-ya)*H;
+ const st=(a,b,n)=>{const r=(b-a)/n,p=Math.pow(10,Math.floor(Math.log10(r))),m=r/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;};const sx=st(xa,xb,W/110),sy=st(ya,yb,H/70);
+ for(let x=Math.ceil(xa/sx-1e-9)*sx;x<=xb+1e-9;x+=sx){seg(g,X(x),Y0,X(x),Y0-H,css('--grid'),1);text(g,String(+x.toFixed(6)),X(x),Y0+20,css('--muted'),'center',15);}
+ for(let y=Math.ceil(ya/sy-1e-9)*sy;y<=yb+1e-9;y+=sy){seg(g,X0,Y(y),X0+W,Y(y),css('--grid'),1);text(g,String(+y.toFixed(6)),X0-6,Y(y)+5,css('--muted'),'right',15);}
+ if(ya<0&&yb>0)seg(g,X0,Y(0),X0+W,Y(0),css('--muted'),1.8);if(xa<0&&xb>0)seg(g,X(0),Y0,X(0),Y0-H,css('--muted'),1.8);
+ g.strokeStyle=css('--line');g.lineWidth=1.5;g.strokeRect(X0,Y0-H,W,H);if(xl)text(g,xl,X0+W,Y0+42,css('--muted'),'right',18);if(yl)text(g,yl,X0+4,Y0-H-10,css('--muted'),'left',18);
+ return {X,Y,X0,Y0,W,H,xa,xb,ya,yb};}
+function plot(g,M,pts,col,w,d){g.save();g.beginPath();g.rect(M.X0,M.Y0-M.H,M.W,M.H);g.clip();poly(g,pts.map(p=>[M.X(p[0]),M.Y(Math.max(-1e4,Math.min(1e4,p[1])))]),col,w,d);g.restore();}
+function fn(M,f,n){const pts=[];n=n||400;for(let i=0;i<=n;i++){const x=M.xa+(M.xb-M.xa)*i/n;pts.push([x,f(x)]);}return pts;}
+function field(g,M,f,nx,col){const ny=Math.round(nx*M.H/M.W),L=M.W/nx*0.36,kx=M.W/(M.xb-M.xa),ky=M.H/(M.yb-M.ya);
+ for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const x=M.xa+(i+0.5)*(M.xb-M.xa)/nx,y=M.ya+(j+0.5)*(M.yb-M.ya)/ny,s=f(x,y);const a=isFinite(s)?Math.atan(s*ky/kx):Math.PI/2;const X=M.X(x),Y=M.Y(y);seg(g,X-L*Math.cos(a),Y+L*Math.sin(a),X+L*Math.cos(a),Y-L*Math.sin(a),col||'#9DB0C6',1.6);}}
+function mark(g,M,x,y,col,r){if(x>=M.xa&&x<=M.xb&&y>=M.ya&&y<=M.yb)dot(g,M.X(x),M.Y(y),r||8,col);}
+const cbrt=Math.cbrt,ex=Math.exp,sq=Math.sqrt;
+
+function lab1(){const g=ctx('c1'),N=Math.round(sl('i1n','o1n')),a=sl('i1a','o1a',v=>v.toFixed(2));const t=Math.exp(-(a-0.6)*1.6);const lv=[];for(let j=1;j<=N;j++)lv.push(-3+(N>1?-2*t*Math.cos(j*Math.PI/(N+1)):0));
+ const M=frame(g,500,555,660,510,0.6,3,-5.5,-0.5,'التباعد (نسبي)','E');for(let x=0.6;x<=3;x+=0.02){const tt=Math.exp(-(x-0.6)*1.6);g.fillStyle='rgba(244,162,89,.25)';const y1=M.Y(-3-2*tt),y2=M.Y(-3+2*tt);g.fillRect(M.X(x),y2,M.X(x+0.02)-M.X(x)+1,y1-y2);}plot(g,M,[[a,-5.5],[a,-0.5]],css('--r'),1.5,[4,4]);
+ lv.forEach(E=>{plot(g,M,[[a-0.06,E],[a+0.06,E]],css('--b'),2);});const s=Math.min(30,360/N);for(let i=0;i<N;i++){const x=120+((i%10))*s,y=150+Math.floor(i/10)*60;ring(g,x+0,y,Math.max(4,s*0.3),css('--muted'),1.5);dot(g,x,y,3,css('--ink'));}
+ R('r1a','N ذرة ⇒ المستوى الذري ينقسم إلى N مستوى');R('r1b','عرض الحزمة ≈ 4t = '+(4*t).toFixed(3)+' (t تكامل التداخل)');R('r1c','عند N كبير تصبح المستويات شبه متصلة: حزمة');R('r1d','كل حزمة تتسع لـ 2N إلكترونًا (مع اللف المغزلي)');}
+function lab2(){const g=ctx('c2'),q=sl('i2k','o2k',v=>v.toFixed(2)),u0=sl('i2u','o2u',v=>v.toFixed(2)),k=q*Math.PI;const u=x=>1+u0*Math.cos(2*Math.PI*x);const M=frame(g,90,555,1060,510,0,8,-2.2,2.2,'x/a','');
+ for(let n=0;n<=8;n++)plot(g,M,[[n,-2.2],[n,2.2]],css('--line'),1,[3,5]);plot(g,M,fn(M,x=>u(x)*Math.cos(k*x-T*1.5),800),css('--b'),3);plot(g,M,fn(M,x=>u(x)*u(x)/2,800),css('--r'),2.5,[6,5]);plot(g,M,fn(M,x=>Math.cos(k*x-T*1.5),800),'#C9D2DA',1.5);
+ text(g,'أزرق: Re ψ · رمادي: e^(ikx) · أحمر متقطع: |ψ|²/2',620,40,css('--muted'),'center',17,true);
+ R('r2a','ψ_k(x) = u_k(x) e^(ikx)،  u_k(x + a) = u_k(x)');R('r2b','ψ(x + a) = e^(ika) ψ(x)');R('r2c','|ψ|² دورية بدورة a: احتمال متساوٍ في كل خلية');R('r2d','k و k + 2π/a يعطيان الحالة نفسها ⇒ يكفي −π/a < k ≤ π/a');}
+let ZN=0;$('kz1').onclick=()=>ZN=0;$('kz2').onclick=()=>ZN=1;
+function lab3(){const g=ctx('c3'),U=sl('i3u','o3u',v=>v.toFixed(2)),q=sl('i3k','o3k',v=>v.toFixed(2));const E0=x=>x*x;const band=(x,s)=>{const a=E0(x),b=E0(x-2*Math.sign(x||1)),m=(a+b)/2,d=(a-b)/2;return m+s*Math.sqrt(d*d+U*U);};
+ const M=frame(g,90,555,700,510,ZN?-2:-1,ZN?2:1,0,ZN?4.5:2.5,'ka/π','E (بوحدة ħ²π²/2ma²)');plot(g,M,fn(M,x=>x*x),'#C9D2DA',1.5,[5,5]);
+ if(!ZN){plot(g,M,fn(M,x=>Math.min(band(x,-1),2.4),400),css('--b'),3.5);plot(g,M,fn(M,x=>band(x,1),400),css('--o'),3.5);mark(g,M,q,band(q,-1),css('--r'),9);}
+ else{plot(g,M,fn(M,x=>Math.abs(x)<=1?band(x,-1):band(x,1),800).filter(p=>Math.abs(Math.abs(p[0])-1)>0.004),css('--b'),3.5);plot(g,M,[[-1,0],[-1,4.5]],css('--line'),1.5,[4,4]);plot(g,M,[[1,0],[1,4.5]],css('--line'),1.5,[4,4]);}
+ const h=1e-3,d2=(band(q+h,-1)-2*band(q,-1)+band(q-h,-1))/(h*h),ms=2/d2;R('r3a','الفجوة عند k = ±π/a:  E_g = 2|U| = '+(2*U).toFixed(2));R('r3b','الكتلة الفعالة m*/m = 2/(d²E/dk²) = '+(isFinite(ms)?ms.toFixed(2):'∞'));R('r3c',ms<0?'قرب قمة الحزمة: m* < 0 (يتصرف كفجوة موجبة)':'قرب قاع الحزمة: m* > 0');R('r3d','عدد قيم k في الحزمة = N (عدد الخلايا) ⇒ 2N حالة');}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3};
+function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>
