@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل تحليل المتجهات</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style>.readout .eq[dir=rtl]{text-align:right;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;font-size:1rem}.readout .eq{margin:2px 0}.readout .ltr{display:inline-block;direction:ltr;font-family:'STIX Two Text',serif}</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل تحليل المتجهات</h1><p>الميكانيكا الكلاسيكية (1) – الوحدة الأولى. التدرج والتباعد والدوران، وتكامل المتجهات ونظريتا جاوس وستوكس.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">التباعد والدوران</button><button role="tab" aria-selected="false" data-t="t2">التدرج</button><button role="tab" aria-selected="false" data-t="t3">نظريتا جاوس وستوكس</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="حقل متجهي مع مؤشر يقيس التباعد والدوران عند نقطة"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="f1">شعاعي (x, y)</button><button class="btn" type="button" id="f2">دوراني (−y, x)</button><button class="btn" type="button" id="f3">قصّي (y, 0)</button><button class="btn" type="button" id="f4">منتظم (1, 0)</button></div><label>موضع المسبار x <b id="o1x"></b></label><input id="i1x" type="range" min="-4" max="4" step="0.1" value="1.5"><label>موضع المسبار y <b id="o1y"></b></label><input id="i1y" type="range" min="-3" max="3" step="0.1" value="1"><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span><span class="eq" id="r1d"></span></div><div class="task"><h3>سؤال</h3>أي الحقول تباعده صفر ودورانه غير صفري؟ وأيها العكس؟ لماذا يدور العجل الصغير في الحقل القصّي رغم أن خطوطه مستقيمة؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="خطوط تساوي دالة قياسية ومتجه التدرج عند نقطة"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="s1">φ = x² + y²</button><button class="btn" type="button" id="s2">φ = xy</button><button class="btn" type="button" id="s3">φ = x² − y²</button></div><label>x <b id="o2x"></b></label><input id="i2x" type="range" min="-3" max="3" step="0.1" value="1"><label>y <b id="o2y"></b></label><input id="i2y" type="range" min="-3" max="3" step="0.1" value="1.5"><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span></div><div class="task"><h3>سؤال</h3>ما الزاوية بين متجه التدرج وخط تساوي φ المار بالنقطة؟ وفي أي اتجاه تزداد φ بأسرع معدل؟</div></div></section><section class="lab" id="t3" role="tabpanel"><canvas id="c3" width="1200" height="600" aria-label="مقارنة التدفق والدوران على منحنى مغلق بالتكامل على المساحة"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="g1">F = (x, y)</button><button class="btn" type="button" id="g2">F = (−y, x)</button><button class="btn" type="button" id="g3">F = (x², xy)</button></div><label>نصف قطر المنحنى R <b id="o3r"></b></label><input id="i3r" type="range" min="0.5" max="3" step="0.1" value="2"><div class="readout"><span class="eq" id="r3a"></span><span class="eq" id="r3b"></span><span class="eq" id="r3c"></span><span class="eq" id="r3d"></span></div><div class="task"><h3>سؤال</h3>تحقق أن التدفق الخارج يساوي تكامل التباعد على المساحة، وأن الدوران حول المنحنى يساوي تكامل الدوران. متى يكون الطرفان صفرًا؟</div></div></section>
+<footer>المعامل الافتراضية · إعداد أ.د. نجم الحصيني · قسم الفيزياء، جامعة الطائف</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;const T0={};
+const el=k=>T-(T0[k]||0),rs=k=>{T0[k]=T;};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;rs(active);}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.textBaseline='alphabetic';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function ring(g,x,y,r,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){if(Math.hypot(x1-x0,y1-y0)<4)return;seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function poly(g,pts,col,w,d){if(pts.length<2)return;g.setLineDash(d||[]);g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts)g.lineTo(p[0],p[1]);g.strokeStyle=col;g.lineWidth=w||2;g.stroke();g.setLineDash([]);}
+function box(g,x0,y0,w,h,fc){g.fillStyle=fc||css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+function axes(g,x0,y0,w,h,xl,yl){g.fillStyle=css('--plot');seg(g,x0,y0,x0+w,y0,css('--muted'),2);seg(g,x0,y0,x0,y0-h,css('--muted'),2);for(let i=1;i<=4;i++){seg(g,x0+i*w/4,y0,x0+i*w/4,y0-h,css('--grid'),1);seg(g,x0,y0-i*h/4,x0+w,y0-i*h/4,css('--grid'),1);}text(g,xl,x0+w,y0+30,css('--muted'),'right',20);text(g,yl,x0+6,y0-h-10,css('--muted'),'left',20);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const set=(o)=>{for(const k in o)$(k).value=o[k];};
+const deg=Math.PI/180,G=9.8;
+const R=(id,s)=>{const e=$(id);if(!/[؀-ۿ]/.test(s)){e.dir='ltr';e.textContent=s;return;}e.dir='rtl';const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ e.innerHTML=s.split(/([؀-ۿ][؀-ۿ\s()⚠]*)/).map((p,i)=>{if(i%2)return esc(p);const t=p.trim();if(!t)return p;return (/^\s/.test(p)?' ':'')+'<span class="ltr">'+esc(t)+'</span>'+(/\s$/.test(p)?' ':'');}).join('');};
+const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=1e5||a<1e-3))return v.toExponential(d===undefined?2:d).replace('e','×10^').replace('+','');return v.toFixed(d===undefined?2:d);};
+
+
+let FD=0;['f1','f2','f3','f4'].forEach((id,i)=>$(id).onclick=()=>FD=i);const FF=[(x,y)=>[x,y],(x,y)=>[-y,x],(x,y)=>[y,0],(x,y)=>[1,0]],DIV=[2,0,0,0],CURL=[0,2,-1,0],NM=['شعاعي','دوراني','قصّي','منتظم'];
+function lab1(){const g=ctx('c1'),px=sl('i1x','o1x',v=>v.toFixed(1)),py=sl('i1y','o1y',v=>v.toFixed(1)),F=FF[FD],cx=600,cy=300,s=70;
+ for(let x=-8;x<=8;x+=1)for(let y=-4;y<=4;y+=1){const [fx,fy]=F(x/2,y/2),m=Math.hypot(fx,fy);if(m<1e-6)continue;const L=Math.min(30,12+m*8);arrow(g,cx+x*s/2-fx/m*L/2,cy-y*s/2+fy/m*L/2,cx+x*s/2+fx/m*L/2,cy-y*s/2-fy/m*L/2,css('--b'),2);}
+ const X=cx+px*s,Y=cy-py*s,d=DIV[FD],c=CURL[FD],t=el('t1');ring(g,X,Y,30+d*6*Math.sin(t*2),css('--o'),3);const a=c*t;for(let k=0;k<4;k++){const b=a+k*Math.PI/2;seg(g,X,Y,X+28*Math.cos(b),Y-28*Math.sin(b),css('--r'),4);}
+ const [fx,fy]=F(px,py);R('r1a','حقل '+NM[FD]+':  F('+px.toFixed(1)+', '+py.toFixed(1)+') = ('+fx.toFixed(2)+', '+fy.toFixed(2)+')');R('r1b','∇·F = '+d+'  (الدائرة البرتقالية '+(d>0?'تتمدد':'لا تتمدد')+')');R('r1c','(∇×F)·k̂ = '+c+'  (العجل الأحمر '+(c!==0?'يدور':'لا يدور')+')');R('r1d',c===0?'دوران صفري: الحقل محافظ ويمكن كتابته F = −∇U':'دوران غير صفري: الحقل غير محافظ');}
+let SF=0;['s1','s2','s3'].forEach((id,i)=>$(id).onclick=()=>SF=i);const PHI=[(x,y)=>x*x+y*y,(x,y)=>x*y,(x,y)=>x*x-y*y],GR=[(x,y)=>[2*x,2*y],(x,y)=>[y,x],(x,y)=>[2*x,-2*y]];
+function lab2(){const g=ctx('c2'),x=sl('i2x','o2x',v=>v.toFixed(1)),y=sl('i2y','o2y',v=>v.toFixed(1)),f=PHI[SF],cx=600,cy=300,s=90;
+ const img=g.createImageData(1200,600);for(let i=0;i<1200;i+=2)for(let j=0;j<600;j+=2){const v=f((i-cx)/s,(cy-j)/s),q=Math.abs(v*2-Math.round(v*2))<0.06;if(q){const k=(j*1200+i)*4;img.data[k]=120;img.data[k+1]=90;img.data[k+2]=60;img.data[k+3]=160;}}g.putImageData(img,0,0);
+ const [gx,gy]=GR[SF](x,y),m=Math.hypot(gx,gy);const X=cx+x*s,Y=cy-y*s;if(m>0)arrow(g,X,Y,X+gx/m*Math.min(160,40+m*20),Y-gy/m*Math.min(160,40+m*20),css('--r'),5);dot(g,X,Y,8,css('--ink'));
+ R('r2a','φ = '+['x² + y²','xy','x² − y²'][SF]+' = '+f(x,y).toFixed(2));R('r2b','∇φ = ('+gx.toFixed(2)+', '+gy.toFixed(2)+')،  |∇φ| = '+m.toFixed(2));R('r2c','التدرج عمودي على خط تساوي φ ويشير نحو أسرع زيادة');}
+let GS=0;['g1','g2','g3'].forEach((id,i)=>$(id).onclick=()=>GS=i);const GF=[(x,y)=>[x,y],(x,y)=>[-y,x],(x,y)=>[x*x,x*y]],GD=[(x,y)=>2,(x,y)=>0,(x,y)=>3*x],GC=[(x,y)=>0,(x,y)=>2,(x,y)=>y];
+function lab3(){const g=ctx('c3'),Rr=sl('i3r','o3r',v=>v.toFixed(1)),F=GF[GS],N=720;let fl=0,ci=0;for(let i=0;i<N;i++){const a=2*Math.PI*(i+0.5)/N,x=Rr*Math.cos(a),y=Rr*Math.sin(a),[fx,fy]=F(x,y),ds=2*Math.PI*Rr/N;fl+=(fx*Math.cos(a)+fy*Math.sin(a))*ds;ci+=(-fx*Math.sin(a)+fy*Math.cos(a))*ds;}
+ let Id=0,Ic=0;const M=80;for(let i=0;i<M;i++)for(let j=0;j<M;j++){const x=-Rr+2*Rr*(i+0.5)/M,y=-Rr+2*Rr*(j+0.5)/M;if(x*x+y*y<=Rr*Rr){const dA=(2*Rr/M)**2;Id+=GD[GS](x,y)*dA;Ic+=GC[GS](x,y)*dA;}}
+ R('r3a','جاوس: ∮F·n̂ ds = '+fl.toFixed(3));R('r3b','∬∇·F dA = '+Id.toFixed(3));R('r3c','ستوكس: ∮F·dr = '+ci.toFixed(3));R('r3d','∬(∇×F)·k̂ dA = '+Ic.toFixed(3));
+ const cx=600,cy=300,s=80;for(let x=-6;x<=6;x++)for(let y=-3;y<=3;y++){const [fx,fy]=F(x*0.6,y*0.6),m=Math.hypot(fx,fy);if(m<1e-6)continue;const L=Math.min(30,10+m*6);arrow(g,cx+x*0.6*s-fx/m*L/2,cy-y*0.6*s+fy/m*L/2,cx+x*0.6*s+fx/m*L/2,cy-y*0.6*s-fy/m*L/2,css('--line'),2);}
+ g.fillStyle='rgba(79,122,88,.15)';g.beginPath();g.arc(cx,cy,Rr*s,0,7);g.fill();ring(g,cx,cy,Rr*s,css('--o'),3);for(let k=0;k<12;k++){const a=k*Math.PI/6,x=Rr*Math.cos(a),y=Rr*Math.sin(a),[fx,fy]=F(x,y),m=Math.hypot(fx,fy)||1;arrow(g,cx+x*s,cy-y*s,cx+x*s+fx/m*Math.min(50,m*12),cy-y*s-fy/m*Math.min(50,m*12),css('--b'),3);}}
+
+const LABS={t1:lab1,t2:lab2,t3:lab3};
+function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>
