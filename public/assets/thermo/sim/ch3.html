@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>معمل القانون الأول للديناميكا الحرارية</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&display=swap">
+<style>
+:root{--bg:#F3F4F6;--panel:#FFFFFF;--ink:#1A1D2B;--muted:#5B6072;--line:#D9DCE3;--o:#C25E00;--b:#1F5BD6;--r:#C8322F;--plot:#F8F9FB;--grid:#E6E8EE;--chip:#ECEEF3;--fill:#E3E6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}}
+:root[data-theme="dark"]{--bg:#10131C;--panel:#181C28;--ink:#ECEEF4;--muted:#A3A9BA;--line:#2A3042;--o:#F2A541;--b:#6EA2FF;--r:#FF7A7A;--plot:#121620;--grid:#232838;--chip:#222838;--fill:#262B3D}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:.2em 0 .1em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.lab{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.lab.on{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+@media (max-width:820px){.lab.on{grid-template-columns:1fr}}
+canvas{width:100%;background:var(--plot);border-radius:10px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-family:'STIX Two Text',serif;font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+input[type=range]{width:100%;accent-color:var(--b)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.readout{background:var(--chip);border-radius:10px;padding:12px 14px}
+.eq{font-family:'STIX Two Text',serif;font-size:1.15rem;direction:ltr;text-align:left;display:block}
+.task{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem}
+.task h3{margin:0 0 4px;font-size:1rem}
+footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+</style>
+<style>.readout .eq[dir=rtl]{text-align:right;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;font-size:1rem}.readout .eq{margin:2px 0}.readout .ltr{display:inline-block;direction:ltr;font-family:'STIX Two Text',serif}</style>
+<style id="vlMobCss">
+#vlFS{position:fixed;top:8px;left:8px;z-index:9999;background:#14284b;color:#fff;border:1px solid #fff6;
+  border-radius:8px;padding:5px 10px;font:600 13px system-ui,Tahoma,sans-serif;cursor:pointer;opacity:.9;box-shadow:0 2px 8px #0004}
+#vlFS:hover{opacity:1}
+html.vl-solo #vlFS,html.vl-solo #vlLaunch{display:none!important}
+#vlLaunch{display:none}
+@media (max-width:600px){
+  html.vl-framed #vlLaunch{display:block;margin:10px;padding:14px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,#14284b,#1f4e8c);color:#fff;font-family:system-ui,Tahoma,sans-serif}
+  #vlLaunch b{display:block;font-size:17px;margin-bottom:4px}
+  #vlLaunch p{margin:0 0 10px;font-size:13px;color:#d3e0f2}
+  #vlLaunch button{width:100%;padding:12px;border:0;border-radius:10px;background:#e8742a;color:#fff;font:700 16px system-ui,Tahoma,sans-serif}
+  #vlLaunch small{display:block;margin-top:8px;color:#d3e0f2}
+  html.vl-framed #vlFS{display:none}
+  /* compact layout */
+  body{font-size:15px;line-height:1.6}
+  header{padding:12px 10px 8px!important}
+  h1{font-size:20px!important}
+  h2{font-size:18px} h3{font-size:16px}
+  .wrap,.container,main{padding:8px!important}
+  .card,section,.panel{padding:10px!important}
+  .grid,.row,.cols{grid-template-columns:1fr!important;flex-direction:column}
+  nav button{flex:1 1 45%!important;padding:7px 4px!important;font-size:13px!important}
+  canvas,svg,img,video{max-width:100%!important;height:auto!important}
+  table{display:block;overflow-x:auto;font-size:13px!important}
+  input,select,button{font-size:15px}
+  .eq.big{font-size:17px!important}
+}
+</style>
+<script id="vlGA" async src="https://www.googletagmanager.com/gtag/js?id=G-7Z27Z6GK0C"></script>
+<script id="vlGAcfg">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());(function(){var t=(document.title||"lab").trim(),solo=!!window.__vlSolo;gtag("config","G-7Z27Z6GK0C",{page_title:"Lab: "+t,page_location:"https://sites.google.com/view/lasers-cha1/lab/"+encodeURIComponent(t)+(solo?"?fs=1":""),cookie_flags:"SameSite=None;Secure"});document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("button,[role=tab]");if(b)gtag("event","lab_click",{lab:t,control:(b.textContent||"").trim().slice(0,40)})},true);})();</script>
+</head>
+<body>
+<div class="wrap">
+<header><h1>معمل القانون الأول للديناميكا الحرارية</h1><p>الحرارة والديناميكا الحرارية – الفصل الثالث. الطاقة الداخلية والحرارة والشغل، والصورة الرياضية للقانون الأول، والإنثالبي.</p></header>
+<nav class="tabs" role="tablist" aria-label="المعامل"><button role="tab" aria-selected="true" data-t="t1">القانون الأول</button><button role="tab" aria-selected="false" data-t="t2">الإنثالبي</button></nav>
+<section class="lab on" id="t1" role="tabpanel"><canvas id="c1" width="1200" height="600" aria-label="غاز في أسطوانة بمكبس يُعطى حرارة ويبذل شغلًا"></canvas><div class="ctrl"><label>الحرارة المعطاة للغاز Q (J) <b id="o1q"></b></label><input id="i1q" type="range" min="-500" max="1000" step="10" value="600"><label>الشغل الذي يبذله الغاز W (J) <b id="o1w"></b></label><input id="i1w" type="range" min="-500" max="1000" step="10" value="250"><div class="row"><button class="btn" type="button" id="p1">مثال: Q = 600 J، W = 250 J</button></div><div class="readout"><span class="eq" id="r1a"></span><span class="eq" id="r1b"></span><span class="eq" id="r1c"></span></div><div class="task"><h3>سؤال</h3>ضع Q = 0 وW موجبًا. ماذا يحدث لطاقة الغاز الداخلية ودرجة حرارته؟ وما اسم هذه العملية؟</div></div></section><section class="lab" id="t2" role="tabpanel"><canvas id="c2" width="1200" height="600" aria-label="تسخين غاز تحت ضغط ثابت ومقارنة ΔU وW وQ"></canvas><div class="ctrl"><div class="row"><button class="btn" type="button" id="m1">غاز أحادي الذرة</button><button class="btn" type="button" id="m2">غاز ثنائي الذرة</button></div><label>عدد المولات n <b id="o2n"></b></label><input id="i2n" type="range" min="0.5" max="5" step="0.1" value="1"><label>الارتفاع في درجة الحرارة ΔT (K) <b id="o2t"></b></label><input id="i2t" type="range" min="1" max="200" step="1" value="50"><div class="readout"><span class="eq" id="r2a"></span><span class="eq" id="r2b"></span><span class="eq" id="r2c"></span><span class="eq" id="r2d"></span></div><div class="task"><h3>سؤال</h3>لماذا الحرارة اللازمة لرفع درجة الحرارة تحت ضغط ثابت أكبر منها تحت حجم ثابت؟</div></div></section>
+<footer>المعامل الافتراضية · إعداد أ.د. نجم الحصيني · قسم الفيزياء، جامعة الطائف</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='t1',T=0;const T0={};
+const el=k=>T-(T0[k]||0),rs=k=>{T0[k]=T;};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.lab').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));active=b.dataset.t;rs(active);}));
+function text(g,s,x,y,col,al,sz,rtl){g.font=(sz||24)+'px Tahoma, Arial, sans-serif';g.fillStyle=col;g.textAlign=al||'left';g.direction=rtl?'rtl':'ltr';g.textBaseline='alphabetic';g.fillText(s,x,y);}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function ring(g,x,y,r,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w||2;g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);}
+function seg(g,x0,y0,x1,y1,col,w,d){g.setLineDash(d||[]);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.setLineDash([]);}
+function arrow(g,x0,y0,x1,y1,col,w){if(Math.hypot(x1-x0,y1-y0)<4)return;seg(g,x0,y0,x1,y1,col,w);const a=Math.atan2(y1-y0,x1-x0),h=Math.max(12,w*3);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1-h*Math.cos(a-.4),y1-h*Math.sin(a-.4));g.lineTo(x1-h*Math.cos(a+.4),y1-h*Math.sin(a+.4));g.closePath();g.fill();}
+function poly(g,pts,col,w,d){if(pts.length<2)return;g.setLineDash(d||[]);g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(const p of pts)g.lineTo(p[0],p[1]);g.strokeStyle=col;g.lineWidth=w||2;g.stroke();g.setLineDash([]);}
+function box(g,x0,y0,w,h,fc){g.fillStyle=fc||css('--fill');g.fillRect(x0,y0,w,h);g.strokeStyle=css('--ink');g.lineWidth=2.5;g.strokeRect(x0,y0,w,h);}
+function floor(g,y,x0,x1){seg(g,x0,y,x1,y,css('--muted'),3);for(let q=x0+20;q<=x1;q+=30)seg(g,q,y,q-16,y+18,css('--muted'),1.5);}
+function axes(g,x0,y0,w,h,xl,yl){g.fillStyle=css('--plot');seg(g,x0,y0,x0+w,y0,css('--muted'),2);seg(g,x0,y0,x0,y0-h,css('--muted'),2);for(let i=1;i<=4;i++){seg(g,x0+i*w/4,y0,x0+i*w/4,y0-h,css('--grid'),1);seg(g,x0,y0-i*h/4,x0+w,y0-i*h/4,css('--grid'),1);}text(g,xl,x0+w,y0+30,css('--muted'),'right',20);text(g,yl,x0+6,y0-h-10,css('--muted'),'left',20);}
+const ctx=id=>{const g=$(id).getContext('2d');g.clearRect(0,0,1200,600);return g;};
+const sl=(id,out,fmt)=>{const v=+$(id).value;if(out)$(out).textContent=fmt?fmt(v):v;return v;};
+const set=(o)=>{for(const k in o)$(k).value=o[k];};
+const deg=Math.PI/180,G=9.8;
+const R=(id,s)=>{const e=$(id);if(!/[؀-ۿ]/.test(s)){e.dir='ltr';e.textContent=s;return;}e.dir='rtl';const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ e.innerHTML=s.split(/([؀-ۿ][؀-ۿ\s()⚠]*)/).map((p,i)=>{if(i%2)return esc(p);const t=p.trim();if(!t)return p;return (/^\s/.test(p)?' ':'')+'<span class="ltr">'+esc(t)+'</span>'+(/\s$/.test(p)?' ':'');}).join('');};
+const f2=(v,d)=>{if(!isFinite(v))return '∞';const a=Math.abs(v);if(a!==0&&(a>=1e5||a<1e-3))return v.toExponential(d===undefined?2:d).replace('e','×10^').replace('+','');return v.toFixed(d===undefined?2:d);};
+
+
+$('p1').onclick=()=>set({i1q:600,i1w:250});
+function lab1(){const g=ctx('c1'),Q=sl('i1q','o1q'),W=sl('i1w','o1w'),dU=Q-W;R('r1a','ΔU = Q − W = '+dU+' J');R('r1b',dU>0?'تزداد الطاقة الداخلية فترتفع درجة الحرارة':dU<0?'تقل الطاقة الداخلية فتنخفض درجة الحرارة':'لا تتغير الطاقة الداخلية (درجة الحرارة ثابتة لغاز مثالي)');R('r1c',Q===0?'عملية أديباتية (لا تبادل حراري)':W===0?'عملية بحجم ثابت':'');
+ const x0=160,y0=120,w=260,hb=360,pist=y0+120-W/1000*90;g.fillStyle=dU>0?'rgba(194,54,47,.18)':'rgba(43,108,176,.18)';g.fillRect(x0,pist,w,y0+hb-pist);g.strokeStyle=css('--ink');g.lineWidth=4;g.beginPath();g.moveTo(x0,y0);g.lineTo(x0,y0+hb);g.lineTo(x0+w,y0+hb);g.lineTo(x0+w,y0);g.stroke();box(g,x0+4,pist-26,w-8,26);seg(g,x0+w/2,pist-26,x0+w/2,pist-90,css('--ink'),6);
+ if(Q!==0)arrow(g,x0+w/2,y0+hb+70*Math.sign(Q)+ (Q>0?0:-70),x0+w/2,y0+hb+(Q>0?8:62),Q>0?css('--r'):css('--b'),6);text(g,'Q',x0+w/2+18,y0+hb+50,Q>=0?css('--r'):css('--b'),'left',26);if(W!==0)arrow(g,x0+w+40,pist,x0+w+40,pist-Math.sign(W)*70,css('--o'),5);text(g,'W',x0+w+56,pist-30,css('--o'),'left',26);
+ const X0=620,Y0=320,bw=120,sc=0.22,bar=(lab,v,c,i)=>{g.fillStyle=c;const h=v*sc;g.fillRect(X0+i*170,v>=0?Y0-h:Y0,bw,Math.abs(h));text(g,lab,X0+i*170+bw/2,Y0+(v>=0?40:-Math.abs(h)-14+ (v<0?Math.abs(h)+40:0)),css('--ink'),'center',24);text(g,v+' J',X0+i*170+bw/2,v>=0?Y0-h-10:Y0+Math.abs(h)+64,css('--muted'),'center',18);};
+ seg(g,X0-20,Y0,X0+520,Y0,css('--muted'),2);bar('Q',Q,css('--r'),0);bar('W',W,css('--o'),1);bar('ΔU',dU,css('--b'),2);}
+let MON=true;$('m1').onclick=()=>MON=true;$('m2').onclick=()=>MON=false;
+function lab2(){const g=ctx('c2'),n=sl('i2n','o2n',v=>v.toFixed(1)),dT=sl('i2t','o2t');const Cv=(MON?1.5:2.5)*8.314,Cp=Cv+8.314,dU=n*Cv*dT,W=n*8.314*dT,Q=n*Cp*dT;
+ R('r2a',(MON?'أحادي الذرة':'ثنائي الذرة')+':  Cv = '+(MON?'3/2':'5/2')+'R،  Cp = '+(MON?'5/2':'7/2')+'R،  γ = '+(Cp/Cv).toFixed(2));R('r2b','ΔU = nCvΔT = '+dU.toFixed(0)+' J');R('r2c','W = PΔV = nRΔT = '+W.toFixed(0)+' J');R('r2d','Q = ΔH = nCpΔT = '+Q.toFixed(0)+' J');
+ const X0=200,Y0=500,bw=180,mx=5*4.5*8.314*200,sc=420/mx*3;[['ΔU',dU,css('--b')],['W',W,css('--o')],['Q = ΔH',Q,css('--r')]].forEach(([l,v,c],i)=>{g.fillStyle=c;const h=Math.min(v*sc,440);g.fillRect(X0+i*300,Y0-h,bw,h);text(g,l,X0+i*300+bw/2,Y0+36,css('--ink'),'center',24);text(g,v.toFixed(0)+' J',X0+i*300+bw/2,Y0-h-12,css('--muted'),'center',20);});
+ seg(g,X0-40,Y0,X0+800,Y0,css('--muted'),2);text(g,'Q = ΔU + W  ⇒  Cp = Cv + R',600,40,css('--ink'),'center',24);}
+
+const LABS={t1:lab1,t2:lab2};
+function loop(t){T=reduce?0:t/1000;try{LABS[active]();}catch(e){console.error(e);}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>

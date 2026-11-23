@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>شهادة إنجاز – الحرارة والديناميكا الحرارية</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=STIX+Two+Text&family=Tajawal:wght@400;700&family=Amiri:wght@700&display=swap">
+<style>
+:root{--bg:#F7F7F9;--panel:#FFFFFF;--ink:#2A2A33;--muted:#5F5F6E;--line:#E1E1E8;--acc:#C2362F;--acc2:#2B6CB0;--chip:#EEF0F5;--ok:#2E7D4F;--okbg:#E3F1E8;--bad:#B03A2E;--badbg:#F8E1DD}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;line-height:1.65}
+.wrap{max-width:820px;margin:0 auto;padding:14px}
+.badge{display:inline-block;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:1px 12px;font-size:.8rem}
+h1{font-size:clamp(1.15rem,3.4vw,1.5rem);margin:.35em 0 .2em}
+h1 span{color:var(--acc)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px}
+.muted{color:var(--muted);font-size:.92rem}
+ul.rules{margin:.4em 0;padding-inline-start:1.2em}
+ul.rules li{margin:.2em 0}
+.btn{font:inherit;font-weight:700;border:0;background:var(--acc);color:#fff;padding:10px 22px;border-radius:12px;cursor:pointer;min-height:46px}
+.btn.ghost{background:transparent;border:1px solid var(--acc2);color:var(--acc2);font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--acc2);width:0}
+.qn{font-size:.82rem;color:var(--acc2);font-weight:700}
+.q{margin:4px 0 8px;font-size:1.02rem;font-weight:700}
+.opt{display:block;width:100%;text-align:start;font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:9px 12px;border-radius:10px;margin:6px 0;cursor:pointer;min-height:44px}
+.opt.sel{border-color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc2)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.eq{font-family:'STIX Two Text',serif;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.big{font-size:2.2rem;font-weight:700;color:var(--acc2);text-align:center}
+.rev{border-top:1px solid var(--line);padding:8px 0;font-size:.92rem}
+.rev b{color:var(--bad)}
+.rev .ok{color:var(--ok)}
+input[type=text]{width:100%;font:inherit;font-size:1.05rem;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+#certImg{width:100%;height:auto;border-radius:8px;display:block;margin-top:10px;-webkit-touch-callout:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hide{display:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<span class="badge">الحرارة والديناميكا الحرارية · <bdi dir="ltr">2033001-4</bdi></span>
+<h1>شهادة إنجاز <span>المعامل الافتراضية</span></h1>
+
+<section id="sIntro" class="card">
+<p>بعد أن تُنهي معامل الفصول السبعة، أجب عن الاختبار الختامي لتحصل على شهادة إنجاز باسمك.</p>
+<ul class="rules">
+<li><b>20 سؤالًا</b> اختيار من متعدد من الفصول السبعة، تُسحب عشوائيًا في كل محاولة.</li>
+<li>درجة النجاح <b>80%</b> (16 سؤالًا صحيحًا على الأقل).</li>
+<li>إن لم تنجح، راجع إجاباتك ثم أعد المحاولة بأسئلة جديدة.</li>
+<li class="muted">لا تُحفظ إجاباتك ولا تُرسل لأحد. هذه شهادة إنجاز ذاتية وليست شهادة رسمية من الجامعة.</li>
+</ul>
+<button class="btn" id="go">ابدأ الاختبار</button>
+</section>
+
+<section id="sQuiz" class="card hide">
+<div class="qn" id="qn"></div>
+<div class="bar"><i id="barI"></i></div>
+<div class="q" id="qt"></div>
+<div id="qo"></div>
+<div class="nav"><button class="btn ghost" id="prev">السابق</button><button class="btn" id="next">التالي</button></div>
+</section>
+
+<section id="sRes" class="card hide">
+<div class="muted" style="text-align:center">نتيجتك</div>
+<div class="big" id="pct"></div>
+<p id="msg" style="text-align:center"></p>
+<div id="passBox" class="hide">
+<label for="nm">اكتب اسمك كما تريده أن يظهر في الشهادة:</label>
+<input type="text" id="nm" maxlength="40" autocomplete="name">
+<button class="btn" id="mk">أنشئ الشهادة</button>
+</div>
+<div id="failBox" class="hide"><button class="btn" id="again">أعد المحاولة بأسئلة جديدة</button></div>
+<div id="review"></div>
+</section>
+
+<section id="sCert" class="card hide">
+<p class="muted" id="saveHint">على الجوال: اضغط مطوّلًا على الشهادة ثم اختر «حفظ الصورة». على الحاسب: استخدم زر التنزيل.</p>
+<img id="certImg" alt="شهادة الإنجاز">
+<div class="row"><a class="btn" id="dl" download="شهادة_إنجاز_الحرارة_والديناميكا.png" href="#" style="text-decoration:none;display:inline-flex;align-items:center">تنزيل الشهادة</a><button class="btn ghost" id="back">رجوع</button></div>
+<canvas id="cv" class="hide"></canvas>
+</section>
+</div>
+<script>
+const BANK=[{"c": 1, "q": "من فروض النظرية الحركية للغاز المثالي أن:", "o": ["الجزيئات تتجاذب بقوى كبيرة", "حجم الجزيئات كبير مقارنة بالمسافات بينها", "تصادمات الجزيئات مرنة تمامًا", "الجزيئات ساكنة"], "a": 2, "e": "تصادمات الجزيئات مع بعضها ومع الجدران مرنة، وحجمها مهمل، ولا قوى بينها إلا لحظة التصادم."}, {"c": 1, "q": "متوسط الطاقة الحركية الانتقالية لجزيء غاز مثالي يساوي:", "o": ["<span class=\"eq\" dir=\"ltr\">kT</span>", "<span class=\"eq\" dir=\"ltr\">(1/2)kT</span>", "<span class=\"eq\" dir=\"ltr\">(3/2)kT</span>", "<span class=\"eq\" dir=\"ltr\">3kT</span>"], "a": 2, "e": "<span class=\"eq\" dir=\"ltr\">⟨K⟩ = (3/2)kT</span>، ويعتمد على درجة الحرارة المطلقة فقط."}, {"c": 1, "q": "إذا ضوعفت درجة الحرارة المطلقة لغاز، فإن v_rms:", "o": ["تتضاعف", "تزداد بمعامل √2", "تصبح أربعة أمثالها", "لا تتغير"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">v<sub>rms</sub> = √(3kT/m)</span> تتناسب مع <span class=\"eq\" dir=\"ltr\">√T</span>."}, {"c": 1, "q": "عند درجة الحرارة نفسها، أي الغازات تكون v_rms لجزيئاته أكبر؟", "o": ["الأرجون (40 u)", "النيتروجين (28 u)", "الهيليوم (4 u)", "متساوية"], "a": 2, "e": "الطاقة الحركية المتوسطة متساوية، فالجزيء الأخف أسرع لأن v تتناسب عكسيًا مع √m."}, {"c": 2, "q": "يكون النظام في حالة اتزان ثرموديناميكي عندما:", "o": ["تتغير متغيراته مع الزمن", "تكون متغيراته ثابتة ومتجانسة دون تأثير خارجي", "يكون ضغطه صفرًا", "تتساوى كتلته وحجمه"], "a": 1, "e": "يجمع الاتزان الثرموديناميكي الاتزان الحراري والميكانيكي والكيميائي معًا."}, {"c": 2, "q": "معادلة الحالة للغاز المثالي هي:", "o": ["<span class=\"eq\" dir=\"ltr\">PV = nRT</span>", "<span class=\"eq\" dir=\"ltr\">P = ρgh</span>", "<span class=\"eq\" dir=\"ltr\">PV<sup>γ</sup> = ثابت</span>", "<span class=\"eq\" dir=\"ltr\">P + ½ρv<sup>2</sup> = ثابت</span>"], "a": 0, "e": "تربط الضغط والحجم ودرجة الحرارة وعدد المولات."}, {"c": 2, "q": "في معادلة فان دير فالس، الحد a/V² يصحح أثر:", "o": ["حجم الجزيئات", "قوى التجاذب بين الجزيئات", "الجاذبية الأرضية", "درجة الحرارة"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">(P + a/V<sup>2</sup>)(V − b) = RT</span>: الثابت a للتجاذب، وb لحجم الجزيئات."}, {"c": 2, "q": "على سطح P-V-T لغاز مثالي، يكون منحنى ثبات درجة الحرارة في مستوى P-V:", "o": ["خطًا مستقيمًا", "قطعًا زائدًا", "دائرة", "خطًا أفقيًا"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">PV = ثابت</span> عند ثبات T، وهو قطع زائد."}, {"c": 3, "q": "الصورة الرياضية للقانون الأول (W شغل يبذله النظام) هي:", "o": ["<span class=\"eq\" dir=\"ltr\">ΔU = Q + W</span>", "<span class=\"eq\" dir=\"ltr\">ΔU = Q − W</span>", "<span class=\"eq\" dir=\"ltr\">Q = ΔU − W</span>", "<span class=\"eq\" dir=\"ltr\">ΔU = W − Q</span>"], "a": 1, "e": "الحرارة المعطاة للنظام تساوي الزيادة في طاقته الداخلية مضافًا إليها الشغل الذي يبذله."}, {"c": 3, "q": "نظام امتص <span class=\"eq\" dir=\"ltr\">600 J</span> وبذل شغلًا <span class=\"eq\" dir=\"ltr\">250 J</span>. التغير في طاقته الداخلية:", "o": ["<span class=\"eq\" dir=\"ltr\">850 J</span>", "<span class=\"eq\" dir=\"ltr\">350 J</span>", "<span class=\"eq\" dir=\"ltr\">−350 J</span>", "<span class=\"eq\" dir=\"ltr\">250 J</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">ΔU = 600 − 250 = 350 J</span>"}, {"c": 3, "q": "الطاقة الداخلية لغاز مثالي تعتمد على:", "o": ["الحجم فقط", "الضغط فقط", "درجة الحرارة فقط", "المسار"], "a": 2, "e": "للغاز المثالي U دالة في T فقط، وهي دالة حالة لا تعتمد على المسار."}, {"c": 3, "q": "الإنثالبي H يُعرّف بـ:", "o": ["<span class=\"eq\" dir=\"ltr\">H = U − PV</span>", "<span class=\"eq\" dir=\"ltr\">H = U + PV</span>", "<span class=\"eq\" dir=\"ltr\">H = TS</span>", "<span class=\"eq\" dir=\"ltr\">H = Q − W</span>"], "a": 1, "e": "وتغيره عند ثبات الضغط يساوي الحرارة المتبادلة: ΔH = Q_P."}, {"c": 4, "q": "في عملية بحجم ثابت يكون:", "o": ["W = 0", "Q = 0", "ΔU = 0", "ΔT = 0"], "a": 0, "e": "لا يتغير الحجم فلا يُبذل شغل، وكل الحرارة تغيّر الطاقة الداخلية."}, {"c": 4, "q": "في التمدد متساوي درجة الحرارة لغاز مثالي:", "o": ["Q = 0", "ΔU = 0 و Q = W", "W = 0", "ΔU = Q"], "a": 1, "e": "U ثابتة لثبات T، فالحرارة الممتصة تتحول كلها شغلًا."}, {"c": 4, "q": "معادلة حالة العملية الأديباتية لغاز مثالي:", "o": ["<span class=\"eq\" dir=\"ltr\">PV = ثابت</span>", "<span class=\"eq\" dir=\"ltr\">PV<sup>γ</sup> = ثابت</span>", "<span class=\"eq\" dir=\"ltr\">P/T = ثابت</span>", "<span class=\"eq\" dir=\"ltr\">V/T = ثابت</span>"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">γ = C<sub>p</sub>/C<sub>v</sub></span>."}, {"c": 4, "q": "قيمة γ لغاز أحادي الذرة مثالي:", "o": ["<span class=\"eq\" dir=\"ltr\">1.00</span>", "<span class=\"eq\" dir=\"ltr\">1.30</span>", "<span class=\"eq\" dir=\"ltr\">1.40</span>", "<span class=\"eq\" dir=\"ltr\">1.67</span>"], "a": 3, "e": "<span class=\"eq\" dir=\"ltr\">γ = (5/2)/(3/2) = 5/3 ≈ 1.67</span>"}, {"c": 5, "q": "العملية العكوسة هي التي:", "o": ["تحدث بسرعة كبيرة", "يمكن عكسها بإعادة النظام والمحيط إلى حالتيهما الأصليتين", "يكون فيها احتكاك", "يُنقل فيها الحرارة عبر فرق حرارة كبير"], "a": 1, "e": "تمر العملية العكوسة بحالات اتزان متتالية (شبه ساكنة) دون احتكاك أو فرق حراري محدود."}, {"c": 5, "q": "من أسباب اللاعكوسية الميكانيكية الخارجية:", "o": ["الاحتكاك وتبديد الشغل", "الاتزان الحراري", "العمليات شبه الساكنة", "ثبات الحجم"], "a": 0, "e": "الاحتكاك يحول الشغل إلى حرارة لا يمكن استعادتها كاملة."}, {"c": 5, "q": "في الترمومتر الغازي ثابت الحجم، يلتقي امتداد خطوط P مع t لأي غاز عند:", "o": ["<span class=\"eq\" dir=\"ltr\">0 °C</span>", "<span class=\"eq\" dir=\"ltr\">−100 °C</span>", "<span class=\"eq\" dir=\"ltr\">−273.15 °C</span>", "<span class=\"eq\" dir=\"ltr\">100 °C</span>"], "a": 2, "e": "هذه النقطة هي الصفر المطلق، أساس مقياس كلفن."}, {"c": 5, "q": "تحويل 100 °C إلى كلفن:", "o": ["<span class=\"eq\" dir=\"ltr\">173.15 K</span>", "<span class=\"eq\" dir=\"ltr\">273.15 K</span>", "<span class=\"eq\" dir=\"ltr\">373.15 K</span>", "<span class=\"eq\" dir=\"ltr\">100 K</span>"], "a": 2, "e": "<span class=\"eq\" dir=\"ltr\">T = t + 273.15</span>"}, {"c": 6, "q": "كفاءة محرك كارنو يعمل بين <span class=\"eq\" dir=\"ltr\">600 K</span> و<span class=\"eq\" dir=\"ltr\">300 K</span>:", "o": ["25%", "50%", "75%", "100%"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">e = 1 − T<sub>C</sub>/T<sub>H</sub> = 1 − 300/600 = 0.5</span>"}, {"c": 6, "q": "ينص القانون الثاني (صيغة كلفن-بلانك) على أنه:", "o": ["لا يمكن لمحرك تحويل كل الحرارة الممتصة من مستودع واحد إلى شغل", "تُحفظ الطاقة دائمًا", "الإنتروبي تقل في العمليات الطبيعية", "الحرارة تنتقل من البارد إلى الساخن تلقائيًا"], "a": 0, "e": "لا بد من طرد جزء من الحرارة إلى مستودع بارد."}, {"c": 6, "q": "تتكون دورة كارنو من:", "o": ["عمليتين بحجم ثابت وعمليتين بضغط ثابت", "عمليتين متساويتي الحرارة وعمليتين أديباتيتين", "أربع عمليات أديباتية", "عملية واحدة عكوسة"], "a": 1, "e": "تمدد متساوي الحرارة، ثم تمدد أديباتي، ثم انضغاط متساوي الحرارة، ثم انضغاط أديباتي."}, {"c": 6, "q": "في نظام معزول، الإنتروبي الكلية:", "o": ["تقل دائمًا", "لا تقل أبدًا", "تبقى صفرًا", "تساوي الطاقة"], "a": 1, "e": "تزداد في العمليات غير العكوسة وتبقى ثابتة في العكوسة."}, {"c": 7, "q": "ينص القانون الثالث على أن إنتروبي بلورة مثالية:", "o": ["تساوي صفرًا عند الصفر المطلق", "لا نهائية عند الصفر المطلق", "ثابتة عند كل درجات الحرارة", "تساوي R"], "a": 0, "e": "كما يقرر أنه لا يمكن بلوغ الصفر المطلق بعدد محدود من الخطوات."}, {"c": 7, "q": "دالة جبس تُعرّف بـ:", "o": ["<span class=\"eq\" dir=\"ltr\">G = U − TS</span>", "<span class=\"eq\" dir=\"ltr\">G = H − TS</span>", "<span class=\"eq\" dir=\"ltr\">G = H + TS</span>", "<span class=\"eq\" dir=\"ltr\">G = U + PV</span>"], "a": 1, "e": "و<span class=\"eq\" dir=\"ltr\">F = U − TS</span> دالة هلمهولتز."}, {"c": 7, "q": "عند ثبات الضغط ودرجة الحرارة، يكون الطور المستقر هو الذي:", "o": ["له أكبر G", "له أصغر G", "له أكبر حجم", "له أكبر H"], "a": 1, "e": "النظام يتجه تلقائيًا نحو أدنى قيمة لدالة جبس."}, {"c": 7, "q": "تربط معادلة كلاوزيوس-كلابيرون:", "o": ["الضغط بالحجم", "ميل منحنى ضغط البخار بالحرارة الكامنة", "الكفاءة بدرجتي الحرارة", "الطاقة بالكتلة"], "a": 1, "e": "<span class=\"eq\" dir=\"ltr\">dP/dT = L/(TΔV)</span>، وتقريبها للغاز: <span class=\"eq\" dir=\"ltr\">ln(P₂/P₁) = −(L/R)(1/T₂ − 1/T₁)</span>."}];
+const N=20,PASS=16;
+const $=id=>document.getElementById(id);
+const show=id=>['sIntro','sQuiz','sRes','sCert'].forEach(s=>$(s).classList.toggle('hide',s!==id));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let Q=[],ans=[],k=0,score=0;
+function draw(){ // two per chapter + the rest random
+  const by={};BANK.forEach((x,i)=>{(by[x.c]=by[x.c]||[]).push(i);});
+  let pick=[];Object.values(by).forEach(l=>pick.push(...shuffle(l).slice(0,2)));
+  const rest=shuffle(BANK.map((_,i)=>i).filter(i=>!pick.includes(i)));
+  pick=pick.concat(rest.slice(0,N-pick.length));
+  Q=shuffle(pick).map(i=>{const x=BANK[i],ord=shuffle(x.o.map((_,j)=>j));return {q:x.q,o:ord.map(j=>x.o[j]),a:ord.indexOf(x.a),e:x.e,c:x.c};});
+  ans=Q.map(()=>-1);k=0;
+}
+function rQ(){
+  const it=Q[k];$('qn').textContent='السؤال '+(k+1)+' من '+N+' · الفصل '+it.c;$('barI').style.width=((k+1)/N*100)+'%';
+  $('qt').innerHTML=it.q;const box=$('qo');box.innerHTML='';
+  it.o.forEach((t,j)=>{const b=document.createElement('button');b.className='opt'+(ans[k]===j?' sel':'');b.innerHTML=t;b.onclick=()=>{ans[k]=j;rQ();};box.appendChild(b);});
+  $('prev').disabled=k===0;$('next').disabled=ans[k]<0;$('next').textContent=k===N-1?'أنهِ الاختبار':'التالي';
+}
+function finish(){
+  score=Q.filter((x,i)=>ans[i]===x.a).length;const p=Math.round(score/N*100);
+  $('pct').innerHTML='<span class="eq">'+score+' / '+N+'</span> · <span class="eq">'+p+'%</span>';
+  const ok=score>=PASS;$('msg').textContent=ok?'مبارك! اجتزت الاختبار الختامي.':'لم تبلغ 80% بعد. راجع الأسئلة التي أخطأت فيها ثم أعد المحاولة.';
+  $('passBox').classList.toggle('hide',!ok);$('failBox').classList.toggle('hide',ok);
+  const wr=Q.map((x,i)=>({x,i})).filter(o=>ans[o.i]!==o.x.a);
+  $('review').innerHTML=wr.length?'<p class="muted" style="margin-top:14px">الأسئلة التي أخطأت فيها:</p>'+wr.map(o=>'<div class="rev"><div>'+o.x.q+'</div><div><b>إجابتك:</b> '+o.x.o[ans[o.i]]+'</div><div><span class="ok">الصحيح:</span> '+o.x.o[o.x.a]+'</div><div class="muted">'+o.x.e+'</div></div>').join(''):'';
+  show('sRes');window.scrollTo(0,0);
+}
+$('go').onclick=()=>{draw();rQ();show('sQuiz');};
+$('prev').onclick=()=>{k--;rQ();};
+$('next').onclick=()=>{if(k<N-1){k++;rQ();}else finish();};
+$('again').onclick=()=>{draw();rQ();show('sQuiz');window.scrollTo(0,0);};
+$('back').onclick=()=>show('sRes');
+
+/* ---------- certificate (dark ruby theme) ---------- */
+const TH={"bg": "#2A2A33", "frame": "#E0675F", "accent": "#6FA3DA", "title": "#F2A49E", "text": "#F4F4F7", "muted": "#B5B5C3", "name": "#FFFFFF", "beam": "#C2362F"};
+function mixLine(c,segs,cx,y){const ws=segs.map(s=>{c.direction=s.ltr?'ltr':'rtl';return c.measureText(s.t).width;});const tot=ws.reduce((a,b)=>a+b,0);let x=cx+tot/2;
+  segs.forEach((s,i)=>{x-=ws[i];c.direction=s.ltr?'ltr':'rtl';c.textAlign=s.ltr?'left':'right';c.fillText(s.t,s.ltr?x:x+ws[i],y);});c.direction='rtl';c.textAlign='center';}
+function fitFont(c,txt,weight,size,family,maxW){let s=size;do{c.font=weight+' '+s+'px '+family;s-=2;}while(c.measureText(txt).width>maxW&&s>30);}
+function drawCert(cv,d){const t=TH,W=1600,H=1131;cv.width=W;cv.height=H;const c=cv.getContext('2d');c.direction='rtl';c.textAlign='center';c.textBaseline='middle';
+  const AR="Tajawal, 'IBM Plex Sans Arabic', Tahoma, sans-serif",TT="Amiri, Tajawal, serif";
+  c.fillStyle=t.bg;c.fillRect(0,0,W,H);c.strokeStyle=t.frame;c.lineWidth=6;c.strokeRect(40,40,W-80,H-80);c.strokeStyle=t.accent;c.lineWidth=2;c.strokeRect(58,58,W-116,H-116);
+  c.fillStyle=t.accent;[[58,58],[W-58,58],[58,H-58],[W-58,H-58]].forEach(([x,y])=>{c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();});
+  const cx=W/2;c.fillStyle=t.muted;c.font='400 30px '+AR;c.fillText('المعامل الافتراضية · أ.د. نجم الحصيني',cx,150);
+  c.fillStyle=t.title;c.font='700 104px '+TT;c.fillText('شهادة إنجاز',cx,280);
+  const g=c.createLinearGradient(cx-260,0,cx+260,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,t.beam);g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(cx-260,360,520,5);
+  c.fillStyle=t.text;c.font='400 38px '+AR;c.fillText('تشهد المعامل الافتراضية بأن',cx,450);
+  c.fillStyle=t.name;fitFont(c,d.name,'700',76,AR,1250);c.fillText(d.name,cx,550);c.fillStyle=t.accent;c.fillRect(cx-300,610,600,2);
+  c.fillStyle=t.text;c.font='400 38px '+AR;
+  mixLine(c,[{t:'أتمّ معامل مقرر «الحرارة والديناميكا الحرارية» (\u20662033001-4\u2069)'}],cx,690);
+  mixLine(c,[{t:'واجتاز الاختبار الختامي بنسبة '},{t:d.score+'%',ltr:true}],cx,750);
+  c.font='400 28px '+AR;c.fillStyle=t.muted;const fy=920;c.fillText('التاريخ',W-300,fy);c.fillText('أستاذ المقرر',300,fy);
+  c.fillStyle=t.text;c.font='700 34px '+AR;c.direction='ltr';c.fillText(d.date,W-300,fy+50);c.direction='rtl';c.fillText('أ.د. نجم الحصيني',300,fy+50);
+  c.save();c.translate(cx,955);c.fillStyle=t.accent;c.beginPath();c.arc(0,0,62,0,Math.PI*2);c.fill();c.strokeStyle=t.bg;c.lineWidth=3;c.beginPath();c.arc(0,0,50,0,Math.PI*2);c.stroke();
+  c.lineWidth=9;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-22,2);c.lineTo(-6,18);c.lineTo(24,-16);c.stroke();c.restore();}
+$('mk').onclick=async()=>{
+  const name=$('nm').value.replace(/\s+/g,' ').trim();if(name.length<3){$('nm').focus();return;}
+  $('mk').disabled=true;
+  try{await Promise.race([Promise.all([document.fonts.load("700 76px Tajawal",name),document.fonts.load("400 38px Tajawal","أتم"),document.fonts.load("700 104px Amiri","شهادة")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  const d=new Date(),date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+  drawCert($('cv'),{name,score:Math.round(score/N*100),date});
+  const url=$('cv').toDataURL('image/png');$('certImg').src=url;$('dl').href=url;$('mk').disabled=false;show('sCert');window.scrollTo(0,0);
+};
+</script>
+<script>(function(){document.documentElement.classList.add("vl-solo");function s(){try{parent.postMessage({__vlh:Math.ceil(document.body.getBoundingClientRect().height+24),id:"f2"},"*")}catch(e){}}addEventListener("load",s);addEventListener("click",function(){setTimeout(s,50);setTimeout(s,400)},true);if(window.ResizeObserver)new ResizeObserver(s).observe(document.body||document.documentElement);setInterval(s,1200);s();})()</script></body>
+</html>
